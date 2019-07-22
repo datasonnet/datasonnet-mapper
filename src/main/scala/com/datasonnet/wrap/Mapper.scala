@@ -2,6 +2,8 @@ package com.datasonnet.wrap
 
 import java.io.{PrintWriter, StringWriter}
 
+import com.datasonnet.PortX
+
 import scala.collection.JavaConverters._
 import fastparse.Parsed
 import sjsonnet.Expr.Params
@@ -22,7 +24,7 @@ class Mapper(jsonnet: String, arguments: java.util.Map[String, String]) {
 
   private val libraries = Map(
     "std" -> Lazy(Std.Std),
-    "portx" -> Lazy(Library.Library)
+    "portx" -> Lazy(PortX.Library)
     // "portx" -> Lazy(library("portx"))
   )
   // TODO add our java functions in the same way Std is done (can probably reuse Std utils a bunch, verify)

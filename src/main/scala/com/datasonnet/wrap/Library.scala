@@ -132,12 +132,7 @@ object Library {
       { (expr, scope) => new Evaluator(scala.collection.mutable.Map(), scope, Map(), null, None).visitExpr(expr, scope)}
     )
   }
-  val functions: Seq[(String, Val.Func)] = Seq(
-    builtin("timesfive", "a"){ (wd, extVars, v1: Int) =>
-      v1 * 5
-    }
-  )
-  val Library = Val.Obj(
+  def library(functions: (String, Val.Func)*): Val.Obj = Val.Obj(
     functions
       .map{
         case (k, v) =>
