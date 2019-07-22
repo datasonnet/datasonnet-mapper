@@ -22,6 +22,7 @@ class Mapper(jsonnet: String, arguments: java.util.Map[String, String]) {
 
   private val libraries = Map(
     "std" -> Lazy(Std.Std),
+    "portx" -> Lazy(Library.Library)
     // "portx" -> Lazy(library("portx"))
   )
   // TODO add our java functions in the same way Std is done (can probably reuse Std utils a bunch, verify)

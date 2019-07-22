@@ -22,7 +22,8 @@ public class MapperTest {
     static Stream<String[]> simpleProvider() {
         return Stream.of(
                 new String[] { "function(payload) { \"uid\": payload.user_id }", "{ \"user_id\": 7 }", "{\"uid\":7}"},
-                new String[] { "function(payload) { \"uid\": payload.user_id }", "{ \"user_id\": 8 }", "{\"uid\":8}"}
+                new String[] { "function(payload) { \"uid\": payload.user_id }", "{ \"user_id\": 8 }", "{\"uid\":8}"},
+                new String[] { "function(payload) { \"uid\": portx.timesfive(payload.user_id) }", "{ \"user_id\": 8 }", "{\"uid\":40}"}
                 );
     }
 
