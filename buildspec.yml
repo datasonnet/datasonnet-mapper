@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   parameter-store:
-    ARTIFACTORY_TOKEN: /ci/datasonnet/artifactorytoken
+    ARTIFACTORY_SETTINGS: /ci/datasonnet/artifactorysettings
 
 phases:
   install:
@@ -10,7 +10,8 @@ phases:
       java: openjdk11
   build:
     commands:
-      - echo $ARTIFACTORY_TOKEN | cut -c1-5
+      - echo $ARTIFACTORY_SETTINGS | cut -c1-5
+      - echo $ARTIFACTORY_SETTINGS > /root/.m2/settings.xml
       - |
         case "$CODEBUILD_WEBHOOK_HEAD_REF" in
           refs/heads/*) export VERSIONING_GIT_BRANCH=${CODEBUILD_WEBHOOK_HEAD_REF#refs/heads/} ;;
