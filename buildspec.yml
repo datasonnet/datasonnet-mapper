@@ -1,21 +1,22 @@
 version: 0.2
 
+env:
+  parameter-store:
+    ARTIFACTORY_TOKEN: /ci/datasonnet/artifactorytoken
+
 phases:
   install:
     runtime-versions:
       java: openjdk11
   build:
     commands:
-      - echo $CODEBUILD_WEBHOOK_HEAD_REF
-      - echo $CODEBUILD_SOURCE_VERSION
-      - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
+      - echo $ARTIFACTORY_TOKEN | cut -c1-5
       - |
         case "$CODEBUILD_WEBHOOK_HEAD_REF" in
           refs/heads/*) export VERSIONING_GIT_BRANCH=${CODEBUILD_WEBHOOK_HEAD_REF#refs/heads/} ;;
           refs/tags/*) export VERSIONING_GIT_TAG=${CODEBUILD_WEBHOOK_HEAD_REF#refs/tags/} ;;
         esac
-      - echo $VERSIONING_GIT_BRANCH
-      - echo $VERSIONING_GIT_TAG
+      -
       - mvn --non-recursive exec:exec -Dexec.executable='echo' -Dexec.args='${project.version}' -q
 
 cache:
