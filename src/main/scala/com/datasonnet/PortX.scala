@@ -9,10 +9,7 @@ import com.datasonnet.wrap.Library.library
 
 
 object PortX {
-  val Library = library(
-    builtin("timesfive", "a"){ (wd, extVars, v1: Int) =>
-      v1 * 5
-    },
+  val Time = library(
     builtin0("now"){ (vs, extVars, wd) => Instant.now().toString() },
     builtin("offset", "datetime", "period"){ (wd, extVars, v1: String, v2: String) =>
       // NOTE: DEMO ONLY (in particular, missing proper error handling)

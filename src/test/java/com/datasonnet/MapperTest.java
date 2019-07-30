@@ -26,8 +26,7 @@ public class MapperTest {
         return Stream.of(
                 new String[] { "function(payload) { \"uid\": payload.user_id }", "{ \"user_id\": 7 }", "{\"uid\":7}"},
                 new String[] { "function(payload) { \"uid\": payload.user_id }", "{ \"user_id\": 8 }", "{\"uid\":8}"},
-                new String[] { "function(payload) { \"uid\": portx.timesfive(payload.user_id) }", "{ \"user_id\": 8 }", "{\"uid\":40}"},
-                new String[] { "function(payload) portx.offset(\"2019-07-22T21:00:00Z\", \"P1Y1D\")", "{}", "\"2020-07-23T21:00:00Z\""}
+                new String[] { "function(payload) portx.time.offset(\"2019-07-22T21:00:00Z\", \"P1Y1D\")", "{}", "\"2020-07-23T21:00:00Z\""}
                 );
     }
 
@@ -51,7 +50,7 @@ public class MapperTest {
     void nowIsNow() {
         Instant before = Instant.now();
 
-        Mapper mapper = new Mapper("function(payload) portx.now()", new HashMap<>());
+        Mapper mapper = new Mapper("function(payload) portx.time.now()", new HashMap<>());
         // getting rid of quotes so the Instant parser works
         Instant mapped = Instant.parse(mapper.transform("{}").replaceAll("\"", ""));
 
