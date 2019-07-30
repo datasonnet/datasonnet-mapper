@@ -14,3 +14,6 @@ Tags that start with `v` will be published with whatever the exact tag is (witho
 To make a release where the SNAPSHOT version is `X.Y.Z-SNAPSHOT`
     - tag the commit being released with `vX.Y.Z` and push.
     - update the POM version to the next SNAPSHOT release by ticking one of the version numbers and make a PR into the main branch.
+
+If a build fails, make a new push, which will trigger the new build with the necessary version information. If a
+tagged build fails, tick the patch version into a new tag and push that to trigger the new build.
