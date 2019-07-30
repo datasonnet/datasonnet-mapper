@@ -104,5 +104,18 @@
         </dependency>
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>portx-repository-releases</id>
+            <name>PortX Releases Repository</name>
+            <url>https://portx.jfrog.io/portx/portx-releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>portx-repository-snapshots</id>
+            <name>PortX Snapshots Repository</name>
+            <url>https://portx.jfrog.io/portx/portx-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 
 </project>

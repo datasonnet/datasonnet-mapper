@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+      - echo webhook ref
+      - echo $CODEBUILD_WEBHOOK_HEAD_REF
+      - echo source version
+      - echo $CODEBUILD_SOURCE_VERSION
+      - echo resolved
+      - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
+      - echo git ref
+      - git symbolic-ref HEAD --short || true
+      - echo git describe
+      - git describe --tags --exact-match || true
+      - echo maven
+      - mvn --non-recursive exec:exec -Dexec.executable='echo' -Dexec.args='${project.version}' -q
+
+cache:
+  paths:
+    - '/root/.m2/**/*'
