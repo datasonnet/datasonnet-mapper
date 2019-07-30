@@ -10,9 +10,9 @@ phases:
       - echo $CODEBUILD_SOURCE_VERSION
       - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
       - |
-        if [[ "$CODEBUILD_WEBHOOK_HEAD_REF" = refs/heads/feature/* ]]; then
-            export VERSIONING_GIT_BRANCH=${CODEBUILD_WEBHOOK_HEAD_REF#refs/heads/feature/};
-        fi
+        case "$CODEBUILD_WEBHOOK_HEAD_REF" in
+          refs/heads/feature/*) export VERSIONING_GIT_BRANCH=${CODEBUILD_WEBHOOK_HEAD_REF#refs/heads/feature/} ;;
+        esac
       - echo $VERSIONING_GIT_BRANCH
       - mvn --non-recursive exec:exec -Dexec.executable='echo' -Dexec.args='${project.version}' -q
 
