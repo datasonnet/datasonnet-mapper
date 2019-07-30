@@ -4,7 +4,7 @@
         <versionFormat>${version}</versionFormat>
     </branch>
     <branch>
-         <pattern><![CDATA[feature/(?<feature>.+)]]></pattern>
+         <pattern><![CDATA[(?<feature>.+)]]></pattern>
          <versionFormat>${feature}-SNAPSHOT</versionFormat>
      </branch>
     <tag>
@@ -12,6 +12,6 @@
         <versionFormat>${tagVersion}</versionFormat>
     </tag>
     <commit>
-        <versionFormat>commit-${commit.short}</versionFormat>
+        <versionFormat>commit-${commit.short}-SNAPSHOT</versionFormat>
     </commit>
 </gitVersioning>
