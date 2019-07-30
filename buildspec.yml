@@ -1,0 +1,27 @@
+version: 0.2
+
+env:
+  parameter-store:
+    ARTIFACTORY_SETTINGS: /ci/datasonnet/artifactorysettings
+
+phases:
+  install:
+    runtime-versions:
+      java: openjdk11
+  build:
+    commands:
+      - echo $ARTIFACTORY_SETTINGS > /root/.m2/settings.xml
+      - |
+        case "$CODEBUILD_WEBHOOK_HEAD_REF" in
+          refs/heads/*) export VERSIONING_GIT_BRANCH=${CODEBUILD_WEBHOOK_HEAD_REF#refs/heads/} ;;
+          refs/tags/*) export VERSIONING_GIT_TAG=${CODEBUILD_WEBHOOK_HEAD_REF#refs/tags/} ;;
+        esac
+      - mvn --non-recursive exec:exec -Dexec.executable='echo' -Dexec.args='${project.version}' -q
+      - mvn test
+  post_build:
+    commands:
+      - mvn deploy
+
+cache:
+  paths:
+    - '/root/.m2/**/*'

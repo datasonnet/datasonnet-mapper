@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.portx</groupId>
-    <artifactId>jsonnetfunc</artifactId>
+    <groupId>com.datasonnet</groupId>
+    <artifactId>datasonnet-library</artifactId>
     <version>1.0-SNAPSHOT</version>
     <build>
         <pluginManagement>
@@ -103,6 +103,19 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>portx-repository-releases</id>
+            <name>PortX Releases Repository</name>
+            <url>https://portx.jfrog.io/portx/portx-releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>portx-repository-snapshots</id>
+            <name>PortX Snapshots Repository</name>
+            <url>https://portx.jfrog.io/portx/portx-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 
 </project>
