@@ -14,7 +14,7 @@ phases:
           refs/heads/feature/*) export VERSIONING_GIT_BRANCH=${CODEBUILD_WEBHOOK_HEAD_REF#refs/heads/feature/} ;;
         esac
       - echo $VERSIONING_GIT_BRANCH
-      - mvn --non-recursive exec:exec -Dexec.executable='echo' -Dexec.args='${project.version}' -q
+      - mvn --non-recursive exec:exec -Dexec.executable='echo' -Dgit.branch=$VERSIONING_GIT_BRANCH -Dexec.args='${project.version}' -q
 
 cache:
   paths:
