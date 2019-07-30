@@ -6,6 +6,7 @@ import com.datasonnet.PortX
 
 import scala.collection.JavaConverters._
 import fastparse.Parsed
+import sjsonnet.Expr.Member.Visibility
 import sjsonnet.Expr.Params
 import sjsonnet._
 
@@ -22,11 +23,27 @@ class Mapper(jsonnet: String, arguments: java.util.Map[String, String]) {
 //
 //  }
 
+  private val portx = Map(
+    "time" -> PortX.Time
+  )
+
   private val libraries = Map(
     "std" -> Lazy(Std.Std),
-    "portx" -> Lazy(PortX.Library)
-    // "portx" -> Lazy(library("portx"))
-  )
+    "portx" -> Lazy(Val.Obj(portx.map {
+        case (k, v) =>
+          (
+            k,
+            Val.Obj.Member(
+              false,
+              Visibility.Hidden,
+              (self: Val.Obj, sup: Option[Val.Obj], _) => Lazy(v)
+            )
+          )
+      }.toMap,
+      _ => (),
+      None
+    )
+  ))
   // TODO add our java functions in the same way Std is done (can probably reuse Std utils a bunch, verify)
   private val scope = new Scope(None, None, None, libraries, os.pwd / "(memory)", os.pwd , List(), None)
 
