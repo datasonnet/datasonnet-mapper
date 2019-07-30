@@ -6,17 +6,14 @@ phases:
       java: openjdk11
   build:
     commands:
-      - echo webhook ref
       - echo $CODEBUILD_WEBHOOK_HEAD_REF
-      - echo source version
       - echo $CODEBUILD_SOURCE_VERSION
-      - echo resolved
       - echo $CODEBUILD_RESOLVED_SOURCE_VERSION
-      - echo git ref
-      - git symbolic-ref HEAD --short || true
-      - echo git describe
-      - git describe --tags --exact-match || true
-      - echo maven
+      - |
+        if [[ "$CODEBUILD_WEBHOOK_HEAD_REF" = refs/heads/feature/* ]]; then
+            export VERSIONING_GIT_BRANCH=${CODEBUILD_WEBHOOK_HEAD_REF#refs/heads/feature/};
+        fi
+      - echo $VERSIONING_GIT_BRANCH
       - mvn --non-recursive exec:exec -Dexec.executable='echo' -Dexec.args='${project.version}' -q
 
 cache:
