@@ -12,6 +12,6 @@
         <versionFormat>${tagVersion}</versionFormat>
     </tag>
     <commit>
-        <versionFormat>${commit.short}</versionFormat>
+        <versionFormat>commit-${commit.short}</versionFormat>
     </commit>
 </gitVersioning>
