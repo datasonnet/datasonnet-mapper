@@ -109,6 +109,13 @@ object Library {
     val Seq(v1: T1, v2: T2, v3: T3) = validate(vs, extVars, wd, Seq(implicitly[ReadWriter[T1]], implicitly[ReadWriter[T2]], implicitly[ReadWriter[T3]]))
     eval(wd, extVars, v1, v2, v3)
   }
+
+  def builtin[R: ReadWriter, T1: ReadWriter, T2: ReadWriter, T3: ReadWriter, T4: ReadWriter](name: String, p1: String, p2: String, p3: String, p4: String)
+                                                                            (eval:  (os.Path, Map[String, ujson.Value], T1, T2, T3, T4) => R): (String, Val.Func) = builtin0(name, p1, p2, p3, p4){ (vs, extVars, wd) =>
+    val Seq(v1: T1, v2: T2, v3: T3, v4: T4) = validate(vs, extVars, wd, Seq(implicitly[ReadWriter[T1]], implicitly[ReadWriter[T2]], implicitly[ReadWriter[T3]], implicitly[ReadWriter[T4]]))
+    eval(wd, extVars, v1, v2, v3, v4)
+  }
+  
   def builtin0[R: ReadWriter](name: String, params: String*)(eval: (Seq[Val], Map[String, ujson.Value], os.Path) => R) = {
     name -> Val.Func(
       empty,
