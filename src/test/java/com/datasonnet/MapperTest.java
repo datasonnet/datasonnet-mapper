@@ -2,6 +2,7 @@ package com.datasonnet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.datasonnet.wrap.Mapper;
 import org.junit.jupiter.api.Test;
@@ -58,6 +59,37 @@ public class MapperTest {
 
         assertTrue(before.compareTo(mapped) <= 0);
         assertTrue(after.compareTo(mapped) >= 0);
+    }
+
+    @Test
+    void parseErrorLineNumber() {
+        try {
+            Mapper mapper = new Mapper("function(payload) portx.time.now() a", new HashMap<>());
+            fail("Must fail to parse");
+        } catch(IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("Expected end-of-input at line 1 column 36"), "Found message: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void noTopLevelFunction() {
+        try {
+            Mapper mapper = new Mapper("{}", new HashMap<>());
+            fail("Must fail to execute");
+        } catch(IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("Top Level Function"), "Found message: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void executeErrorLineNumber() {
+        try {
+            Mapper mapper = new Mapper("function(payload) payload.foo", new HashMap<>());
+            mapper.transform("{}");
+            fail("Must fail to execute");
+        } catch(IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("at line 1 column 26"), "Found message: " + e.getMessage());
+        }
     }
 
 }

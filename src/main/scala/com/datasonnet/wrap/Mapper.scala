@@ -5,12 +5,13 @@ import java.io.{PrintWriter, StringWriter}
 import com.datasonnet.PortX
 
 import scala.collection.JavaConverters._
-import fastparse.Parsed
+import fastparse.{IndexedParserInput, Parsed}
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet.Expr.Params
 import sjsonnet._
 
 import scala.io.Source
+
 
 
 class Mapper(jsonnet: String, arguments: java.util.Map[String, String]) {
@@ -53,10 +54,13 @@ class Mapper(jsonnet: String, arguments: java.util.Map[String, String]) {
       ujson.read(value) // not sure how to handle errors here
     }
 
+  def expandParseErrorLineNumber(error: String): String =
+    error.replaceFirst("([a-zA-Z-]):(\\d+):(\\d+)", "$1 at line $2 column $3")
+
 
   private val function = (for {
     parsed <- parseCache.getOrElseUpdate(jsonnet, fastparse.parse(jsonnet, Parser.document(_))) match {
-      case f @ Parsed.Failure(l, i, e) => throw new IllegalArgumentException("Parse error: " + f.trace().msg)
+      case f @ Parsed.Failure(l, i, e) => throw new IllegalArgumentException("Problem parsing map: " + expandParseErrorLineNumber(f.trace().msg))
       case Parsed.Success(r, index) => Some(r)
     }
     evaluated <-
@@ -66,13 +70,22 @@ class Mapper(jsonnet: String, arguments: java.util.Map[String, String]) {
         val p = new PrintWriter(s)
         e.printStackTrace(p)
         p.close()
-        throw new IllegalArgumentException("Problem evaluating map: " + s.toString.replace("\t", "    "))
+        // as far as I can tell this is impossible if it parses unless there's some unexpected internal error
+        throw new IllegalArgumentException("Please contact the developers with this error! Problem compiling map: " + s.toString.replace("\t", "    "))
       }
     verified <- evaluated match {
       case f: Val.Func => Some(f) // TODO check for at least one argument
       case _ => throw new IllegalArgumentException("Not a valid map. Maps must have a Top Level Function.")
     }
   } yield verified).get
+
+  private val mapIndex = new IndexedParserInput(jsonnet);
+
+  private val offset = raw"\.\(\(memory\) offset::(\d+)\)".r
+
+  def expandExecuteErrorLineNumber(error: String): String = offset.replaceAllIn(error, _ match {
+    case offset(position) => { val Array(line, column) = mapIndex.prettyIndex(position.toInt).split(":"); s"line $line column $column" }
+  })
 
   def transform(payload: String): String = {
 
@@ -88,15 +101,17 @@ class Mapper(jsonnet: String, arguments: java.util.Map[String, String]) {
     } .toList
 
 
+
+
     val materialized = try Materializer(function.copy(params = Params(firstMaterialized :: values)), Map(), os.pwd)
     catch {
-      case DelegateError(msg) => throw new IllegalArgumentException("Problem executing map: " + msg)
+      case DelegateError(msg) => throw new IllegalArgumentException("Problem executing map: " + expandExecuteErrorLineNumber(msg))
       case e: Throwable =>
         val s = new StringWriter()
         val p = new PrintWriter(s)
         e.printStackTrace(p)
         p.close()
-        throw new IllegalArgumentException("Problem executing map: " + s.toString.replace("\t", "    "))
+        throw new IllegalArgumentException("Problem executing map: " + expandExecuteErrorLineNumber(s.toString).replace("\t", "    "))
     }
 
     materialized.toString()
