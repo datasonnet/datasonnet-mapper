@@ -4,14 +4,14 @@
         <versionFormat>${version}</versionFormat>
     </branch>
     <branch>
-         <pattern><![CDATA[(?<feature>.+)]]></pattern>
-         <versionFormat>${feature}-SNAPSHOT</versionFormat>
-     </branch>
+        <pattern><![CDATA[(?<feature>.+)]]></pattern>
+        <versionFormat>${version.release}-${feature}-SNAPSHOT</versionFormat>
+    </branch>
     <tag>
         <pattern><![CDATA[v(?<tagVersion>[0-9].*)]]></pattern>
         <versionFormat>${tagVersion}</versionFormat>
     </tag>
     <commit>
-        <versionFormat>commit-${commit.short}-SNAPSHOT</versionFormat>
+        <versionFormat>${version.release}-commit-${commit.short}-SNAPSHOT</versionFormat>
     </commit>
 </gitVersioning>
