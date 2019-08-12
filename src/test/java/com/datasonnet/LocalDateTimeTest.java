@@ -14,7 +14,7 @@ public class LocalDateTimeTest {
 
     @Test
     void testOffset() {
-        Mapper mapper = new Mapper("function(payload) PortX.LocalDateTime.offset(\"2019-07-22T21:00:00\", \"P1Y1D\")", new HashMap<>());
+        Mapper mapper = new Mapper("PortX.LocalDateTime.offset(\"2019-07-22T21:00:00\", \"P1Y1D\")", new HashMap<>(), true);
         String offsetDate = mapper.transform("{}").replaceAll("\"", "");
         assertTrue("2020-07-23T21:00:00".equals(offsetDate));
 //        System.out.println("Offset date is " + offsetDate);
@@ -24,7 +24,7 @@ public class LocalDateTimeTest {
     void testNow() {
         Instant before = Instant.now();
 
-        Mapper mapper = new Mapper("function(payload) PortX.LocalDateTime.now()", new HashMap<>());
+        Mapper mapper = new Mapper("PortX.LocalDateTime.now()", new HashMap<>(), true);
         // getting rid of quotes so the Instant parser works
         String mapped = mapper.transform("{}").replaceAll("\"", "");
         String today = java.time.LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
@@ -37,7 +37,7 @@ public class LocalDateTimeTest {
 
     @Test
     void testFormat() {
-        Mapper mapper = new Mapper("function(payload) PortX.LocalDateTime.format(\"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\", \"d MMM uuuu\")", new HashMap<>());
+        Mapper mapper = new Mapper("PortX.LocalDateTime.format(\"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\", \"d MMM uuuu\")", new HashMap<>(), true);
         String formattedDate = mapper.transform("{}").replaceAll("\"", "");
         //System.out.println("Formatted date is " + formattedDate);
         assertTrue("4 Jul 2019".equals(formattedDate));
@@ -45,7 +45,7 @@ public class LocalDateTimeTest {
 
     @Test
     void testCompare() {
-        Mapper mapper = new Mapper("function(payload) PortX.LocalDateTime.compare(\"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\", \"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\")", new HashMap<>());
+        Mapper mapper = new Mapper("PortX.LocalDateTime.compare(\"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\", \"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\")", new HashMap<>(), true);
         String compareResult = mapper.transform("{}").replaceAll("\"", "");
         //System.out.println("Formatted date is " + formattedDate);
         assertTrue("0".equals(compareResult));

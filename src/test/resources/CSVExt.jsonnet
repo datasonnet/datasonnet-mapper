@@ -1,4 +1,3 @@
-function(payload)
 local csvFile = std.parseJson(PortX.CSV.readExt(payload, false, "'", "|", "\\", "\\n"));
 {
     fName: csvFile[0][0],

@@ -20,7 +20,7 @@ public class CSVMapperTest {
     void testCSVReader() throws URISyntaxException, IOException {
         String jsonData = "\"" + StringEscapeUtils.escapeJson(readFileAsString("test.csv")) + "\"";
 
-        Mapper mapper = new Mapper("function(payload) local csvInput = std.parseJson(PortX.CSV.read(payload)); { fName: csvInput[0][\"First Name\"] }", new HashMap<>());
+        Mapper mapper = new Mapper("local csvInput = std.parseJson(PortX.CSV.read(payload)); { fName: csvInput[0][\"First Name\"] }", new HashMap<>(), true);
         String mappedJson = mapper.transform(jsonData);//.replaceAll("\\\"", "\"");
 
         assertEquals("{\"fName\":\"Eugene\"}", mappedJson);
@@ -31,7 +31,7 @@ public class CSVMapperTest {
         String jsonData = "\"" + StringEscapeUtils.escapeJson(readFileAsString("test2.csv")) + "\"";
         String jsonnet = readFileAsString("CSVExt.jsonnet");
 
-        Mapper mapper = new Mapper(jsonnet, new HashMap<>());
+        Mapper mapper = new Mapper(jsonnet, new HashMap<>(), true);
         String mappedJson = mapper.transform(jsonData);
 
         assertEquals("{\"fName\":\"Eugene\",\"num\":\"234\"}", mappedJson);
