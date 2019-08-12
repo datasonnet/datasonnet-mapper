@@ -115,7 +115,19 @@ object Library {
     val Seq(v1: T1, v2: T2, v3: T3, v4: T4) = validate(vs, extVars, wd, Seq(implicitly[ReadWriter[T1]], implicitly[ReadWriter[T2]], implicitly[ReadWriter[T3]], implicitly[ReadWriter[T4]]))
     eval(wd, extVars, v1, v2, v3, v4)
   }
-  
+
+  def builtin[R: ReadWriter, T1: ReadWriter, T2: ReadWriter, T3: ReadWriter, T4: ReadWriter, T5: ReadWriter](name: String, p1: String, p2: String, p3: String, p4: String, p5: String)
+                                                                                            (eval:  (os.Path, Map[String, ujson.Value], T1, T2, T3, T4, T5) => R): (String, Val.Func) = builtin0(name, p1, p2, p3, p4, p5){ (vs, extVars, wd) =>
+    val Seq(v1: T1, v2: T2, v3: T3, v4: T4, v5: T5) = validate(vs, extVars, wd, Seq(implicitly[ReadWriter[T1]], implicitly[ReadWriter[T2]], implicitly[ReadWriter[T3]], implicitly[ReadWriter[T4]], implicitly[ReadWriter[T5]]))
+    eval(wd, extVars, v1, v2, v3, v4, v5)
+  }
+
+  def builtin[R: ReadWriter, T1: ReadWriter, T2: ReadWriter, T3: ReadWriter, T4: ReadWriter, T5: ReadWriter, T6: ReadWriter](name: String, p1: String, p2: String, p3: String, p4: String, p5: String, p6: String)
+                                                                                                            (eval:  (os.Path, Map[String, ujson.Value], T1, T2, T3, T4, T5, T6) => R): (String, Val.Func) = builtin0(name, p1, p2, p3, p4, p5, p6){ (vs, extVars, wd) =>
+    val Seq(v1: T1, v2: T2, v3: T3, v4: T4, v5: T5, v6: T6) = validate(vs, extVars, wd, Seq(implicitly[ReadWriter[T1]], implicitly[ReadWriter[T2]], implicitly[ReadWriter[T3]], implicitly[ReadWriter[T4]], implicitly[ReadWriter[T5]], implicitly[ReadWriter[T6]]))
+    eval(wd, extVars, v1, v2, v3, v4, v5, v6)
+  }
+
   def builtin0[R: ReadWriter](name: String, params: String*)(eval: (Seq[Val], Map[String, ujson.Value], os.Path) => R) = {
     name -> Val.Func(
       empty,

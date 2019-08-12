@@ -25,12 +25,16 @@ class Mapper(jsonnet: String, arguments: java.util.Map[String, String]) {
 //  }
 
   private val portx = Map(
-    "time" -> PortX.Time
+//    "Time" -> PortX.Time,
+    "ZonedDateTime" -> PortX.ZonedDateTime,
+    "LocalDateTime" -> PortX.LocalDateTime,
+    "CSV" -> PortX.CSV,
+    "Crypto" -> PortX.Crypto
   )
 
   private val libraries = Map(
     "std" -> Lazy(Std.Std),
-    "portx" -> Lazy(Val.Obj(portx.map {
+    "PortX" -> Lazy(Val.Obj(portx.map {
         case (k, v) =>
           (
             k,
