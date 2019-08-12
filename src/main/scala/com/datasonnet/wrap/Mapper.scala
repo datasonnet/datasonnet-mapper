@@ -1,20 +1,41 @@
 package com.datasonnet.wrap
 
-import java.io.{PrintWriter, StringWriter}
+import java.io.{File, PrintWriter, StringWriter}
+import java.util
 
 import com.datasonnet.PortX
 
 import scala.collection.JavaConverters._
 import fastparse.{IndexedParserInput, Parsed}
+import os.Path
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet.Expr.Params
 import sjsonnet._
 
 import scala.io.Source
 
+object Mapper {
+  def wrap(jsonnet: String, arguments: util.Map[String, String])=
+    (Seq("payload") ++ arguments.asScala.keys).mkString("function(", ",", ")\n") + jsonnet
+}
 
 
 class Mapper(jsonnet: String, arguments: java.util.Map[String, String]) {
+
+  var wrapped = false;  // for use when setting line numbers
+  def lineOffset = if (wrapped) 1 else 0
+
+
+
+  def this(jsonnet: String, arguments: java.util.Map[String, String], needsWrapper: Boolean) {
+    this(if (needsWrapper) Mapper.wrap(jsonnet, arguments) else jsonnet, arguments)
+    wrapped = needsWrapper
+  }
+
+  def this(jsonnet: File, arguments: java.util.Map[String, String]) =
+    this(os.read(Path(jsonnet.getAbsoluteFile())), arguments)
+  def this(jsonnet: File, arguments: java.util.Map[String, String], needsWrapper: Boolean) =
+    this(os.read(Path(jsonnet.getAbsoluteFile())), arguments, needsWrapper)
 
   private val parseCache = collection.mutable.Map[String, fastparse.Parsed[Expr]]()
 
@@ -88,7 +109,10 @@ class Mapper(jsonnet: String, arguments: java.util.Map[String, String]) {
   private val offset = raw"\.\(\(memory\) offset::(\d+)\)".r
 
   def expandExecuteErrorLineNumber(error: String): String = offset.replaceAllIn(error, _ match {
-    case offset(position) => { val Array(line, column) = mapIndex.prettyIndex(position.toInt).split(":"); s"line $line column $column" }
+    case offset(position) => {
+      val Array(line, column) = mapIndex.prettyIndex(position.toInt).split(":")
+      s"line ${line.toInt - lineOffset} column $column"
+    }
   })
 
   def transform(payload: String): String = {

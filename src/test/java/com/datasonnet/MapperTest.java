@@ -77,4 +77,15 @@ public class MapperTest {
             assertTrue(e.getMessage().contains("at line 1 column 26"), "Found message: " + e.getMessage());
         }
     }
+
+    @Test
+    void executeErrorLineNumberWhenWrapped() {
+        try {
+            Mapper mapper = new Mapper("payload.foo", new HashMap<>(), true);
+            mapper.transform("{}");
+            fail("Must fail to execute");
+        } catch(IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("at line 1 column 8"), "Found message: " + e.getMessage());
+        }
+    }
 }
