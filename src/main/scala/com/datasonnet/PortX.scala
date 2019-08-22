@@ -6,6 +6,7 @@ import java.time.{Instant, Period, ZoneId, ZoneOffset, ZonedDateTime}
 import com.datasonnet.wrap.Library.builtin
 import com.datasonnet.wrap.Library.builtin0
 import com.datasonnet.wrap.Library.library
+import sjsonnet.{Materializer, Val}
 
 /*
 ZonedDateTime
@@ -104,12 +105,20 @@ object PortX {
   val CSV = library(
     builtin("read", "csvFile") {
       (wd, extVars, csvFile: String) =>
-        com.datasonnet.portx.CSVReader.readCSV(csvFile)
+        Materializer.reverse(ujson.read(com.datasonnet.portx.CSVReader.readCSV(csvFile)))
     },
     builtin("readExt", "csvFile", "useHeader", "quote", "separator", "escape", "newLine") {
       (wd, extVars, csvFile: String, useHeader: Boolean, quote: String, separator: String, escape: String, newLine: String) =>
-        com.datasonnet.portx.CSVReader.readCSV(csvFile, useHeader, quote, separator, escape, newLine)
-    }
+        Materializer.reverse(ujson.read(com.datasonnet.portx.CSVReader.readCSV(csvFile, useHeader, quote, separator, escape, newLine)))
+    },
+    builtin("write", "jsonArray") {
+      (wd, extVars, jsonArray: Val) =>
+        com.datasonnet.portx.CSVWriter.writeCSV(ujson.write(Materializer.apply(jsonArray, extVars, wd)))
+    },
+    builtin("writeExt", "jsonArray", "useHeader", "quote", "separator", "escape", "newLine") {
+      (wd, extVars, jsonArray: Val, useHeader: Boolean, quote: String, separator: String, escape: String, newLine: String) =>
+        com.datasonnet.portx.CSVWriter.writeCSV(ujson.write(Materializer.apply(jsonArray, extVars, wd)), useHeader, quote, separator, escape, newLine)
+    },
   )
 
   val Crypto = library(
