@@ -1,0 +1,1 @@
+* xref:intellij:ROOT:index.adoc[IntelliJ Plugin]

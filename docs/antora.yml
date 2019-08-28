@@ -1,4 +1,7 @@
 name: datasonnet
 title: DataSonnet
-version: '1.0.0-beta'
+version: '1.0-SNAPSHOT'
 start_page: ROOT:index.adoc
+nav:
+- modules/ROOT/nav.adoc
+- modules/ROOT/nav-intellij.adoc
