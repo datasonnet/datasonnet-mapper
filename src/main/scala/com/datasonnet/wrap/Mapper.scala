@@ -12,46 +12,75 @@ import sjsonnet.Expr.Member.Visibility
 import sjsonnet.Expr.Params
 import sjsonnet._
 
+import scala.io.Source
+import scala.util.{Failure, Success, Try}
+
 object Mapper {
   def wrap(jsonnet: String, arguments: util.Map[String, String])=
     (Seq("payload") ++ arguments.asScala.keys).mkString("function(", ",", ")\n") + jsonnet
+
+  def expandParseErrorLineNumber(error: String): String =
+    error.replaceFirst("([a-zA-Z-]):(\\d+):(\\d+)", "$1 at line $2 column $3")
+
+  def evaluate(cache: collection.mutable.Map[String, fastparse.Parsed[Expr]], scope: Scope, jsonnet: String): Try[Val] = {
+    val evaluator = new NoFileEvaluator(cache, scope)
+
+    for {
+      parsed <- cache.getOrElseUpdate(jsonnet, fastparse.parse(jsonnet, Parser.document(_))) match {
+        case f @ Parsed.Failure(l, i, e) => Failure(new IllegalArgumentException("Problem parsing: " + expandParseErrorLineNumber(f.trace().msg)))
+        case Parsed.Success(r, index) => Success(r)
+      }
+      evaluated <-
+        try Success(evaluator.visitExpr(parsed, scope))
+        catch { case e: Throwable =>
+          val s = new StringWriter()
+          val p = new PrintWriter(s)
+          e.printStackTrace(p)
+          p.close()
+          Failure(new IllegalArgumentException("Please contact the developers with this error! Problem compiling: " + s.toString.replace("\t", "    ")))
+        }
+    } yield evaluated
+  }
+
+  def scope(libraries: Map[String, Lazy]) = new Scope(None, None, None, libraries, os.pwd / "(memory)", os.pwd, List(), None)
+
+  def library(libraries: Map[String, Lazy], cache: collection.mutable.Map[String, fastparse.Parsed[Expr]], name: String): (String, Val) = {
+    val jsonnetLibrarySource = Source.fromURL(getClass.getResource(s"/$name.libsonnet")).mkString
+    val jsonnetLibrary = Mapper.evaluate(cache, scope(libraries), jsonnetLibrarySource).get
+    (name -> jsonnetLibrary)
+  }
 }
 
 
-class Mapper(jsonnet: String, arguments: java.util.Map[String, String]) {
+class Mapper(var jsonnet: String, arguments: java.util.Map[String, String], needsWrapper: Boolean) {
 
-  var wrapped = false;  // for use when setting line numbers
-  def lineOffset = if (wrapped) 1 else 0
-
-
-
-  def this(jsonnet: String, arguments: java.util.Map[String, String], needsWrapper: Boolean) {
-    this(if (needsWrapper) Mapper.wrap(jsonnet, arguments) else jsonnet, arguments)
-    wrapped = needsWrapper
+  if(needsWrapper) {
+    jsonnet = Mapper.wrap(jsonnet, arguments)
   }
 
-  def this(jsonnet: File, arguments: java.util.Map[String, String]) =
-    this(os.read(Path(jsonnet.getAbsoluteFile())), arguments)
-  def this(jsonnet: File, arguments: java.util.Map[String, String], needsWrapper: Boolean) =
+  def lineOffset = if (needsWrapper) 1 else 0
+
+
+  def this(jsonnet: File, arguments: util.Map[String, String], needsWrapper: Boolean) =
     this(os.read(Path(jsonnet.getAbsoluteFile())), arguments, needsWrapper)
 
-  private val parseCache = collection.mutable.Map[String, fastparse.Parsed[Expr]]()
+  private val parseCache = collection.mutable.Map[String, Parsed[Expr]]()
 
-  // TODO finish this. Might need a first evaluator; not sure how best to do that
-//  private def library(name: String): Val = {
-//    val resource = Source.fromResource(s"/$name.libsonnet").mkString
-//
-//  }
+  private val standardLibrary = Map(
+    "std" -> Lazy(Std.Std)
+  )
 
-  private val portx = Map(
-//    "Time" -> PortX.Time,
+  private var portx: Map[String, Val] = Map(
     "ZonedDateTime" -> PortX.ZonedDateTime,
     "LocalDateTime" -> PortX.LocalDateTime,
     "CSV" -> PortX.CSV,
     "Crypto" -> PortX.Crypto
   )
 
-  private val libraries = Map(
+  portx = portx + Mapper.library(standardLibrary, parseCache, "Util")
+
+
+  private var libraries = Map(
     "std" -> Lazy(Std.Std),
     "PortX" -> Lazy(Val.Obj(portx.map {
         case (k, v) =>
@@ -68,39 +97,18 @@ class Mapper(jsonnet: String, arguments: java.util.Map[String, String]) {
       None
     )
   ))
-  // TODO add our java functions in the same way Std is done (can probably reuse Std utils a bunch, verify)
-  private val scope = new Scope(None, None, None, libraries, os.pwd / "(memory)", os.pwd , List(), None)
 
-  private val evaluator = new NoFileEvaluator(parseCache, scope)
+  private val scope = Mapper.scope(libraries)
 
-  private val parsedArguments = arguments.asScala.mapValues { (value) =>
-      ujson.read(value) // not sure how to handle errors here
-    }
-
-  def expandParseErrorLineNumber(error: String): String =
-    error.replaceFirst("([a-zA-Z-]):(\\d+):(\\d+)", "$1 at line $2 column $3")
-
-
+  
   private val function = (for {
-    parsed <- parseCache.getOrElseUpdate(jsonnet, fastparse.parse(jsonnet, Parser.document(_))) match {
-      case f @ Parsed.Failure(l, i, e) => throw new IllegalArgumentException("Problem parsing map: " + expandParseErrorLineNumber(f.trace().msg))
-      case Parsed.Success(r, index) => Some(r)
-    }
-    evaluated <-
-      try Some(evaluator.visitExpr(parsed, scope))
-      catch { case e: Throwable =>
-        val s = new StringWriter()
-        val p = new PrintWriter(s)
-        e.printStackTrace(p)
-        p.close()
-        // as far as I can tell this is impossible if it parses unless there's some unexpected internal error
-        throw new IllegalArgumentException("Please contact the developers with this error! Problem compiling map: " + s.toString.replace("\t", "    "))
-      }
+    evaluated <- Mapper.evaluate(parseCache, scope, jsonnet)
     verified <- evaluated match {
-      case f: Val.Func => Some(f) // TODO check for at least one argument
-      case _ => throw new IllegalArgumentException("Not a valid map. Maps must have a Top Level Function.")
+      case f: Val.Func => Success(f) // TODO check for at least one argument
+      case _ => Failure(new IllegalArgumentException("Not a valid map. Maps must have a Top Level Function."))
     }
   } yield verified).get
+
 
   private val mapIndex = new IndexedParserInput(jsonnet);
 
@@ -112,6 +120,10 @@ class Mapper(jsonnet: String, arguments: java.util.Map[String, String]) {
       s"line ${line.toInt - lineOffset} column $column"
     }
   })
+
+  private val parsedArguments = arguments.asScala.view.mapValues { (value) =>
+    ujson.read(value) // not sure how to handle errors here
+  }
 
   def transform(payload: String): String = {
     transform(payload, "application/json")

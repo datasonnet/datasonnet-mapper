@@ -17,11 +17,11 @@ phases:
           refs/tags/*) export VERSIONING_GIT_TAG=${CODEBUILD_WEBHOOK_HEAD_REF#refs/tags/} ;;
         esac
       - mvn --non-recursive exec:exec -Dexec.executable='echo' -Dexec.args='${project.version}' -q
-      - mvn test
+      - mvn -B test
       - |
         case "$CODEBUILD_WEBHOOK_TRIGGER" in
           pr/*) echo "pull request, not uploaded" ;;
-          *) mvn deploy ;;
+          *) mvn -B deploy ;;
         esac
 
 cache:

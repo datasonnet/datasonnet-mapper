@@ -88,4 +88,10 @@ public class MapperTest {
             assertTrue(e.getMessage().contains("at line 1 column 8"), "Found message: " + e.getMessage());
         }
     }
+
+    @Test
+    void includedJsonnetLibraryWorks() {
+        Mapper mapper = new Mapper("PortX.Util.select({a: {b: 5}}, 'a.b')", new HashMap<>(), true);
+        assertEquals("5", mapper.transform("{}"));
+    }
 }
