@@ -1,0 +1,25 @@
+version: 0.2
+
+env:
+  variables:
+    DOCS_SUBDIRECTORY: mapper
+
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+  build:
+    commands:
+      - docker run -v `pwd`:/antora --rm antora/antora --cache-dir=./.cache/antora playbook.yml
+      - |
+        case "$CODEBUILD_WEBHOOK_HEAD_REF" in
+          refs/heads/*)
+            export BRANCH=${CODEBUILD_WEBHOOK_HEAD_REF#refs/heads/}
+            aws s3 cp build/site s3://datasonnet/docs-ci/$DOCS_SUBDIRECTORY/$BRANCH/ --recursive
+            ;;
+          *) echo "Not a trigger for a branch, not uploading" ;;
+        esac
+
+cache:
+  paths:
+    - '.cache/antora/**/*'
