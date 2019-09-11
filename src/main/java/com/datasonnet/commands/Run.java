@@ -1,6 +1,8 @@
 package com.datasonnet.commands;
 
-import com.datasonnet.wrap.Mapper;
+import com.datasonnet.Document;
+import com.datasonnet.Mapper;
+import com.datasonnet.StringDocument;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
@@ -44,9 +46,9 @@ public class Run implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        Mapper mapper = new Mapper(datasonnet, combinedArguments(), !alreadyWrapped);
-        String result = mapper.transform(payload());
-        System.out.println(result);
+        Mapper mapper = new Mapper(datasonnet, combinedArguments().keySet(), !alreadyWrapped);
+        Document result = mapper.transform(new StringDocument(payload(), "application/json"), combinedArguments(), "application/json");
+        System.out.println(result.contents());
         return null;
     }
 
@@ -64,11 +66,11 @@ public class Run implements Callable<Void> {
         }
     }
 
-    private Map<String,String> combinedArguments() throws IOException {
+    private Map<String, Document> combinedArguments() throws IOException {
         Map combined = new HashMap<>(arguments);
         for(Map.Entry<String, File> entry : argumentFiles.entrySet()) {
             String contents = readFile(entry.getValue());
-            combined.put(entry.getKey(), contents);
+            combined.put(entry.getKey(), new StringDocument(contents, "application/json"));
         }
         return combined;
     }

@@ -1,13 +1,12 @@
 package com.datasonnet.commands;
 
 
-import com.datasonnet.wrap.Mapper;
+import com.datasonnet.Mapper;
 import picocli.CommandLine;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
 
 @CommandLine.Command(
         name = "validate",
@@ -27,7 +26,7 @@ public class Validate implements Runnable {
 
     @Override
     public void run() {
-        Mapper mapper = new Mapper(datasonnet, new HashMap<>(), !includesFunction);
+        Mapper mapper = new Mapper(datasonnet, new ArrayList<>(), !includesFunction);
         System.out.println("Validates!");
     }
 }

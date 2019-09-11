@@ -10,7 +10,7 @@ phases:
       docker: 18
   build:
     commands:
-      - docker run -v `pwd`:/antora --rm antora/antora --cache-dir=./.cache/antora playbook.yml
+      - docker run -v `pwd`:/antora --rm antora/antora playbook.yml
       - |
         case "$CODEBUILD_WEBHOOK_HEAD_REF" in
           refs/heads/*)
@@ -19,7 +19,3 @@ phases:
             ;;
           *) echo "Not a trigger for a branch, not uploading" ;;
         esac
-
-cache:
-  paths:
-    - '.cache/antora/**/*'

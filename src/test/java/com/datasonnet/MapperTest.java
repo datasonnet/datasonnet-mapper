@@ -4,14 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import com.datasonnet.wrap.Mapper;
+import com.datasonnet.Mapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class MapperTest {
@@ -19,7 +20,7 @@ public class MapperTest {
     @ParameterizedTest
     @MethodSource("simpleProvider")
     void simple(String jsonnet, String json, String expected) {
-        Mapper mapper = new Mapper(jsonnet, new HashMap<String, String>(), true);
+        Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
         assertEquals(expected, mapper.transform(json));
     }
 
@@ -34,10 +35,10 @@ public class MapperTest {
     @ParameterizedTest
     @MethodSource("variableProvider")
     void variables(String jsonnet, String json, String variable, String value, String expected) {
-        HashMap<String, String> variables = new HashMap<String, String>();
-        variables.put(variable, value);
-        Mapper mapper = new Mapper(jsonnet, variables, true);
-        assertEquals(expected, mapper.transform(json));
+        HashMap<String, Document> variables = new HashMap<>();
+        variables.put(variable, new StringDocument(value, "application/json"));
+        Mapper mapper = new Mapper(jsonnet, variables.keySet(), true);
+        assertEquals(expected, mapper.transform(new StringDocument(json, "application/json"), variables).contents());
     }
 
     static Stream<String[]> variableProvider() {
@@ -50,7 +51,7 @@ public class MapperTest {
     @Test
     void parseErrorLineNumber() {
         try {
-            Mapper mapper = new Mapper("function(payload) portx.time.now() a", new HashMap<>(), false);
+            Mapper mapper = new Mapper("function(payload) portx.time.now() a", new ArrayList<>(), false);
             fail("Must fail to parse");
         } catch(IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("Expected end-of-input at line 1 column 36"), "Found message: " + e.getMessage());
@@ -60,7 +61,7 @@ public class MapperTest {
     @Test
     void noTopLevelFunction() {
         try {
-            Mapper mapper = new Mapper("{}", new HashMap<>(), false);
+            Mapper mapper = new Mapper("{}", new ArrayList<>(), false);
             fail("Must fail to execute");
         } catch(IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("Top Level Function"), "Found message: " + e.getMessage());
@@ -70,7 +71,7 @@ public class MapperTest {
     @Test
     void executeErrorLineNumber() {
         try {
-            Mapper mapper = new Mapper("function(payload) payload.foo", new HashMap<>(), false);
+            Mapper mapper = new Mapper("function(payload) payload.foo", new ArrayList<>(), false);
             mapper.transform("{}");
             fail("Must fail to execute");
         } catch(IllegalArgumentException e) {
@@ -81,7 +82,7 @@ public class MapperTest {
     @Test
     void executeErrorLineNumberWhenWrapped() {
         try {
-            Mapper mapper = new Mapper("payload.foo", new HashMap<>(), true);
+            Mapper mapper = new Mapper("payload.foo", new ArrayList<>(), true);
             mapper.transform("{}");
             fail("Must fail to execute");
         } catch(IllegalArgumentException e) {
@@ -91,7 +92,14 @@ public class MapperTest {
 
     @Test
     void includedJsonnetLibraryWorks() {
-        Mapper mapper = new Mapper("PortX.Util.select({a: {b: 5}}, 'a.b')", new HashMap<>(), true);
+        Mapper mapper = new Mapper("PortX.Util.select({a: {b: 5}}, 'a.b')", new ArrayList<>(), true);
         assertEquals("5", mapper.transform("{}"));
+    }
+
+    @Test
+    void nonJsonArguments() {
+        Mapper mapper = new Mapper("argument", List.of("argument"), true);
+        Document mapped = mapper.transform(new StringDocument("{}", "application/json"), Map.of("argument", new StringDocument("value", "text/plain")), "text/plain");
+        assertEquals(new StringDocument("value", "text/plain"), mapped);
     }
 }

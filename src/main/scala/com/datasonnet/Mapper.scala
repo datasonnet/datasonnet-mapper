@@ -1,23 +1,24 @@
-package com.datasonnet.wrap
+package com.datasonnet
 
 import java.io.{File, PrintWriter, StringWriter}
-import java.util
 
-import com.datasonnet.PortX
+import com.datasonnet.wrap.NoFileEvaluator
 import fastparse.{IndexedParserInput, Parsed}
-
-import scala.collection.JavaConverters._
 import os.Path
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet.Expr.Params
 import sjsonnet._
 
+import scala.collection.JavaConverters._
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
+
+case class StringDocument(contents: String, mimeType: String) extends Document
+
 object Mapper {
-  def wrap(jsonnet: String, arguments: util.Map[String, String])=
-    (Seq("payload") ++ arguments.asScala.keys).mkString("function(", ",", ")\n") + jsonnet
+  def wrap(jsonnet: String, argumentNames: Iterable[String])=
+    (Seq("payload") ++ argumentNames).mkString("function(", ",", ")\n") + jsonnet
 
   def expandParseErrorLineNumber(error: String): String =
     error.replaceFirst("([a-zA-Z-]):(\\d+):(\\d+)", "$1 at line $2 column $3")
@@ -49,20 +50,39 @@ object Mapper {
     val jsonnetLibrary = Mapper.evaluate(cache, scope(libraries), jsonnetLibrarySource).get
     (name -> jsonnetLibrary)
   }
+
+  def input(data: Document): Expr = {
+    val json = data.mimeType match {
+      case "text/plain" | "application/csv" => ujson.Str(data.contents)
+      case "application/json" => ujson.read(data.contents)
+      case x => throw new IllegalArgumentException("The input mime type " + x + " is not supported")
+    }
+
+    Materializer.toExpr(json)
+  }
+
+  def output(output: ujson.Value, mimeType: String): Document = {
+    val string = mimeType match {
+      case "application/json" => output.toString()
+      case "text/plain" | "application/csv" => output.str
+      case x => throw new IllegalArgumentException("The output mime type " + x + " is not supported")
+    }
+    new StringDocument(string, mimeType)
+  }
 }
 
 
-class Mapper(var jsonnet: String, arguments: java.util.Map[String, String], needsWrapper: Boolean) {
+class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) {
 
   if(needsWrapper) {
-    jsonnet = Mapper.wrap(jsonnet, arguments)
+    jsonnet = Mapper.wrap(jsonnet, argumentNames.asScala)
   }
 
   def lineOffset = if (needsWrapper) 1 else 0
 
 
-  def this(jsonnet: File, arguments: util.Map[String, String], needsWrapper: Boolean) =
-    this(os.read(Path(jsonnet.getAbsoluteFile())), arguments, needsWrapper)
+  def this(jsonnet: File, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) =
+    this(os.read(Path(jsonnet.getAbsoluteFile())), argumentNames, needsWrapper)
 
   private val parseCache = collection.mutable.Map[String, Parsed[Expr]]()
 
@@ -100,7 +120,7 @@ class Mapper(var jsonnet: String, arguments: java.util.Map[String, String], need
 
   private val scope = Mapper.scope(libraries)
 
-  
+
   private val function = (for {
     evaluated <- Mapper.evaluate(parseCache, scope, jsonnet)
     verified <- evaluated match {
@@ -121,35 +141,28 @@ class Mapper(var jsonnet: String, arguments: java.util.Map[String, String], need
     }
   })
 
-  private val parsedArguments = arguments.asScala.view.mapValues { (value) =>
-    ujson.read(value) // not sure how to handle errors here
-  }
 
   def transform(payload: String): String = {
-    transform(payload, "application/json")
+    transform(new StringDocument(payload, "application/json"), new java.util.HashMap(), "application/json").contents
   }
 
-  def transform(payload: String, inputMimeType: String): String = {
-    transform(payload, inputMimeType,"application/json")
+  def transform(payload: Document, arguments: java.util.Map[String, Document]): Document = {
+    transform(payload, arguments,"application/json")
   }
 
-  def transform(payload: String, inputMimeType: String, outputMimeType: String): String = {
+  def transform(payload: Document, arguments: java.util.Map[String, Document], outputMimeType: String): Document = {
 
-    val jsonData = inputMimeType match {
-      case "text/plain" | "application/csv" => ujson.Str(payload).render(2, true)
-      case "application/xml" => throw new IllegalArgumentException("XML mapping is not supported yet")
-      case "application/json" => payload
-      case _ => throw new IllegalArgumentException("The input mime type " + inputMimeType + " is not supported")
-    }
+    val data = Mapper.input(payload)
 
-    val data = Materializer.toExpr(ujson.read(jsonData))
+    val parsedArguments = arguments.asScala.view.mapValues { Mapper.input(_) }
+
 
     val first :: rest: Seq[(String, Option[Expr])] = function.params.args
 
     val firstMaterialized: (String, Option[Expr]) = first.copy(_2 = Some(data))
 
     val values: List[(String, Option[Expr])] = rest.map { case (name, default) =>
-      val argument: Option[Expr] = parsedArguments.get(name).map(Materializer.toExpr(_)).orElse(default)
+      val argument: Option[Expr] = parsedArguments.get(name).orElse(default)
       (name, argument)
     } .toList
 
@@ -164,18 +177,6 @@ class Mapper(var jsonnet: String, arguments: java.util.Map[String, String], need
         throw new IllegalArgumentException("Problem executing map: " + expandExecuteErrorLineNumber(s.toString).replace("\t", "    "))
     }
 
-    if (outputMimeType == "application/csv")
-      ujson.read(materialized.toString()).str.trim()
-    else
-      materialized.toString()
-  }
-
-  private def isJSON(data: String): Boolean = {
-    try {
-      ujson.read(data)
-      true
-    } catch {
-      case e: Exception => false
-    }
+    Mapper.output(materialized, outputMimeType)
   }
 }
