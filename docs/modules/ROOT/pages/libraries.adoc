@@ -2,59 +2,230 @@
 :toc:
 :toclevels: 1
 
-## JsonPath
+## Crypto
 
-### `select(object json, string path)`
+### `hash(string value, string algorithm)`
+Calculates hash of a String value using one of the supported algorithms. The `algorithm` must be one of `MD2`, `MD5`, `SHA-1`, `SHA-256`, `SHA-384`, `SHA-512`
+The response is a string containing the hash bytes.
 
-Evaluates JsonPath expression and returns the resulting JSON object.
-It uses the https://github.com/json-path/JsonPath[Jayway JsonPath implementation] and fully supports https://goessner.net/articles/JsonPath/[JsonPath specification].
+*Example:*
 
-*Example*
-
-.Payload
 ------------------------
 {
-  "store": {
-    "book": [
-      {
-        "category": "reference",
-        "author": "Nigel Rees",
-        "title": "Sayings of the Century",
-        "price": 8.95
-      },
-      {
-        "category": "fiction",
-        "author": "Evelyn Waugh",
-        "title": "Sword of Honour",
-        "price": 12.99
-      },
-      {
-        "category": "fiction",
-        "author": "Herman Melville",
-        "title": "Moby Dick",
-        "isbn": "0-553-21311-3",
-        "price": 8.99
-      },
-      {
-        "category": "fiction",
-        "author": "J. R. R. Tolkien",
-        "title": "The Lord of the Rings",
-        "isbn": "0-395-19395-8",
-        "price": 22.99
-      }
-    ]
-  }
-}
-------------------------
-.DataSonnet map:
-------------------------
-{
-    author: PortX.JsonPath.select(payload, "$..book[-2:]..author")[0]
+    hashValue: PortX.Crypto.hash("HelloWorld", "MD5")
 }
 ------------------------
 .Result
 ------------------------
 {
-    "author": "Herman Melville"
+    "hashValue": "68e109f0f40ca72a15e05cc22786f8e6"
 }
+------------------------
+### `hmac(string value, string secret, string algorithm)`
+Generates hash-based message autentication code using provided secret and a hash function algorithm. The `algoritm` must be one of `HmacSHA1`, `HmacSHA256` or `HmacSHA512`.
+
+*Example:*
+
+------------------------
+{
+    hmacValue: PortX.Crypto.hmac("HelloWorld", "PortX rules!", "HmacSHA256")
+}
+------------------------
+.Result
+------------------------
+{
+    "hmacValue": "7854220ef827b07529509f68f391a80bf87fff328dbda140ed582520a1372dc1"
+}
+------------------------
+
+### `encrypt(string value, string key)`
+Encrypts the string using the key and the Blowfish algorithm. The result is Base64-encoded encrypted string.
+
+*Example:*
+
+------------------------
+{
+    passwd: PortX.Crypto.encrypt("HelloWorld", "DataSonnet123")
+}
+------------------------
+.Result
+------------------------
+{
+    "passwd": "HdK8opktKiK3ero0RJiYbA=="
+}
+------------------------
+
+### `decrypt(string value, string key)`
+Decrypts the string using the key and the Blowfish algorithm.
+
+*Example:*
+
+------------------------
+{
+    passwd: PortX.Crypto.decrypt(payload.encryptedPassword, "MySecretKey")
+}
+------------------------
+
+## ZonedDateTime
+
+### `now()`
+Returns the current date/time from the system UTC clock in ISO-8601 format.
+
+*Example*
+
+------------------------
+{
+    currentZuluTime: PortX.ZonedDateTime.now()
+}
+------------------------
+
+.Result:
+------------------------
+{
+    "currentZuluTime": "2019-08-19T18:58:38.313Z"
+}
+------------------------
+
+### `offset(string datetime, string period)`
+Returns a copy of this datetime with the specified amount added. The `datetime` parameter is in the ISO-8601 format.
+The `period` is a string in the ISO-8601 period format.
+
+*Example*
+
+------------------------
+PortX.ZonedDateTime.offset("2019-07-22T21:00:00Z", "P1Y1D")
+------------------------
+.Result:
+------------------------
+2020-07-23T21:00:00Z
+------------------------
+
+### `format(string datetime, string inputFormat, string outputFormat)`
+Reformats a zoned date-time string.
+
+*Example*
+
+------------------------
+PortX.ZonedDateTime.format("2019-07-04T21:00:00Z", "yyyy-MM-dd'T'HH:mm:ssVV", "d MMM uuuu")
+------------------------
+.Result:
+------------------------
+4 Jul 2019
+------------------------
+
+### `compare(string datetime1, string format1, string datetime2, string format2)`
+Returns 1 if datetime1 > datetime2, -1 if datetime1 < datetime2, 0 if datetime1 == datetime2.
+
+### `changeTimeZone(string datetime, string format, string timezone)`
+Changes the date timezone, retaining the instant. This normally results in a change to the local date-time.
+The response is formatted using the same format as an input.
+
+*Example*
+
+------------------------
+PortX.ZonedDateTime.changeTimeZone("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ", "America/Los_Angeles")
+------------------------
+.Result:
+------------------------
+2019-07-04T19:00:00-0700
+------------------------
+
+### `toLocalDate(string datetime, string format)`
+Returns only local date part of the `datetime` parameter in the ISO-8601 format without the offset.
+
+*Example*
+
+------------------------
+PortX.ZonedDateTime.toLocalDate("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
+------------------------
+.Result:
+------------------------
+2019-07-04
+------------------------
+
+### `toLocalTime(string datetime, string format)`
+Returns only local time part of the `datetime` parameter in the ISO-8601 format without the offset.
+
+*Example*
+
+------------------------
+PortX.ZonedDateTime.toLocalTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
+------------------------
+.Result:
+------------------------
+21:00:00
+------------------------
+
+### `toLocalDateTime(string datetime, string format)`
+Returns local datetime part of the `datetime` parameter in the ISO-8601 format without the offset.
+
+*Example*
+
+------------------------
+PortX.ZonedDateTime.toLocalDateTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
+------------------------
+.Result:
+------------------------
+2019-07-04T21:00:00
+------------------------
+
+## LocalDateTime
+
+### `now()`
+Returns the current date/time from the system UTC clock in ISO-8601 format without a time zone.
+
+*Example*
+
+------------------------
+{
+    currentLocalTime: PortX.LocalDateTime.now()
+}
+------------------------
+
+.Result:
+------------------------
+{
+    "currentLocalTime": "2019-08-19T18:58:38.313"
+}
+------------------------
+
+### `offset(string datetime, string period)`
+Returns a copy of this datetime with the specified amount added. The `datetime` parameter is in the ISO-8601 format without an offset.
+The `period` is a string in the ISO-8601 period format.
+
+*Example*
+
+------------------------
+PortX.LocalDateTime.offset("2019-07-22T21:00:00", "P1Y1D")
+------------------------
+.Result:
+------------------------
+2020-07-23T21:00:00
+------------------------
+
+### `format(string datetime, string inputFormat, string outputFormat)`
+Reformats a local date-time string.
+
+*Example*
+
+------------------------
+PortX.LocalDateTime.format("2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss", "d MMM uuuu")
+------------------------
+.Result:
+------------------------
+4 Jul 2019
+------------------------
+
+### `compare(string datetime1, string format1, string datetime2, string format2)`
+Returns `1` if `datetime1 > datetime2`, `-1` if `datetime1 < datetime2`, and `0` if `datetime1 == datetime2`.
+The `format1` and `format2` parameters must not have an offset or time zone.
+
+*Example*
+
+------------------------
+PortX.LocalDateTime.compare("2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss", "2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss")
+------------------------
+.Result:
+------------------------
+0
 ------------------------
