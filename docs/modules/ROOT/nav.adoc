@@ -1,1 +1,2 @@
 * xref:index.adoc[Introduction]
+* xref:libraries.adoc[Built-in Libraries]

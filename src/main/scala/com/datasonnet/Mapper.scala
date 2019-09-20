@@ -94,7 +94,9 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], nee
     "ZonedDateTime" -> PortX.ZonedDateTime,
     "LocalDateTime" -> PortX.LocalDateTime,
     "CSV" -> PortX.CSV,
-    "Crypto" -> PortX.Crypto
+    "Crypto" -> PortX.Crypto,
+    //"XML" -> PortX.XML,
+    "JsonPath" -> PortX.JsonPath
   )
 
   portx = portx + Mapper.library(standardLibrary, parseCache, "Util")

@@ -140,4 +140,11 @@ object PortX {
     },
   )
 
+  val JsonPath = library(
+    builtin("select", "json", "path") {
+      (wd, extVars, json: Val, path: String) =>
+        Materializer.reverse(ujson.read(com.datasonnet.portx.JsonPath.select(ujson.write(Materializer.apply(json, extVars, wd)), path)))
+    },
+  )
+
 }
