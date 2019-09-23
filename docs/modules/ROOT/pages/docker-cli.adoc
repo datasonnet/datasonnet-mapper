@@ -1,0 +1,21 @@
+== Obtaining the CLI via Docker
+
+These instructions assume you have Docker installed already.
+If you do not, go ahead and do that first.
+To find out how to install Docker for your operating system, go to https://docs.docker.com/install/ then click on your operating system in the left-hand menu.
+
+To obtain access to the Docker CLI during our internal release, first contact Kent to gain access to our private docker repository, including configuration instructions.
+
+== Using the CLI via the Jar
+
+Once you have access to the private Docker repository, use the docker CLI like the following:
+
+----
+docker run -it --rm 849905330246.dkr.ecr.us-west-2.amazonaws.com/datasonnet/datasonnet:1.0-docker-cli-SNAPSHOT
+----
+
+For example, performing a transformation would be
+
+----
+docker run -it --rm 849905330246.dkr.ecr.us-west-2.amazonaws.com/datasonnet/datasonnet:1.0-docker-cli-SNAPSHOT run mapping.ds input.json
+----

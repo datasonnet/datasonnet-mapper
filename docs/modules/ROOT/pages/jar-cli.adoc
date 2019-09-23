@@ -1,0 +1,47 @@
+== Obtaining the CLI Jar
+
+These instructions assume you already have Maven installed.
+If you don't have Maven installed, Docker is probably better for calling the CLI.
+
+First, you’ll need to add the Maven Repository credentials.
+We’re providing a temporary read-only set of credentials that you’ll be able to use for now if you don’t otherwise have credentials, which we’ll remove once we migrate the DataSonnet artifacts to a public repository.
+
+The section to add to ~/.m2/settings.xml with temporary credentials, inside the `<servers></servers>` section is:
+
+[source,xml]
+----
+<server>
+  <id>portx-repository-snapshots</id>
+  <username>datasonnet</username>
+  <password>PEqBwAtMP8KW84wjdMfe</password>
+</server>
+----
+
+Once you’ve added that, you need to get the jar with all the dependencies, using maven.
+You do not need to have a maven project for this to work. If you don’t have maven installed, you’ll need to install it, which can be done via Homebrew (`brew install maven`) or manually (https://maven.apache.org/install.html). If you’re not sure how, reach out and we can assist.
+
+What you need to run with Maven is all one long command line:
+
+[source,bash]
+----
+mvn dependency:get -DremoteRepositories=portx-repository-snapshots::::https://portx.jfrog.io/portx/portx-snapshots/ -Dartifact=com.datasonnet:datasonnet-mapper:1.0-SNAPSHOT:jar:jar-with-dependencies -Ddest=datasonnet.jar
+----
+
+After you run that, you’ll have a file named datasonnet.jar in the directory you’re currently in.
+
+
+== Using the CLI via the Jar
+
+In the same directory as datasonnet.jar, you can use the cli with the following base command:
+
+----
+
+java -jar datasonnet.jar
+
+----
+
+For example, performing a transformation would be
+
+----
+java -jar datasonnet.jar run mapping.ds input.json
+----

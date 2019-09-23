@@ -1,0 +1,24 @@
+= Command Line Interface
+
+You'll call the Command Line Interface (CLI) either via a Java Jar or Docker, but the arguments passed will be the same either way.
+In this shared documentation, calling the CLI with some arguments will be written `_datasonnet_ -args here`, where `_datasonnet_` stands for either the Jar or Docker calling convention.
+
+== Transforming Data
+
+`_datasonnet_ run mapping.ds input.json`
+
+
+This passes “input.json” as the payload to the transformation.
+Note: it doesn’t matter to the CLI what your filename is, it will pass it to the DataSonnet with the name “payload”.
+The output will be printed.
+
+== Validation
+
+`_datasonnet_ validate mapping.ds`
+
+This validates the syntax of your DataSonnet.
+Note: it does not validate the logic of the program at all, for example, errors in variable names.
+
+== Help
+
+For more options, including how to pass variables into your DataSonnet, check out the help options with -h.
