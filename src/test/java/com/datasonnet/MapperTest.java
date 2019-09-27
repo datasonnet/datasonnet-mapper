@@ -9,10 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class MapperTest {
@@ -96,10 +93,16 @@ public class MapperTest {
         assertEquals("5", mapper.transform("{}"));
     }
 
+    Map<String, Document> stringArgument(String key, String value) {
+        return new HashMap<String, Document>() {{
+            put(key, new StringDocument(value, "text/plain"));
+        }};
+    }
+
     @Test
     void nonJsonArguments() {
-        Mapper mapper = new Mapper("argument", List.of("argument"), true);
-        Document mapped = mapper.transform(new StringDocument("{}", "application/json"), Map.of("argument", new StringDocument("value", "text/plain")), "text/plain");
+        Mapper mapper = new Mapper("argument", Arrays.asList("argument"), true);
+        Document mapped = mapper.transform(new StringDocument("{}", "application/json"), stringArgument("argument", "value"), "text/plain");
         assertEquals(new StringDocument("value", "text/plain"), mapped);
     }
 }

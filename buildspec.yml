@@ -8,6 +8,11 @@ phases:
   install:
     runtime-versions:
       java: openjdk11
+      docker: 18
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
   build:
     commands:
       - echo $ARTIFACTORY_SETTINGS > /root/.m2/settings.xml
