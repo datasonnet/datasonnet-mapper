@@ -56,6 +56,16 @@ public class MapperTest {
     }
 
     @Test
+    void parseErrorLineNumberWhenWrapped() {
+        try {
+            Mapper mapper = new Mapper("portx.time.now() a", new ArrayList<>(), true);
+            fail("Must fail to parse");
+        } catch(IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("Expected end-of-input at line 1 column 18"), "Found message: " + e.getMessage());
+        }
+    }
+
+    @Test
     void noTopLevelFunction() {
         try {
             Mapper mapper = new Mapper("{}", new ArrayList<>(), false);

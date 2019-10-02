@@ -7,6 +7,7 @@ import fastparse.{IndexedParserInput, Parsed}
 import os.Path
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet.Expr.Params
+import sjsonnet.Val.Lazy
 import sjsonnet._
 
 import scala.collection.JavaConverters._
@@ -20,19 +21,33 @@ object Mapper {
   def wrap(jsonnet: String, argumentNames: Iterable[String])=
     (Seq("payload") ++ argumentNames).mkString("function(", ",", ")\n") + jsonnet
 
-  def expandParseErrorLineNumber(error: String): String =
-    error.replaceFirst("([a-zA-Z-]):(\\d+):(\\d+)", "$1 at line $2 column $3")
+  val parse = raw"([a-zA-Z-]):(\d+):(\d+)".r
+  def expandParseErrorLineNumber(error: String, lineOffset: Int) = parse.replaceAllIn(error, _ match {
+    case parse(token, line, column) => s"$token at line ${line.toInt - lineOffset} column $column"
+  })
 
-  def evaluate(cache: collection.mutable.Map[String, fastparse.Parsed[Expr]], scope: Scope, jsonnet: String): Try[Val] = {
-    val evaluator = new NoFileEvaluator(cache, scope)
+  // TODO later, this will probably need to dynamically apply the offset to only appropriate files
+  val execute = raw"\.\(:(\d+):(\d+)\)".r
+  def expandExecuteErrorLineNumber(error: String, lineOffset: Int) = execute.replaceAllIn(error, _ match {
+    case execute(line, column) => s"line ${line.toInt - lineOffset} column $column"
+  })
+
+
+  def evaluate(evaluator: Evaluator, cache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]], jsonnet: String, libraries: Map[String, Val], lineOffset: Int): Try[Val] = {
 
     for {
-      parsed <- cache.getOrElseUpdate(jsonnet, fastparse.parse(jsonnet, Parser.document(_))) match {
-        case f @ Parsed.Failure(l, i, e) => Failure(new IllegalArgumentException("Problem parsing: " + expandParseErrorLineNumber(f.trace().msg)))
+      fullParse <- cache.getOrElseUpdate(jsonnet, fastparse.parse(jsonnet, Parser.document(_))) match {
+        case f @ Parsed.Failure(l, i, e) => Failure(new IllegalArgumentException("Problem parsing: " + expandParseErrorLineNumber(f.trace().msg, lineOffset)))
         case Parsed.Success(r, index) => Success(r)
       }
+
+      (parsed, indices) = fullParse
+
       evaluated <-
-        try Success(evaluator.visitExpr(parsed, scope))
+        try Success(evaluator.visitExpr(parsed)(
+          Mapper.scope(indices, libraries),
+          new FileScope(OsPath(os.pwd), indices)
+        ))
         catch { case e: Throwable =>
           val s = new StringWriter()
           val p = new PrintWriter(s)
@@ -43,11 +58,30 @@ object Mapper {
     } yield evaluated
   }
 
-  def scope(libraries: Map[String, Lazy]) = new Scope(None, None, None, libraries, os.pwd / "(memory)", os.pwd, List(), None)
+  def scope(indices: Map[String, Int], roots: Map[String, Val]) = Std.scope(indices.size + 1).extend(
+    roots flatMap {
+      case (key, value) =>
+        if (indices.contains(key))
+          Seq((indices(key), (_: Option[Val.Obj], _: Option[Val.Obj]) => Lazy(value)))
+        else
+          Seq()
+    }
+  )
 
-  def library(libraries: Map[String, Lazy], cache: collection.mutable.Map[String, fastparse.Parsed[Expr]], name: String): (String, Val) = {
+  def objectify(objects: Map[String, Val]) = new Val.Obj(
+    objects.map{
+      case (key, value) =>
+        (key, Val.Obj.Member(false, Visibility.Hidden, (self: Val.Obj, sup: Option[Val.Obj], _, _) => value))
+    }
+    .toMap,
+    _ => (),
+    None
+  )
+
+
+  def library(evaluator: Evaluator, name: String, cache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]): (String, Val) = {
     val jsonnetLibrarySource = Source.fromURL(getClass.getResource(s"/$name.libsonnet")).mkString
-    val jsonnetLibrary = Mapper.evaluate(cache, scope(libraries), jsonnetLibrarySource).get
+    val jsonnetLibrary = Mapper.evaluate(evaluator, cache, jsonnetLibrarySource, Map(), 0).get  // libraries are never wrapped
     (name -> jsonnetLibrary)
   }
 
@@ -84,65 +118,25 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], nee
   def this(jsonnet: File, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) =
     this(os.read(Path(jsonnet.getAbsoluteFile())), argumentNames, needsWrapper)
 
-  private val parseCache = collection.mutable.Map[String, Parsed[Expr]]()
+  private val parseCache = collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]()
 
-  private val standardLibrary = Map(
-    "std" -> Lazy(Std.Std)
-  )
+  val evaluator = new NoFileEvaluator(jsonnet, OsPath(os.pwd), parseCache)
 
-  private var portx: Map[String, Val] = Map(
-    "ZonedDateTime" -> PortX.ZonedDateTime,
-    "LocalDateTime" -> PortX.LocalDateTime,
-    "CSV" -> PortX.CSV,
-    "Crypto" -> PortX.Crypto,
-    //"XML" -> PortX.XML,
-    "JsonPath" -> PortX.JsonPath
-  )
-
-  portx = portx + Mapper.library(standardLibrary, parseCache, "Util")
-
-
-  private var libraries = Map(
-    "std" -> Lazy(Std.Std),
-    "PortX" -> Lazy(Val.Obj(portx.map {
-        case (k, v) =>
-          (
-            k,
-            Val.Obj.Member(
-              false,
-              Visibility.Hidden,
-              (self: Val.Obj, sup: Option[Val.Obj], _) => Lazy(v)
-            )
-          )
-      }.toMap,
-      _ => (),
-      None
+  private val libraries = Map(
+    "PortX" -> Mapper.objectify(
+      PortX.libraries + Mapper.library(evaluator, "Util", parseCache)
     )
-  ))
-
-  private val scope = Mapper.scope(libraries)
-
+  )
 
   private val function = (for {
-    evaluated <- Mapper.evaluate(parseCache, scope, jsonnet)
+    evaluated <- Mapper.evaluate(evaluator, parseCache, jsonnet, libraries, lineOffset)
     verified <- evaluated match {
       case f: Val.Func => Success(f) // TODO check for at least one argument
       case _ => Failure(new IllegalArgumentException("Not a valid map. Maps must have a Top Level Function."))
     }
   } yield verified).get
 
-
   private val mapIndex = new IndexedParserInput(jsonnet);
-
-  private val offset = raw"\.\(\(memory\) offset::(\d+)\)".r
-
-  def expandExecuteErrorLineNumber(error: String): String = offset.replaceAllIn(error, _ match {
-    case offset(position) => {
-      val Array(line, column) = mapIndex.prettyIndex(position.toInt).split(":")
-      s"line ${line.toInt - lineOffset} column $column"
-    }
-  })
-
 
   def transform(payload: String): String = {
     transform(new StringDocument(payload, "application/json"), new java.util.HashMap(), "application/json").contents
@@ -159,24 +153,25 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], nee
     val parsedArguments = arguments.asScala.view.mapValues { Mapper.input(_) }
 
 
-    val first :: rest: Seq[(String, Option[Expr])] = function.params.args
+    val first +: rest = function.params.args
 
-    val firstMaterialized: (String, Option[Expr]) = first.copy(_2 = Some(data))
+    val firstMaterialized = first.copy(_2 = Some(data))
 
-    val values: List[(String, Option[Expr])] = rest.map { case (name, default) =>
+    val values = rest.map { case (name, default, i) =>
       val argument: Option[Expr] = parsedArguments.get(name).orElse(default)
-      (name, argument)
-    } .toList
+      (name, argument, i)
+    }.toVector
 
-    val materialized = try Materializer(function.copy(params = Params(firstMaterialized :: values)), Map(), os.pwd)
+
+    val materialized = try Materializer.apply0(function.copy(params = Params(firstMaterialized +: values)), ujson.Value)(evaluator)
     catch {
-      case DelegateError(msg) => throw new IllegalArgumentException("Problem executing map: " + expandExecuteErrorLineNumber(msg))
+      case Error.Delegate(msg) => throw new IllegalArgumentException("Problem executing map: " + Mapper.expandExecuteErrorLineNumber(msg, lineOffset))
       case e: Throwable =>
         val s = new StringWriter()
         val p = new PrintWriter(s)
         e.printStackTrace(p)
         p.close()
-        throw new IllegalArgumentException("Problem executing map: " + expandExecuteErrorLineNumber(s.toString).replace("\t", "    "))
+        throw new IllegalArgumentException("Problem executing map: " + Mapper.expandExecuteErrorLineNumber(s.toString, lineOffset).replace("\t", "    "))
     }
 
     Mapper.output(materialized, outputMimeType)

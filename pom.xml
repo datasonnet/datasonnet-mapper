@@ -166,8 +166,8 @@
     <dependencies>
         <dependency>
             <groupId>com.lihaoyi</groupId>
-            <artifactId>sjsonnet-2.13.0_2.13</artifactId>
-            <version>0.1.4</version>
+            <artifactId>sjsonnet_2.13</artifactId>
+            <version>0.1.6</version>
         </dependency>
         <dependency>
             <groupId>org.scala-lang</groupId>

@@ -1,18 +1,17 @@
 package com.datasonnet.wrap
 
-import sjsonnet.{Evaluator, Expr, Scope}
+import sjsonnet.{Evaluator, Expr, Path, OsPath}
 
-class NoFileEvaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[Expr]], originalScope: Scope) extends Evaluator(parseCache, originalScope, Map(), os.pwd, Some(Set()), None) {
+class NoFileEvaluator(jsonnet: String, path: Path, parseCache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]) extends Evaluator(parseCache, Map(), path, (Path, String) => None) {
 
+
+
+
+  this.loadedFileContents(path) = jsonnet
+  // okay, I think part of overriding error handling (including line numbering) is
+  // to override `implicit def evalScope: EvalScope = this` in Evaluator, if we can (probably?)
+  // alternatively, we could just let it do it by handling the import bits
 
   // TODO add import support for named imports
-  // Currently all imports are blocked by the empty allowedImports
-  // (Though I believe the implementation can be used to discover what files are present, as it still does that lookup)
-  // Note: we can't get what we need by passing an `importer` because that only does path discovery; os.read is still called
-
-  // make this return a dummy path
-  // override def resolveImport(scope: Scope, value: String, offset: Int): os.Path
-
-  // and make this just do a path -> String lookup in a Map we'll provide from config
-  // override def importString(scope: Scope, offset: Int, value: String, p: os.Path): String
+  
 }
