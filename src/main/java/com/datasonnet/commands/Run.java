@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -41,12 +43,15 @@ public class Run implements Callable<Void> {
     @CommandLine.Option(names = {"-f", "--argument-file"}, split = ",", description = "argument name and file containing the value (as JSON)")
     Map<String, File> argumentFiles = new HashMap<>();
 
+    @CommandLine.Option(names = {"-i", "--import-file"}, description = "file to make available for imports")
+    List<File> importFiles = new ArrayList<>();
+
     @CommandLine.Option(names = {"-n", "--no-wrap"})
     boolean alreadyWrapped;
 
     @Override
     public Void call() throws Exception {
-        Mapper mapper = new Mapper(datasonnet, combinedArguments().keySet(), !alreadyWrapped);
+        Mapper mapper = new Mapper(Main.readFile(datasonnet), combinedArguments().keySet(), imports(), !alreadyWrapped);
         Document result = mapper.transform(new StringDocument(payload(), "application/json"), combinedArguments(), "application/json");
         System.out.println(result.contents());
         return null;
@@ -62,20 +67,27 @@ public class Run implements Callable<Void> {
             }
             return contents.toString();
         } else {
-            return readFile(input);
+            return Main.readFile(input);
         }
     }
 
     private Map<String, Document> combinedArguments() throws IOException {
         Map combined = new HashMap<>(arguments);
         for(Map.Entry<String, File> entry : argumentFiles.entrySet()) {
-            String contents = readFile(entry.getValue());
+            String contents = Main.readFile(entry.getValue());
             combined.put(entry.getKey(), new StringDocument(contents, "application/json"));
         }
         return combined;
     }
 
-    private String readFile(File file) throws IOException {
-        return Files.lines(file.toPath()).collect(Collectors.joining());
+    private Map<String, String> imports() throws IOException {
+        Map imports = new HashMap<>();
+        for(File importFile : importFiles) {
+            String name = importFile.getPath();
+            String contents = Main.readFile(importFile);
+            imports.put(name, contents);
+        }
+        return imports;
     }
+
 }

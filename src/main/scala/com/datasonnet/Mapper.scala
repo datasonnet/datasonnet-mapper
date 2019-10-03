@@ -2,9 +2,8 @@ package com.datasonnet
 
 import java.io.{File, PrintWriter, StringWriter}
 
-import com.datasonnet.wrap.NoFileEvaluator
+import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
 import fastparse.{IndexedParserInput, Parsed}
-import os.Path
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet.Expr.Params
 import sjsonnet.Val.Lazy
@@ -13,6 +12,7 @@ import sjsonnet._
 import scala.collection.JavaConverters._
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
+import scala.util.chaining._
 
 
 case class StringDocument(contents: String, mimeType: String) extends Document
@@ -21,15 +21,20 @@ object Mapper {
   def wrap(jsonnet: String, argumentNames: Iterable[String])=
     (Seq("payload") ++ argumentNames).mkString("function(", ",", ")\n") + jsonnet
 
-  val parse = raw"([a-zA-Z-]):(\d+):(\d+)".r
-  def expandParseErrorLineNumber(error: String, lineOffset: Int) = parse.replaceAllIn(error, _ match {
-    case parse(token, line, column) => s"$token at line ${line.toInt - lineOffset} column $column"
-  })
 
-  // TODO later, this will probably need to dynamically apply the offset to only appropriate files
-  val execute = raw"\.\(:(\d+):(\d+)\)".r
-  def expandExecuteErrorLineNumber(error: String, lineOffset: Int) = execute.replaceAllIn(error, _ match {
-    case execute(line, column) => s"line ${line.toInt - lineOffset} column $column"
+
+
+  val location = raw"\.\(([a-zA-Z-_\.]*):(\d+):(\d+)\)|([a-zA-Z-]+):(\d+):(\d+)".r
+  def expandErrorLineNumber(error: String, lineOffset: Int) = location.replaceAllIn(error, _ match {
+    case location(filename, frow, fcolumn, token, trow, tcolumn) => {
+      if (token != null) {
+        s"$token at line ${trow.toInt - lineOffset} column $tcolumn"
+      } else if (filename.length > 0) {
+        s"$filename line $frow column $fcolumn"
+      } else {
+        s"line ${frow.toInt - lineOffset} column $fcolumn of the transformation"
+      }
+    }
   })
 
 
@@ -37,7 +42,7 @@ object Mapper {
 
     for {
       fullParse <- cache.getOrElseUpdate(jsonnet, fastparse.parse(jsonnet, Parser.document(_))) match {
-        case f @ Parsed.Failure(l, i, e) => Failure(new IllegalArgumentException("Problem parsing: " + expandParseErrorLineNumber(f.trace().msg, lineOffset)))
+        case f @ Parsed.Failure(l, i, e) => Failure(new IllegalArgumentException("Problem parsing: " + expandErrorLineNumber(f.trace().msg, lineOffset)))
         case Parsed.Success(r, index) => Success(r)
       }
 
@@ -46,7 +51,7 @@ object Mapper {
       evaluated <-
         try Success(evaluator.visitExpr(parsed)(
           Mapper.scope(indices, libraries),
-          new FileScope(OsPath(os.pwd), indices)
+          new FileScope(DataSonnetPath("."), indices)
         ))
         catch { case e: Throwable =>
           val s = new StringWriter()
@@ -78,7 +83,6 @@ object Mapper {
     None
   )
 
-
   def library(evaluator: Evaluator, name: String, cache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]): (String, Val) = {
     val jsonnetLibrarySource = Source.fromURL(getClass.getResource(s"/$name.libsonnet")).mkString
     val jsonnetLibrary = Mapper.evaluate(evaluator, cache, jsonnetLibrarySource, Map(), 0).get  // libraries are never wrapped
@@ -103,10 +107,11 @@ object Mapper {
     }
     new StringDocument(string, mimeType)
   }
+
 }
 
 
-class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) {
+class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imports: java.util.Map[String, String], needsWrapper: Boolean) {
 
   if(needsWrapper) {
     jsonnet = Mapper.wrap(jsonnet, argumentNames.asScala)
@@ -114,13 +119,26 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], nee
 
   def lineOffset = if (needsWrapper) 1 else 0
 
+  def this(jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) {
+    this(jsonnet, argumentNames, new java.util.HashMap[String, String](), needsWrapper)
+  }
 
-  def this(jsonnet: File, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) =
-    this(os.read(Path(jsonnet.getAbsoluteFile())), argumentNames, needsWrapper)
+  def importer(parent: Path, path: String): Option[(Path, String)] = for {
+    resolved <- parent match {
+      case DataSonnetPath("") => Some(path)
+      case DataSonnetPath(p) => Some(p + "/" + path)
+      case _ => None
+    }
+    contents <- imports.get(resolved) match {
+      case null => None
+      case v => Some(v)
+    }
+    combined = (DataSonnetPath(resolved) -> contents)
+  } yield combined
 
   private val parseCache = collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]()
 
-  val evaluator = new NoFileEvaluator(jsonnet, OsPath(os.pwd), parseCache)
+  val evaluator = new NoFileEvaluator(jsonnet, DataSonnetPath("."), parseCache, importer)
 
   private val libraries = Map(
     "PortX" -> Mapper.objectify(
@@ -165,13 +183,14 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], nee
 
     val materialized = try Materializer.apply0(function.copy(params = Params(firstMaterialized +: values)), ujson.Value)(evaluator)
     catch {
-      case Error.Delegate(msg) => throw new IllegalArgumentException("Problem executing map: " + Mapper.expandExecuteErrorLineNumber(msg, lineOffset))
+      // if there's a parse error it must be in an import, so the offset is 0
+      case Error(msg, stack, underlying) if msg.contains("had Parse error")=> throw new IllegalArgumentException("Problem executing map: " + Mapper.expandErrorLineNumber(msg, 0))
       case e: Throwable =>
         val s = new StringWriter()
         val p = new PrintWriter(s)
         e.printStackTrace(p)
         p.close()
-        throw new IllegalArgumentException("Problem executing map: " + Mapper.expandExecuteErrorLineNumber(s.toString, lineOffset).replace("\t", "    "))
+        throw new IllegalArgumentException("Problem executing map: " + Mapper.expandErrorLineNumber(s.toString, lineOffset).replace("\t", "    "))
     }
 
     Mapper.output(materialized, outputMimeType)

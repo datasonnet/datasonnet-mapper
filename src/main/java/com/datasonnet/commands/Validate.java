@@ -6,13 +6,13 @@ import picocli.CommandLine;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.Callable;
 
 @CommandLine.Command(
         name = "validate",
         description = "Validate a DataSonnet map"
 )
-public class Validate implements Runnable {
+public class Validate implements Callable<Void> {
 
     @CommandLine.Parameters(
             index = "0",
@@ -25,8 +25,9 @@ public class Validate implements Runnable {
 
 
     @Override
-    public void run() {
-        Mapper mapper = new Mapper(datasonnet, new ArrayList<>(), !includesFunction);
+    public Void call() throws Exception {
+        Mapper mapper = new Mapper(Main.readFile(datasonnet), new ArrayList<>(), !includesFunction);
         System.out.println("Validates!");
+        return null;
     }
 }
