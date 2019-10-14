@@ -1,0 +1,12 @@
+{
+  "root": {
+    "emptyElement": {},
+    "nullElement": null,
+    "valueElement": "Test",
+    "intElement": 1,
+    "boolElement": true,
+    "realElement": {
+      "$": "realValue"
+    }
+  }
+}

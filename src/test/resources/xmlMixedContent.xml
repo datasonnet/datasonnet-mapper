@@ -1,0 +1,7 @@
+<?xml version="1.1" encoding="UTF-8" standalone="yes"?>
+<letter>
+    Dear Mr. <name>John Smith</name>.
+    Your order <orderid>1032</orderid>
+    will be shipped on <shipdate>2001-07-13</shipdate>.
+</letter>
+

@@ -19,7 +19,7 @@ public class CSVReaderTest {
                 "application/csv"
         );
 
-        Mapper mapper = new Mapper("local csvInput = PortX.CSV.read(payload); { fName: csvInput[0][\"First Name\"] }", new ArrayList<>(), true);
+        Mapper mapper = new Mapper("local csvInput = PortX.Formats.read(payload, \"application/csv\"); { fName: csvInput[0][\"First Name\"] }", new ArrayList<>(), true);
         Document mapped = mapper.transform(data, new HashMap<>(), "application/json");
 
         assertEquals("{\"fName\":\"Eugene\"}", mapped.contents());
@@ -31,7 +31,7 @@ public class CSVReaderTest {
                 TestResourceReader.readFileAsString("readCSVExtTest.csv"),
                 "application/csv"
         );
-        String jsonnet = TestResourceReader.readFileAsString("readCSVExtTest.jsonnet");
+        String jsonnet = TestResourceReader.readFileAsString("readCSVExtTest.ds");
 
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
         Document mapped = mapper.transform(data, new HashMap<>(), "application/json");

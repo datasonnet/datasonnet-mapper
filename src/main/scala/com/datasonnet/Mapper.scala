@@ -91,7 +91,7 @@ object Mapper {
 
   def input(data: Document): Expr = {
     val json = data.mimeType match {
-      case "text/plain" | "application/csv" => ujson.Str(data.contents)
+      case "text/plain" | "application/csv" | "application/xml" => ujson.Str(data.contents)
       case "application/json" => ujson.read(data.contents)
       case x => throw new IllegalArgumentException("The input mime type " + x + " is not supported")
     }
@@ -102,7 +102,7 @@ object Mapper {
   def output(output: ujson.Value, mimeType: String): Document = {
     val string = mimeType match {
       case "application/json" => output.toString()
-      case "text/plain" | "application/csv" => output.str
+      case "text/plain" | "application/csv" | "application/xml" => output.str
       case x => throw new IllegalArgumentException("The output mime type " + x + " is not supported")
     }
     new StringDocument(string, mimeType)
@@ -137,6 +137,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   } yield combined
 
   private val parseCache = collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]()
+
 
   val evaluator = new NoFileEvaluator(jsonnet, DataSonnetPath("."), parseCache, importer)
 
@@ -181,7 +182,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
     }.toVector
 
 
-    val materialized = try Materializer.apply0(function.copy(params = Params(firstMaterialized +: values)), ujson.Value)(evaluator)
+    val materialized = try Materializer.apply(function.copy(params = Params(firstMaterialized +: values)))(evaluator)
     catch {
       // if there's a parse error it must be in an import, so the offset is 0
       case Error(msg, stack, underlying) if msg.contains("had Parse error")=> throw new IllegalArgumentException("Problem executing map: " + Mapper.expandErrorLineNumber(msg, 0))

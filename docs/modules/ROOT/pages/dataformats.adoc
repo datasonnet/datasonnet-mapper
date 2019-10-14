@@ -1,0 +1,362 @@
+# Formats Library
+:toc:
+:toclevels: 1
+
+## Generic Read and Write Functions
+
+The `Formats` library contains `read`, and `write` functions for input and output of other data formats, e.g. XML or CSV. The XML and CSV plugins are built into the standard DataSonnet distributions while other formats can be supported by implementing `DataFormatPlugin` interface.
+
+### `read(string xml, string inputMimeType, object params={})`
+
+Reads input data in the specified mime type and accepts additional parameters which override default plugin behavior. The list and format of parameters is specific to a plugin implementation.
+
+*Example*
+------------------------
+PortX.Formats.read(payload, "application/xml")
+------------------------
+*Example*
+------------------------
+local params = {
+    "NamespaceDeclarations" : {
+        "datasonnet" : "http://www.modusbox.com"
+    },
+    "NamespaceSeparator": "%",
+    "TextValueKey": "__text",
+    "AttributeCharacter": "*"
+};
+
+PortX.Formats.readExt(payload, "application/xml", params);
+------------------------
+
+### `write(string output, string outputMimeType, object params={})`
+
+Outputs the data into specified data format and accepts additional parameters which override default plugin behavior. The list and format of parameters is specific to a plugin implementation.
+
+*Example*
+------------------------
+PortX.Formats.write(payload, "application/csv")
+------------------------
+
+*Example*
+------------------------
+local params = {
+    "NamespaceDeclarations" : {
+        "datasonnet" : "http://www.modusbox.com"
+    },
+    "NamespaceSeparator": "%",
+    "TextValueKey": "__text",
+    "AttributeCharacter": "*",
+    "XmlVersion" : "1.1",
+    "AutoEmptyElements": false
+};
+
+PortX.Formats.writeExt(payload, "application/xml", params);
+------------------------
+
+## XML Format
+
+### `read`
+Converts input XML string to a JSON object using http://wiki.open311.org/JSON_and_XML_Conversion/#the-badgerfish-convention[BadgerFish convention]:
+
+* Element names become object properties
+* Text content of elements goes in the `$` property of an object.
+* Nested elements become nested properties
+* Multiple elements at the same level become array elements.
+* Attributes go in properties whose names begin with `@`.
+* Active namespaces for an element go in the element's `@xmlns` property.
+* The default namespace URI goes in `@xmlns.$`.
+* Other namespaces go in other properties of `@xmlns`.
+* Elements with namespace prefixes become object properties, too.
+* The `@xmlns` property goes only in object relative to the element where namespace was declared.
+* CDATA sections go in properties named `#1`, `#2`, etc.
+* Text fragments in mixed contents (elements and text) goes in properties named `$1`, `$2`, etc.
+
+*Example*
+
+.Payload
+------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<test:root xmlns:test="http://www.modusbox.com">
+    <test:datasonnet version="1.0">Hello World</test:datasonnet>
+</test:root>
+------------------------
+.DataSonnet map:
+------------------------
+PortX.Formats.read(payload, "application/xml")
+------------------------
+.Result
+------------------------
+{
+    "test:root": {
+        "@xmlns": {
+            "test":"http://www.modusbox.com"
+        },
+        "test:datasonnet": {
+            "@version": "1.0",
+            "$": "Hello World"
+        }
+    }
+}
+------------------------
+
+Providing an optional `params` object allows for additional control over JSON generation. The `params` is a JSON object where following properties can be set:
+
+* `NamespaceSeparator` - replaces default `:` separator between the prefix and the local name
+* `TextValueKey` - replaces default `$` as a key prefix for the text value property
+* `CdataValueKey` - replaces default `#` as a key prefix for the CDATA value property
+* `AttributeCharacter` - replaces `@` as a property key prefix which designates an XML element attribute
+* `NamespaceDeclarations` - a JSON object with a map of internal prefixes to the namespaces
+
+*Example*
+
+.Payload
+------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<test:root xmlns:test="http://www.modusbox.com">
+    <test:datasonnet version="1.0">Hello World</test:datasonnet>
+</test:root>
+------------------------
+.DataSonnet map:
+------------------------
+local params = {
+    "NamespaceDeclarations" : {
+        "datasonnet" : "http://www.modusbox.com"
+    },
+    "NamespaceSeparator": "%",
+    "TextValueKey": "__text",
+    "AttributeCharacter": "*"
+};
+
+PortX.Formats.read(payload, "application/xml", params);
+------------------------
+.Result
+------------------------
+{
+    "datasonnet%root": {
+        "*xmlns": {
+            "datasonnet": "http://www.modusbox.com"
+        },
+        "datasonnet%datasonnet": {
+            "*version": "1.0",
+            "__text": "Hello World"
+        }
+    }
+}
+------------------------
+
+### `write`
+Converts the input JSON object into XML using the Badgerfish convention.
+
+.Payload
+------------------------
+{
+    "test:root": {
+        "@xmlns": {
+            "test":"http://www.modusbox.com"
+        },
+        "test:datasonnet": {
+            "@version": "1.0",
+            "$": "Hello World"
+        }
+    }
+}
+------------------------
+.DataSonnet map:
+------------------------
+PortX.Formats.write(payload, "application/xml")
+------------------------
+.Result
+------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<test:root xmlns:test="http://www.modusbox.com">
+    <test:datasonnet version="1.0">Hello World</test:datasonnet>
+</test:root>
+------------------------
+
+Providing a `params` object allows for more control over generated XML. In addition to the parameters described in the `read` section, the following XML output-only parameters are supported:
+
+* `XmlVersion` - overrides the default XML version 1.0
+* `Encoding` - overrides the default `UTF-8` encoding
+* `AutoEmptyElements` - if set to `true`, empty elements are mapped to self-closing tags. If set to `false`, start- and end tags are generated.
+* `NullAsEmptyElement` - if set to `true`, element with null value is treated as empty element. Otherwise null values are skipped.
+* `OmitXmlDeclaration` - if set to `true`, XML declaration is not written in the resulting output.
+
+.Payload
+------------------------
+{
+    "test%root": {
+        "*xmlns": {
+            "test":"http://www.modusbox.com"
+        },
+        "test%datasonnet": {
+            "*version": "1.0",
+            "__text": "Hello World"
+        },
+        "test%empty": {}
+    }
+}
+------------------------
+.DataSonnet map:
+------------------------
+local params = {
+    "NamespaceDeclarations" : {
+        "datasonnet" : "http://www.modusbox.com"
+    },
+    "NamespaceSeparator": "%",
+    "TextValueKey": "__text",
+    "AttributeCharacter": "*",
+    "XmlVersion" : "1.1",
+    "AutoEmptyElements": false
+};
+
+PortX.Formats.write(payload, "application/xml", params);
+------------------------
+.Result
+------------------------
+<?xml version="1.1" encoding="UTF-8"?>
+<datasonnet:root xmlns:test="http://www.modusbox.com">
+    <datasonnet:datasonnet version="1.0">Hello World</datasonnet:datasonnet>
+    <datasonnet:empty/>
+</datasonnet:root>
+------------------------
+
+## CSV Format
+
+### `read`
+
+Parses the CSV and converts it to a JSON array of objects. It expects the CSV payload to be in a default format, with first row as column headers, comma separator, double quote, backslash escape character and `\n` newline character. CSV headers are used as keys for the corresponding JSON object values.
+
+*Example*
+
+.Payload
+------------------------
+"First Name","Last Name",Phone
+William,Shakespeare,"(123)456-7890"
+Christopher,Marlow,"(987)654-3210"
+------------------------
+.DataSonnet map:
+------------------------
+{
+    local csvInput = PortX.Formats.read(payload, "application/csv");
+
+    {
+        name: csvInput[0]["First Name"] + " " + csvInput[0]["Last Name"]
+    }
+}
+------------------------
+.Result
+------------------------
+{
+    "name": "William Shakespeare"
+}
+------------------------
+
+Providing an optional `params` object allows more control over the format of the input CSV. The `params` is a JSON object where following properties can be set:
+
+* `UseHeader` - if set to `true`, the first row of CSV will be interpreted as a list of column headers and will map to the JSON object property names
+* `Quote` - specifies the quote character
+* `Separator` - CSV separator character
+* `Escape` - CSV escape character
+* `NewLine` - new line character combination
+
+*Example*
+
+.Payload
+------------------------
+'William'|'Shakespeare'|'(123)456-7890'
+'Christopher'|'Marlow'|'(987)654-3210'
+------------------------
+.DataSonnet map:
+------------------------
+local params = {
+    "UseHeader": false,
+    "Quote": "'",
+    "Separator": "|",
+    "Escape": "\\",
+    "NewLine": "\n"
+};
+
+local csvInput = PortX.Formats.read(payload, "application/csv", params);
+
+{
+    name: csvInput[0][0] + " " + csvInput[0][1]
+}
+------------------------
+.Result
+------------------------
+{
+    "name": "William Shakespeare"
+}
+------------------------
+
+### `write`
+
+Creates a CSV out of an array of JSON objects, using default quote, separator, escape and new line characters. The keys of JSON object values are used as a CSV headers.
+
+*Example*
+
+.Payload
+------------------------
+[
+  {
+    "First Name": "William",
+    "Last Name": "Shakespeare",
+    "Phone": "(123)456-7890"
+  },
+  {
+    "First Name": "Christopher",
+    "Last Name": "Marlow",
+    "Phone": "(987)654-3210"
+  }
+]
+------------------------
+.DataSonnet map:
+------------------------
+PortX.Formats.write(payload, "application/csv")
+------------------------
+.Result
+------------------------
+"First Name","Last Name",Phone
+William,Shakespeare,"(123)456-7890"
+Christopher,Marlow,"(987)654-3210"
+------------------------
+
+Providing an optional `params` object allows for more control over the format of the output CSV. Quote, separator, escape and new line characters can be specified, CSV can be created without headers - in this case the input can be an array of arrays. In addition, a list of columns can be specified to override the JSON object names. In addition to the parameters described in the `read` section, the following CSV output-only parameters are supported:
+
+* `Headers` - an array of strings to use as column names
+
+*Example*
+
+.Payload
+------------------------
+[
+  [
+    "William",
+    "Shakespeare",
+    "(123)456-7890"
+  ],
+  [
+    "Christopher",
+    "Marlow",
+    "(987)654-3210"
+  ]
+]
+------------------------
+.DataSonnet map:
+------------------------
+local params = {
+    "UseHeader": false,
+    "Quote": "'",
+    "Separator": "|",
+    "Escape": "\\",
+    "NewLine": "\n"
+};
+PortX.Formats.writeExt(payload, "application/csv", params)
+------------------------
+.Result
+------------------------
+'William'|'Shakespeare'|'(123)456-7890'
+'Christopher'|'Marlow'|'(987)654-3210'
+------------------------
+
+

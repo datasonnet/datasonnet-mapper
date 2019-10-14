@@ -1,30 +1,15 @@
 package com.datasonnet
 
 import java.time.format.DateTimeFormatter
-import java.time.{Instant, Period, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.{Instant, Period, ZoneId, ZoneOffset}
 
-import com.datasonnet.wrap.Library.builtin
-import com.datasonnet.wrap.Library.builtin0
-import com.datasonnet.wrap.Library.library
-import sjsonnet.{Materializer, Val}
+import com.datasonnet.portx.spi.DataFormatPlugin
+import com.datasonnet.wrap.Library.{builtin, builtin0, library}
+import sjsonnet.Std.builtinWithDefaults
+import sjsonnet.{EvalScope, Expr, Materializer, Val}
 
-/*
-ZonedDateTime
-DateTime
-Date
+import scala.util.Failure
 
-offset (datetime, period, input format, output format)
-format (datetime, input format, output format)
-
-periodBetween - TBD
-
-compare (date1, format1, date2, format2) - returns 1 if date1 > date2, -1 if date1 < date2, 0 if date1 == date2)
-
-now
-
-convertZone
-
-*/
 
 object PortX {
 
@@ -64,7 +49,7 @@ object PortX {
         val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
         datetimeObj.toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE)
       },
-
+  
       builtin("toLocalTime", "datetime", "format") { (ev, fs, datetime: String, format: String) =>
         val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
         datetimeObj.toLocalTime().format(DateTimeFormatter.ISO_LOCAL_TIME)
@@ -74,6 +59,28 @@ object PortX {
         val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
         datetimeObj.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
       }
+    ),
+
+    "Formats" -> library(
+      builtinWithDefaults("read",
+                          "data" -> None,
+                          "mimeType" -> None,
+                          "params" -> Some(Expr.Null(0))) { (args, ev) =>
+        val data = args("data").asInstanceOf[Val.Str].value
+        val mimeType = args("mimeType").asInstanceOf[Val.Str].value
+        val params = if (args("params") == Val.Null) null else args("params").asInstanceOf[Val.Obj]
+        read(data, mimeType, params, ev)
+      },
+      builtinWithDefaults("write",
+        "data" -> None,
+        "mimeType" -> None,
+        "params" -> Some(Expr.Null(0))) { (args, ev) =>
+        val data = args("data")
+        val mimeType = args("mimeType").asInstanceOf[Val.Str].value
+        val params = if (args("params") == Val.Null) null else args("params").asInstanceOf[Val.Obj]
+        write(data, mimeType, params, ev)
+      },
+
     ),
 
     "LocalDateTime" -> library(
@@ -103,25 +110,6 @@ object PortX {
       }
     ),
 
-    "CSV" -> library(
-      builtin("read", "csvFile") {
-        (ev, fs, csvFile: String) =>
-          Materializer.reverse(ujson.read(com.datasonnet.portx.CSVReader.readCSV(csvFile)))
-      },
-      builtin("readExt", "csvFile", "useHeader", "quote", "separator", "escape", "newLine") {
-        (ev, fs, csvFile: String, useHeader: Boolean, quote: String, separator: String, escape: String, newLine: String) =>
-          Materializer.reverse(ujson.read(com.datasonnet.portx.CSVReader.readCSV(csvFile, useHeader, quote, separator, escape, newLine)))
-      },
-      builtin("write", "jsonArray") {
-        (ev, fs, jsonArray: Val) =>
-          com.datasonnet.portx.CSVWriter.writeCSV(ujson.write(Materializer.apply(jsonArray)(ev)))
-      },
-      builtin("writeExt", "jsonArray", "useHeader", "quote", "separator", "escape", "newLine") {
-        (ev, fs, jsonArray: Val, useHeader: Boolean, quote: String, separator: String, escape: String, newLine: String) =>
-          com.datasonnet.portx.CSVWriter.writeCSV(ujson.write(Materializer.apply(jsonArray)(ev)), useHeader, quote, separator, escape, newLine)
-      },
-    ),
-
     "Crypto" -> library(
       builtin("hash", "value", "algorithm") {
         (ev, fs, value: String, algorithm: String) =>
@@ -149,4 +137,57 @@ object PortX {
     )
   )
 
+  def read(data: String, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {
+    val plugin = com.datasonnet.portx.spi.DataFormatService.getInstance().getPluginFor(mimeType)
+    val javaParams = if (params != null) toJavaParams(ev, params, plugin) else new java.util.HashMap[String, Object]()
+    Materializer.reverse(plugin.read(data, javaParams))
+  }
+
+  def write(json: Val, mimeType: String, params: Val.Obj, ev: EvalScope): String = {
+    val plugin = com.datasonnet.portx.spi.DataFormatService.getInstance().getPluginFor(mimeType)
+    val javaParams = if (params != null) toJavaParams(ev, params, plugin) else new java.util.HashMap[String, Object]()
+    plugin.write(Materializer.apply(json)(ev), javaParams)
+  }
+
+  def toJavaParams(ev: EvalScope, params: Val.Obj, plugin: DataFormatPlugin): java.util.Map[String, Object] = {
+
+    val scalaParams = ujson.read(Materializer.apply(params)(ev)).obj;
+    val javaParams = new java.util.HashMap[String, Object]()
+    val supportedParams = plugin.getReadParameters()
+
+    //Convert to Java map
+    for ((k, v) <- scalaParams) {
+      if (!supportedParams.containsKey(k)) {
+        Failure(new com.datasonnet.portx.spi.UnsupportedParameterException("The parameter " + k + " is not supported by plugin " + plugin.getPluginId))
+      }
+      javaParams.put(k, toJavaObject(v))
+    }
+
+    javaParams
+  }
+
+  def toJavaObject(v: ujson.Value): java.lang.Object = {
+    if (v.isInstanceOf[ujson.Bool]) {
+      new java.lang.Boolean(v.bool)
+    } else if (v.isInstanceOf[ujson.Str]) {
+      v.str
+    } else if (v.isInstanceOf[ujson.Num]) {
+      new java.lang.Double(v.num)
+    } else if (v.isInstanceOf[ujson.Obj]) {
+      val javaMap = new java.util.HashMap[String, Object]()
+      for ((k, vv) <- v.obj) {
+        javaMap.put(k, toJavaObject(vv))
+      }
+      javaMap
+    } else if (v.isInstanceOf[ujson.Arr]) {
+      val javaArr = new java.util.ArrayList[Object]()
+      for ((vv) <- v.arr) {
+        javaArr.add(toJavaObject(vv))
+      }
+      javaArr
+    } else {
+      //TODO support other types or throw an exception???
+      null
+    }
+  }
 }

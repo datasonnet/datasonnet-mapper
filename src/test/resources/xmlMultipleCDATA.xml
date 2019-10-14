@@ -1,0 +1,20 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<cdataTest>
+    <invoice>1234567890</invoice>
+    <letter>
+        <![CDATA[
+        Dear Mr. <name>John Smith</name>.
+        Your order <orderid>1032</orderid>
+        will be shipped on <shipdate>2001-07-13</shipdate>.
+        ]]>
+        <![CDATA[
+            {
+                "item":"Gizmo",
+                "sku":"g123",
+                "quantity":1,
+                "price":"$123.45"
+            }
+        ]]>
+    </letter>
+</cdataTest>
+

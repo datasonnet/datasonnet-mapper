@@ -1,0 +1,13 @@
+local params = {
+    "NamespaceDeclarations" : {
+        "datasonnet" : "http://www.modusbox.com"
+    },
+    "NamespaceSeparator": "%",
+    "TextValueKey": "__text",
+    "AttributeCharacter": "*"
+};
+
+//local parsedXml = PortX.Formats.readExt(payload, "application/xml", params);
+local parsedXml = PortX.Formats.read(payload, "application/xml", params);
+
+parsedXml
