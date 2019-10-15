@@ -1,0 +1,10 @@
+local things = [
+    item.id
+    for item in payload.items
+    if item.remainingQuantity > 0
+];
+
+{
+    shipper: payload.from,
+    items: things
+}

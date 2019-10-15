@@ -1,4 +1,5 @@
 * xref:index.adoc[Introduction]
+* xref:quickstart.adoc[Quick Start]
 * xref:dataformats.adoc[Data Formats]
 * xref:jsonnet-doc.adoc[Standard Library Documentation]
 * xref:libraries.adoc[Additional DataSonnet Libraries]

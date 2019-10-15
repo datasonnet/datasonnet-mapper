@@ -1,0 +1,11 @@
+local items = [
+    item + { inStock: true }
+    for item in payload.items
+    if item.remainingQuantity > 0
+];
+
+{
+    shipper: payload.from,
+    items: items,
+    totalItems: std.length(items)
+}

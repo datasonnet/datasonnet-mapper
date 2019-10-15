@@ -1,0 +1,4 @@
+{
+    shipper: payload.from,
+    items: [item.id for item in payload.items]
+}

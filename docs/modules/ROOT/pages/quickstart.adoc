@@ -1,0 +1,267 @@
+# Quick Start
+:toc:
+
+## Setting up IntelliJ
+
+If you don't already have IntelliJ, you'll need to install it.
+You can download the Community Edition, which is free, at https://www.jetbrains.com/idea/download/
+
+### Creating a playground project
+
+You can use the DataSonnet IntelliJ Plugin in any IntelliJ project, but you'll set one up just for this tutorial.
+
+. Create a new project.
+If you've just installed IntelliJ, you may have a Create New Project option.
+Otherwise, you can go to the File menu and select `New -> Project...`.
+A window will appear with a list of project types along the left.
+. Select "Maven" (it has a blue "m" to the left of it).
+. Leaving everything else set to the defaults, press the "Next" button in the lower right.
+. The next page has three fields, and you need to put values in `GroupID` and `ArtifactID`.
+You can leave `Version` as the default value.
+You can use any values you like (that are legal for Maven), but some that will work just fine are `tutorial` and `tutorial`.
+. Press "Next" in the lower right again.
+. On this screen the default values are fine, so conclude with "Finish", again in the lower right.
+. Wait a short period for the project to initialize.
+If a pop-up appears (usually in the lower right) saying "Maven projects need to be imported" and offering you the option to "Enable Auto-Import", choose that option.
+
+### Installing the plugin
+
+Now, follow the directions for installing the plugin at xref:intellij:ROOT:index.adoc[IntelliJ Plugin].
+
+### Creating your working files
+
+Now that the basic project is created and the plugin is installed, you'll create the first DataSonnet transformation and scenario for experimentation.
+On the left side of IntelliJ is a pane representing the structure of your project.
+If you named the project `tutorial`, it has a folder icon with the word `tutorial` in bold.
+
+. Expand the carets next to and below that icon to reach `src -> main -> resources`.
+. Right click on `src -> main -> resources` and choose `New -> File`, naming the file `transformation.ds`.
+. Now, expand the carets to reach `src -> test`.
+. Right click on `test` and choose `New -> Directory`, naming it `resources`.
+. Right click on `src -> test -> resources` and choose (near the end of the menu) `Mark Directory as -> Test Resources Root`.
+. Your `transformation.ds` file should still be open.
+If it isn't, double click it.
+. On the left side of the file you'll see an icon with a plus and several lines.
+It adds a new scenario, go ahead and click it.
+For the scenario name, enter `tutorial`.
+. There will now be a new icon just to the right of the previous icon, with a plus over a page icon.
+It adds a new input to the scenario, go ahead and click it.
+For the name, enter `payload`, and leave the format as JSON.
+. Now, copy and paste the following contents into the `payload` input that has appeared.
+This is the data that will be used for the tutorial.
+
+[source,json]
+----
+include::example$quickstart-payload.json[]
+----
+
+## DataSonnet Basics
+
+Currently your rightmost pane under `transformation.ds`, which says "Preview", probably has an error message in it.
+To fix that, you need to update your DataSonnet file, which is the currently empty middle pane.
+
+### The minimal transformation
+
+In the empty middle pane, put two curly brackets `{}`.
+This is a minimal DataSonnet transformation, though it does not use the input data at all.
+
+It returns itself as a value, so you should see the Preview change to also have `{}`.
+If you don't, hit the second icon down directly to the left of the Preview area, the red refresh icon.
+
+Now you'll change this to use the input data.
+First, remove the curly brackets and put the word `payload`, with no quotation marks.
+The Preview area should now show an exact copy of the `payload` input.
+
+The input data is available in the `payload` variable, and the last expression of the transformation is what it outputs, so a line with just `payload` on it outputs the input.
+
+That isn't very interesting, so make one last alteration to see a minimal transformation that actually does something (small).
+Change the transformation to be `{payload: payload}`.
+
+The Preview area should look very similar, but with the input inside an object underneath a key named `"payload"`.
+In the transformation, the first `payload` is a field key.
+
+So long as those don't have spaces or other special characters, they don't need to be in quotation marks.
+Then the value is an expression, which is the same `payload` variable from the previous minimal transformation.
+
+### Including a value from the input
+
+To include a single value from the input in the output, you can access fields of the payload.
+
+[source,javascript]
+----
+include::example$include-value.ds[]
+----
+
+This transformation outputs an object with a key named `"shipper"` with a value copied from the `from` field of the payload.
+
+There's an alternative way of looking up that field, which you can use if the field has special characters or if you want to look up a field based on an expression.
+
+[source,javascript]
+----
+include::example$include-value-alternate.ds[]
+----
+
+### Transforming an array of items
+
+The main way to transform arrays in DataSonnet is called an array comprehension.
+To create a new array derived from the `items` in the input, update the transformation to
+
+[source,javascript]
+----
+include::example$transform-array.ds[]
+----
+
+This comprehension creates a new array where each element in it is the `id` from a corresponding item in the input.
+You could put any expression where it has `item.id` currently.
+Try changing it to the following and see how the output changes.
+
+[source,javascript]
+----
+include::example$transform-array-alternate.ds[]
+----
+
+What's happening in this line will be covered later in the tutorial, for now notice how any expression works in that location.
+
+Now, notice how there's a comma after the line you already had, that's the field separator inside an object.
+If you left out that comma, you'd get an error something like
+
+[source]
+----
+Problem parsing: Expected "}":4:5, found "items: [it"
+----
+
+Generally speaking when you see `Expected "}"`, that means there's a missing comma.
+
+
+### Filtering an array
+
+Array comprehensions support filtering.
+To filter the items in the input by their remainingQuantity, update the transformation to
+
+[source,javascript]
+----
+include::example$filter-array.ds[]
+----
+
+Again, you can change the expression that goes after the if, but in this location it must always have a value of either true or false.
+
+If you accidentally made a typo in which field you use, or if some items did not have a `remainingQuantity` field, you would see an error something like
+
+[source]
+----
+Problem executing map: sjsonnet.Error: Field does not exist: remainingQuantiy
+    at line 3 column 54 of the transformation
+----
+
+DataSonnet is much stricter about issues like this than Javascript.
+This means it tends to fail if unusual data arrives rather than produce unexpected output, a crucial field for data transformations.
+Use realistic testing data and you can be confident that the transformation in production will either work correctly or fail if the data does not match your expectations.
+
+### Using a local variable to reuse a transformation
+
+So far the DataSonnet transformation is a single expression with a number of parts, but accomplishing complex transformations requires the ability to break down code into smaller pieces.
+Update the transformation to
+
+[source,javascript]
+----
+include::example$local-variable.ds[]
+----
+
+This performs the exact same transformation as the previous example.
+It extracts the logic for constructing the array into a variable named `items`.
+The name is completely arbitrary--here's the same transformation again, but with a different name.
+
+[source,javascript]
+----
+include::example$local-variable-renamed.ds[]
+----
+
+Notice that while the variable name changed to `things`, the `items` key in the output needs to remain the same if you want the same output.
+
+There's a semicolon after the line with the local variable.
+Every statement you write before the last expression, which will usually be assignments to local variables, must end with a semicolon.
+If you left out that semicolon, you'd get an error something like
+
+[source]
+----
+Problem parsing: Expected ";":7:2, found ""
+----
+
+As the error says, a semicolon was expected.
+
+So far this is no big improvement on the original transformation.
+But, by having the variable it is easy to do new things with the same values.
+Update the transformation to
+
+[source,javascript]
+----
+include::example$local-variable-reused.ds[]
+----
+
+The output object now has an additional field indicating the total number of items included.
+`std.length` finds the number of things in an array, so using it with the `items` variable makes it easy to compute the value.
+
+### Combining objects
+
+In data transformations, parts of the input data are often reproduced in the output.
+Even when that is not the case, it's often useful to build objects in layers.
+DataSonnet makes that easy by supporting object combination.
+Update the transformation to
+
+[source,javascript]
+----
+include::example$combine-objects.ds[]
+----
+
+This transformation combines the input item objects with an additional object that gets overlaid, containing an extra field.
+But now everything in the input is shown, including the `secretInfo` on one object.
+
+One option would be to not use combinations and only copy the desired fields, but with numerous fields that is a lot of extra code.
+Instead, update the transformation to
+
+[source,javascript]
+----
+include::example$combine-objects-hidden.ds[]
+----
+
+Using two colons instead of one for a field makes it a hidden field, and it won't show up in output.
+Since the value isn't used in this transformation, I assigned it to null, but even if it had a non-null value it would not show up.
+
+
+Combining objects like this is useful but limited, with fields replacing other fields.
+DataSonnet supports much more powerful operations when combining objects.
+Update the transformation to
+
+[source,javascript]
+----
+include::example$combine-objects-derive.ds[]
+----
+
+Now, instead of only including in-stock items in the output, all items are included, and they are marked with whether or not they are in stock.
+To do that, the overlay refers to the `remainingQuantity` of the item it gets combined with via `super`.
+Additionally, the overlay is abstracted into a separate variable.
+When combined with each item in the array comprehension, the combination is dynamically evaluated, giving the right output.
+
+## Further reading
+
+The JSonnet language DataSonnet uses includes many more powerful capabilities.
+You can learn more of them in https://jsonnet.org/learning/tutorial.html[the tutorial on the JSonnet website], though it is more focused on generating configurations.
+
+
+
+////
+
+// TODO all of this stuff later
+### Putting a complicated transformation inside a function
+
+
+
+## The Standard Library
+
+### Some utility functions
+
+### Sorting
+
+### What you can do with sets
+
+////

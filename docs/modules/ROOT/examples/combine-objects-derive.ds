@@ -1,0 +1,12 @@
+local overlay = {
+    inStock: super.remainingQuantity > 0,
+    secretInfo:: null
+};
+
+local items = [item + overlay for item in payload.items];
+
+{
+    shipper: payload.from,
+    items: items,
+    totalItems: std.length(items)
+}
