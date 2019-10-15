@@ -154,7 +154,7 @@ Problem executing map: sjsonnet.Error: Field does not exist: remainingQuantiy
 ----
 
 DataSonnet is much stricter about issues like this than Javascript.
-This means it tends to fail if unusual data arrives rather than produce unexpected output, a crucial field for data transformations.
+This means it tends to fail if unusual data arrives rather than produce unexpected output, a crucial feature for data transformations.
 Use realistic testing data and you can be confident that the transformation in production will either work correctly or fail if the data does not match your expectations.
 
 ### Using a local variable to reuse a transformation
