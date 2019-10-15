@@ -1,0 +1,40 @@
+local arrayOfLetters = [ "a", "c", "b", "c", "d", "c", "a", "b", "b" ];
+
+local arrayOfObjects = [
+    {
+        "a": "a",
+        "b":"b"
+    },
+    {
+        "a": "a",
+        "c" : {
+            "t":"t",
+            "y":"y"
+        },
+    },
+    {
+        "a": "a"
+    },
+    {
+        "a": "a"
+    },
+    {
+        "a": "a"
+    },
+    {
+        "a": "a",
+        "c" : {
+            "y":"y",
+            "t":"t"
+        },
+    },
+    {
+        "a": "a"
+    }
+];
+
+{
+  uniqueLetters: PortX.Util.distinctBy(arrayOfLetters),
+  uniqueObjects: PortX.Util.distinctBy(arrayOfObjects)
+}
+

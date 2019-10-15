@@ -1,0 +1,11 @@
+local result = [
+    {
+        name: person.name,
+        gender: person.gender
+    } + if std.objectHas(person, "insurance") && person.insurance == true then { insured: true } else {}    
+    for person in payload
+];
+
+assert result == output;
+
+result

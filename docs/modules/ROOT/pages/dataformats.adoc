@@ -25,7 +25,7 @@ local params = {
     "AttributeCharacter": "*"
 };
 
-PortX.Formats.readExt(payload, "application/xml", params);
+PortX.Formats.read(payload, "application/xml", params);
 ------------------------
 
 ### `write(string output, string outputMimeType, object params={})`
@@ -50,7 +50,7 @@ local params = {
     "AutoEmptyElements": false
 };
 
-PortX.Formats.writeExt(payload, "application/xml", params);
+PortX.Formats.write(payload, "application/xml", params);
 ------------------------
 
 ## XML Format
@@ -351,7 +351,7 @@ local params = {
     "Escape": "\\",
     "NewLine": "\n"
 };
-PortX.Formats.writeExt(payload, "application/csv", params)
+PortX.Formats.write(payload, "application/csv", params)
 ------------------------
 .Result
 ------------------------

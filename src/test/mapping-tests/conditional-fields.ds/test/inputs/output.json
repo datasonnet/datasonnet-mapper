@@ -1,0 +1,19 @@
+[
+  {
+    "gender": "Male",
+    "insured": true,
+    "name": "Joe"
+  },
+  {
+    "gender": "Male",
+    "name": "Bob"
+  },
+  {
+    "gender": "Female",
+    "name": "Jane"
+  },
+  {
+    "gender": "Female",
+    "name": "Mary"
+  }
+]

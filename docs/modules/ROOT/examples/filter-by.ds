@@ -1,0 +1,9 @@
+local isInsured(person) = std.objectHas(person, "insurance") && person.insurance == true;
+
+local result = {
+    "insured" : std.filter(function(person) isInsured(person), payload)
+};
+
+assert result == output;
+
+result

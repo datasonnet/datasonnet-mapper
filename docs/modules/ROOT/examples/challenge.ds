@@ -1,0 +1,84 @@
+local itemList = [
+                     {
+                         "Item_ID": std.toString(item.ID),
+                         "Count": item.Count,
+                         "Unit_Price": item.Unit_Price,
+                         "Total_Price": item.Unit_Price * item.Count
+                     } + if std.objectHas(item, "Sub_ID") then { "Sub_ID": item.Sub_ID} else { }
+                     for item in payload.Items
+                 ];
+local itemListWithSubIDs = [
+    item + if std.objectHas(item, "Sub_ID") then { ItemID_SubID: std.toString(item.ID) + "-" + item.Sub_ID } else { ItemID_SubID: std.toString(item.ID) }
+    for item in payload.Items
+];
+
+local idsWithSubIDs = PortX.JsonPath.select(itemListWithSubIDs, "$..ItemID_SubID");
+
+local warnings = {
+                     "Total_Price_Alert" : "true If total cost is > 500 * Number of Unique Items (Not including sub-items)",
+                     "Warning_Price" : ["Add an 'itemID_SubID' to this array if it is outside the low/high price points given by the pricing table below."],
+                     "Has_900311" : std.length(PortX.JsonPath.select(itemList, "$[?(@.Item_ID == \"900311\")]")) > 0,
+                     "Duplicates" : std.setDiff(idsWithSubIDs, std.uniq(idsWithSubIDs))
+                     //Duplicates: idsWithSubIDs
+                 };
+
+{
+  "Received_From": payload.From,
+  "PO_Type": payload.PO_Type,
+  "Contact_Name": payload.Contact_Name,
+  "Contact_Email": payload.Contact_Email,
+  "Creation_DT": payload.Creation_DT,
+  "Needs_Review": "true if and of the warnings are true or if any of the arrays have entries. else false",
+  "Warnings": warnings,
+  "Total_Cost": std.foldl(function(aggregate, item) aggregate + item.Total_Price, itemList, 0),
+  "Average_Cost": "Average cost per Item",
+  "Total_Unique_Items": "Total Unique Items (Not including Sub Items)",
+  "Total_Items": std.foldl(function(aggregate, item) aggregate + item.Count, itemList, 0),
+  "Items_Above_Average": "Number of Item's whose cost is above the Average",
+  "Item_List": itemList,
+  "PricingTable": [
+    {
+      "ItemID_SubID": "900001-1",
+      "Low_Price": 1.00,
+      "High_Price": 2.00
+    },
+    {
+      "ItemID_SubID": "900001-2",
+      "Low_Price": 5.00,
+      "High_Price": 10.00
+    },
+    {
+      "ItemID_SubID": "900001-3",
+      "Low_Price": 10.00,
+      "High_Price": 12.00
+    },
+    {
+      "ItemID_SubID": "900010",
+      "Low_Price": 100.00,
+      "High_Price": 110.00
+    },
+    {
+      "ItemID_SubID": "900011",
+      "Low_Price": 3.00,
+      "High_Price": 4.00
+    },
+    {
+      "ItemID_SubID": "900311",
+      "Low_Price": 500.00,
+      "High_Price": 505.00
+    },
+    {
+      "ItemID_SubID": "901051-1",
+      "Low_Price": 0.15,
+      "High_Price": 0.20
+    },
+    {
+      "ItemID_SubID": "901051-2",
+      "Low_Price": 0.10,
+      "High_Price": 0.20
+    }
+  ],
+
+
+  zzItems: idsWithSubIDs
+}

@@ -1,0 +1,5 @@
+std.mapWithIndex(function(value, index)
+                 {
+                     "index": index,
+                     "value": value
+                 }, payload.flights)

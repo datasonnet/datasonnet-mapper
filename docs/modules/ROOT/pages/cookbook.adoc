@@ -1,0 +1,966 @@
+# DataSonnet Cookbook
+:toc:
+:toclevels: 1
+=================
+
+### Single Field to Single Field
+
+Here's an example of оne-to-one mapping of JSON object fields to the JSON output:
+
+.Payload
+-------------
+{
+  "userId" : "123",
+  "name" : "PortX"
+}
+-------------
+.Mapping
+-------------
+{
+  "uid": payload.userId,
+  "uname": payload.name,
+}
+-------------
+.Output
+-------------
+{
+  "uid" : "123",
+  "uname" : "PortX"
+}
+-------------
+
+### Multiple Fields to Single Field
+
+Field values can be combined together, concatenated as a string, added as numerical values or merged as objects. Strings may be concatenated with *`+`*, which implicitly converts one operand to string if needed. Objects may be combined with *`+`* where the right-hand side wins field conflicts.
+
+.Payload
+-------------
+{
+  "userId" : "123",
+  "name" : "PortX",
+  "number1" : 1,
+  "number2" : 2,
+  "object1" : {
+    "Hello" : "Hello"
+  },
+  "object2" : {
+    "World" : "World"
+  },
+  "array1": [1, 2],
+  "array2": [3, 4],
+  "array3": [2, 4]
+}
+-------------
+.Mapping
+-------------
+{
+  "nameId": payload.name + " - " + payload.userId,
+  "numberPlusString" : payload.number1 + payload.name,
+  "stringPlusNumber" : payload.name + payload.number1,
+  "numberPlusNumber" : payload.number1 + payload.number2,
+  "objects" : payload.object1 + payload.object2,
+  "arrays" : payload.array1 +
+             payload.array2 +
+             payload.array3
+}
+-------------
+.Output
+-------------
+{
+  "arrays": [
+    1,
+    2,
+    3,
+    4,
+    2,
+    4
+  ],
+  "nameId": "PortX - 123",
+  "numberPlusNumber": 3,
+  "numberPlusString": "1PortX",
+  "objects": {
+    "Hello": "Hello",
+    "World": "World"
+  },
+  "stringPlusNumber": "PortX1"
+}
+-------------
+
+### Conditional Mapping
+Conditional expressions look like `if b then e else e`. The `else` branch is optional and defaults to `null`.
+
+.Payload
+-------------
+[
+  {
+    "name" : "Joe",
+    "gender" : "Male",
+    "age" : 46,
+    "insurance": true
+  },
+  {
+    "name" : "Bob",
+    "gender" : "Male",
+    "age" : 40,
+    "insurance": false
+  },
+  {
+    "name" : "Jane",
+    "gender" : "Female",
+    "age" : 33
+  },
+  {
+    "name" : "Mary",
+    "gender" : "Female",
+    "age" : 40
+  }
+]
+-------------
+.Mapping
+[subs="quotes"]
+-------------
+{
+  "insured" : [
+    {
+      name: person.name,
+      gender: person.gender
+    }
+    for person in payload
+    *if std.objectHas(person, "insurance") &&
+       person.insurance == true*
+  ],
+  "uninsured" : [
+    {
+      name: person.name,
+      gender: person.gender
+    }
+    for person in payload
+    *if !std.objectHas(person, "insurance") || 
+       person.insurance == false*
+  ]
+}
+-------------
+.Output
+-------------
+{
+  "insured": [
+    {
+      "gender": "Male",
+      "name": "Joe"
+    }
+  ],
+  "uninsured": [
+    {
+      "gender": "Male",
+      "name": "Bob"
+    },
+    {
+      "gender": "Female",
+      "name": "Jane"
+    },
+    {
+      "gender": "Female",
+      "name": "Mary"
+    }
+  ]
+}
+-------------
+
+### Validation
+Errors can arise from the language itself (e.g. an array overrun) or thrown from Jsonnet code. Stack traces provide context for the error.
+
+- To raise an error: `error "foo"`;
+- To assert a condition before an expression: `assert "foo"`;
+- A custom failure message: `assert "foo" : "message"`;
+- Assert fields have a property: `assert self.f == 10`;
+- With custom failure message: `assert "foo" : "message"`
+
+### Array Index Selector
+
+- arr[x] selects element with the index X from the array. Indexes start with 0;
+- arr[x : y] returns slice of an array from index X (inclusive) to index Y (exclusive). E.g.:
+
+.Payload
+-------------
+[ "a", "b", "c", "d" ]
+-------------
+.Mapping
+-------------
+{
+    slice1: payload[0 : 2],
+    slice2: payload[2 : 2],
+    slice3: payload[1 : 10]
+}
+-------------
+.Output
+-------------
+{
+   "slice1": [
+      "a",
+      "b"
+   ],
+   "slice2": [
+      "c"
+   ],
+   "slice3": [
+      "b",
+      "c",
+      "d"
+   ]
+}
+-------------
+
+### Looping
+
+.Payload
+-------------
+[ "a", "b", "c", "d" ]
+-------------
+.Mapping
+-------------
+[
+    {
+        letter: x
+    } for x in payload
+]
+-------------
+.Output
+-------------
+[
+   {
+      "letter": "a"
+   },
+   {
+      "letter": "b"
+   },
+   {
+      "letter": "c"
+   },
+   {
+      "letter": "d"
+   }
+]
+-------------
+
+Indexes are not available in `for` loop. In order to use both element value and index in the mapping, use `std.mapWithIndex()` function with custom mapping function, e.g.
+.Payload
+-------------
+{
+    "flights": [
+        {
+            "availableSeats": 45,
+            "airlineName": "Delta",
+            "aircraftBrand": "Boeing",
+            "aircraftType": "717",
+            "departureDate": "01/20/2019",
+            "origin": "PHX",
+            "destination": "SEA"
+        },
+        {
+            "availableSeats": 134,
+            "airlineName": "Delta",
+            "aircraftBrand": "Airbus",
+            "aircraftType": "A350",
+            "departureDate": "10/13/2018",
+            "origin": "AMS",
+            "destination": "DTW"
+        }
+    ]
+}
+-------------
+.Mapping
+[subs="quotes"]
+-------------
+*std.mapWithIndex*(function(index, value)
+                 {
+                     "index": index,
+                     "value": value
+                 }, payload.flights)
+-------------
+.Output
+-------------
+[
+   {
+      "index": 0,
+      "value": {
+         "aircraftBrand": "Boeing",
+         "aircraftType": "717",
+         "airlineName": "Delta",
+         "availableSeats": 45,
+         "departureDate": "01/20/2019",
+         "destination": "SEA",
+         "origin": "PHX"
+      }
+   },
+   {
+      "index": 1,
+      "value": {
+         "aircraftBrand": "Airbus",
+         "aircraftType": "A350",
+         "airlineName": "Delta",
+         "availableSeats": 134,
+         "departureDate": "10/13/2018",
+         "destination": "DTW",
+         "origin": "AMS"
+      }
+   }
+]
+-------------
+
+### Filter By
+Standard Jsonnet library has `std.filter()` function:
+
+.Payload
+-------------
+[
+  {
+    "name" : "Joe",
+    "gender" : "Male",
+    "age" : 46,
+    "insurance": true
+  },
+  {
+    "name" : "Bob",
+    "gender" : "Male",
+    "age" : 40,
+    "insurance": false
+  },
+  {
+    "name" : "Jane",
+    "gender" : "Female",
+    "age" : 33,
+    "insurance": true
+  },
+  {
+    "name" : "Mary",
+    "gender" : "Female",
+    "age" : 40
+  }
+]
+-------------
+.Mapping
+[subs="quotes"]
+-------------
+local isInsured(person) = std.objectHas(person, "insurance") &&
+                          person.insurance == true;
+
+{
+    "insured" : *std.filter*(function(person) isInsured(person), payload)
+}
+-------------
+.Output
+-------------
+{
+   "insured": [
+      {
+         "age": 46,
+         "gender": "Male",
+         "insurance": true,
+         "name": "Joe"
+      },
+      {
+         "age": 33,
+         "gender": "Female",
+         "insurance": true,
+         "name": "Jane"
+      }
+   ]
+}
+
+-------------
+
+### Order By / Sorting
+The `std.sort(arr)` function is available in the standard library. All elements of an array must be of the same type. If elements of array are objects or other arrays, a function must be provided to to extract comparison key from each list element.
+
+.Payload
+-------------
+[
+  3,
+  4,
+  5,
+  6,
+  7,
+  1,
+  2
+]
+-------------
+.Mapping
+[subs="quotes"]
+-------------
+std.sort(payload)
+-------------
+.Output
+-------------
+[
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+]
+-------------
+
+//TODO Sort with key
+
+### Group By
+`PortX.Util.groupBy()` function provided. The first argument is a list of objects, the second is the name of the element to group by. The following example groups list of objects by name of the language:
+
+.Payload
+-------------
+{
+  "languages": [
+    {
+      "language": {
+        "name": "Java",
+        "version": "1.8"
+      }
+    },
+    {
+      "language": {
+        "name": "Scala",
+        "version": "2.13.0"
+      }
+    },
+    {
+      "language": {
+        "name": "Java",
+        "version": "1.7"
+      }
+    },
+    {
+      "language": {
+        "name": "Scala",
+        "version": "2.11.12"
+      }
+    }
+  ]
+}
+-------------
+.Mapping
+[subs="quotes"]
+-------------
+{
+  languages: PortX.Util.groupBy(payload.languages, 'language.name'),
+}
+-------------
+.Output
+-------------
+{
+   "languages": {
+      "Java": [
+         {
+            "language": {
+               "name": "Java",
+               "version": "1.8"
+            }
+         },
+         {
+            "language": {
+               "name": "Java",
+               "version": "1.7"
+            }
+         }
+      ],
+      "Scala": [
+         {
+            "language": {
+               "name": "Scala",
+               "version": "2.13.0"
+            }
+         },
+         {
+            "language": {
+               "name": "Scala",
+               "version": "2.11.12"
+            }
+         }
+      ]
+   }
+}
+-------------
+### Distinct By
+`PortX.Util.distinctBy()` function provided.
+
+.Payload
+-------------
+{
+   "arrayOfLetters": [ "a", "c", "b", "c", "d", "c", "a", "b", "b" ],
+   "arrayOfObjects": [
+        {
+            "a": "a",
+            "b":"b"
+        },
+        {
+            "a": "a",
+            "c" : {
+                "t":"t",
+                "y":"y"
+            },
+        },
+        {
+            "a": "a"
+        },
+        {
+            "a": "a"
+        },
+        {
+            "a": "a"
+        },
+        {
+            "a": "a",
+            "c" : {
+                "y":"y",
+                "t":"t"
+            },
+        },
+        {
+            "a": "a"
+        }
+   ]
+}
+-------------
+
+.Mapping
+[subs="quotes"]
+-------------
+{
+  uniqueLetters: *PortX.Util.distinctBy*(payload.arrayOfLetters),
+  uniqueObjects: *PortX.Util.distinctBy*(payload.arrayOfObjects)
+}
+-------------
+.Output
+-------------
+{
+  "uniqueLetters": [
+    "a",
+    "c",
+    "b",
+    "d"
+  ],
+  "uniqueObjects": [
+    {
+      "a": "a",
+      "b": "b"
+    },
+    {
+      "a": "a",
+      "c": {
+        "t": "t",
+        "y": "y"
+      }
+    },
+    {
+      "a": "a"
+    }
+  ]
+}
+-------------
+An optional `criterion` parameter can be provided, in this case only value of the field specified in the parameter considered when objects are checked for uniqueness. For example, the following mapping only selects distinct languages, regardless of their versions:
+
+.Mapping
+[subs="quotes"]
+-------------
+local listOfLanguages =
+    [
+      {
+        "language": {
+          "name": "Java",
+          "version": "1.8"
+        }
+      },
+      {
+        "language": {
+          "name": "Scala",
+          "version": "2.13.0"
+        }
+      },
+      {
+        "language": {
+          "name": "Java",
+          "version": "1.7"
+        }
+      },
+      {
+        "language": {
+          "name": "Scala",
+          "version": "2.11.12"
+        }
+      }
+    ];
+
+PortX.Util.distinctBy(listOfLanguages, *"language.name"*)
+-------------
+.Output
+-------------
+[
+   {
+      "language": {
+         "name": "Java",
+         "version": "1.8"
+      }
+   },
+   {
+      "language": {
+         "name": "Scala",
+         "version": "2.13.0"
+      }
+   }
+]
+-------------
+
+### Count
+`std.length()` function is available out of the box. If parameter is an array, it will return number of elements in the array.
+
+### Array Flattening
+`PortX.Util.deepFlattenArrays()` function recursively iterates over array of elements, some or all of which may be arrays too, and merges them all in a single array.
+
+.Payload
+-------------
+[
+  1,
+  2,
+  [
+    3
+  ],
+  [
+    4,
+    [
+      5,
+      6,
+      7
+    ],
+    {
+      "x": "y"
+    }
+  ]
+]
+-------------
+.Mapping
+[subs="quotes"]
+-------------
+PortX.Util.deepFlattenArrays(payload)
+-------------
+.Output
+-------------
+[
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  {
+    "x": "y"
+  }
+]
+-------------
+
+Note that `std.flattenArrays(arrs)` function is also available, it only flattens a single level of nesting.
+
+### Insert Literal Data
+It's possible to import both code and raw data from other files.
+
+- The import construct is like copy/pasting Jsonnet code.
+- Files designed for import by convention end with `.libsonnet`
+- Raw JSON can be imported this way too.
+- The `importstr` construct is for verbatim UTF-8 text.
+
+Usually, imported Jsonnet content is stashed in a top-level local variable. This resembles the way other programming languages handle modules. Jsonnet libraries typically return an object, so that they can easily be extended. Neither of these conventions are enforced.
+
+### Sum Up Numbers in an Array
+Standard library has the `foldl` function which calls the function on each array element and the result of the previous function call, or init in the case of the initial element. It traverses the array from left to right.
+
+.Payload
+--------
+[
+  2,
+  3,
+  5,
+  7,
+  11,
+  13,
+  17
+]
+--------
+.Mapping
+[subs="quotes"]
+-------------
+{
+  sum: *std.foldl*(function(aggregate, num) aggregate + num, payload, 0)
+}
+-------------
+.Output
+-------------
+{
+  "sum": 58
+}
+-------------
+
+### Default Values
+One option to set fields with default values is to create an overlay object with default values and add your input objects to it. Consider the following example:
+
+.Payload
+--------
+[
+  {
+    "name": "Steve Jobs",
+    "company": "Apple"
+  },
+  {
+    "name": "Bill Gates",
+    "company": "Microsoft"
+  },
+  {
+    "name": "John Doe"
+  },
+  {
+    "name": "John Smith"
+  },
+  {
+    "company": "ACME Software"
+  }
+]
+--------
+.Mapping
+[subs="quotes"]
+-------------
+local *defaultValues* = {
+    "name": "No Name",
+    "company": "N/A"
+};
+
+std.map(function(obj) *defaultValues + obj*, payload)
+-------------
+.Output
+[subs="quotes"]
+-------------
+[
+  {
+    "company": "Apple",
+    "name": "Steve Jobs"
+  },
+  {
+    "company": "Microsoft",
+    "name": "Bill Gates"
+  },
+  {
+    *"company": "N/A"*,
+    "name": "John Doe"
+  },
+  {
+    *"company": "N/A"*,
+    "name": "John Smith"
+  },
+  {
+    "company": "ACME Software",
+    *"name": "No Name"*
+  }
+]
+-------------
+
+### Add and Subtract Dates
+DataSonnet uses ISO-8601 dates and periods. To add or subtract a number of years. months and days, use `PortX.LocalDateTime.offset()` and `PortX.ZonedDateTime.offset()` functions.
+
+.Mapping
+[subs="quotes"]
+---------------
+PortX.LocalDateTime.offset("2019-07-22T21:00:00", "P1Y1D")
+---------------
+.Output
+[subs="quotes"]
+-------------
+2020-07-23T21:00:00
+-------------
+
+See https://docs.oracle.com/javase/8/docs/api/java/time/Period.html#parse-java.lang.CharSequence-[Java 8 Period documentation] for period format details and examples.
+
+### Creating a Pivot Table
+There are number of ways to pivot a table in DataSonnet. For example, `std.foldl` reduce function can be used:
+
+.Payload
+--------
+[
+  {
+    "name": "Steve Jobs",
+    "company": "Apple"
+  },
+  {
+    "name": "Bill Gates",
+    "company": "Microsoft"
+  },
+  {
+    "name": "John Doe"
+  },
+  {
+    "name": "John Smith"
+  },
+  {
+    "company": "ACME Software"
+  }
+]
+--------
+.Mapping
+[subs="quotes"]
+--------
+local overlay = {
+  "name": "No Name",
+  "company": "N/A"
+};
+
+local payloadWithDefaults = std.map(function(obj) overlay + obj, payload);
+
+{
+  names: std.foldl(function(aggregate, obj) aggregate + [obj.name], payloadWithDefaults, []),
+  companies: std.foldl(function(aggregate, obj) aggregate + [obj.company], payloadWithDefaults, []),
+}
+--------
+.Output
+[subs="quotes"]
+-------------
+{
+  "companies": [
+    "Apple",
+    "Microsoft",
+    "N/A",
+    "N/A",
+    "ACME Software"
+  ],
+  "names": [
+    "Steve Jobs",
+    "Bill Gates",
+    "John Doe",
+    "John Smith",
+    "No Name"
+  ]
+}
+-------------
+
+### Removing Fields from Object
+The field will not be included in the result object if its key is set to `null`. For example:
+
+.Payload
+--------
+{
+    "account_id": "654",
+    "disabled": false,
+    "email_address": "wexler@modusbox.com",
+    "full_name": "Dave Wexler",
+    "generic": false,
+    "headline": "CEO",
+    "id": "789",
+    "photo": "n/a",
+    "update_whitelist": [
+        "full_name",
+        "headline",
+        "email_address",
+        "external_reference"
+    ]
+}
+--------
+.Mapping
+[subs="quotes"]
+--------
+local removeFields = [ "photo", "generic", "disabled", "update_whitelist", "id" ];
+
+{
+    [ if std.count(removeFields, k) <= 0 then k else *null* ] : payload[k]
+    for k in std.objectFields(payload)
+}
+--------
+.Output
+--------
+{
+    "account_id": "654",
+    "email_address": "wexler@modusbox.com",
+    "full_name": "Dave Wexler",
+    "headline": "CEO"
+}
+--------
+
+`PortX.Util.remove(object, key)` and `PortX.Util.removeAll(object, arrayOfKeys)` functions provided for convenience:
+
+[subs="quotes"]
+--------
+*PortX.Util.removeAll*(payload, [ "photo", "generic", "disabled", "update_whitelist", "id" ])
+--------
+
+### Finding If Array Contains Value
+For simple scenarios `std.count(arr, val) > 0` will return `true` if an array contains the value. For more complex scenarios JsonPath can be used.
+
+.Payload
+--------
+[
+   {
+      "language": {
+         "name": "Java",
+         "version": "1.8"
+      }
+   },
+   {
+      "language": {
+         "name": "Scala",
+         "version": "2.13.0"
+      }
+   }
+]
+--------
+.Mapping
+[subs="quotes"]
+--------
+local javaLanguages = PortX.JsonPath.select(payload, "$..language[?(@.name == 'Java')]");
+
+std.length(javaLanguages) > 0
+--------
+.Output
+[subs="quotes"]
+-------------
+true
+-------------
+
+### Merging Objects and Adding Fields to Objects
+
+DataSonnet allows objects to be merged, i.e. there's a `+` operation defined with the resulting object being a union of both objects. This allows adding fields to existing objects without having to map each field individually. For example:
+
+.Payload
+----------
+{
+    "firstName": "Java",
+    "lastName": "Duke",
+    "title": "Duke of Java",
+    "addresses": [
+        {
+            "street1": "123 Foo",
+            "city": "Menlo Park"
+        }
+    ]
+}
+----------
+.Mapping
+[subs="quotes"]
+---------------
+payload + { "middleName": "NMN",
+            "addresses": [
+              addr + { "state": "CA" } for addr in payload.addresses
+            ]
+          }
+---------------
+.Output
+[subs="quotes"]
+-------------
+{
+  "addresses": [
+    {
+      "city": "Menlo Park",
+      *"state": "CA",*
+      "street1": "123 Foo"
+    }
+  ],
+  "firstName": "Java",
+  "lastName": "Duke",
+  *"middleName": "NMN",*
+  "title": "Duke of Java"
+}
+-------------

@@ -1,0 +1,15 @@
+{
+  "userId" : "123",
+  "name" : "PortX",
+  "number1" : 1,
+  "number2" : 2,
+  "object1" : {
+    "Hello" : "Hello"
+  },
+  "object2" : {
+    "World" : "World"
+  },
+  "array1": [1, 2],
+  "array2": [3, 4],
+  "array3": [2, 4]
+}

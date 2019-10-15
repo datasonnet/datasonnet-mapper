@@ -1,0 +1,11 @@
+local overlay = {
+    "name": "No Name",
+    "company": "N/A"
+};
+
+local payloadWithDefaults = std.map(function(obj) overlay + obj, payload);
+
+{
+  names: std.foldl(function(aggregate, obj) aggregate + [obj.name], payloadWithDefaults, []),
+  companies: std.foldl(function(aggregate, obj) aggregate + [obj.company], payloadWithDefaults, []),
+}

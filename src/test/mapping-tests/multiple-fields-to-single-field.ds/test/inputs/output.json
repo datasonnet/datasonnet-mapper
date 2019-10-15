@@ -1,0 +1,18 @@
+{
+  "arrays": [
+    1,
+    2,
+    3,
+    4,
+    2,
+    4
+  ],
+  "nameId": "PortX - 123",
+  "numberPlusNumber": 3,
+  "numberPlusString": "1PortX",
+  "objects": {
+    "Hello": "Hello",
+    "World": "World"
+  },
+  "stringPlusNumber": "PortX1"
+}

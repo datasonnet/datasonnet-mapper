@@ -1,0 +1,19 @@
+[
+  {
+    "name": "Steve Jobs",
+    "company": "Apple"
+  },
+  {
+    "name": "Bill Gates",
+    "company": "Microsoft"
+  },
+  {
+    "name": "John Doe"
+  },
+  {
+    "name": "John Smith"
+  },
+  {
+    "company": "ACME Software"
+  }
+]

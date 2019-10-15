@@ -1,0 +1,22 @@
+{
+  "flights": [
+    {
+      "availableSeats": 45,
+      "airlineName": "Delta",
+      "aircraftBrand": "Boeing",
+      "aircraftType": "717",
+      "departureDate": "01/20/2019",
+      "origin": "PHX",
+      "destination": "SEA"
+    },
+    {
+      "availableSeats": 134,
+      "airlineName": "Delta",
+      "aircraftBrand": "Airbus",
+      "aircraftType": "A350",
+      "departureDate": "10/13/2018",
+      "origin": "AMS",
+      "destination": "DTW"
+    }
+  ]
+}

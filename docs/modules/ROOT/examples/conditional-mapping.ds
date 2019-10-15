@@ -1,0 +1,20 @@
+{
+    "insured" : [
+        {
+            name: person.name,
+            gender: person.gender
+        }
+        for person in payload
+        if std.objectHas(person, "insurance") && person.insurance == true
+    ],
+    "uninsured" : [
+        {
+            name: person.name,
+            gender: person.gender
+        }
+        for person in payload
+        if !std.objectHas(person, "insurance") || person.insurance == false
+    ],
+    
+    assert self == output
+}

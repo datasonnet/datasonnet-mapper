@@ -1,0 +1,12 @@
+local result = {
+    "nameId": payload.name + " - " + payload.userId,
+    "numberPlusString" : payload.number1 + payload.name,
+    "stringPlusNumber" : payload.name + payload.number1,
+    "numberPlusNumber" : payload.number1 + payload.number2,
+    "objects" : payload.object1 + payload.object2,
+    "arrays" : payload.array1 + payload.array2 + payload.array3
+};
+
+assert result == output;
+
+result

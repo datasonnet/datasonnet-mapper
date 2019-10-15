@@ -1,0 +1,14 @@
+local result = [
+    {
+      [ if key == 'availableSeats' then 'emptySeats' else
+        if key == 'airlineName' then 'airline' else
+        key ]: flight[key]
+         for key in std.objectFields(flight)        
+    } 
+    for flight in payload.flights
+];
+
+assert result == output;
+
+result
+

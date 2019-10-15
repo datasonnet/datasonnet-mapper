@@ -4,3 +4,4 @@
 * xref:cli.adoc[Command Line Interface]
 ** xref:jar-cli.adoc[Using the CLI via a Jar]
 ** xref:docker-cli.adoc[Using the CLI via Docker]
+* xref:cookbook.adoc[Cookbook]

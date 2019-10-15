@@ -1,0 +1,25 @@
+[
+  {
+    "name" : "Joe",
+    "gender" : "Male",
+    "age" : 46,
+    "insurance": true
+  },
+  {
+    "name" : "Bob",
+    "gender" : "Male",
+    "age" : 40,
+    "insurance": false
+  },
+  {
+    "name" : "Jane",
+    "gender" : "Female",
+    "age" : 33,
+    "insurance": true
+  },
+  {
+    "name" : "Mary",
+    "gender" : "Female",
+    "age" : 40
+  }
+]

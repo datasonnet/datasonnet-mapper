@@ -1,0 +1,20 @@
+[
+  {
+    "aircraftBrand": "Boeing",
+    "aircraftType": "717",
+    "airline": "Delta",
+    "departureDate": "01/20/2019",
+    "destination": "SEA",
+    "emptySeats": 45,
+    "origin": "PHX"
+  },
+  {
+    "aircraftBrand": "Airbus",
+    "aircraftType": "A350",
+    "airline": "Delta",
+    "departureDate": "10/13/2018",
+    "destination": "DTW",
+    "emptySeats": 134,
+    "origin": "AMS"
+  }
+]

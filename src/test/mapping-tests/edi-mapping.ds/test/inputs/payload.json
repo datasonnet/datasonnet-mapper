@@ -1,0 +1,795 @@
+{
+  "ZDELVRY03_620": {
+    "IDOC": {
+      "EDI_DC40": {
+        "TABNAM": "EDI_DC40",
+        "MANDT": "010",
+        "DOCNUM": "0000000050374840",
+        "DOCREL": "740",
+        "STATUS": "30",
+        "DIRECT": "1",
+        "OUTMOD": "2",
+        "IDOCTYP": "DELVRY03",
+        "CIMTYP": "ZDELVRY03_620",
+        "MESTYP": "DESADV",
+        "STDMES": "DESADV",
+        "SNDPOR": "SAPSN1",
+        "SNDPRT": "LS",
+        "SNDPRN": "SN1CLNT010",
+        "RCVPOR": "MULE_IDOC",
+        "RCVPRT": "KU",
+        "RCVPFC": "AG",
+        "RCVPRN": "0000049898",
+        "CREDAT": "20180706",
+        "CRETIM": "083417",
+        "SERIAL": "20180607154632"
+      },
+      "E1EDL20": {
+        "VBELN": "0083057273",
+        "VSTEL": "4976",
+        "VKORG": "4975",
+        "ABLAD": "MUP",
+        "INCO1": "FO1",
+        "VSBED": "01",
+        "BTGEW": "993.600",
+        "NTGEW": "993.600",
+        "GEWEI": "LB",
+        "VOLUM": "0.000",
+        "ANZPK": "00004",
+        "PARID": "8432",
+        "PODAT": "20180607",
+        "POTIM": "154633",
+        "ZVDLVHD": {
+          "BUKRS": "4975",
+          "GBSTK": "C",
+          "WBSTK": "A"
+        },
+        "E1EDL22": {
+          "VSTEL_BEZ": "ORBIS CANADA LIMITED - Rexdale",
+          "VKORG_BEZ": "Orbis Canada Limited",
+          "INCO1_BEZ": "FOB - Collect",
+          "VSBED_BEZ": "Standard Shipping"
+        },
+        "E1EDL21": {
+          "LFART": "LF",
+          "LPRIO": "54",
+          "KDGRP": "RT",
+          "TRAGR": "0001",
+          "E1EDL23": {
+            "LFART_BEZ": "Delivery",
+            "LPRIO_BEZ": "Conf-Don't ShipEarly",
+            "KDGRP_BEZ": "Retailer",
+            "TRAGR_BEZ": "Standard transport'n"
+          }
+        },
+        "E1EDL18": {
+          "QUALF": "ORI"
+        },
+        "E1ADRM1": [
+          {
+            "PARTNER_Q": "AG",
+            "PARTNER_ID": "0000049898",
+            "JURISDIC": "7001514201",
+            "LANGUAGE": "EN",
+            "NAME1": "CANADIAN TIRE",
+            "NAME2": "(EDI ACCOUNT ONLY)",
+            "STREET1": "STN K",
+            "POSTL_COD1": "M4P 2V8",
+            "CITY1": "TORONTO",
+            "CITY2": "ONTARIO",
+            "POSTL_PBOX": "770",
+            "POSTL_COD2": "M4P 2V8",
+            "TELEPHONE1": "416-480-3112",
+            "TELEPHONE2": "4164808317",
+            "TELEFAX": "4164843843",
+            "E_MAIL": "michael.legere@cantire.com",
+            "COUNTRY1": "CA",
+            "REGION": "ON",
+            "E1ADRE1": {
+              "EXTEND_Q": "300",
+              "EXTEND_D": "8432"
+            }
+          },
+          {
+            "PARTNER_Q": "SP",
+            "PARTNER_ID": "0000550221",
+            "LANGUAGE": "EN",
+            "NAME1": "SEE SHIPPING INSTRUCTIONS",
+            "STREET1": "-",
+            "POSTL_COD1": "99999",
+            "CITY1": "-",
+            "COUNTRY1": "US",
+            "REGION": "WI"
+          },
+          {
+            "PARTNER_Q": "WE",
+            "PARTNER_ID": "0000362797",
+            "JURISDIC": "7001585681",
+            "LANGUAGE": "EN",
+            "NAME1": "CT RETAIL - BOLTON D.C.",
+            "STREET1": "8400 HEALEY RD",
+            "POSTL_COD1": "L7E 4K3",
+            "CITY1": "BOLTON",
+            "CITY2": "ONTARIO",
+            "COUNTRY1": "CA",
+            "REGION": "ON",
+            "E1ADRE1": {
+              "EXTEND_Q": "302",
+              "EXTEND_D": "2016136689004"
+            }
+          },
+          {
+            "PARTNER_Q": "OSP",
+            "PARTNER_ID": "4976",
+            "JURISDIC": "7001504701",
+            "LANGUAGE": "EN",
+            "NAME1": "ORBIS CANADA LIMITED",
+            "STREET1": "39 WESTMORE DRIVE",
+            "POSTL_COD1": "M9V 3Y6",
+            "CITY1": "TORONTO",
+            "CITY2": "ONTARIO",
+            "COUNTRY1": "CA",
+            "REGION": "ON"
+          },
+          {
+            "PARTNER_Q": "OSO",
+            "PARTNER_ID": "4975",
+            "JURISDIC": "7001524201",
+            "LANGUAGE": "EN",
+            "NAME1": "ORBIS - NPL",
+            "STREET1": "39 WESTMORE DRIVE",
+            "POSTL_COD1": "M9V 3Y6",
+            "CITY1": "REXDALE",
+            "CITY2": "ONTARIO",
+            "TELEPHONE1": "416-745-6980",
+            "COUNTRY1": "CA",
+            "REGION": "ON"
+          }
+        ],
+        "E1EDT13": [
+          {
+            "QUALF": "006",
+            "NTANF": "20180625",
+            "NTANZ": "000000",
+            "NTEND": "20180625",
+            "NTENZ": "000000",
+            "TZONE_BEG": "CST",
+            "ISDD": "00000000",
+            "ISDZ": "000000",
+            "IEDD": "00000000",
+            "IEDZ": "000000",
+            "TZONE_END": "CST"
+          },
+          {
+            "QUALF": "003",
+            "NTANF": "20180625",
+            "NTANZ": "000000",
+            "NTEND": "20180625",
+            "NTENZ": "000000",
+            "TZONE_BEG": "CST",
+            "ISDD": "00000000",
+            "ISDZ": "000000",
+            "IEDD": "00000000",
+            "IEDZ": "000000"
+          },
+          {
+            "QUALF": "001",
+            "NTANF": "20180625",
+            "NTANZ": "000000",
+            "NTEND": "20180625",
+            "NTENZ": "000000",
+            "TZONE_BEG": "CST",
+            "ISDD": "00000000",
+            "ISDZ": "000000",
+            "IEDD": "00000000",
+            "IEDZ": "000000"
+          },
+          {
+            "QUALF": "007",
+            "NTANF": "20180625",
+            "NTANZ": "000000",
+            "NTEND": "20180625",
+            "NTENZ": "000000",
+            "TZONE_BEG": "EST",
+            "ISDD": "00000000",
+            "ISDZ": "000000",
+            "IEDD": "00000000",
+            "IEDZ": "000000"
+          },
+          {
+            "QUALF": "010",
+            "NTANF": "20180622",
+            "NTANZ": "000000",
+            "NTEND": "20180622",
+            "NTENZ": "000000",
+            "TZONE_BEG": "CST",
+            "ISDD": "00000000",
+            "ISDZ": "000000",
+            "IEDD": "00000000",
+            "IEDZ": "000000"
+          },
+          {
+            "QUALF": "015",
+            "NTANF": "20180607",
+            "NTANZ": "000000",
+            "NTEND": "20180607",
+            "NTENZ": "000000",
+            "ISDD": "00000000",
+            "ISDZ": "000000",
+            "IEDD": "00000000",
+            "IEDZ": "000000"
+          }
+        ],
+        "E1TXTH8": [
+          {
+            "TDOBJECT": "VBBK",
+            "TDOBNAME": "0083057273",
+            "TDID": "ZZ01",
+            "TDSPRAS": "E",
+            "LANGUA_ISO": "EN",
+            "E1TXTP8": [
+              {
+                "TDLINE": "MISHRA, CHINMAY   HA"
+              },
+              {
+                "TDLINE": "(416)480-8733"
+              }
+            ]
+          },
+          {
+            "TDOBJECT": "VBBK",
+            "TDOBNAME": "0083057273",
+            "TDID": "ZZ04",
+            "TDSPRAS": "E",
+            "LANGUA_ISO": "EN",
+            "E1TXTP8": [
+              {
+                "TDFORMAT": "*",
+                "TDLINE": "CONTACT CANADIAN TIRE FOR ROUTING."
+              },
+              {
+                "TDFORMAT": "*"
+              },
+              {
+                "TDFORMAT": "*",
+                "TDLINE": "RPA:"
+              },
+              {
+                "TDFORMAT": "*"
+              },
+              {
+                "TDFORMAT": "*",
+                "TDLINE": "REQUESTED SHIP DATE:"
+              },
+              {
+                "TDFORMAT": "*"
+              },
+              {
+                "TDFORMAT": "*"
+              }
+            ]
+          },
+          {
+            "TDOBJECT": "VBBK",
+            "TDOBNAME": "0083057273",
+            "TDID": "ZZ05",
+            "TDSPRAS": "E",
+            "LANGUA_ISO": "EN",
+            "E1TXTP8": {
+              "TDFORMAT": "*",
+              "TDLINE": "RPA:"
+            }
+          },
+          {
+            "TDOBJECT": "VBBK",
+            "TDOBNAME": "0083057273",
+            "TDID": "ZZ11",
+            "TDSPRAS": "E",
+            "LANGUA_ISO": "EN",
+            "E1TXTP8": {
+              "TDLINE": "CC"
+            }
+          },
+          {
+            "TDOBJECT": "VBBK",
+            "TDOBNAME": "0083057273",
+            "TDID": "ZZ71",
+            "TDSPRAS": "E",
+            "LANGUA_ISO": "EN",
+            "E1TXTP8": [
+              {
+                "TDFORMAT": "*"
+              },
+              {
+                "TDFORMAT": "*",
+                "TDLINE": "A COPY OF THE PURCHASE ORDER CAN BE VIEWED THROUGH THE EDI DOCUMENT"
+              },
+              {
+                "TDLINE": "REPOSITORY AT HTTPS://LINK.MENASHA.COM/OPERATIONS/EDI . CLICK ON THE EDI"
+              },
+              {
+                "TDLINE": "REPOSITORY LINK UNDER THE OPERATIONS TAB."
+              },
+              {
+                "TDFORMAT": "*",
+                "TDLINE": "IN THE KEY FILTERS BOX USE-"
+              },
+              {
+                "TDFORMAT": "*",
+                "TDLINE": "MENASHA COMPANY: ORBIS"
+              },
+              {
+                "TDFORMAT": "*",
+                "TDLINE": "MENASHA LOCATION: 4000"
+              },
+              {
+                "TDFORMAT": "*",
+                "TDLINE": "PARTNER: SEARCH FOR THE CUSTOMER'S NAME THAT THE ORDER IS FOR"
+              },
+              {
+                "TDFORMAT": "*",
+                "TDLINE": "TRAN TYPE: 850"
+              },
+              {
+                "TDFORMAT": "*",
+                "TDLINE": "THEN CLICK ON \"APPLY\" TO VIEW ALL THE PURCHASE ORDERS FOR THAT COMPANY."
+              },
+              {
+                "TDFORMAT": "*",
+                "TDLINE": "YOU CAN SEARCH FOR A SPECIFIC PURCHASE ORDER NUMBER BY USING THE SEARCH"
+              },
+              {
+                "TDLINE": "BOX IN THE UPPER RIGHT HAND CORNER OF THE PAGE. FOR MORE DETAILED STEP"
+              },
+              {
+                "TDLINE": "BY STEP INSTRUCTIONS, SEE THE EDI PURCHASE ORDER SEARCH DOCUMENT."
+              },
+              {
+                "TDFORMAT": "*"
+              },
+              {
+                "TDFORMAT": "*"
+              }
+            ]
+          }
+        ],
+        "E1EDL24": {
+          "POSNR": "000010",
+          "MATNR": "1104957",
+          "MATWA": "1104957",
+          "ARKTX": "12 GAL 252-RC12-DQ BLUE1001 AU690  CTC",
+          "MATKL": "200000000",
+          "WERKS": "4976",
+          "LGORT": "WE01",
+          "KDMAT": "042-3078-8",
+          "LFIMG": "288.000",
+          "VRKME": "EA",
+          "LGMNG": "288.000",
+          "MEINS": "EA",
+          "NTGEW": "993.600",
+          "BRGEW": "993.600",
+          "GEWEI": "LB",
+          "VOLUM": "0.000",
+          "LADGR": "0001",
+          "TRAGR": "0001",
+          "VKBUR": "Y1",
+          "VTWEG": "01",
+          "SPART": "01",
+          "GRKOR": "000",
+          "MFRGR": "PL125",
+          "KDMAT35": "042-3078-8",
+          "POSEX": "000001",
+          "USR01": "FERT",
+          "USR02": "000000",
+          "VFDAT": "00000000",
+          "EXPIRY_DATE_EXT": "0",
+          "VGBEL": "0091384870",
+          "VGPOS": "000010",
+          "ORMNG": "       288.000",
+          "EXPIRY_DATE_EXT_B": "0",
+          "ZVDLVIT": {
+            "PRCTR": "4976",
+            "UNITPRICE": "        5.75",
+            "GARVZ": "PL125",
+            "GTART": "PL125",
+            "GTKLS": "125",
+            "BEZEI": "Plastic Articles 156600 S",
+            "ORD_QTY": "         288.000",
+            "CUST_MATERIAL": "042-3078-8"
+          },
+          "ZVADATB": {
+            "ZZBRAN1": "441310",
+            "ZZBRAN": "44"
+          },
+          "E1EDL25": {
+            "LGORT_BEZ": "WE01 AILE E",
+            "LADGR_BEZ": "On-Site Loading",
+            "TRAGR_BEZ": "Standard transport'n",
+            "VKBUR_BEZ": "RSC Distribution",
+            "VTWEG_BEZ": "Direct Sales",
+            "SPART_BEZ": "ORBIS Sales",
+            "MFRGR_BEZ": "Plastics/Class 125"
+          },
+          "E1EDL26": {
+            "PSTYV": "TAN",
+            "MATKL": "200000000",
+            "PRODH": "00700000200030",
+            "UMVKZ": "1",
+            "UMVKN": "1",
+            "KZTLF": "C",
+            "UEBTO": "1.0",
+            "UNTTO": "0.0",
+            "E1EDL27": {
+              "PSTYV_BEZ": "Standard Item",
+              "MATKL_BEZ": "Finished Goods",
+              "PRODH_BEZ": "12 Gal. Hopper Recyc",
+              "WERKS_BEZ": "ORBIS CANADA LIMITED - REXDALE"
+            }
+          },
+          "E1EDL35": {
+            "STAWN": "3924.90.5650",
+            "HERKL": "CA",
+            "HERKR": "ON",
+            "E1EDL36": {
+              "STXT1": "Other household articles, other, other",
+              "STXT2": "other, other",
+              "HERKL_BEZ": "Canada",
+              "HERKR_BEZ": "Ontario"
+            }
+          },
+          "E1EDL43": {
+            "QUALF": "C",
+            "BELNR": "0091384870",
+            "POSNR": "000010",
+            "DATUM": "20180606"
+          },
+          "E1EDL41": [
+            {
+              "QUALI": "001",
+              "BSTNR": "05092712",
+              "BSTDT": "20180604",
+              "BSARK": "DFUE",
+              "POSEX": "000001",
+              "E1EDL42": {
+                "BSARK_BEZ": "By telecommunication"
+              }
+            },
+            {
+              "QUALI": "002",
+              "BSTNR": "8432",
+              "BSTDT": "00000000"
+            }
+          ],
+          "E1TXTH9": [
+            {
+              "TDOBJECT": "VBBP",
+              "TDOBNAME": "0083057273000010",
+              "TDID": "0100",
+              "TDSPRAS": "E",
+              "LANGUA_ISO": "EN",
+              "E1TXTP9": [
+                {
+                  "TDFORMAT": "*",
+                  "TDLINE": "7/7/10 - MD 53040 - THIS ITEM REPLACES 1103391"
+                },
+                {
+                  "TDFORMAT": "/"
+                },
+                {
+                  "TDFORMAT": "/",
+                  "TDLINE": "08/05/10 - PROGRAM UPDATED PER FGIP 10-241 ATTACHED."
+                },
+                {
+                  "TDFORMAT": "/",
+                  "TDLINE": "(SLB)"
+                },
+                {
+                  "TDFORMAT": "/"
+                },
+                {
+                  "TDFORMAT": "/",
+                  "TDLINE": "8/8/11 - PROGRAM CANCELLED PER FGIP 11-211 ATTACHED."
+                },
+                {
+                  "TDFORMAT": "/",
+                  "TDLINE": "(SLB)"
+                }
+              ]
+            },
+            {
+              "TDOBJECT": "VBBP",
+              "TDOBNAME": "0083057273000010",
+              "TDID": "Z009",
+              "TDSPRAS": "E",
+              "LANGUA_ISO": "EN",
+              "E1TXTP9": [
+                {
+                  "TDFORMAT": "*",
+                  "TDLINE": "PLASTIC RECYCLING CONTAINER"
+                },
+                {
+                  "TDFORMAT": "*",
+                  "TDLINE": "ATTACH 0092159 - LABEL 6X4 WHT/BK/MUTLI BRCD ORBIS HOPPER"
+                },
+                {
+                  "TDFORMAT": "/",
+                  "TDLINE": "ON 1 LONG SIDE"
+                },
+                {
+                  "TDFORMAT": "/",
+                  "TDLINE": "TO READ:"
+                },
+                {
+                  "TDFORMAT": "/",
+                  "TDLINE": "STACKING HOPPER BIN / TREMIE EMPILABLE"
+                },
+                {
+                  "TDFORMAT": "/",
+                  "TDLINE": "BARCODE (7 72499 25205 4)"
+                },
+                {
+                  "TDFORMAT": "/"
+                },
+                {
+                  "TDFORMAT": "/",
+                  "TDLINE": "REF OPTION AU690"
+                },
+                {
+                  "TDFORMAT": "/"
+                }
+              ]
+            },
+            {
+              "TDOBJECT": "VBBP",
+              "TDOBNAME": "0083057273000010",
+              "TDID": "ZZ77",
+              "TDSPRAS": "E",
+              "LANGUA_ISO": "EN",
+              "E1TXTP9": {
+                "TDLINE": "PO113-CA"
+              }
+            }
+          ]
+        },
+        "E1EDL37": [
+          {
+            "EXIDV": "00000000000000611140",
+            "TARAG": "50.000",
+            "GWEIT": "LB",
+            "BRGEW": "298.400",
+            "NTGEW": "248.400",
+            "MAGEW": "0.000",
+            "GWEIM": "LB",
+            "BTVOL": "0.000",
+            "NTVOL": "0.000",
+            "MAVOL": "0.000",
+            "TAVOL": "0.000",
+            "VHILM": "PALLET",
+            "LAENG": "0.000",
+            "BREIT": "0.000",
+            "HOEHE": "0.000",
+            "VHART": "ORB1",
+            "MAGRV": "ORB1",
+            "LADLG": "0",
+            "FARZT": "0",
+            "ENTFE": "0",
+            "VELTP": "C",
+            "VEBEZ": "PALLET",
+            "SMGKN": "S",
+            "ERNAM": "63LAMDAN",
+            "EXIDA": "A",
+            "MOVE_STATUS": "0020",
+            "ZUL_AUFL": "           0.000",
+            "ZBARCOD": {
+              "BARVALUE": "0010772499000611140",
+              "BARTEXT": "(00) 1 0772499 0006111406",
+              "BARCHECK": "6",
+              "BARFULL": "00107724990006111406",
+              "BSTKD": "05092712",
+              "BSTDK": "20180604",
+              "POSEX": "000001",
+              "BSTKD_E": "8432",
+              "BSTDK_E": "00000000"
+            },
+            "E1EDL38": {
+              "VHART_BEZ": "ORBIS PALLET",
+              "MAGRV_BEZ": "PALLET",
+              "VEBEZ": "PALLET"
+            },
+            "E1EDL44": {
+              "VELIN": "1",
+              "VBELN": "0083057273",
+              "POSNR": "000010",
+              "VEMNG": "72.000",
+              "VEMEH": "EA",
+              "MATNR": "1104957",
+              "WERKS": "4976",
+              "LGORT": "WE01",
+              "CUOBJ": "000000000000000000",
+              "ANZSN": "         0",
+              "WDATU": "00000000",
+              "KDMAT_EXTERNAL": "042-3078-8"
+            }
+          },
+          {
+            "EXIDV": "00000000000000611142",
+            "TARAG": "50.000",
+            "GWEIT": "LB",
+            "BRGEW": "298.400",
+            "NTGEW": "248.400",
+            "MAGEW": "0.000",
+            "GWEIM": "LB",
+            "BTVOL": "0.000",
+            "NTVOL": "0.000",
+            "MAVOL": "0.000",
+            "TAVOL": "0.000",
+            "VHILM": "PALLET",
+            "LAENG": "0.000",
+            "BREIT": "0.000",
+            "HOEHE": "0.000",
+            "VHART": "ORB1",
+            "MAGRV": "ORB1",
+            "LADLG": "0",
+            "FARZT": "0",
+            "ENTFE": "0",
+            "VELTP": "C",
+            "VEBEZ": "PALLET",
+            "SMGKN": "S",
+            "ERNAM": "63LAMDAN",
+            "EXIDA": "A",
+            "MOVE_STATUS": "0020",
+            "ZUL_AUFL": "           0.000",
+            "ZBARCOD": {
+              "BARVALUE": "0010772499000611142",
+              "BARTEXT": "(00) 1 0772499 0006111420",
+              "BARCHECK": "0",
+              "BARFULL": "00107724990006111420",
+              "BSTKD": "05092712",
+              "BSTDK": "20180604",
+              "POSEX": "000001",
+              "BSTKD_E": "8432",
+              "BSTDK_E": "00000000"
+            },
+            "E1EDL38": {
+              "VHART_BEZ": "ORBIS PALLET",
+              "MAGRV_BEZ": "PALLET",
+              "VEBEZ": "PALLET"
+            },
+            "E1EDL44": {
+              "VELIN": "1",
+              "VBELN": "0083057273",
+              "POSNR": "000010",
+              "VEMNG": "72.000",
+              "VEMEH": "EA",
+              "MATNR": "1104957",
+              "WERKS": "4976",
+              "LGORT": "WE01",
+              "CUOBJ": "000000000000000000",
+              "ANZSN": "         0",
+              "WDATU": "00000000",
+              "KDMAT_EXTERNAL": "042-3078-8"
+            }
+          },
+          {
+            "EXIDV": "00000000000000611143",
+            "TARAG": "50.000",
+            "GWEIT": "LB",
+            "BRGEW": "298.400",
+            "NTGEW": "248.400",
+            "MAGEW": "0.000",
+            "GWEIM": "LB",
+            "BTVOL": "0.000",
+            "NTVOL": "0.000",
+            "MAVOL": "0.000",
+            "TAVOL": "0.000",
+            "VHILM": "PALLET",
+            "LAENG": "0.000",
+            "BREIT": "0.000",
+            "HOEHE": "0.000",
+            "VHART": "ORB1",
+            "MAGRV": "ORB1",
+            "LADLG": "0",
+            "FARZT": "0",
+            "ENTFE": "0",
+            "VELTP": "C",
+            "VEBEZ": "PALLET",
+            "SMGKN": "S",
+            "ERNAM": "63LAMDAN",
+            "EXIDA": "A",
+            "MOVE_STATUS": "0020",
+            "ZUL_AUFL": "           0.000",
+            "ZBARCOD": {
+              "BARVALUE": "0010772499000611143",
+              "BARTEXT": "(00) 1 0772499 0006111437",
+              "BARCHECK": "7",
+              "BARFULL": "00107724990006111437",
+              "BSTKD": "05092712",
+              "BSTDK": "20180604",
+              "POSEX": "000001",
+              "BSTKD_E": "8432",
+              "BSTDK_E": "00000000"
+            },
+            "E1EDL38": {
+              "VHART_BEZ": "ORBIS PALLET",
+              "MAGRV_BEZ": "PALLET",
+              "VEBEZ": "PALLET"
+            },
+            "E1EDL44": {
+              "VELIN": "1",
+              "VBELN": "0083057273",
+              "POSNR": "000010",
+              "VEMNG": "72.000",
+              "VEMEH": "EA",
+              "MATNR": "1104957",
+              "WERKS": "4976",
+              "LGORT": "WE01",
+              "CUOBJ": "000000000000000000",
+              "ANZSN": "         0",
+              "WDATU": "00000000",
+              "KDMAT_EXTERNAL": "042-3078-8"
+            }
+          },
+          {
+            "EXIDV": "00000000000000611144",
+            "TARAG": "50.000",
+            "GWEIT": "LB",
+            "BRGEW": "298.400",
+            "NTGEW": "248.400",
+            "MAGEW": "0.000",
+            "GWEIM": "LB",
+            "BTVOL": "0.000",
+            "NTVOL": "0.000",
+            "MAVOL": "0.000",
+            "TAVOL": "0.000",
+            "VHILM": "PALLET",
+            "LAENG": "0.000",
+            "BREIT": "0.000",
+            "HOEHE": "0.000",
+            "VHART": "ORB1",
+            "MAGRV": "ORB1",
+            "LADLG": "0",
+            "FARZT": "0",
+            "ENTFE": "0",
+            "VELTP": "C",
+            "VEBEZ": "PALLET",
+            "SMGKN": "S",
+            "ERNAM": "63LAMDAN",
+            "EXIDA": "A",
+            "MOVE_STATUS": "0020",
+            "ZUL_AUFL": "           0.000",
+            "ZBARCOD": {
+              "BARVALUE": "0010772499000611144",
+              "BARTEXT": "(00) 1 0772499 0006111444",
+              "BARCHECK": "4",
+              "BARFULL": "00107724990006111444",
+              "BSTKD": "05092712",
+              "BSTDK": "20180604",
+              "POSEX": "000001",
+              "BSTKD_E": "8432",
+              "BSTDK_E": "00000000"
+            },
+            "E1EDL38": {
+              "VHART_BEZ": "ORBIS PALLET",
+              "MAGRV_BEZ": "PALLET",
+              "VEBEZ": "PALLET"
+            },
+            "E1EDL44": {
+              "VELIN": "1",
+              "VBELN": "0083057273",
+              "POSNR": "000010",
+              "VEMNG": "72.000",
+              "VEMEH": "EA",
+              "MATNR": "1104957",
+              "WERKS": "4976",
+              "LGORT": "WE01",
+              "CUOBJ": "000000000000000000",
+              "ANZSN": "         0",
+              "WDATU": "00000000",
+              "KDMAT_EXTERNAL": "042-3078-8"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

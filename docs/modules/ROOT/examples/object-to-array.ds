@@ -1,0 +1,9 @@
+local filterKeys = [ "photo", "generic", "disabled", "update_whitelist", "id" ];
+//local filterKeys = [];
+[
+    {
+        [ if std.count(filterKeys, k) <= 0 then k else null ] : payload.users[key][k]
+        for k in std.objectFields(payload.users[key])
+    }
+    for key in std.objectFields(payload.users)
+]

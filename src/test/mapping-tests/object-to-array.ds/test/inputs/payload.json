@@ -1,0 +1,52 @@
+{
+  "users": {
+    "123": {
+      "full_name": "Steve Jobs",
+      "photo": "n/a",
+      "email_address": "steve.jobs@apple.com",
+      "headline": "CEO",
+      "generic": false,
+      "disabled": false,
+      "update_whitelist": [
+        "full_name",
+        "headline",
+        "email_address",
+        "external_reference"
+      ],
+      "account_id": "987",
+      "id": "123"
+    },
+    "456": {
+      "full_name": "Bill Gates",
+      "photo": "n/a",
+      "email_address": "bill.gates@microsoft.com",
+      "headline": "CEO",
+      "generic": false,
+      "disabled": false,
+      "update_whitelist": [
+        "full_name",
+        "headline",
+        "email_address",
+        "external_reference"
+      ],
+      "account_id": "654",
+      "id": "456"
+    },
+    "789": {
+      "full_name": "Dave Wexler",
+      "photo": "n/a",
+      "email_address": "wexler@modusbox.com",
+      "headline": "CEO",
+      "generic": false,
+      "disabled": false,
+      "update_whitelist": [
+        "full_name",
+        "headline",
+        "email_address",
+        "external_reference"
+      ],
+      "account_id": "654",
+      "id": "789"
+    }
+  }
+}
