@@ -1,22 +1,17 @@
 = DataSonnet
 Russell Duhon <fugu13@gmail.com>
-:toc:
 
 _Powerful, portable data transformation_
 
 == Introduction
 
-Businesses create connections between sources of data every day, but currently have to choose either portable tools unfriendly to business users, such as XSLT, or proprietary tools that lock them in and only work on certain platforms.
+Welcome to the documentation landing page for https://datasonnet.com[DataSonnet].
 
-DataSonnet is a new open source data transformation capability for everywhere.
+DataSonnet is a new open source data transformation tool. At its core is JSonnet, a highly portable programming language for manipulating data, originally designed for creating configurations.
 
-.It is
-* Portable, able to work in Mule 3, Mule 4, any other ESB, any other Java-based platform, or as a standalone executable
-* Open, with a permissive open-source license to ensure you’ll never be locked in
-* Resilient, using an underlying language that configures many of the largest clouds in the world
-* Business-friendly, easy for anyone working on data integration to get started with even if they aren’t a programmer
+DataSonnet repurposes JSonnet for data transformation by providing
 
-.DataSonnet combines
-* JSonnet, a highly portable programming language designed for manipulating data, in use at enormous scales by businesses from Google to DataBricks
-* A suite of powerful functions tailored for business data integration, including EDI and API data
-* Pluggable input and output metadata for JSON, XML, CSV, and more
+- additional libraries,
+- conventions for executing JSonnet for transformations,
+- tooling,
+- and documentation focused on data transformation.
