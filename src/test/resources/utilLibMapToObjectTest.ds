@@ -33,7 +33,7 @@ local expected = {
                  }
                };
 
-local mapped = PortX.Util.mapToObject(languages, function(x) x.language.name, function(v) v.language);
+local mapped = DS.Util.mapToObject(languages, function(x) x.language.name, function(v) v.language);
 
 assert expected == mapped : "MapToObject result is " + mapped;
 

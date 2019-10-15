@@ -22,8 +22,8 @@ public class XMLReaderTest {
     void testOverrideNamespaces() throws Exception {
         String xml = "<a xmlns='http://example.com/1' xmlns:b='http://example.com/2'><b:b/></a>";
         // note how b is bound to the default namespace, which means the 'b' above needs to be auto-rebound
-        //String jsonnet = "PortX.Formats.readExt(payload, \"application/xml\", {NamespaceDeclarations: {b: \"http://example.com/1\"}})";
-        String jsonnet = "PortX.Formats.read(payload, \"application/xml\", {NamespaceDeclarations: {b: \"http://example.com/1\"}})";
+        //String jsonnet = "DS.Formats.readExt(payload, \"application/xml\", {NamespaceDeclarations: {b: \"http://example.com/1\"}})";
+        String jsonnet = "DS.Formats.read(payload, \"application/xml\", {NamespaceDeclarations: {b: \"http://example.com/1\"}})";
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
         String mapped = mapper.transform(new StringDocument(xml, "application/xml"), new HashMap<>(), "application/json").contents();
 
@@ -69,7 +69,7 @@ public class XMLReaderTest {
         String xmlData = TestResourceReader.readFileAsString(inputFileName);
         String expectedJson = TestResourceReader.readFileAsString(expectedFileName);
 
-        Mapper mapper = new Mapper("PortX.Formats.read(payload, \"application/xml\")", new ArrayList<>(), true);
+        Mapper mapper = new Mapper("DS.Formats.read(payload, \"application/xml\")", new ArrayList<>(), true);
         String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), new HashMap<>(), "application/json").contents();
 
         JSONAssert.assertEquals(expectedJson, mappedJson, false);

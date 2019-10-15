@@ -169,8 +169,8 @@ local ediShipments = if (std.isArray(payload.ZDELVRY03_620.IDOC.E1EDL20)) then
                       payload.ZDELVRY03_620.IDOC.E1EDL20 else
                       [payload.ZDELVRY03_620.IDOC.E1EDL20];
 
-local nowString = PortX.LocalDateTime.now();
-local nowDateTime = PortX.LocalDateTime.format(nowString, "yyyy-MM-dd'T'HH:mm:ss.SSS", "d MMM uuuu");
+local nowString = DS.LocalDateTime.now();
+local nowDateTime = DS.LocalDateTime.format(nowString, "yyyy-MM-dd'T'HH:mm:ss.SSS", "d MMM uuuu");
 
 local mappingResult = {
     Heading: {

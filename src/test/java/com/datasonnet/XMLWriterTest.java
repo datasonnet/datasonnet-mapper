@@ -20,7 +20,7 @@ public class XMLWriterTest {
     @Test
     void testOverrideNamespaces() throws Exception {
         String json = "{\"b:a\":{\"@xmlns\":{\"b\":\"http://example.com/1\",\"b1\":\"http://example.com/2\"},\"b1:b\":{}}}";
-        String jsonnet = "PortX.Formats.write(payload, \"application/xml\", {NamespaceDeclarations: {\"c\": \"http://example.com/1\", \"\": \"http://example.com/2\"}})";
+        String jsonnet = "DS.Formats.write(payload, \"application/xml\", {NamespaceDeclarations: {\"c\": \"http://example.com/1\", \"\": \"http://example.com/2\"}})";
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
         String mapped = mapper.transform(new StringDocument(json, "application/json"), new HashMap<>(), "application/xml").contents();
 
@@ -40,7 +40,7 @@ public class XMLWriterTest {
     @Test
     void testNamespaceBump() throws Exception {
         String json = "{\"b:a\":{\"@xmlns\":{\"b\":\"http://example.com/1\",\"b1\":\"http://example.com/2\"},\"b1:b\":{}}}";
-        String jsonnet = "PortX.Formats.write(payload, \"application/xml\", {NamespaceDeclarations: {\"b1\": \"http://example.com/1\"}})";
+        String jsonnet = "DS.Formats.write(payload, \"application/xml\", {NamespaceDeclarations: {\"b1\": \"http://example.com/1\"}})";
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
         String mapped = mapper.transform(new StringDocument(json, "application/json"), new HashMap<>(), "application/xml").contents();
 
@@ -79,10 +79,10 @@ public class XMLWriterTest {
 
 //        Mapper mapper = new Mapper("local params = {\n" +
 //                "    \"XmlVersion\" : \"1.1\"\n" +
-//                "};PortX.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"XmlVersion\" : \"1.1\"\n" +
-                "};PortX.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
+                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
 
         assertEquals(expectedXml, mappedXml);
@@ -98,10 +98,10 @@ public class XMLWriterTest {
 
 //        Mapper mapper = new Mapper("local params = {\n" +
 //                "    \"XmlVersion\" : \"1.1\"\n" +
-//                "};PortX.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"XmlVersion\" : \"1.1\"\n" +
-                "};PortX.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
+                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
@@ -114,10 +114,10 @@ public class XMLWriterTest {
 
 //        Mapper mapper = new Mapper("local params = {\n" +
 //                "    \"XmlVersion\" : \"1.1\"\n" +
-//                "};PortX.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"XmlVersion\" : \"1.1\"\n" +
-                "};PortX.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
+                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
@@ -131,11 +131,11 @@ public class XMLWriterTest {
 //        Mapper mapper = new Mapper("local params = {\n" +
 //                "    \"AutoEmptyElements\" : true,\n" +
 //                "    \"NullAsEmptyElement\" : true\n" +
-//                "};PortX.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"AutoEmptyElements\" : true,\n" +
                 "    \"NullAsEmptyElement\" : true\n" +
-                "};PortX.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
+                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
@@ -145,11 +145,11 @@ public class XMLWriterTest {
 //        mapper = new Mapper("local params = {\n" +
 //                "    \"AutoEmptyElements\" : true,\n" +
 //                "    \"NullAsEmptyElement\" : false\n" +
-//                "};PortX.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
         mapper = new Mapper("local params = {\n" +
                 "    \"AutoEmptyElements\" : true,\n" +
                 "    \"NullAsEmptyElement\" : false\n" +
-                "};PortX.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
+                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
         mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
@@ -161,20 +161,20 @@ public class XMLWriterTest {
 
 //        Mapper mapper = new Mapper("local params = {\n" +
 //                "    \"OmitXmlDeclaration\" : true\n" +
-//                "};PortX.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"OmitXmlDeclaration\" : true\n" +
-                "};PortX.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
+                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
 
         assertFalse(mappedXml.contains("<?xml"));
 
 //        mapper = new Mapper("local params = {\n" +
 //                "    \"OmitXmlDeclaration\" : false\n" +
-//                "};PortX.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
         mapper = new Mapper("local params = {\n" +
                 "    \"OmitXmlDeclaration\" : false\n" +
-                "};PortX.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
+                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
 
         mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
 
@@ -184,7 +184,7 @@ public class XMLWriterTest {
     void simpleJsonTest() throws Exception {
         String jsonData = TestResourceReader.readFileAsString("test.json");
 
-        Mapper mapper = new Mapper("PortX.Formats.write(payload, \"application/xml\")", new ArrayList<>(), true);
+        Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/xml\")", new ArrayList<>(), true);
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
 
         assertTrue(mappedXml.contains("<?xml"));

@@ -32,7 +32,7 @@ public class XMLPropertyTest {
     @Property
     public void reversible(@From(XMLGenerator.class) @Dictionary("xml.dict") Document dom) throws Exception {
         String xml = XMLDocumentUtils.documentToString(dom);
-        Mapper mapper = new Mapper("PortX.Formats.write(PortX.Formats.read(payload, \"application/xml\"), \"application/xml\")", new ArrayList<>(), true);
+        Mapper mapper = new Mapper("DS.Formats.write(DS.Formats.read(payload, \"application/xml\"), \"application/xml\")", new ArrayList<>(), true);
         com.datasonnet.Document output = mapper.transform(new StringDocument(xml, "application/xml"), new HashMap<>(), "application/xml");
         DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document parsed = db.parse(new ByteArrayInputStream(output.contents().getBytes("UTF-8")));

@@ -21,6 +21,6 @@ local filteredArr = [
                       }
                     ];
 
-local result = [ PortX.Util.removeAll(user, filterKeys) for user in payload ];
+local result = [ DS.Util.removeAll(user, filterKeys) for user in payload ];
 
 result == filteredArr

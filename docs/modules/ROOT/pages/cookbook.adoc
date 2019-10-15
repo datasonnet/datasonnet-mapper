@@ -11,7 +11,7 @@ Here's an example of оne-to-one mapping of JSON object fields to the JSON outpu
 -------------
 {
   "userId" : "123",
-  "name" : "PortX"
+  "name" : "DataSonnet"
 }
 -------------
 .Mapping
@@ -25,7 +25,7 @@ Here's an example of оne-to-one mapping of JSON object fields to the JSON outpu
 -------------
 {
   "uid" : "123",
-  "uname" : "PortX"
+  "uname" : "DataSonnet"
 }
 -------------
 
@@ -37,7 +37,7 @@ Field values can be combined together, concatenated as a string, added as numeri
 -------------
 {
   "userId" : "123",
-  "name" : "PortX",
+  "name" : "DataSonnet",
   "number1" : 1,
   "number2" : 2,
   "object1" : {
@@ -75,14 +75,14 @@ Field values can be combined together, concatenated as a string, added as numeri
     2,
     4
   ],
-  "nameId": "PortX - 123",
+  "nameId": "DataSonnet - 123",
   "numberPlusNumber": 3,
-  "numberPlusString": "1PortX",
+  "numberPlusString": "1DataSonnet",
   "objects": {
     "Hello": "Hello",
     "World": "World"
   },
-  "stringPlusNumber": "PortX1"
+  "stringPlusNumber": "DataSonnet1"
 }
 -------------
 
@@ -405,7 +405,7 @@ std.sort(payload)
 //TODO Sort with key
 
 ### Group By
-`PortX.Util.groupBy()` function provided. The first argument is a list of objects, the second is the name of the element to group by. The following example groups list of objects by name of the language:
+`DS.Util.groupBy()` function provided. The first argument is a list of objects, the second is the name of the element to group by. The following example groups list of objects by name of the language:
 
 .Payload
 -------------
@@ -442,7 +442,7 @@ std.sort(payload)
 [subs="quotes"]
 -------------
 {
-  languages: PortX.Util.groupBy(payload.languages, 'language.name'),
+  languages: DS.Util.groupBy(payload.languages, 'language.name'),
 }
 -------------
 .Output
@@ -481,7 +481,7 @@ std.sort(payload)
 }
 -------------
 ### Distinct By
-`PortX.Util.distinctBy()` function provided.
+`DS.Util.distinctBy()` function provided.
 
 .Payload
 -------------
@@ -526,8 +526,8 @@ std.sort(payload)
 [subs="quotes"]
 -------------
 {
-  uniqueLetters: *PortX.Util.distinctBy*(payload.arrayOfLetters),
-  uniqueObjects: *PortX.Util.distinctBy*(payload.arrayOfObjects)
+  uniqueLetters: *DS.Util.distinctBy*(payload.arrayOfLetters),
+  uniqueObjects: *DS.Util.distinctBy*(payload.arrayOfObjects)
 }
 -------------
 .Output
@@ -590,7 +590,7 @@ local listOfLanguages =
       }
     ];
 
-PortX.Util.distinctBy(listOfLanguages, *"language.name"*)
+DS.Util.distinctBy(listOfLanguages, *"language.name"*)
 -------------
 .Output
 -------------
@@ -614,7 +614,7 @@ PortX.Util.distinctBy(listOfLanguages, *"language.name"*)
 `std.length()` function is available out of the box. If parameter is an array, it will return number of elements in the array.
 
 ### Array Flattening
-`PortX.Util.deepFlattenArrays()` function recursively iterates over array of elements, some or all of which may be arrays too, and merges them all in a single array.
+`DS.Util.deepFlattenArrays()` function recursively iterates over array of elements, some or all of which may be arrays too, and merges them all in a single array.
 
 .Payload
 -------------
@@ -640,7 +640,7 @@ PortX.Util.distinctBy(listOfLanguages, *"language.name"*)
 .Mapping
 [subs="quotes"]
 -------------
-PortX.Util.deepFlattenArrays(payload)
+DS.Util.deepFlattenArrays(payload)
 -------------
 .Output
 -------------
@@ -762,12 +762,12 @@ std.map(function(obj) *defaultValues + obj*, payload)
 -------------
 
 ### Add and Subtract Dates
-DataSonnet uses ISO-8601 dates and periods. To add or subtract a number of years. months and days, use `PortX.LocalDateTime.offset()` and `PortX.ZonedDateTime.offset()` functions.
+DataSonnet uses ISO-8601 dates and periods. To add or subtract a number of years. months and days, use `DS.LocalDateTime.offset()` and `DS.ZonedDateTime.offset()` functions.
 
 .Mapping
 [subs="quotes"]
 ---------------
-PortX.LocalDateTime.offset("2019-07-22T21:00:00", "P1Y1D")
+DS.LocalDateTime.offset("2019-07-22T21:00:00", "P1Y1D")
 ---------------
 .Output
 [subs="quotes"]
@@ -880,11 +880,11 @@ local removeFields = [ "photo", "generic", "disabled", "update_whitelist", "id" 
 }
 --------
 
-`PortX.Util.remove(object, key)` and `PortX.Util.removeAll(object, arrayOfKeys)` functions provided for convenience:
+`DS.Util.remove(object, key)` and `DS.Util.removeAll(object, arrayOfKeys)` functions provided for convenience:
 
 [subs="quotes"]
 --------
-*PortX.Util.removeAll*(payload, [ "photo", "generic", "disabled", "update_whitelist", "id" ])
+*DS.Util.removeAll*(payload, [ "photo", "generic", "disabled", "update_whitelist", "id" ])
 --------
 
 ### Finding If Array Contains Value
@@ -910,7 +910,7 @@ For simple scenarios `std.count(arr, val) > 0` will return `true` if an array co
 .Mapping
 [subs="quotes"]
 --------
-local javaLanguages = PortX.JsonPath.select(payload, "$..language[?(@.name == 'Java')]");
+local javaLanguages = DS.JsonPath.select(payload, "$..language[?(@.name == 'Java')]");
 
 std.length(javaLanguages) > 0
 --------

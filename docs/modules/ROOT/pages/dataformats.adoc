@@ -12,7 +12,7 @@ Reads input data in the specified mime type and accepts additional parameters wh
 
 *Example*
 ------------------------
-PortX.Formats.read(payload, "application/xml")
+DS.Formats.read(payload, "application/xml")
 ------------------------
 *Example*
 ------------------------
@@ -25,7 +25,7 @@ local params = {
     "AttributeCharacter": "*"
 };
 
-PortX.Formats.read(payload, "application/xml", params);
+DS.Formats.read(payload, "application/xml", params);
 ------------------------
 
 ### `write(string output, string outputMimeType, object params={})`
@@ -34,7 +34,7 @@ Outputs the data into specified data format and accepts additional parameters wh
 
 *Example*
 ------------------------
-PortX.Formats.write(payload, "application/csv")
+DS.Formats.write(payload, "application/csv")
 ------------------------
 
 *Example*
@@ -50,7 +50,7 @@ local params = {
     "AutoEmptyElements": false
 };
 
-PortX.Formats.write(payload, "application/xml", params);
+DS.Formats.write(payload, "application/xml", params);
 ------------------------
 
 ## XML Format
@@ -82,7 +82,7 @@ Converts input XML string to a JSON object using http://wiki.open311.org/JSON_an
 ------------------------
 .DataSonnet map:
 ------------------------
-PortX.Formats.read(payload, "application/xml")
+DS.Formats.read(payload, "application/xml")
 ------------------------
 .Result
 ------------------------
@@ -127,7 +127,7 @@ local params = {
     "AttributeCharacter": "*"
 };
 
-PortX.Formats.read(payload, "application/xml", params);
+DS.Formats.read(payload, "application/xml", params);
 ------------------------
 .Result
 ------------------------
@@ -163,7 +163,7 @@ Converts the input JSON object into XML using the Badgerfish convention.
 ------------------------
 .DataSonnet map:
 ------------------------
-PortX.Formats.write(payload, "application/xml")
+DS.Formats.write(payload, "application/xml")
 ------------------------
 .Result
 ------------------------
@@ -209,7 +209,7 @@ local params = {
     "AutoEmptyElements": false
 };
 
-PortX.Formats.write(payload, "application/xml", params);
+DS.Formats.write(payload, "application/xml", params);
 ------------------------
 .Result
 ------------------------
@@ -237,7 +237,7 @@ Christopher,Marlow,"(987)654-3210"
 .DataSonnet map:
 ------------------------
 {
-    local csvInput = PortX.Formats.read(payload, "application/csv");
+    local csvInput = DS.Formats.read(payload, "application/csv");
 
     {
         name: csvInput[0]["First Name"] + " " + csvInput[0]["Last Name"]
@@ -276,7 +276,7 @@ local params = {
     "NewLine": "\n"
 };
 
-local csvInput = PortX.Formats.read(payload, "application/csv", params);
+local csvInput = DS.Formats.read(payload, "application/csv", params);
 
 {
     name: csvInput[0][0] + " " + csvInput[0][1]
@@ -312,7 +312,7 @@ Creates a CSV out of an array of JSON objects, using default quote, separator, e
 ------------------------
 .DataSonnet map:
 ------------------------
-PortX.Formats.write(payload, "application/csv")
+DS.Formats.write(payload, "application/csv")
 ------------------------
 .Result
 ------------------------
@@ -351,7 +351,7 @@ local params = {
     "Escape": "\\",
     "NewLine": "\n"
 };
-PortX.Formats.write(payload, "application/csv", params)
+DS.Formats.write(payload, "application/csv", params)
 ------------------------
 .Result
 ------------------------

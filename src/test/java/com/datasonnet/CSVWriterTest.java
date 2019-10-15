@@ -20,7 +20,7 @@ public class CSVWriterTest {
                 TestResourceReader.readFileAsString("writeCSVTest.json"),
                 "application/json"
         );
-        Mapper mapper = new Mapper("PortX.Formats.write(payload, \"application/csv\")", new ArrayList<>(), true);
+        Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/csv\")", new ArrayList<>(), true);
         Document mapped = mapper.transform(data, new HashMap<>(), "application/csv");
         String expected = TestResourceReader.readFileAsString("writeCSVTest.csv");
         assertEquals(expected.trim(), mapped.contents().trim());

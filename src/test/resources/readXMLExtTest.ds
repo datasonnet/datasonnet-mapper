@@ -7,7 +7,7 @@ local params = {
     "AttributeCharacter": "*"
 };
 
-//local parsedXml = PortX.Formats.readExt(payload, "application/xml", params);
-local parsedXml = PortX.Formats.read(payload, "application/xml", params);
+//local parsedXml = DS.Formats.readExt(payload, "application/xml", params);
+local parsedXml = DS.Formats.read(payload, "application/xml", params);
 
 parsedXml

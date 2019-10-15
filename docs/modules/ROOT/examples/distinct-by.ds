@@ -34,7 +34,7 @@ local arrayOfObjects = [
 ];
 
 {
-  uniqueLetters: PortX.Util.distinctBy(arrayOfLetters),
-  uniqueObjects: PortX.Util.distinctBy(arrayOfObjects)
+  uniqueLetters: DS.Util.distinctBy(arrayOfLetters),
+  uniqueObjects: DS.Util.distinctBy(arrayOfObjects)
 }
 

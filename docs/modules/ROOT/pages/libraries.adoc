@@ -1,4 +1,4 @@
-# PortX Libraries
+# DataSonnet Libraries
 :toc:
 :toclevels: 1
 
@@ -12,7 +12,7 @@ The response is a string containing the hash bytes.
 
 ------------------------
 {
-    hashValue: PortX.Crypto.hash("HelloWorld", "MD5")
+    hashValue: DS.Crypto.hash("HelloWorld", "MD5")
 }
 ------------------------
 .Result
@@ -28,7 +28,7 @@ Generates hash-based message autentication code using provided secret and a hash
 
 ------------------------
 {
-    hmacValue: PortX.Crypto.hmac("HelloWorld", "PortX rules!", "HmacSHA256")
+    hmacValue: DS.Crypto.hmac("HelloWorld", "DataSonnet rules!", "HmacSHA256")
 }
 ------------------------
 .Result
@@ -45,7 +45,7 @@ Encrypts the string using the key and the Blowfish algorithm. The result is Base
 
 ------------------------
 {
-    passwd: PortX.Crypto.encrypt("HelloWorld", "DataSonnet123")
+    passwd: DS.Crypto.encrypt("HelloWorld", "DataSonnet123")
 }
 ------------------------
 .Result
@@ -62,7 +62,7 @@ Decrypts the string using the key and the Blowfish algorithm.
 
 ------------------------
 {
-    passwd: PortX.Crypto.decrypt(payload.encryptedPassword, "MySecretKey")
+    passwd: DS.Crypto.decrypt(payload.encryptedPassword, "MySecretKey")
 }
 ------------------------
 
@@ -75,7 +75,7 @@ Returns the current date/time from the system UTC clock in ISO-8601 format.
 
 ------------------------
 {
-    currentZuluTime: PortX.ZonedDateTime.now()
+    currentZuluTime: DS.ZonedDateTime.now()
 }
 ------------------------
 
@@ -93,7 +93,7 @@ The `period` is a string in the ISO-8601 period format.
 *Example*
 
 ------------------------
-PortX.ZonedDateTime.offset("2019-07-22T21:00:00Z", "P1Y1D")
+DS.ZonedDateTime.offset("2019-07-22T21:00:00Z", "P1Y1D")
 ------------------------
 .Result:
 ------------------------
@@ -106,7 +106,7 @@ Reformats a zoned date-time string.
 *Example*
 
 ------------------------
-PortX.ZonedDateTime.format("2019-07-04T21:00:00Z", "yyyy-MM-dd'T'HH:mm:ssVV", "d MMM uuuu")
+DS.ZonedDateTime.format("2019-07-04T21:00:00Z", "yyyy-MM-dd'T'HH:mm:ssVV", "d MMM uuuu")
 ------------------------
 .Result:
 ------------------------
@@ -123,7 +123,7 @@ The response is formatted using the same format as an input.
 *Example*
 
 ------------------------
-PortX.ZonedDateTime.changeTimeZone("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ", "America/Los_Angeles")
+DS.ZonedDateTime.changeTimeZone("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ", "America/Los_Angeles")
 ------------------------
 .Result:
 ------------------------
@@ -136,7 +136,7 @@ Returns only local date part of the `datetime` parameter in the ISO-8601 format 
 *Example*
 
 ------------------------
-PortX.ZonedDateTime.toLocalDate("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
+DS.ZonedDateTime.toLocalDate("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
 ------------------------
 .Result:
 ------------------------
@@ -149,7 +149,7 @@ Returns only local time part of the `datetime` parameter in the ISO-8601 format 
 *Example*
 
 ------------------------
-PortX.ZonedDateTime.toLocalTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
+DS.ZonedDateTime.toLocalTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
 ------------------------
 .Result:
 ------------------------
@@ -162,7 +162,7 @@ Returns local datetime part of the `datetime` parameter in the ISO-8601 format w
 *Example*
 
 ------------------------
-PortX.ZonedDateTime.toLocalDateTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
+DS.ZonedDateTime.toLocalDateTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
 ------------------------
 .Result:
 ------------------------
@@ -178,7 +178,7 @@ Returns the current date/time from the system UTC clock in ISO-8601 format witho
 
 ------------------------
 {
-    currentLocalTime: PortX.LocalDateTime.now()
+    currentLocalTime: DS.LocalDateTime.now()
 }
 ------------------------
 
@@ -196,7 +196,7 @@ The `period` is a string in the ISO-8601 period format.
 *Example*
 
 ------------------------
-PortX.LocalDateTime.offset("2019-07-22T21:00:00", "P1Y1D")
+DS.LocalDateTime.offset("2019-07-22T21:00:00", "P1Y1D")
 ------------------------
 .Result:
 ------------------------
@@ -209,7 +209,7 @@ Reformats a local date-time string.
 *Example*
 
 ------------------------
-PortX.LocalDateTime.format("2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss", "d MMM uuuu")
+DS.LocalDateTime.format("2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss", "d MMM uuuu")
 ------------------------
 .Result:
 ------------------------
@@ -223,7 +223,7 @@ The `format1` and `format2` parameters must not have an offset or time zone.
 *Example*
 
 ------------------------
-PortX.LocalDateTime.compare("2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss", "2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss")
+DS.LocalDateTime.compare("2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss", "2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss")
 ------------------------
 .Result:
 ------------------------
@@ -277,7 +277,7 @@ It uses the https://github.com/json-path/JsonPath[Jayway JsonPath implementation
 .DataSonnet map:
 ------------------------
 {
-    author: PortX.JsonPath.select(payload, "$..book[-2:]..author")[0]
+    author: DS.JsonPath.select(payload, "$..book[-2:]..author")[0]
 }
 ------------------------
 .Result
@@ -308,7 +308,7 @@ Returns a value inside the object by given path separated by dot ('.').
 .DataSonnet map:
 ------------------------
 {
-  language: PortX.Util.select(payload, 'language.name')
+  language: DS.Util.select(payload, 'language.name')
 }
 ------------------------
 .Result
@@ -350,7 +350,7 @@ Filters array of objects by given condition.
 .DataSonnet map:
 ------------------------
 {
-  nonJavaLanguages: PortX.Util.filterEx(payload.languages, 'language', 'Java', function(x, y) x != y)
+  nonJavaLanguages: DS.Util.filterEx(payload.languages, 'language', 'Java', function(x, y) x != y)
 }
 ------------------------
 .Result
@@ -404,7 +404,7 @@ The discriminator can be a path inside the objects to group, e.g. 'language.name
 .DataSonnet map:
 ------------------------
 {
-  languageGroups: PortX.Util.groupBy(payload.languages, 'language.name')
+  languageGroups: DS.Util.groupBy(payload.languages, 'language.name')
 }
 ------------------------
 .Result
@@ -459,7 +459,7 @@ Removes a property with given name from the object and returns the remaining obj
 ----------
 .DataSonnet map:
 ------------------------
-PortX.Util.remove(payload, 'availableSeats')
+DS.Util.remove(payload, 'availableSeats')
 ------------------------
 .Result
 ------------------------
@@ -492,7 +492,7 @@ Removes all properties with names from a provided list of strings from the objec
 ----------
 .DataSonnet map:
 ------------------------
-PortX.Util.removeAll(payload, ['availableSeats', 'aircraftType', 'aircraftBrand'])
+DS.Util.removeAll(payload, ['availableSeats', 'aircraftType', 'aircraftBrand'])
 ------------------------
 .Result
 ------------------------
@@ -532,7 +532,7 @@ Flattens multiple nested arrays into a single array.
 ----------
 .DataSonnet map:
 ------------------------
-PortX.Util.flattenArrays(payload)
+DS.Util.flattenArrays(payload)
 ------------------------
 .Result
 ------------------------
@@ -565,7 +565,7 @@ Returns an array with elements in reverse order.
 ----------
 .DataSonnet map:
 ------------------------
-PortX.Util.reverse(payload)
+DS.Util.reverse(payload)
 ------------------------
 .Result
 ------------------------
@@ -593,7 +593,7 @@ Parses a string which contains a double number and returns its numeric represent
 .DataSonnet map:
 ------------------------
 {
-    num: PortX.Util.parseDouble(payload.numberAsString)
+    num: DS.Util.parseDouble(payload.numberAsString)
 }
 ------------------------
 .Result
@@ -635,7 +635,7 @@ WARNING: The parameter `keyF` is ignored. This is a known issue and will be reso
 ----------
 .DataSonnet map:
 ------------------------
-PortX.Util.duplicates(payload, function(x) x.language.name)
+DS.Util.duplicates(payload, function(x) x.language.name)
 ------------------------
 .Result
 ------------------------
@@ -660,7 +660,7 @@ Returns sum of all elements in the array.
 ----------
 .DataSonnet map:
 ------------------------
-PortX.Util.sum(payload)
+DS.Util.sum(payload)
 ------------------------
 .Result
 ------------------------
@@ -680,7 +680,7 @@ Rounds a double to the number of digits after the decimal point
 ----------
 .DataSonnet map:
 ------------------------
-PortX.Util.round(payload.num, 6)
+DS.Util.round(payload.num, 6)
 ------------------------
 .Result
 ------------------------
@@ -720,7 +720,7 @@ Returns an object where keys are the results of calling keyF on the values, and 
 ----------
 .DataSonnet map:
 ------------------------
-PortX.Util.counts(payload, function(x) x.language.name);
+DS.Util.counts(payload, function(x) x.language.name);
 ------------------------
 .Result
 ------------------------
@@ -764,7 +764,7 @@ Maps an array into an object, where the keys are the result of calling keyF on e
 ----------
 .DataSonnet map:
 ------------------------
-PortX.Util.mapToObject(payload, function(x) x.language.name, function(v) v.language);
+DS.Util.mapToObject(payload, function(x) x.language.name, function(v) v.language);
 ------------------------
 .Result
 ------------------------

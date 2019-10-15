@@ -142,7 +142,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   val evaluator = new NoFileEvaluator(jsonnet, DataSonnetPath("."), parseCache, importer)
 
   private val libraries = Map(
-    "PortX" -> Mapper.objectify(
+    "DS" -> Mapper.objectify(
       PortX.libraries + Mapper.library(evaluator, "Util", parseCache)
     )
   )

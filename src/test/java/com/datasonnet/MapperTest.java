@@ -24,7 +24,7 @@ public class MapperTest {
         return Stream.of(
                 new String[] { "{ \"uid\": payload.user_id }", "{ \"user_id\": 7 }", "{\"uid\":7}"},
                 new String[] { "{ \"uid\": payload.user_id }", "{ \"user_id\": 8 }", "{\"uid\":8}"},
-                new String[] { "PortX.ZonedDateTime.offset(\"2019-07-22T21:00:00Z\", \"P1Y1D\")", "{}", "\"2020-07-23T21:00:00Z\""}
+                new String[] { "DS.ZonedDateTime.offset(\"2019-07-22T21:00:00Z\", \"P1Y1D\")", "{}", "\"2020-07-23T21:00:00Z\""}
                 );
     }
 
@@ -47,20 +47,20 @@ public class MapperTest {
     @Test
     void parseErrorLineNumber() {
         try {
-            Mapper mapper = new Mapper("function(payload) portx.time.now() a", new ArrayList<>(), false);
+            Mapper mapper = new Mapper("function(payload) DS.time.now() a", new ArrayList<>(), false);
             fail("Must fail to parse");
         } catch(IllegalArgumentException e) {
-            assertTrue(e.getMessage().contains("Expected end-of-input at line 1 column 36"), "Found message: " + e.getMessage());
+            assertTrue(e.getMessage().contains("Expected end-of-input at line 1 column 33"), "Found message: " + e.getMessage());
         }
     }
 
     @Test
     void parseErrorLineNumberWhenWrapped() {
         try {
-            Mapper mapper = new Mapper("portx.time.now() a", new ArrayList<>(), true);
+            Mapper mapper = new Mapper("DS.time.now() a", new ArrayList<>(), true);
             fail("Must fail to parse");
         } catch(IllegalArgumentException e) {
-            assertTrue(e.getMessage().contains("Expected end-of-input at line 1 column 18"), "Found message: " + e.getMessage());
+            assertTrue(e.getMessage().contains("Expected end-of-input at line 1 column 15"), "Found message: " + e.getMessage());
         }
     }
 
@@ -98,7 +98,7 @@ public class MapperTest {
 
     @Test
     void includedJsonnetLibraryWorks() {
-        Mapper mapper = new Mapper("PortX.Util.select({a: {b: 5}}, 'a.b')", new ArrayList<>(), true);
+        Mapper mapper = new Mapper("DS.Util.select({a: {b: 5}}, 'a.b')", new ArrayList<>(), true);
         assertEquals("5", mapper.transform("{}"));
     }
 

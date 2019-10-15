@@ -19,7 +19,7 @@ public class CSVReaderTest {
                 "application/csv"
         );
 
-        Mapper mapper = new Mapper("local csvInput = PortX.Formats.read(payload, \"application/csv\"); { fName: csvInput[0][\"First Name\"] }", new ArrayList<>(), true);
+        Mapper mapper = new Mapper("local csvInput = DS.Formats.read(payload, \"application/csv\"); { fName: csvInput[0][\"First Name\"] }", new ArrayList<>(), true);
         Document mapped = mapper.transform(data, new HashMap<>(), "application/json");
 
         assertEquals("{\"fName\":\"Eugene\"}", mapped.contents());

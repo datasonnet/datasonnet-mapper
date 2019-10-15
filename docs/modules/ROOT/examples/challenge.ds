@@ -12,12 +12,12 @@ local itemListWithSubIDs = [
     for item in payload.Items
 ];
 
-local idsWithSubIDs = PortX.JsonPath.select(itemListWithSubIDs, "$..ItemID_SubID");
+local idsWithSubIDs = DS.JsonPath.select(itemListWithSubIDs, "$..ItemID_SubID");
 
 local warnings = {
                      "Total_Price_Alert" : "true If total cost is > 500 * Number of Unique Items (Not including sub-items)",
                      "Warning_Price" : ["Add an 'itemID_SubID' to this array if it is outside the low/high price points given by the pricing table below."],
-                     "Has_900311" : std.length(PortX.JsonPath.select(itemList, "$[?(@.Item_ID == \"900311\")]")) > 0,
+                     "Has_900311" : std.length(DS.JsonPath.select(itemList, "$[?(@.Item_ID == \"900311\")]")) > 0,
                      "Duplicates" : std.setDiff(idsWithSubIDs, std.uniq(idsWithSubIDs))
                      //Duplicates: idsWithSubIDs
                  };
