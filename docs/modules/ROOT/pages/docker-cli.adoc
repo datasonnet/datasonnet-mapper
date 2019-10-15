@@ -1,3 +1,6 @@
+== Coming Soon
+
+////
 == Obtaining the CLI via Docker
 
 These instructions assume you have Docker installed already.
@@ -6,7 +9,7 @@ To find out how to install Docker for your operating system, go to https://docs.
 
 To obtain access to the Docker CLI during our internal release, first contact Kent to gain access to our private docker repository, including configuration instructions.
 
-== Using the CLI via the Jar
+== Using the CLI via Docker
 
 Once you have access to the private Docker repository, use the docker CLI like the following:
 
@@ -21,3 +24,4 @@ docker run -it --rm -v `pwd`:/var/cache/datasonnet 849905330246.dkr.ecr.us-west-
 ----
 
 The command assumes your scripts are all in the current directory or directories below it, and that you use relative paths.
+////
