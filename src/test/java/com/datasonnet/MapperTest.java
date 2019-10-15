@@ -111,7 +111,12 @@ public class MapperTest {
     @Test
     void nonJsonArguments() {
         Mapper mapper = new Mapper("argument", Arrays.asList("argument"), true);
-        Document mapped = mapper.transform(new StringDocument("{}", "application/json"), stringArgument("argument", "value"), "text/plain");
+
+        Map<String, Document> map = new HashMap<>();
+        map.put("argument", new StringDocument("value", "text/plain"));
+
+        Document mapped = mapper.transform(new StringDocument("{}", "application/json"), map, "text/plain");
+
         assertEquals(new StringDocument("value", "text/plain"), mapped);
     }
 }

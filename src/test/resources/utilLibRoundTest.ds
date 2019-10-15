@@ -1,0 +1,6 @@
+assert PortX.Util.round(123.562567558, 1) == 123.6 : "#1 failed %f" % PortX.Util.round(123.562567558, 1);
+assert PortX.Util.round(123.562567558, 6) == 123.562568 : "#2 failed %f" % round(123.562567558, 6);
+assert PortX.Util.round(-123.562567558, 1) == -123.6 : "#3 failed %f" % PortX.Util.round(-123.562567558, 1);
+assert PortX.Util.round(-123.562567558, 6) == -123.562568 : "#4 failed %f" % PortX.Util.round(-123.562567558, 6);
+
+true

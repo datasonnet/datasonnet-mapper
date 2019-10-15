@@ -5,7 +5,6 @@ local params = {
     "Escape": "\\",
     "NewLine": "\n"
 };
-//local csvFile = PortX.Formats.readExt(payload, "application/csv", params);
 local csvFile = PortX.Formats.read(payload, "application/csv", params);
 
 {

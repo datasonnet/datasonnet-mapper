@@ -24,8 +24,6 @@ public class XMLWriterTest {
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
         String mapped = mapper.transform(new StringDocument(json, "application/json"), new HashMap<>(), "application/xml").contents();
 
-        System.out.println("MAPPED IS " + mapped);
-
         // original mapping is gone
         assertThat(mapped, not(containsString("b:a")));
         assertThat(mapped, not(containsString("b1:b")));

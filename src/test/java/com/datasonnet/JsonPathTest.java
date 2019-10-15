@@ -21,4 +21,14 @@ public class JsonPathTest {
         assertEquals(mappedJson, "\"Herman Melville\"");
     }
 
+    @Test
+    void testJsonPathArrSelector() throws Exception {
+        String jsonData = TestResourceReader.readFileAsString("jsonPathArrTest.json");
+
+        Mapper mapper = new Mapper("std.length(PortX.JsonPath.select(payload, \"$..language[?(@.name == 'Java')]\")) > 0", new ArrayList<>(), true);
+        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/json").contents();
+
+        assertEquals(mappedJson, "true");
+    }
+
 }

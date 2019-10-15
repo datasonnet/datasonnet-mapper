@@ -286,3 +286,501 @@ It uses the https://github.com/json-path/JsonPath[Jayway JsonPath implementation
     "author": "Herman Melville"
 }
 ------------------------
+
+## Util
+
+### `select(object obj, string path)`
+
+Returns a value inside the object by given path separated by dot ('.').
+
+*Example*
+
+.Payload
+----------
+{
+  "name": "Foo",
+  "language": {
+      "name": "Java",
+      "version": "1.8"
+  }
+}
+----------
+.DataSonnet map:
+------------------------
+{
+  language: PortX.Util.select(payload, 'language.name')
+}
+------------------------
+.Result
+------------------------
+{
+   "language": "Java"
+}
+------------------------
+
+### `filterEx(array objects, string key, string value, function filter_func=function(value1, value2) value1 == value2)`
+
+Filters array of objects by given condition.
+
+*Example*
+
+.Payload
+----------
+{
+   "languages": [
+     {
+       "name": "Foo",
+       "language": "Java"
+     },
+     {
+       "name": "Bar",
+       "language": "Scala"
+     },
+     {
+       "name": "FooBar",
+       "language": "Java"
+     },
+     {
+       "name": "FooBar",
+       "language": "C++"
+     }
+   ]
+ }
+----------
+.DataSonnet map:
+------------------------
+{
+  nonJavaLanguages: PortX.Util.filterEx(payload.languages, 'language', 'Java', function(x, y) x != y)
+}
+------------------------
+.Result
+------------------------
+[
+ {
+   "name": "Bar",
+   "language": "Scala"
+ },
+ {
+   "name": "FooBar",
+   "language": "C++"
+ }
+]
+------------------------
+
+### `groupBy(array arr, string keyName)`
+Partitions an array into a Object that contains Arrays, according to the discriminator key you define.
+The discriminator can be a path inside the objects to group, e.g. 'language.name'
+
+*Example*
+
+.Payload
+----------
+{
+  "languages": [
+    {
+      "name": "Foo",
+      "language": {
+          "name": "Java",
+          "version": "1.8"
+      }
+    },
+    {
+      "name": "Bar",
+      "language": {
+          "name": "Scala",
+          "version": "1.0"
+      }
+    },
+    {
+      "name": "FooBar",
+      "language": {
+          "name": "Java",
+          "version": "1.7"
+      }
+    }
+  ]
+}
+----------
+.DataSonnet map:
+------------------------
+{
+  languageGroups: PortX.Util.groupBy(payload.languages, 'language.name')
+}
+------------------------
+.Result
+------------------------
+{
+    "languageGroups": {
+       "Java": [
+          {
+             "language": {
+                "name": "Java",
+                "version": "1.8"
+             },
+             "name": "Foo"
+          },
+          {
+             "language": {
+                "name": "Java",
+                "version": "1.7"
+             },
+             "name": "FooBar"
+          }
+       ],
+       "Scala": [
+          {
+             "language": {
+                "name": "Scala",
+                "version": "1.0"
+             },
+             "name": "Bar"
+          }
+       ]
+    }
+}
+------------------------
+
+### `remove(object obj, string keyName)`
+Removes a property with given name from the object and returns the remaining object
+
+*Example*
+
+.Payload
+----------
+{
+   "availableSeats": 45,
+   "airlineName": "Delta",
+   "aircraftBrand": "Boeing",
+   "aircraftType": "717",
+   "departureDate": "01/20/2019",
+   "origin": "PHX",
+   "destination": "SEA"
+ }
+----------
+.DataSonnet map:
+------------------------
+PortX.Util.remove(payload, 'availableSeats')
+------------------------
+.Result
+------------------------
+{
+   "airlineName": "Delta",
+   "aircraftBrand": "Boeing",
+   "aircraftType": "717",
+   "departureDate": "01/20/2019",
+   "origin": "PHX",
+   "destination": "SEA"
+ }
+------------------------
+
+### `removeAll(object obj, array keyNames)`
+Removes all properties with names from a provided list of strings from the object and returns the remaining object
+
+*Example*
+
+.Payload
+----------
+{
+   "availableSeats": 45,
+   "airlineName": "Delta",
+   "aircraftBrand": "Boeing",
+   "aircraftType": "717",
+   "departureDate": "01/20/2019",
+   "origin": "PHX",
+   "destination": "SEA"
+ }
+----------
+.DataSonnet map:
+------------------------
+PortX.Util.removeAll(payload, ['availableSeats', 'aircraftType', 'aircraftBrand'])
+------------------------
+.Result
+------------------------
+{
+   "airlineName": "Delta",
+   "departureDate": "01/20/2019",
+   "origin": "PHX",
+   "destination": "SEA"
+ }
+------------------------
+
+### `deepFlattenArrays(array arr)`
+Flattens multiple nested arrays into a single array.
+
+*Example*
+
+.Payload
+----------
+[
+    1,
+    2,
+    [
+      3
+    ],
+    [
+      4,
+      [
+        5,
+        6,
+        7
+      ],
+      {
+        "x": "y"
+      }
+    ]
+]
+----------
+.DataSonnet map:
+------------------------
+PortX.Util.flattenArrays(payload)
+------------------------
+.Result
+------------------------
+[
+     1,
+     2,
+     4,
+     5,
+     6,
+     7,
+     {
+        "x": "y"
+     }
+]
+------------------------
+
+### `reverse(array arr)`
+Returns an array with elements in reverse order.
+
+*Example*
+
+.Payload
+----------
+[
+    "a",
+    "b",
+    "c",
+    "d"
+]
+----------
+.DataSonnet map:
+------------------------
+PortX.Util.reverse(payload)
+------------------------
+.Result
+------------------------
+[
+    "d",
+    "c",
+    "b",
+    "a",
+]
+------------------------
+
+### `parseDouble(string str)`
+
+Parses a string which contains a double number and returns its numeric representation
+
+*Example*
+
+.Payload
+----------
+{
+    "numberAsString": "123.45679"
+}
+
+----------
+.DataSonnet map:
+------------------------
+{
+    num: PortX.Util.parseDouble(payload.numberAsString)
+}
+------------------------
+.Result
+------------------------
+{
+    "num": 123.45679
+}
+------------------------
+
+### `duplicates(array arr, function keyF=id, boolean set=true)`
+Returns an array containing duplicate elements from input array. An optional key function returns a value which will be used as a comparison key. If `set` parameter is set to true, only the first duplicate value will be included.
+
+WARNING: The parameter `keyF` is ignored. This is a known issue and will be resolved once the new version of the `sjsonnet` library is released. The below example will not work, for now `duplicates` can only work with primitive types.
+
+*Example*
+
+.Payload
+----------
+[
+    {
+      "language": {
+        "name": "Java8",
+        "version": "1.8"
+      }
+    },
+    {
+      "language": {
+        "name": "Java8",
+        "version": "1.8.0"
+      }
+    },
+    {
+      "language": {
+        "name": "Scala",
+        "version": "2.13.0"
+      }
+    }
+]
+----------
+.DataSonnet map:
+------------------------
+PortX.Util.duplicates(payload, function(x) x.language.name)
+------------------------
+.Result
+------------------------
+[
+  {
+    "language": {
+      "name": "Java8",
+      "version":"1.8.0"
+    }
+  }
+]
+------------------------
+
+### `sum(array arr)`
+Returns sum of all elements in the array.
+
+*Example*
+
+.Payload
+----------
+[ 10, 20, 30 ]
+----------
+.DataSonnet map:
+------------------------
+PortX.Util.sum(payload)
+------------------------
+.Result
+------------------------
+60
+------------------------
+
+### `round(double num, int precision)`
+Rounds a double to the number of digits after the decimal point
+
+*Example*
+
+.Payload
+----------
+{
+    "num": 123.562567558
+}
+----------
+.DataSonnet map:
+------------------------
+PortX.Util.round(payload.num, 6)
+------------------------
+.Result
+------------------------
+123.562568
+------------------------
+
+### `counts(array arr, function keyF=id)`
+Returns an object where keys are the results of calling keyF on the values, and the values are the counts of values that produced the corresponding key.
+
+*Example*
+
+.Payload
+----------
+[
+    {
+      "name": "Foo",
+      "language": {
+        "name": "Java",
+        "version": "1.8"
+      }
+    },
+    {
+      "name": "Bar",
+      "language": {
+        "name": "Scala",
+        "version": "1.0"
+      }
+    },
+    {
+      "name": "FooBar",
+      "language": {
+        "name": "Java",
+        "version": "1.7"
+      }
+    }
+  ]
+----------
+.DataSonnet map:
+------------------------
+PortX.Util.counts(payload, function(x) x.language.name);
+------------------------
+.Result
+------------------------
+{
+    "Java": 2,
+    "Scala": 1
+}
+------------------------
+
+### `mapToObject(arr, keyF, valueF=id)`
+Maps an array into an object, where the keys are the result of calling keyF on each value (which becomes the value at the key). If valueF is provided it gets run on the value. Duplicate keys are removed.
+
+*Example*
+
+.Payload
+----------
+[
+    {
+      "name": "Foo",
+      "language": {
+        "name": "Java",
+        "version": "1.8"
+      }
+    },
+    {
+      "name": "Bar",
+      "language": {
+        "name": "Scala",
+        "version": "1.0"
+      }
+    },
+    {
+      "name": "FooBar",
+      "language": {
+        "name": "C++",
+        "version": "n/a"
+      }
+    }
+  ]
+
+----------
+.DataSonnet map:
+------------------------
+PortX.Util.mapToObject(payload, function(x) x.language.name, function(v) v.language);
+------------------------
+.Result
+------------------------
+{
+ "Java": {
+   "name": "Java",
+   "version": "1.8"
+ },
+ "C++": {
+   "name": "C++",
+   "version": "n/a"
+ },
+ "Scala": {
+   "name": "Scala",
+   "version": "1.0"
+ }
+};
+------------------------
+

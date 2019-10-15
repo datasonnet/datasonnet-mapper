@@ -5,5 +5,4 @@ local params = {
     "Escape": "\\",
     "NewLine": "\n"
 };
-//PortX.Formats.writeExt(payload, "application/csv", params)
 PortX.Formats.write(payload, "application/csv", params)

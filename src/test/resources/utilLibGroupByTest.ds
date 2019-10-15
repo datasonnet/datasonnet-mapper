@@ -1,0 +1,33 @@
+local expected = {
+   "Java": [
+      {
+         "language": {
+            "name": "Java",
+            "version": "1.8"
+         },
+         "name": "Foo"
+      },
+      {
+         "language": {
+            "name": "Java",
+            "version": "1.7"
+         },
+         "name": "FooBar"
+      }
+   ],
+   "Scala": [
+      {
+         "language": {
+            "name": "Scala",
+            "version": "1.0"
+         },
+         "name": "Bar"
+      }
+   ]
+ };
+
+local result = PortX.Util.groupBy(payload.languages, 'language.name');
+
+assert expected == result;
+
+true

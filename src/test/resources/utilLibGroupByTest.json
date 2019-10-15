@@ -1,0 +1,25 @@
+{
+  "languages": [
+    {
+      "name": "Foo",
+      "language": {
+        "name": "Java",
+        "version": "1.8"
+      }
+    },
+    {
+      "name": "Bar",
+      "language": {
+        "name": "Scala",
+        "version": "1.0"
+      }
+    },
+    {
+      "name": "FooBar",
+      "language": {
+        "name": "Java",
+        "version": "1.7"
+      }
+    }
+  ]
+}

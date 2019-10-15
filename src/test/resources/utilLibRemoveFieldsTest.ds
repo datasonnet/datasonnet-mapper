@@ -1,0 +1,26 @@
+local filterKeys = [ "photo", "generic", "disabled", "update_whitelist", "id" ];
+
+local filteredArr = [
+                      {
+                        "account_id": "987",
+                        "email_address": "steve.jobs@apple.com",
+                        "full_name": "Steve Jobs",
+                        "headline": "CEO"
+                      },
+                      {
+                        "account_id": "654",
+                        "email_address": "bill.gates@microsoft.com",
+                        "full_name": "Bill Gates",
+                        "headline": "CEO"
+                      },
+                      {
+                        "account_id": "654",
+                        "email_address": "wexler@modusbox.com",
+                        "full_name": "Dave Wexler",
+                        "headline": "CEO"
+                      }
+                    ];
+
+local result = [ PortX.Util.removeAll(user, filterKeys) for user in payload ];
+
+result == filteredArr

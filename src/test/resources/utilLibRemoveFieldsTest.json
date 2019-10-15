@@ -1,0 +1,50 @@
+[
+  {
+    "account_id": "987",
+    "disabled": false,
+    "email_address": "steve.jobs@apple.com",
+    "full_name": "Steve Jobs",
+    "generic": false,
+    "headline": "CEO",
+    "id": "123",
+    "photo": "n/a",
+    "update_whitelist": [
+      "full_name",
+      "headline",
+      "email_address",
+      "external_reference"
+    ]
+  },
+  {
+    "account_id": "654",
+    "disabled": false,
+    "email_address": "bill.gates@microsoft.com",
+    "full_name": "Bill Gates",
+    "generic": false,
+    "headline": "CEO",
+    "id": "456",
+    "photo": "n/a",
+    "update_whitelist": [
+      "full_name",
+      "headline",
+      "email_address",
+      "external_reference"
+    ]
+  },
+  {
+    "account_id": "654",
+    "disabled": false,
+    "email_address": "wexler@modusbox.com",
+    "full_name": "Dave Wexler",
+    "generic": false,
+    "headline": "CEO",
+    "id": "789",
+    "photo": "n/a",
+    "update_whitelist": [
+      "full_name",
+      "headline",
+      "email_address",
+      "external_reference"
+    ]
+  }
+]

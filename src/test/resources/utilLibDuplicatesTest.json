@@ -1,0 +1,50 @@
+{
+  "primitive": [
+    "hello",
+    "hello",
+    "world",
+    "world",
+    "world",
+    "!"
+  ],
+  "complex": [
+    {
+      "language": {
+        "name": "Java8",
+        "version": "1.8"
+      }
+    },
+    {
+      "language": {
+        "name": "Java8",
+        "version": "1.8.0"
+      }
+    },
+    {
+      "language": {
+        "name": "Scala",
+        "version": "2.13.0"
+      }
+    }
+  ],
+  "moreComplex": [
+    {
+      "language": {
+        "name": "Java8",
+        "version": "1.8_151"
+      }
+    },
+    {
+      "language": {
+        "name": "Java1.8",
+        "version": "1.8_152"
+      }
+    },
+    {
+      "language": {
+        "name": "Scala",
+        "version": "2.13.0"
+      }
+    }
+  ]
+}

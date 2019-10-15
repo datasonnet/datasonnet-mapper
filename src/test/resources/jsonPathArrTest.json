@@ -1,0 +1,14 @@
+[
+  {
+    "language": {
+      "name": "Java",
+      "version": "1.8"
+    }
+  },
+  {
+    "language": {
+      "name": "Scala",
+      "version": "2.13.0"
+    }
+  }
+]
