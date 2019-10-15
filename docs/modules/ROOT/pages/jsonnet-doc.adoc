@@ -1,0 +1,3 @@
+= Standard Library Documentation
+
+There's a core standard library that is shared by all JSonnet implementations, including DataSonnet, that has many useful functions. There are small differences in versions and the like, so eventually it will be completely documented here. But for now you can view that documentation on the JSonnet Website which can be found at this link: https://jsonnet.org/ref/stdlib.html[Standard Library Documentation].
