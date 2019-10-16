@@ -26,7 +26,10 @@ phases:
       - |
         case "$CODEBUILD_WEBHOOK_TRIGGER" in
           pr/*) echo "pull request, not uploaded" ;;
-          *) mvn -B deploy ;;
+          *)
+            mvn -B deploy
+            aws s3 cp target/*.jar s3://datasonnet/jars/
+          ;;
         esac
 
 cache:
