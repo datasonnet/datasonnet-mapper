@@ -5,7 +5,7 @@ _Powerful, portable data transformation_
 
 == Introduction
 
-Welcome to the documentation landing page for https://datasonnet.com[DataSonnet].
+Welcome to the documentation for https://datasonnet.com[DataSonnet].
 
 DataSonnet is a new open source data transformation tool. At its core is JSonnet, a highly portable programming language for manipulating data, originally designed for creating configurations.
 
