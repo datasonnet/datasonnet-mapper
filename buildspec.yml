@@ -28,6 +28,7 @@ phases:
           pr/*) echo "pull request, not deployed" ;;
           *) mvn -B deploy ;;
         esac
+      - echo aws s3 cp target/datasonnet-mapper-*.jar s3://datasonnet/jars/
       - |
         case "$CODEBUILD_WEBHOOK_TRIGGER" in
           pr/*) echo "pull request, not uploaded" ;;
