@@ -28,7 +28,7 @@ phases:
           pr/*) echo "pull request, not deployed" ;;
           *)
             mvn -B deploy
-            aws s3 cp --recursive --exclude "*" --include "*.jar" target s3://datasonnet/jars/
+            aws s3 cp --quiet --recursive --exclude "*" --include "*.jar" target s3://datasonnet/jars/
           ;;
         esac
 
