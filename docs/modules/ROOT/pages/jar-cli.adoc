@@ -2,8 +2,12 @@
 
 The CLI jar is a version that contains all dependencies.
 
-You can download the current CLI jar at TODO DOWNLOAD LOCATION
+You can download the current CLI jar at https://datasonnet.s3-us-west-2.amazonaws.com/jars/datasonnet-mapper-1.0.1-SNAPSHOT-jar-with-dependencies.jar
 
+We recommend renaming the jar to datasonnet.jar for simplicity.
+
+
+////
 Alternatively, if you have maven installed, you can download it as datasonnet.jar with the following command:
 
 [source,bash]
@@ -12,7 +16,7 @@ mvn dependency:get -Ddest=datasonnet.jar -Dartifact=com.datasonnet:datasonnet-ma
 ----
 
 After you run that, you’ll have a file named datasonnet.jar in the directory you’re currently in.
-
+////
 
 == Using the CLI via the Jar
 
