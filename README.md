@@ -22,7 +22,7 @@ To use the mapper in your Java project, import the `com.datasonnet.Mapper` class
 
 ```
 import com.datasonnet.Mapper;
-
+import com.datasonnet.StringDocument;
 ...
 
 String jsonData = ...;
