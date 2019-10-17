@@ -1,5 +1,38 @@
 # DataSonnet
 
+## Usage
+
+DataSonnet Mapper is available as a Maven dependency. To include it in your project, use one of the following snippets:
+
+Maven:
+```
+<dependency>
+    <groupId>com.datasonnet</groupId>
+    <artifactId>datasonnet-mapper</artifactId>
+    <version>1.0.1-SNAPSHOT</version>
+</dependency>
+```
+
+Gradle:
+```
+compile group: 'com.datasonnet', name: 'datasonnet-mapper', version: '1.0.1-SNAPSHOT'
+```
+
+To use the mapper in your Java project, import the `com.datasonnet.Mapper` class, instantiate it and invoke the `transform` method:
+
+```
+import com.datasonnet.Mapper;
+
+...
+
+String jsonData = ...;
+String dataSonnetMappingScript = ...;
+
+Mapper mapper = new Mapper(dataSonnetMappingScript, new ArrayList<>(), true);
+String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/json").contents();
+
+...
+```
 ## Build and Versioning notes
 
 The version in the POM should always be a SNAPSHOT version. That is the version that will be published
