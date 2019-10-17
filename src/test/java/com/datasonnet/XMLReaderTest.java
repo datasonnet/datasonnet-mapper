@@ -25,7 +25,7 @@ public class XMLReaderTest {
         //String jsonnet = "DS.Formats.readExt(payload, \"application/xml\", {NamespaceDeclarations: {b: \"http://example.com/1\"}})";
         String jsonnet = "DS.Formats.read(payload, \"application/xml\", {NamespaceDeclarations: {b: \"http://example.com/1\"}})";
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
-        String mapped = mapper.transform(new StringDocument(xml, "application/xml"), new HashMap<>(), "application/json").contents();
+        String mapped = mapper.transform(new StringDocument(xml, "application/xml"), new HashMap<>(), "application/json").contents().toString();
 
         // the b namespace must have been remapped
         assertThat(mapped, not(containsString("b:b")));
@@ -45,7 +45,7 @@ public class XMLReaderTest {
         String expectedJson = TestResourceReader.readFileAsString("readXMLExtTest.json");
 
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
-        String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), new HashMap<>(), "application/json").contents();
+        String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), new HashMap<>(), "application/json").contents().toString();
 
         JSONAssert.assertEquals(expectedJson, mappedJson, false);
     }
@@ -70,7 +70,7 @@ public class XMLReaderTest {
         String expectedJson = TestResourceReader.readFileAsString(expectedFileName);
 
         Mapper mapper = new Mapper("DS.Formats.read(payload, \"application/xml\")", new ArrayList<>(), true);
-        String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), new HashMap<>(), "application/json").contents();
+        String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), new HashMap<>(), "application/json").contents().toString();
 
         JSONAssert.assertEquals(expectedJson, mappedJson, false);
     }

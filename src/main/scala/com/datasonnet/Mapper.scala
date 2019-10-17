@@ -2,6 +2,7 @@ package com.datasonnet
 
 import java.io.{File, PrintWriter, StringWriter}
 
+import com.datasonnet.portx.JacksonAdapter
 import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
 import fastparse.{IndexedParserInput, Parsed}
 import sjsonnet.Expr.Member.Visibility
@@ -16,6 +17,8 @@ import scala.util.chaining._
 
 
 case class StringDocument(contents: String, mimeType: String) extends Document
+
+case class ObjectDocument(contents: Object, mimeType: String) extends Document
 
 object Mapper {
   def wrap(jsonnet: String, argumentNames: Iterable[String])=
@@ -91,8 +94,9 @@ object Mapper {
 
   def input(data: Document): Expr = {
     val json = data.mimeType match {
-      case "text/plain" | "application/csv" | "application/xml" => ujson.Str(data.contents)
-      case "application/json" => ujson.read(data.contents)
+      case "text/plain" | "application/csv" | "application/xml" => ujson.Str(data.contents.toString)
+      case "application/json" => ujson.read(data.contents.toString)
+      case "application/java" => JacksonAdapter.javaToJson(data.contents());
       case x => throw new IllegalArgumentException("The input mime type " + x + " is not supported")
     }
 
@@ -100,12 +104,21 @@ object Mapper {
   }
 
   def output(output: ujson.Value, mimeType: String): Document = {
-    val string = mimeType match {
-      case "application/json" => output.toString()
-      case "text/plain" | "application/csv" | "application/xml" => output.str
+    mimeType match {
+      case "application/json" => {
+        val string = output.toString()
+        new StringDocument(string, mimeType)
+      }
+      case "text/plain" | "application/csv" | "application/xml" => {
+        val string = output.str
+        new StringDocument(string, mimeType)
+      }
+      case "application/java" => {
+        new ObjectDocument(JacksonAdapter.jsonToJava(output), mimeType)
+      }
       case x => throw new IllegalArgumentException("The output mime type " + x + " is not supported")
     }
-    new StringDocument(string, mimeType)
+
   }
 
 }
@@ -158,7 +171,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   private val mapIndex = new IndexedParserInput(jsonnet);
 
   def transform(payload: String): String = {
-    transform(new StringDocument(payload, "application/json"), new java.util.HashMap(), "application/json").contents
+    transform(new StringDocument(payload, "application/json"), new java.util.HashMap(), "application/json").contents.toString
   }
 
   def transform(payload: Document, arguments: java.util.Map[String, Document]): Document = {
@@ -170,7 +183,6 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
     val data = Mapper.input(payload)
 
     val parsedArguments = arguments.asScala.view.mapValues { Mapper.input(_) }
-
 
     val first +: rest = function.params.args
 

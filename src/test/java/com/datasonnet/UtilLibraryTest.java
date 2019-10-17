@@ -15,17 +15,17 @@ public class UtilLibraryTest {
         String jsonData = TestResourceReader.readFileAsString("utilLibDuplicatesTest.json");
 
         Mapper mapper = new Mapper("DS.Util.duplicates(payload.primitive)", new ArrayList<>(), true);
-        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/json").contents();
+        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/json").contents().toString();
         assertEquals(mappedJson, "[\"hello\",\"world\"]");
 
 //TODO these won't work until sjsonnet supports key functions
 
 //        mapper = new Mapper("DS.Util.duplicates(payload.complex, function(x) x.language.name)", new ArrayList<>(), true);
-//        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/json").contents();
+//        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/json").contents().toString();
 //        assertEquals(mappedJson, "[{\"language\":{\"name\":\"Java8\",\"version\":\"1.8.0\"}}]");
 //
 //        mapper = new Mapper("DS.Util.duplicates(payload.moreComplex, function(x) std.substr(x.language.version, 0, 3))", new ArrayList<>(), true);
-//        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/json").contents();
+//        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/json").contents().toString();
 //        assertEquals(mappedJson, "[{\"language\":{\"name\":\"Java1.8\",\"version\":\"1.8_152\"}}]");
     }
 
@@ -39,7 +39,7 @@ public class UtilLibraryTest {
     void testReverse() throws Exception {
         String jsonData = "[\"a\",\"b\",\"c\",\"d\"]";
         Mapper mapper = new Mapper("DS.Util.reverse(payload)", new ArrayList<>(), true);
-        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/json").contents();
+        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/json").contents().toString();
 
         assertEquals(mappedJson, "[\"d\",\"c\",\"b\",\"a\"]");
     }
@@ -69,7 +69,7 @@ public class UtilLibraryTest {
         String ds = TestResourceReader.readFileAsString(dsFileName);
 
         Mapper mapper = new Mapper(ds, new ArrayList<>(), true);
-        String mappedJson = mapper.transform(new StringDocument(input, "application/json"), new HashMap<>(), "application/json").contents();
+        String mappedJson = mapper.transform(new StringDocument(input, "application/json"), new HashMap<>(), "application/json").contents().toString();
 
         assertEquals(mappedJson, "true");
     }

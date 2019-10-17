@@ -35,7 +35,7 @@ public class XMLPropertyTest {
         Mapper mapper = new Mapper("DS.Formats.write(DS.Formats.read(payload, \"application/xml\"), \"application/xml\")", new ArrayList<>(), true);
         com.datasonnet.Document output = mapper.transform(new StringDocument(xml, "application/xml"), new HashMap<>(), "application/xml");
         DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document parsed = db.parse(new ByteArrayInputStream(output.contents().getBytes("UTF-8")));
+        Document parsed = db.parse(new ByteArrayInputStream(output.contents().toString().getBytes("UTF-8")));
         assertTrue("For input " + xml + " found output " + output.contents(), dom.isEqualNode(parsed));
 
         // okay, so this doesn't work because of ordering differences... let me see... we could sort both the same?

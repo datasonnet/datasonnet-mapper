@@ -1,6 +1,6 @@
 package com.datasonnet;
 
 public interface Document {
-    public String contents();
+    public Object contents();
     public String mimeType();
 }

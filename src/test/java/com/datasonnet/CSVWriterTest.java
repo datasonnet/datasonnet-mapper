@@ -23,7 +23,7 @@ public class CSVWriterTest {
         Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/csv\")", new ArrayList<>(), true);
         Document mapped = mapper.transform(data, new HashMap<>(), "application/csv");
         String expected = TestResourceReader.readFileAsString("writeCSVTest.csv");
-        assertEquals(expected.trim(), mapped.contents().trim());
+        assertEquals(expected.trim(), mapped.contents().toString().trim());
     }
 
     @Test
@@ -37,7 +37,7 @@ public class CSVWriterTest {
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
         Document mapped = mapper.transform(data, new HashMap<>(), "application/csv");
         String expected = TestResourceReader.readFileAsString("writeCSVExtTest.csv");
-        assertEquals(expected.trim(), mapped.contents().trim());
+        assertEquals(expected.trim(), mapped.contents().toString().trim());
     }
 
 }

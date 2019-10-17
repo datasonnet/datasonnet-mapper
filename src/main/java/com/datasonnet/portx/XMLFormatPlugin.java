@@ -47,12 +47,12 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         System.setProperty("javax.xml.stream.XMLOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");
     }
 
-    public Value read(String inputXML, Map<String, Object> params) throws Exception {
+    public Value read(Object inputXML, Map<String, Object> params) throws Exception {
         if(params == null) {
             params = new HashMap<>();
         }
 
-        try(Reader input = new StringReader(inputXML);
+        try(Reader input = new StringReader((String)inputXML);
             StringWriter output = new StringWriter();
             ) {
             XMLStreamReader2 reader = createInputStream(input);

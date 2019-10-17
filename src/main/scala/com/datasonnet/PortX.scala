@@ -137,7 +137,7 @@ object PortX {
     )
   )
 
-  def read(data: String, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {
+  def read(data: Any, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {
     val plugin = com.datasonnet.portx.spi.DataFormatService.getInstance().getPluginFor(mimeType)
     val javaParams = if (params != null) toJavaParams(ev, params, plugin) else new java.util.HashMap[String, Object]()
     Materializer.reverse(plugin.read(data, javaParams))

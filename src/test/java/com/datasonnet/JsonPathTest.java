@@ -16,7 +16,7 @@ public class JsonPathTest {
         String jsonData = TestResourceReader.readFileAsString("jsonPathTest.json");
 
         Mapper mapper = new Mapper("DS.JsonPath.select(payload, \"$..book[-2:]..author\")[0]", new ArrayList<>(), true);
-        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/json").contents();
+        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/json").contents().toString();
 
         assertEquals(mappedJson, "\"Herman Melville\"");
     }
@@ -26,7 +26,7 @@ public class JsonPathTest {
         String jsonData = TestResourceReader.readFileAsString("jsonPathArrTest.json");
 
         Mapper mapper = new Mapper("std.length(DS.JsonPath.select(payload, \"$..language[?(@.name == 'Java')]\")) > 0", new ArrayList<>(), true);
-        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/json").contents();
+        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/json").contents().toString();
 
         assertEquals(mappedJson, "true");
     }

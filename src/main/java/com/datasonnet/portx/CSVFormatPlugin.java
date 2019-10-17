@@ -27,7 +27,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
 
     }
 
-    public Value read(String input, Map<String, Object> params) throws IOException {
+    public Value read(Object input, Map<String, Object> params) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         CsvSchema.Builder builder = this.getBuilder(params);
@@ -40,8 +40,8 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         csvMapper.enable(CsvParser.Feature.WRAP_AS_ARRAY);
 
         // Read data from CSV file
-        List readAll = useHeader ? csvMapper.readerFor(Map.class).with(csvSchema).readValues(input).readAll() :
-                csvMapper.readerFor(List.class).with(csvSchema).readValues(input).readAll();
+        List readAll = useHeader ? csvMapper.readerFor(Map.class).with(csvSchema).readValues((String)input).readAll() :
+                csvMapper.readerFor(List.class).with(csvSchema).readValues((String)input).readAll();
         String jsonStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(readAll);
 
         return UjsonUtil.jsonObjectValueOf(jsonStr);
