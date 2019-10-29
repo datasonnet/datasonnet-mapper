@@ -119,4 +119,14 @@ public class MapperTest {
 
         assertEquals(new StringDocument("value", "text/plain"), mapped);
     }
+
+    @Test
+    void noTopLevelFunctionArgs() {
+        try {
+            Mapper mapper = new Mapper("function() { test: \'HelloWorld\' } ", new ArrayList<>(), false);
+            fail("Must fail to execute");
+        } catch(IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("Top Level Function must have at least one argument"), "Found message: " + e.getMessage());
+        }
+    }
 }

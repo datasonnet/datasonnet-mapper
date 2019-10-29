@@ -138,7 +138,6 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
 
   private val parseCache = collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]()
 
-
   val evaluator = new NoFileEvaluator(jsonnet, DataSonnetPath("."), parseCache, importer)
 
   private val libraries = Map(
@@ -150,7 +149,13 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   private val function = (for {
     evaluated <- Mapper.evaluate(evaluator, parseCache, jsonnet, libraries, lineOffset)
     verified <- evaluated match {
-      case f: Val.Func => Success(f) // TODO check for at least one argument
+      case f: Val.Func => {
+        val topLevelF = f.asInstanceOf[Val.Func]
+        if (topLevelF.params.args.size < 1)
+          Failure(new IllegalArgumentException("Top Level Function must have at least one argument."))
+        else
+          Success(f)
+      }
       case _ => Failure(new IllegalArgumentException("Not a valid map. Maps must have a Top Level Function."))
     }
   } yield verified).get
