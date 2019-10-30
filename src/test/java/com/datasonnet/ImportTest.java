@@ -1,5 +1,6 @@
 package com.datasonnet;
 
+import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -41,6 +42,33 @@ public class ImportTest {
         } catch(IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("output.json line 1 column 1"), "Found message: " + e.getMessage());
             assertTrue(e.getMessage().contains("line 1 column 1 of the transformation"), "Found message: " + e.getMessage());
+        }
+    }
+
+    @Test
+    void importLibsonnet() throws Exception {
+        try {
+            final String lib = TestResourceReader.readFileAsString("importTest.libsonnet");
+            final String json = TestResourceReader.readFileAsString("importLibsonnetTest.json");
+            Mapper mapper = new Mapper("local testlib = import 'importTest.libsonnet'; local teststr = import 'importLibsonnetTest.json'; { greeting: testlib.sayHello('World') }", new ArrayList<>(), new HashMap<String, String>() {{
+                put("importTest.libsonnet", lib);
+                put("importLibsonnetTest.json", json);
+            }}, true);
+        } catch (IllegalArgumentException e) {
+            fail("This test should not fail, only libraries are evaluated at this point");
+        }
+    }
+
+    @Test
+    void importLibsonnetFail() throws Exception {
+        try {
+            final String libErr = TestResourceReader.readFileAsString("importTestFail.libsonnet");
+            Mapper mapper = new Mapper("local testlib = import 'importTestFail.libsonnet'; { greeting: testlib.sayHello('World') }", new ArrayList<>(), new HashMap<String, String>() {{
+                put("importTestFail.libsonnet", libErr);
+            }}, true);
+            fail("This test should fail");
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("Unable to parse library: importTestFail.libsonnet"), "Found message: " + e.getMessage());
         }
     }
 }

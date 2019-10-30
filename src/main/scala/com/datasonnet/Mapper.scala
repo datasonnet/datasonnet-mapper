@@ -133,11 +133,11 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
       case null => None
       case v => Some(v)
     }
+
     combined = (DataSonnetPath(resolved) -> contents)
   } yield combined
 
   private val parseCache = collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]()
-
 
   val evaluator = new NoFileEvaluator(jsonnet, DataSonnetPath("."), parseCache, importer)
 
@@ -146,6 +146,16 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
       PortX.libraries + Mapper.library(evaluator, "Util", parseCache)
     )
   )
+
+  imports.forEach((name, lib) => {
+    if (name.endsWith(".libsonnet") || name.endsWith(".ds")) {
+      val evaluated = Mapper.evaluate(evaluator, parseCache, lib, libraries, lineOffset)
+      evaluated match {
+        case Success(value) =>
+        case Failure(f) => throw new IllegalArgumentException("Unable to parse library: " + name, f)
+      }
+    }
+  })
 
   private val function = (for {
     evaluated <- Mapper.evaluate(evaluator, parseCache, jsonnet, libraries, lineOffset)
