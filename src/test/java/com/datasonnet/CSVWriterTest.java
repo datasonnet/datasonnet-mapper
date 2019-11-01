@@ -1,5 +1,6 @@
 package com.datasonnet;
 
+import com.datasonnet.portx.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import com.datasonnet.Mapper;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,9 @@ public class CSVWriterTest {
                 TestResourceReader.readFileAsString("writeCSVTest.json"),
                 "application/json"
         );
+
+        DataFormatService.getInstance().findAndRegisterPlugins();
+
         Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/csv\")", new ArrayList<>(), true);
         Document mapped = mapper.transform(data, new HashMap<>(), "application/csv");
         String expected = TestResourceReader.readFileAsString("writeCSVTest.csv");
@@ -33,6 +37,8 @@ public class CSVWriterTest {
                 "application/json"
         );
         String jsonnet = TestResourceReader.readFileAsString("writeCSVExtTest.ds");
+
+        DataFormatService.getInstance().findAndRegisterPlugins();
 
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
         Document mapped = mapper.transform(data, new HashMap<>(), "application/csv");
