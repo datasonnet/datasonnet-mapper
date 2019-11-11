@@ -149,7 +149,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
 
   imports.forEach((name, lib) => {
     if (name.endsWith(".libsonnet") || name.endsWith(".ds")) {
-      val evaluated = Mapper.evaluate(evaluator, parseCache, lib, libraries, lineOffset)
+      val evaluated = Mapper.evaluate(evaluator, parseCache, lib, libraries, 0)
       evaluated match {
         case Success(value) =>
         case Failure(f) => throw new IllegalArgumentException("Unable to parse library: " + name, f)
