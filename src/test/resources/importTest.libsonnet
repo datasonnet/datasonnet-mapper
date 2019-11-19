@@ -1,0 +1,3 @@
+{
+    sayHello(name):: "Hello, " + name
+}
