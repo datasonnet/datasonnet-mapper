@@ -1,5 +1,6 @@
 package com.datasonnet;
 
+import com.datasonnet.portx.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +25,9 @@ public class XMLReaderTest {
         // note how b is bound to the default namespace, which means the 'b' above needs to be auto-rebound
         //String jsonnet = "DS.Formats.readExt(payload, \"application/xml\", {NamespaceDeclarations: {b: \"http://example.com/1\"}})";
         String jsonnet = "DS.Formats.read(payload, \"application/xml\", {NamespaceDeclarations: {b: \"http://example.com/1\"}})";
+
+        DataFormatService.getInstance().findAndRegisterPlugins();
+
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
         String mapped = mapper.transform(new StringDocument(xml, "application/xml"), new HashMap<>(), "application/json").contents();
 
@@ -43,6 +47,8 @@ public class XMLReaderTest {
         String xmlData = TestResourceReader.readFileAsString("readXMLExtTest.xml");
         String jsonnet = TestResourceReader.readFileAsString("readXMLExtTest.ds");
         String expectedJson = TestResourceReader.readFileAsString("readXMLExtTest.json");
+
+        DataFormatService.getInstance().findAndRegisterPlugins();
 
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
         String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), new HashMap<>(), "application/json").contents();
@@ -68,6 +74,8 @@ public class XMLReaderTest {
     private void mapAndAssert(String inputFileName, String expectedFileName) throws Exception {
         String xmlData = TestResourceReader.readFileAsString(inputFileName);
         String expectedJson = TestResourceReader.readFileAsString(expectedFileName);
+
+        DataFormatService.getInstance().findAndRegisterPlugins();
 
         Mapper mapper = new Mapper("DS.Formats.read(payload, \"application/xml\")", new ArrayList<>(), true);
         String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), new HashMap<>(), "application/json").contents();

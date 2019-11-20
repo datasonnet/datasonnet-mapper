@@ -1,17 +1,15 @@
 package com.datasonnet.portx.spi;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 
 public class DataFormatService {
 
     private static DataFormatService service;
-    private ServiceLoader<DataFormatPlugin> loader;
+
+    private static Map<String, List<DataFormatPlugin>> pluginRegistry;
 
     private DataFormatService() {
-        loader = ServiceLoader.load(DataFormatPlugin.class, DataFormatService.class.getClassLoader());
+        pluginRegistry = new HashMap<>();
     }
 
     public static synchronized DataFormatService getInstance() {
@@ -21,36 +19,40 @@ public class DataFormatService {
         return service;
     }
 
-    public DataFormatPlugin getPluginFor(String mimeType) throws UnsupportedMimeTypeException {
-        Iterator<DataFormatPlugin> plugins = loader.iterator();
+    public void registerPlugin(String mimeType, DataFormatPlugin plugin) {
+        List<DataFormatPlugin> pluginsList = pluginRegistry.getOrDefault(mimeType, new ArrayList<>());
+        if (!pluginsList.contains(plugin)) {
+            pluginsList.add(plugin);
+        }
+        pluginRegistry.put(mimeType, pluginsList);
+    }
 
-        while (plugins.hasNext()) {
-            DataFormatPlugin nextPlugin = plugins.next();
-            String[] supportedTypes = nextPlugin.getSupportedMimeTypes();
-            for (String nextType: supportedTypes) {
-                if (nextType.equalsIgnoreCase(mimeType)) {
-                    return nextPlugin;
-                }
+    public DataFormatPlugin getPluginFor(String mimeType) {
+        //TODO should we return list instead?
+        return pluginRegistry.containsKey(mimeType) ? pluginRegistry.get(mimeType).get(0) : null;
+    }
+
+    public Map<String, List<DataFormatPlugin>> findPlugins() {
+        Map<String, List<DataFormatPlugin>> pluginsMap = new HashMap<>();
+
+        ServiceLoader<DataFormatPlugin> loader = ServiceLoader.load(DataFormatPlugin.class);
+
+        for (DataFormatPlugin plugin : loader) {
+            for (String mimeType: plugin.getSupportedMimeTypes()) {
+                List<DataFormatPlugin> pluginsList = pluginsMap.getOrDefault(mimeType, new ArrayList<>());
+                pluginsList.add(plugin);
+                pluginsMap.put(mimeType, pluginsList);
             }
         }
 
-        throw new UnsupportedMimeTypeException("No suitable plugin found for mime type: " + mimeType);
+        return pluginsMap;
     }
 
     public List<String> getSupportedMimeTypes() {
-        List<String> mimeTypes = new ArrayList<>();
+        return new ArrayList(pluginRegistry.keySet());
+    }
 
-        mimeTypes.add("application/json");
-
-        Iterator<DataFormatPlugin> plugins = loader.iterator();
-
-        while (plugins.hasNext()) {
-            DataFormatPlugin nextPlugin = plugins.next();
-            for (String t : nextPlugin.getSupportedMimeTypes()) {
-                mimeTypes.add(t);
-            }
-        }
-
-        return mimeTypes;
+    public void findAndRegisterPlugins() {
+        pluginRegistry.putAll(findPlugins());
     }
 }

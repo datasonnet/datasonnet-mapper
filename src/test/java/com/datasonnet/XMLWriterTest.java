@@ -1,5 +1,6 @@
 package com.datasonnet;
 
+import com.datasonnet.portx.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import com.datasonnet.Mapper;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,9 @@ public class XMLWriterTest {
     void testOverrideNamespaces() throws Exception {
         String json = "{\"b:a\":{\"@xmlns\":{\"b\":\"http://example.com/1\",\"b1\":\"http://example.com/2\"},\"b1:b\":{}}}";
         String jsonnet = "DS.Formats.write(payload, \"application/xml\", {NamespaceDeclarations: {\"c\": \"http://example.com/1\", \"\": \"http://example.com/2\"}})";
+
+        DataFormatService.getInstance().findAndRegisterPlugins();
+
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
         String mapped = mapper.transform(new StringDocument(json, "application/json"), new HashMap<>(), "application/xml").contents();
 
@@ -41,6 +45,9 @@ public class XMLWriterTest {
     void testNamespaceBump() throws Exception {
         String json = "{\"b:a\":{\"@xmlns\":{\"b\":\"http://example.com/1\",\"b1\":\"http://example.com/2\"},\"b1:b\":{}}}";
         String jsonnet = "DS.Formats.write(payload, \"application/xml\", {NamespaceDeclarations: {\"b1\": \"http://example.com/1\"}})";
+
+        DataFormatService.getInstance().findAndRegisterPlugins();
+
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
         String mapped = mapper.transform(new StringDocument(json, "application/json"), new HashMap<>(), "application/xml").contents();
 
@@ -62,6 +69,8 @@ public class XMLWriterTest {
         String jsonnet = TestResourceReader.readFileAsString("writeXMLExtTest.ds");
         String expectedXml = TestResourceReader.readFileAsString("readXMLExtTest.xml");
 
+        DataFormatService.getInstance().findAndRegisterPlugins();
+
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
 
@@ -80,6 +89,8 @@ public class XMLWriterTest {
 //        Mapper mapper = new Mapper("local params = {\n" +
 //                "    \"XmlVersion\" : \"1.1\"\n" +
 //                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+        DataFormatService.getInstance().findAndRegisterPlugins();
+
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"XmlVersion\" : \"1.1\"\n" +
                 "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
@@ -99,6 +110,8 @@ public class XMLWriterTest {
 //        Mapper mapper = new Mapper("local params = {\n" +
 //                "    \"XmlVersion\" : \"1.1\"\n" +
 //                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+        DataFormatService.getInstance().findAndRegisterPlugins();
+
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"XmlVersion\" : \"1.1\"\n" +
                 "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
@@ -115,6 +128,8 @@ public class XMLWriterTest {
 //        Mapper mapper = new Mapper("local params = {\n" +
 //                "    \"XmlVersion\" : \"1.1\"\n" +
 //                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+        DataFormatService.getInstance().findAndRegisterPlugins();
+
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"XmlVersion\" : \"1.1\"\n" +
                 "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
@@ -132,6 +147,8 @@ public class XMLWriterTest {
 //                "    \"AutoEmptyElements\" : true,\n" +
 //                "    \"NullAsEmptyElement\" : true\n" +
 //                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+        DataFormatService.getInstance().findAndRegisterPlugins();
+
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"AutoEmptyElements\" : true,\n" +
                 "    \"NullAsEmptyElement\" : true\n" +
@@ -162,6 +179,8 @@ public class XMLWriterTest {
 //        Mapper mapper = new Mapper("local params = {\n" +
 //                "    \"OmitXmlDeclaration\" : true\n" +
 //                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+        DataFormatService.getInstance().findAndRegisterPlugins();
+
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"OmitXmlDeclaration\" : true\n" +
                 "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
@@ -183,6 +202,8 @@ public class XMLWriterTest {
 
     void simpleJsonTest() throws Exception {
         String jsonData = TestResourceReader.readFileAsString("test.json");
+
+        DataFormatService.getInstance().findAndRegisterPlugins();
 
         Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/xml\")", new ArrayList<>(), true);
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();

@@ -3,7 +3,7 @@ package com.datasonnet
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, Period, ZoneId, ZoneOffset}
 
-import com.datasonnet.portx.spi.DataFormatPlugin
+import com.datasonnet.portx.spi.{DataFormatPlugin, UnsupportedMimeTypeException}
 import com.datasonnet.wrap.Library.{builtin, builtin0, library}
 import sjsonnet.Std.builtinWithDefaults
 import sjsonnet.{EvalScope, Expr, Materializer, Val}
@@ -139,12 +139,18 @@ object PortX {
 
   def read(data: String, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {
     val plugin = com.datasonnet.portx.spi.DataFormatService.getInstance().getPluginFor(mimeType)
+    if (plugin == null) {
+      throw new UnsupportedMimeTypeException("No suitable plugin found for mime type: " + mimeType)
+    }
     val javaParams = if (params != null) toJavaParams(ev, params, plugin) else new java.util.HashMap[String, Object]()
     Materializer.reverse(plugin.read(data, javaParams))
   }
 
   def write(json: Val, mimeType: String, params: Val.Obj, ev: EvalScope): String = {
     val plugin = com.datasonnet.portx.spi.DataFormatService.getInstance().getPluginFor(mimeType)
+    if (plugin == null) {
+      throw new UnsupportedMimeTypeException("No suitable plugin found for mime type: " + mimeType);
+    }
     val javaParams = if (params != null) toJavaParams(ev, params, plugin) else new java.util.HashMap[String, Object]()
     plugin.write(Materializer.apply(json)(ev), javaParams)
   }
