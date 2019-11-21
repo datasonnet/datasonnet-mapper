@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.pholser.junit.quickcheck.generator.GenerationStatus;
@@ -47,8 +48,9 @@ public class DictionaryBackedStringGenerator extends Generator<String> {
 
     public DictionaryBackedStringGenerator(String source, Generator<String> fallback) throws IOException {
         super(String.class);
-        this.dictionary = new ArrayList<>();
         this.fallback = fallback;
+
+        List<String> dictionary = new ArrayList<>();
 
         // Read dictionary words
         try (InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream(source)) {
@@ -62,6 +64,7 @@ public class DictionaryBackedStringGenerator extends Generator<String> {
                 dictionary.add(item);
             }
         }
+        this.dictionary = Collections.unmodifiableList(dictionary);
     }
 
     @Override

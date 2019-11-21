@@ -1,6 +1,7 @@
 package com.datasonnet.badgerfish;
 
 import javax.xml.namespace.NamespaceContext;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +22,7 @@ public class BadgerFishConfiguration {
     public static String DEFAULT_CDATA_VALUE_KEY = "#";
 
     public BadgerFishConfiguration() {
-        this(DEFAULT_NAMESPACE_SEPARATOR, DEFAULT_ATTRIBUTE_CHARACTER, DEFAULT_TEXT_VALUE_KEY, DEFAULT_CDATA_VALUE_KEY, true, false, new HashMap<>());
+        this(DEFAULT_NAMESPACE_SEPARATOR, DEFAULT_ATTRIBUTE_CHARACTER, DEFAULT_TEXT_VALUE_KEY, DEFAULT_CDATA_VALUE_KEY, true, false, Collections.emptyMap());
     }
 
     public BadgerFishConfiguration(String namespaceSeparator, String attributeCharacter, String textValueKey, String cdataValueKey, boolean nullAsEmptyElement, boolean omitXmlDeclaration, Map<String, String> namespaces) {

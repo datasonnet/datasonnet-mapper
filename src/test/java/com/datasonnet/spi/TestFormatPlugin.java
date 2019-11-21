@@ -2,6 +2,7 @@ package com.datasonnet.spi;
 
 import ujson.Value;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,9 +27,7 @@ public class TestFormatPlugin implements DataFormatPlugin {
 
     @Override
     public Map<String, String> getReadParameters() {
-        Map<String, String> readParams = new HashMap<>();
-        readParams.put(TEST_PARAM, "TestParameter");
-        return readParams;
+        return Collections.singletonMap(TEST_PARAM, "TestParameter");
     }
 
     @Override

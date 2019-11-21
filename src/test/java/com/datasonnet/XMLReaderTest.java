@@ -11,8 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.skyscreamer.jsonassert.JSONAssert;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 
 public class XMLReaderTest {
 
@@ -33,8 +32,8 @@ public class XMLReaderTest {
 
         String jsonnet = "/** DataSonnet\nversion=1.0\ninput.payload.application/xml.NamespaceDeclarations.b=http://example.com/1\n*/\npayload";
 
-        Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
-        String mapped = mapper.transform(new StringDocument(xml, "application/xml"), new HashMap<>(), "application/json").contents();
+        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+        String mapped = mapper.transform(new StringDocument(xml, "application/xml"), Collections.emptyMap(), "application/json").contents();
 
         // the b namespace must have been remapped
         assertThat(mapped, not(containsString("b:b")));
@@ -52,8 +51,8 @@ public class XMLReaderTest {
         String jsonnet = TestResourceReader.readFileAsString("readXMLExtTest.ds");
         String expectedJson = TestResourceReader.readFileAsString("readXMLExtTest.json");
 
-        Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
-        String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), new HashMap<>(), "application/json").contents();
+        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+        String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), Collections.emptyMap(), "application/json").contents();
 
         JSONAssert.assertEquals(expectedJson, mappedJson, false);
     }
@@ -78,8 +77,8 @@ public class XMLReaderTest {
         String expectedJson = TestResourceReader.readFileAsString(expectedFileName);
 
 
-        Mapper mapper = new Mapper("payload", new ArrayList<>(), true);
-        String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), new HashMap<>(), "application/json").contents();
+        Mapper mapper = new Mapper("payload", Collections.emptyList(), true);
+        String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), Collections.emptyMap(), "application/json").contents();
 
         JSONAssert.assertEquals(expectedJson, mappedJson, false);
     }

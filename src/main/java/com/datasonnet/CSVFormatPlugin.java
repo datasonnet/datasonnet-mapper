@@ -10,6 +10,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import ujson.Value;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,7 +111,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         readParams.put(SEPARATOR_CHAR, "CSV separator character");
         readParams.put(ESCAPE_CHAR, "CSV escape character");
         readParams.put(NEW_LINE, "New line character");
-        return readParams;
+        return Collections.unmodifiableMap(readParams);
     }
 
     @Override

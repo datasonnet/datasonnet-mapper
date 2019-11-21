@@ -11,6 +11,7 @@ import ujson.Str;
 import ujson.Value;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,12 +37,12 @@ public class PlainTextFormatPlugin implements DataFormatPlugin {
 
     @Override
     public Map<String, String> getReadParameters() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
     public Map<String, String> getWriteParameters() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     public String getPluginId() {

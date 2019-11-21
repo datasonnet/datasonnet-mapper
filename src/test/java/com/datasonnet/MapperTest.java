@@ -17,7 +17,7 @@ public class MapperTest {
     @ParameterizedTest
     @MethodSource("simpleProvider")
     void simple(String jsonnet, String json, String expected) {
-        Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
+        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
         assertEquals(expected, mapper.transform(json));
     }
 
@@ -32,8 +32,7 @@ public class MapperTest {
     @ParameterizedTest
     @MethodSource("variableProvider")
     void variables(String jsonnet, String json, String variable, String value, String expected) {
-        HashMap<String, Document> variables = new HashMap<>();
-        variables.put(variable, new StringDocument(value, "application/json"));
+        Map<String, Document> variables = Collections.singletonMap(variable, new StringDocument(value, "application/json"));
         Mapper mapper = new Mapper(jsonnet, variables.keySet(), true);
         assertEquals(expected, mapper.transform(new StringDocument(json, "application/json"), variables).contents());
     }
@@ -48,7 +47,7 @@ public class MapperTest {
     @Test
     void parseErrorLineNumber() {
         try {
-            Mapper mapper = new Mapper("function(payload) DS.time.now() a", new ArrayList<>(), false);
+            Mapper mapper = new Mapper("function(payload) DS.time.now() a", Collections.emptyList(), false);
             fail("Must fail to parse");
         } catch(IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("Expected end-of-input at line 1 column 33"), "Found message: " + e.getMessage());
@@ -58,7 +57,7 @@ public class MapperTest {
     @Test
     void parseErrorLineNumberWhenWrapped() {
         try {
-            Mapper mapper = new Mapper("DS.time.now() a", new ArrayList<>(), true);
+            Mapper mapper = new Mapper("DS.time.now() a", Collections.emptyList(), true);
             fail("Must fail to parse");
         } catch(IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("Expected end-of-input at line 1 column 15"), "Found message: " + e.getMessage());
@@ -68,7 +67,7 @@ public class MapperTest {
     @Test
     void noTopLevelFunction() {
         try {
-            Mapper mapper = new Mapper("{}", new ArrayList<>(), false);
+            Mapper mapper = new Mapper("{}", Collections.emptyList(), false);
             fail("Must fail to execute");
         } catch(IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("Top Level Function"), "Found message: " + e.getMessage());
@@ -78,7 +77,7 @@ public class MapperTest {
     @Test
     void executeErrorLineNumber() {
         try {
-            Mapper mapper = new Mapper("function(payload) payload.foo", new ArrayList<>(), false);
+            Mapper mapper = new Mapper("function(payload) payload.foo", Collections.emptyList(), false);
             mapper.transform("{}");
             fail("Must fail to execute");
         } catch(IllegalArgumentException e) {
@@ -89,7 +88,7 @@ public class MapperTest {
     @Test
     void executeErrorLineNumberWhenWrapped() {
         try {
-            Mapper mapper = new Mapper("payload.foo", new ArrayList<>(), true);
+            Mapper mapper = new Mapper("payload.foo", Collections.emptyList(), true);
             mapper.transform("{}");
             fail("Must fail to execute");
         } catch(IllegalArgumentException e) {
@@ -99,7 +98,7 @@ public class MapperTest {
 
     @Test
     void includedJsonnetLibraryWorks() {
-        Mapper mapper = new Mapper("DS.Util.select({a: {b: 5}}, 'a.b')", new ArrayList<>(), true);
+        Mapper mapper = new Mapper("DS.Util.select({a: {b: 5}}, 'a.b')", Collections.emptyList(), true);
         assertEquals("5", mapper.transform("{}"));
     }
 
@@ -114,8 +113,7 @@ public class MapperTest {
         DataFormatService.getInstance().findAndRegisterPlugins();
         Mapper mapper = new Mapper("argument", Arrays.asList("argument"), true);
 
-        Map<String, Document> map = new HashMap<>();
-        map.put("argument", new StringDocument("value", "text/plain"));
+        Map<String, Document> map = Collections.singletonMap("argument", new StringDocument("value", "text/plain"));
 
         Document mapped = mapper.transform(new StringDocument("{}", "application/json"), map, "text/plain");
 
@@ -125,7 +123,7 @@ public class MapperTest {
     @Test
     void noTopLevelFunctionArgs() {
         try {
-            Mapper mapper = new Mapper("function() { test: \'HelloWorld\' } ", new ArrayList<>(), false);
+            Mapper mapper = new Mapper("function() { test: \'HelloWorld\' } ", Collections.emptyList(), false);
             fail("Must fail to execute");
         } catch(IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("Top Level Function must have at least one argument"), "Found message: " + e.getMessage());

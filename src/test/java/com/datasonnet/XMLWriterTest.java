@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.matchers.CompareMatcher;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,8 +30,8 @@ public class XMLWriterTest {
         String json = "{\"b:a\":{\"@xmlns\":{\"b\":\"http://example.com/1\",\"b1\":\"http://example.com/2\"},\"b1:b\":{}}}";
         String datasonnet = TestResourceReader.readFileAsString("xmlOverrideNamespaces.ds");
 
-        Mapper mapper = new Mapper(datasonnet, new ArrayList<>(), true);
-        String mapped = mapper.transform(new StringDocument(json, "application/json"), new HashMap<>(), "application/xml").contents();
+        Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        String mapped = mapper.transform(new StringDocument(json, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         // original mapping is gone
         assertThat(mapped, not(containsString("b:a")));
@@ -52,8 +52,8 @@ public class XMLWriterTest {
 
         String datasonnet = TestResourceReader.readFileAsString("xmlNamespaceBump.ds");
 
-        Mapper mapper = new Mapper(datasonnet, new ArrayList<>(), true);
-        String mapped = mapper.transform(new StringDocument(json, "application/json"), new HashMap<>(), "application/xml").contents();
+        Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        String mapped = mapper.transform(new StringDocument(json, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         // original mapping is gone
         assertThat(mapped, not(containsString("b:a")));
@@ -73,8 +73,8 @@ public class XMLWriterTest {
         String datasonnet = TestResourceReader.readFileAsString("writeXMLExtTest.ds");
         String expectedXml = TestResourceReader.readFileAsString("readXMLExtTest.xml");
 
-        Mapper mapper = new Mapper(datasonnet, new ArrayList<>(), true);
-        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+        Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         Map<String, String> namespaces = new HashMap<>();
         namespaces.put("test", "http://www.modusbox.com");
@@ -89,8 +89,8 @@ public class XMLWriterTest {
         String expectedXml = TestResourceReader.readFileAsString("xmlNonAscii.xml");
         String datasonnet = TestResourceReader.readFileAsString("xmlNonAscii.ds");
 
-        Mapper mapper = new Mapper(datasonnet, new ArrayList<>(), true);
-        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+        Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertEquals(expectedXml, mappedXml);
 
@@ -104,8 +104,8 @@ public class XMLWriterTest {
         String expectedXml = TestResourceReader.readFileAsString("xmlCDATA.xml");
         String datasonnet = TestResourceReader.readFileAsString("xmlNonAscii.ds");//Reuse existing one to avoid duplication
 
-        Mapper mapper = new Mapper(datasonnet, new ArrayList<>(), true);
-        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+        Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
     }
@@ -117,8 +117,8 @@ public class XMLWriterTest {
 
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"XmlVersion\" : \"1.1\"\n" +
-                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
-        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+                "};DS.Formats.write(payload, \"application/xml\", params)", Collections.emptyList(), true);
+        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
     }
@@ -129,16 +129,16 @@ public class XMLWriterTest {
         String expectedXml = TestResourceReader.readFileAsString("xmlEmptyElementsNull.xml");
         String datasonnet = TestResourceReader.readFileAsString("xmlEmptyElementsNull.ds");
 
-        Mapper mapper = new Mapper(datasonnet, new ArrayList<>(), true);
-        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+        Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
 
         expectedXml = TestResourceReader.readFileAsString("xmlEmptyElementsNoNull.xml");
         datasonnet = TestResourceReader.readFileAsString("xmlEmptyElementsNoNull.ds");
 
-        mapper = new Mapper(datasonnet, new ArrayList<>(), true);
-        mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+        mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
     }
@@ -151,8 +151,8 @@ public class XMLWriterTest {
                 "version=1.0\n" +
                 "output.application/xml.OmitXmlDeclaration=true\n" +
                 "*/\n" +
-                "payload", new ArrayList<>(), true);
-        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+                "payload", Collections.emptyList(), true);
+        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertFalse(mappedXml.contains("<?xml"));
 
@@ -160,9 +160,9 @@ public class XMLWriterTest {
                 "version=1.0\n" +
                 "output.application/xml.OmitXmlDeclaration=false\n" +
                 "*/\n" +
-                "payload", new ArrayList<>(), true);
+                "payload", Collections.emptyList(), true);
 
-        mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+        mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertTrue(mappedXml.startsWith("<?xml"));
     }
@@ -171,9 +171,9 @@ public class XMLWriterTest {
     void testXMLRoot() throws Exception {
         String jsonData = TestResourceReader.readFileAsString("xmlRoot.json");
 
-        Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/xml\")", new ArrayList<>(), true);
+        Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/xml\")", Collections.emptyList(), true);
         try {
-            String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+            String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
             fail("Must fail to transform");
         } catch(IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("Object must have only one root element"), "Found message: " + e.getMessage());
@@ -183,9 +183,9 @@ public class XMLWriterTest {
                 "version=1.0\n" +
                 "output.application/xml.RootElement=TestRoot\n" +
                 "*/\n" +
-                "payload", new ArrayList<>(), true);
+                "payload", Collections.emptyList(), true);
         try {
-            String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+            String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
         } catch(IllegalArgumentException e) {
             fail("This transformation should not fail");
         }
@@ -194,8 +194,8 @@ public class XMLWriterTest {
     void simpleJsonTest() throws Exception {
         String jsonData = TestResourceReader.readFileAsString("test.json");
 
-        Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/xml\")", new ArrayList<>(), true);
-        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+        Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/xml\")", Collections.emptyList(), true);
+        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertTrue(mappedXml.contains("<?xml"));
     }
