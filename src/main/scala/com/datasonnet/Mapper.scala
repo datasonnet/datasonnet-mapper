@@ -1,6 +1,7 @@
 package com.datasonnet
 
 import java.io.{File, PrintWriter, StringWriter}
+import java.util.Collections
 
 import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
 import fastparse.{IndexedParserInput, Parsed}
@@ -120,7 +121,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   def lineOffset = if (needsWrapper) 1 else 0
 
   def this(jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) {
-    this(jsonnet, argumentNames, new java.util.HashMap[String, String](), needsWrapper)
+    this(jsonnet, argumentNames, Collections.emptyMap(), needsWrapper)
   }
 
   def importer(parent: Path, path: String): Option[(Path, String)] = for {

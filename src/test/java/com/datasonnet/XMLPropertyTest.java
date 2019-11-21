@@ -19,8 +19,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 
 import static org.junit.Assert.*;
 
@@ -32,8 +31,8 @@ public class XMLPropertyTest {
     @Property
     public void reversible(@From(XMLGenerator.class) @Dictionary("xml.dict") Document dom) throws Exception {
         String xml = XMLDocumentUtils.documentToString(dom);
-        Mapper mapper = new Mapper("DS.Formats.write(DS.Formats.read(payload, \"application/xml\"), \"application/xml\")", new ArrayList<>(), true);
-        com.datasonnet.Document output = mapper.transform(new StringDocument(xml, "application/xml"), new HashMap<>(), "application/xml");
+        Mapper mapper = new Mapper("DS.Formats.write(DS.Formats.read(payload, \"application/xml\"), \"application/xml\")", Collections.emptyList(), true);
+        com.datasonnet.Document output = mapper.transform(new StringDocument(xml, "application/xml"), Collections.emptyMap(), "application/xml");
         DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document parsed = db.parse(new ByteArrayInputStream(output.contents().getBytes("UTF-8")));
         assertTrue("For input " + xml + " found output " + output.contents(), dom.isEqualNode(parsed));

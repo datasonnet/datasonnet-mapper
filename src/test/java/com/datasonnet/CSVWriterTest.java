@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -24,8 +23,8 @@ public class CSVWriterTest {
 
         DataFormatService.getInstance().findAndRegisterPlugins();
 
-        Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/csv\")", new ArrayList<>(), true);
-        Document mapped = mapper.transform(data, new HashMap<>(), "application/csv");
+        Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/csv\")", Collections.emptyList(), true);
+        Document mapped = mapper.transform(data, Collections.emptyMap(), "application/csv");
         String expected = TestResourceReader.readFileAsString("writeCSVTest.csv");
         assertEquals(expected.trim(), mapped.contents().trim());
     }
@@ -40,8 +39,8 @@ public class CSVWriterTest {
 
         DataFormatService.getInstance().findAndRegisterPlugins();
 
-        Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
-        Document mapped = mapper.transform(data, new HashMap<>(), "application/csv");
+        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+        Document mapped = mapper.transform(data, Collections.emptyMap(), "application/csv");
         String expected = TestResourceReader.readFileAsString("writeCSVExtTest.csv");
         assertEquals(expected.trim(), mapped.contents().trim());
     }

@@ -6,7 +6,7 @@ import com.datasonnet.Mapper;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.matchers.CompareMatcher;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,8 +25,8 @@ public class XMLWriterTest {
 
         DataFormatService.getInstance().findAndRegisterPlugins();
 
-        Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
-        String mapped = mapper.transform(new StringDocument(json, "application/json"), new HashMap<>(), "application/xml").contents();
+        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+        String mapped = mapper.transform(new StringDocument(json, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         // original mapping is gone
         assertThat(mapped, not(containsString("b:a")));
@@ -48,8 +48,8 @@ public class XMLWriterTest {
 
         DataFormatService.getInstance().findAndRegisterPlugins();
 
-        Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
-        String mapped = mapper.transform(new StringDocument(json, "application/json"), new HashMap<>(), "application/xml").contents();
+        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+        String mapped = mapper.transform(new StringDocument(json, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         // original mapping is gone
         assertThat(mapped, not(containsString("b:a")));
@@ -71,8 +71,8 @@ public class XMLWriterTest {
 
         DataFormatService.getInstance().findAndRegisterPlugins();
 
-        Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
-        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         Map<String, String> namespaces = new HashMap<>();
         namespaces.put("test", "http://www.modusbox.com");
@@ -88,13 +88,13 @@ public class XMLWriterTest {
 
 //        Mapper mapper = new Mapper("local params = {\n" +
 //                "    \"XmlVersion\" : \"1.1\"\n" +
-//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", Collections.emptyList(), true);
         DataFormatService.getInstance().findAndRegisterPlugins();
 
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"XmlVersion\" : \"1.1\"\n" +
-                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
-        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+                "};DS.Formats.write(payload, \"application/xml\", params)", Collections.emptyList(), true);
+        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertEquals(expectedXml, mappedXml);
 
@@ -109,13 +109,13 @@ public class XMLWriterTest {
 
 //        Mapper mapper = new Mapper("local params = {\n" +
 //                "    \"XmlVersion\" : \"1.1\"\n" +
-//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", Collections.emptyList(), true);
         DataFormatService.getInstance().findAndRegisterPlugins();
 
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"XmlVersion\" : \"1.1\"\n" +
-                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
-        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+                "};DS.Formats.write(payload, \"application/xml\", params)", Collections.emptyList(), true);
+        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
     }
@@ -127,13 +127,13 @@ public class XMLWriterTest {
 
 //        Mapper mapper = new Mapper("local params = {\n" +
 //                "    \"XmlVersion\" : \"1.1\"\n" +
-//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", Collections.emptyList(), true);
         DataFormatService.getInstance().findAndRegisterPlugins();
 
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"XmlVersion\" : \"1.1\"\n" +
-                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
-        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+                "};DS.Formats.write(payload, \"application/xml\", params)", Collections.emptyList(), true);
+        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
     }
@@ -146,14 +146,14 @@ public class XMLWriterTest {
 //        Mapper mapper = new Mapper("local params = {\n" +
 //                "    \"AutoEmptyElements\" : true,\n" +
 //                "    \"NullAsEmptyElement\" : true\n" +
-//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", Collections.emptyList(), true);
         DataFormatService.getInstance().findAndRegisterPlugins();
 
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"AutoEmptyElements\" : true,\n" +
                 "    \"NullAsEmptyElement\" : true\n" +
-                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
-        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+                "};DS.Formats.write(payload, \"application/xml\", params)", Collections.emptyList(), true);
+        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
 
@@ -162,12 +162,12 @@ public class XMLWriterTest {
 //        mapper = new Mapper("local params = {\n" +
 //                "    \"AutoEmptyElements\" : true,\n" +
 //                "    \"NullAsEmptyElement\" : false\n" +
-//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", Collections.emptyList(), true);
         mapper = new Mapper("local params = {\n" +
                 "    \"AutoEmptyElements\" : true,\n" +
                 "    \"NullAsEmptyElement\" : false\n" +
-                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
-        mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+                "};DS.Formats.write(payload, \"application/xml\", params)", Collections.emptyList(), true);
+        mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
     }
@@ -178,24 +178,24 @@ public class XMLWriterTest {
 
 //        Mapper mapper = new Mapper("local params = {\n" +
 //                "    \"OmitXmlDeclaration\" : true\n" +
-//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", Collections.emptyList(), true);
         DataFormatService.getInstance().findAndRegisterPlugins();
 
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"OmitXmlDeclaration\" : true\n" +
-                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
-        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+                "};DS.Formats.write(payload, \"application/xml\", params)", Collections.emptyList(), true);
+        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertFalse(mappedXml.contains("<?xml"));
 
 //        mapper = new Mapper("local params = {\n" +
 //                "    \"OmitXmlDeclaration\" : false\n" +
-//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", new ArrayList<>(), true);
+//                "};DS.Formats.writeExt(payload, \"application/xml\", params)", Collections.emptyList(), true);
         mapper = new Mapper("local params = {\n" +
                 "    \"OmitXmlDeclaration\" : false\n" +
-                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
+                "};DS.Formats.write(payload, \"application/xml\", params)", Collections.emptyList(), true);
 
-        mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+        mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertTrue(mappedXml.startsWith("<?xml"));
     }
@@ -205,8 +205,8 @@ public class XMLWriterTest {
 
         DataFormatService.getInstance().findAndRegisterPlugins();
 
-        Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/xml\")", new ArrayList<>(), true);
-        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
+        Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/xml\")", Collections.emptyList(), true);
+        String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").contents();
 
         assertTrue(mappedXml.contains("<?xml"));
     }
