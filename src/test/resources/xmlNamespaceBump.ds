@@ -1,0 +1,5 @@
+/** DataSonnet
+version=1.0
+dataformat.application/xml.output.NamespaceDeclarations.b1=http://example.com/1
+*/
+payload

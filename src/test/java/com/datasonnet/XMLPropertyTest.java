@@ -1,12 +1,14 @@
 package com.datasonnet;
 
 
+import com.datasonnet.portx.spi.DataFormatService;
 import com.datasonnet.util.Dictionary;
 import com.datasonnet.util.XMLDocumentUtils;
 import com.datasonnet.util.XMLGenerator;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.Ignore;
+import org.junit.jupiter.api.BeforeAll;
 import org.w3c.dom.Document;
 
 import com.pholser.junit.quickcheck.From;
@@ -28,6 +30,11 @@ import static org.junit.Assert.*;
 @Ignore
 @RunWith(JUnitQuickcheck.class)
 public class XMLPropertyTest {
+
+    @BeforeAll
+    static void registerPlugins() throws Exception {
+        DataFormatService.getInstance().findAndRegisterPlugins();
+    }
 
     @Property
     public void reversible(@From(XMLGenerator.class) @Dictionary("xml.dict") Document dom) throws Exception {

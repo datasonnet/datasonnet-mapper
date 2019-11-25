@@ -1,0 +1,48 @@
+# DataSonnet Header
+
+The header is an optional comment section in the mapping document which must start with `/\** DataSonnet` followed by a new line character and end with a line `*/` and contains a set of configuration properties.
+The properties are hierarchical, with sections separated by the `.` (dot) character, e.g.:
+
+------------
+dataformat.application/xml.payload.NamespaceSeparator=:
+dataformat.application/xml.payload.TextValueKey=__text
+dataformat.application/csv.myVar.Quote="
+dataformat.application/csv.myVar.Separator=|
+------------
+
+The header must be the first comment before any other line of code, in the following format:
+
+-------------
+/** DataSonnet
+version=<VERSION_NUMBER>
+<PROPERTY>=<VALUE>
+...
+*/
+-------------
+*Example*
+------------------------
+/** DataSonnet
+version=1.0
+*/
+//DataSonnet mapping starts here
+{
+    mappedValue: payload.value
+}
+------------------------
+
+The header is optional; if omitted, all default settings will be used.
+
+## Data Format Properties
+
+The data format properties control the data format plugins behavior. The property names must start with `dataformat.<MIME_TYPE>.payload|output|*|<VAR_NAME>` where `<MIME_TYPE>` is the mime type supported by the DataSonnet. If a property is not recognized, an error will be raised.
+
+The wildcard `*` is used for default values, if a parameter for payload, output, or variable is not defned explicitly.
+
+For the list of the supported data formats and their configurable properties, see the "Data Formats" section.
+
+
+
+
+
+
+

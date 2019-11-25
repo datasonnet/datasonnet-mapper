@@ -1,8 +1,10 @@
-local params = {
-    "UseHeader": false,
-    "Quote": "'",
-    "Separator": "|",
-    "Escape": "\\",
-    "NewLine": "\n"
-};
-DS.Formats.write(payload, "application/csv", params)
+/** DataSonnet
+version=1.0
+dataformat.application/csv.output.UseHeader=false
+dataformat.application/csv.output.Quote='
+dataformat.application/csv.output.Separator=|
+dataformat.application/csv.output.Escape=\
+dataformat.application/csv.output.NewLine=\n
+*/
+
+payload

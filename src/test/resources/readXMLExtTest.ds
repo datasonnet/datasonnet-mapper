@@ -1,13 +1,9 @@
-local params = {
-    "NamespaceDeclarations" : {
-        "datasonnet" : "http://www.modusbox.com"
-    },
-    "NamespaceSeparator": "%",
-    "TextValueKey": "__text",
-    "AttributeCharacter": "*"
-};
+/** DataSonnet
+version=1.0
+dataformat.application/xml.payload.NamespaceDeclarations.datasonnet=http://www.modusbox.com
+dataformat.application/xml.payload.NamespaceSeparator=%
+dataformat.application/xml.payload.TextValueKey=__text
+dataformat.application/xml.payload.AttributeCharacter=*
+*/
 
-//local parsedXml = DS.Formats.readExt(payload, "application/xml", params);
-local parsedXml = DS.Formats.read(payload, "application/xml", params);
-
-parsedXml
+payload
