@@ -5,7 +5,6 @@ import picocli.CommandLine;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(

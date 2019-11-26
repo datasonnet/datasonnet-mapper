@@ -3,6 +3,8 @@ package com.datasonnet.commands;
 import com.datasonnet.Document;
 import com.datasonnet.Mapper;
 import com.datasonnet.StringDocument;
+import com.datasonnet.portx.spi.DataFormatPlugin;
+import com.datasonnet.portx.spi.DataFormatService;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
@@ -10,13 +12,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 @CommandLine.Command(
         name = "run",
@@ -26,7 +26,7 @@ public class Run implements Callable<Void> {
 
     @CommandLine.Parameters(
             index = "0",
-            description = "Map file"
+            description = "Map file (mime-type is autodetected by suffix, defaulting to JSON)"
     )
     private File datasonnet;
 
@@ -40,7 +40,7 @@ public class Run implements Callable<Void> {
     @CommandLine.Option(names = {"-a", "--argument"}, split = ",", description = "argument name and value (as JSON)")
     Map<String, String> arguments = new HashMap<>();
 
-    @CommandLine.Option(names = {"-f", "--argument-file"}, split = ",", description = "argument name and file containing the value (as JSON)")
+    @CommandLine.Option(names = {"-f", "--argument-file"}, split = ",", description = "argument name and file containing the value (mime-type is autodetected by suffix, defaulting to JSON)")
     Map<String, File> argumentFiles = new HashMap<>();
 
     @CommandLine.Option(names = {"-i", "--import-file"}, description = "file to make available for imports")
@@ -49,12 +49,33 @@ public class Run implements Callable<Void> {
     @CommandLine.Option(names = {"-n", "--no-wrap"})
     boolean alreadyWrapped;
 
+    private Map<String, String> suffixMimeTypes = new HashMap() {{
+        for(List<DataFormatPlugin> plugins : DataFormatService.getInstance().findPlugins().values()) {
+            for(DataFormatPlugin plugin : plugins) {
+                putIfAbsent(plugin.getPluginId().toLowerCase(), plugin.getSupportedMimeTypes()[0]);
+            }
+        }
+    }};
+
     @Override
     public Void call() throws Exception {
         Mapper mapper = new Mapper(Main.readFile(datasonnet), combinedArguments().keySet(), imports(), !alreadyWrapped);
-        Document result = mapper.transform(new StringDocument(payload(), "application/json"), combinedArguments(), "application/json");
+        Document result = mapper.transform(new StringDocument(payload(), mimeType(datasonnet)), combinedArguments(), "application/json");
         System.out.println(result.contents());
         return null;
+    }
+
+    private String suffix(File file) {
+        String[] parts = file.getName().split(".");
+        if(parts.length > 1) {
+            return parts[parts.length - 1];
+        } else {
+            return "";  // no suffix
+        }
+    }
+
+    private String mimeType(File file) {
+        return suffixMimeTypes.getOrDefault(suffix(file), "application/json");
     }
 
     private String payload() throws IOException {
@@ -72,13 +93,18 @@ public class Run implements Callable<Void> {
     }
 
     private Map<String, Document> combinedArguments() throws IOException {
-        Map combined = new HashMap<>(arguments);
-        for(Map.Entry<String, File> entry : argumentFiles.entrySet()) {
-            String contents = Main.readFile(entry.getValue());
-            combined.put(entry.getKey(), new StringDocument(contents, "application/json"));
-        }
-        return combined;
+        return new HashMap<String, Document>() {{
+            for(Map.Entry<String, String> entry : arguments.entrySet()) {
+                put(entry.getKey(), new StringDocument(entry.getValue(), "application/json"));
+            }
+            for(Map.Entry<String, File> entry : argumentFiles.entrySet()) {
+                File file = entry.getValue();
+                String contents = Main.readFile(file);
+                put(entry.getKey(), new StringDocument(contents, mimeType(file)));
+            }
+        }};
     }
+
 
     private Map<String, String> imports() throws IOException {
         Map imports = new HashMap<>();
