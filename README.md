@@ -17,3 +17,4 @@ To make a release where the POM SNAPSHOT version is `X.Y.Z-SNAPSHOT`
 
 If a build fails, make a new push, which will trigger the new build with the necessary version information. If a
 tagged build fails, tick the patch version into a new tag and push that to trigger the new build.
+
