@@ -20,7 +20,8 @@ import java.util.concurrent.Callable;
 
 @CommandLine.Command(
         name = "run",
-        description = "Transform data using DataSonnet"
+        description = "Transform data using DataSonnet",
+        footer = {"Available input and output formats are JSON, XML, and CSV"}
 )
 public class Run implements Callable<Void> {
 
@@ -46,8 +47,11 @@ public class Run implements Callable<Void> {
     @CommandLine.Option(names = {"-i", "--import-file"}, description = "file to make available for imports")
     List<File> importFiles = new ArrayList<>();
 
-    @CommandLine.Option(names = {"-n", "--no-wrap"})
+    @CommandLine.Option(names = {"-n", "--no-wrap"}, description = "Do not wrap in a function call. Only use this if your transformation is already a top-level function.")
     boolean alreadyWrapped;
+
+    @CommandLine.Option(names = {"-o", "--output-type"}, description = "Handle the output as this format. Defaults to JSON.")
+    String outputType = "application/json";
 
     private Map<String, String> suffixMimeTypes = new HashMap() {{
         for(List<DataFormatPlugin> plugins : DataFormatService.getInstance().findPlugins().values()) {
@@ -60,7 +64,7 @@ public class Run implements Callable<Void> {
     @Override
     public Void call() throws Exception {
         Mapper mapper = new Mapper(Main.readFile(datasonnet), combinedArguments().keySet(), imports(), !alreadyWrapped);
-        Document result = mapper.transform(new StringDocument(payload(), mimeType(datasonnet)), combinedArguments(), "application/json");
+        Document result = mapper.transform(new StringDocument(payload(), mimeType(datasonnet)), combinedArguments(), outputType);
         System.out.println(result.contents());
         return null;
     }
