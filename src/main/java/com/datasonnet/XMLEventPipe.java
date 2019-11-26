@@ -1,4 +1,4 @@
-package com.datasonnet.portx;
+package com.datasonnet;
 
 import javax.xml.stream.XMLStreamException;
 import org.codehaus.stax2.XMLStreamReader2;

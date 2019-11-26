@@ -1,4 +1,4 @@
-package com.datasonnet.portx.badgerfish;
+package com.datasonnet.badgerfish;
 
 
 import org.codehaus.jettison.AbstractXMLStreamReader;
@@ -29,7 +29,7 @@ public class BadgerFishXMLStreamReader extends AbstractXMLStreamReader {
         this(obj, new BadgerFishConvention());
     }
 
-    public BadgerFishXMLStreamReader(JSONObject obj, com.datasonnet.portx.badgerfish.BadgerFishConvention convention) throws JSONException, XMLStreamException {
+    public BadgerFishXMLStreamReader(JSONObject obj, com.datasonnet.badgerfish.BadgerFishConvention convention) throws JSONException, XMLStreamException {
         CONVENTION = convention;
         String rootName = (String) obj.keys().next();
         this.node = new Node(null, rootName, obj.getJSONObject(rootName), CONVENTION);

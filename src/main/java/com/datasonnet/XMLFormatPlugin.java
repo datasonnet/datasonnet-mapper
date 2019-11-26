@@ -1,9 +1,9 @@
-package com.datasonnet.portx;
+package com.datasonnet;
 
 
-import com.datasonnet.portx.badgerfish.*;
-import com.datasonnet.portx.spi.DataFormatPlugin;
-import com.datasonnet.portx.spi.UjsonUtil;
+import com.datasonnet.badgerfish.*;
+import com.datasonnet.spi.DataFormatPlugin;
+import com.datasonnet.spi.UjsonUtil;
 
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONException;
@@ -23,8 +23,6 @@ import javax.xml.stream.*;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 

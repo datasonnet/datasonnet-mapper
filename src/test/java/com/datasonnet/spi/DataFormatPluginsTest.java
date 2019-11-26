@@ -1,7 +1,7 @@
-package com.datasonnet;
+package com.datasonnet.spi;
 
-import com.datasonnet.portx.spi.DataFormatPlugin;
-import com.datasonnet.portx.spi.DataFormatService;
+import com.datasonnet.spi.DataFormatPlugin;
+import com.datasonnet.spi.DataFormatService;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -13,7 +13,7 @@ public class DataFormatPluginsTest {
 
     @Test
     void testDataFormatPlugins() throws Exception {
-        DataFormatService service = DataFormatService.getInstance();
+        DataFormatService service = new DataFormatService();
         assertNull(service.getPluginFor("application/xml"));
         Map<String, List<DataFormatPlugin>> plugins = service.findPlugins();
         assertTrue(plugins.containsKey("application/xml"));

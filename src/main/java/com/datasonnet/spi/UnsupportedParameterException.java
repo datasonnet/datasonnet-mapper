@@ -1,4 +1,4 @@
-package com.datasonnet.portx.spi;
+package com.datasonnet.spi;
 
 public class UnsupportedParameterException extends Exception {
 

@@ -1,4 +1,4 @@
-package com.datasonnet.portx.badgerfish;
+package com.datasonnet.badgerfish;
 
 import javax.xml.namespace.NamespaceContext;
 import java.util.HashMap;
