@@ -1,4 +1,4 @@
-package com.datasonnet.portx.spi;
+package com.datasonnet.spi;
 
 import java.util.*;
 
@@ -6,11 +6,9 @@ public class DataFormatService {
 
     private static DataFormatService service;
 
-    private static Map<String, List<DataFormatPlugin>> pluginRegistry;
+    private Map<String, List<DataFormatPlugin>> pluginRegistry = new HashMap<>();
 
-    private DataFormatService() {
-        pluginRegistry = new HashMap<>();
-    }
+    DataFormatService() { }
 
     public static synchronized DataFormatService getInstance() {
         if (service == null) {

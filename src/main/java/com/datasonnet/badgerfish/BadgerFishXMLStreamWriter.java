@@ -1,8 +1,7 @@
-package com.datasonnet.portx.badgerfish;
+package com.datasonnet.badgerfish;
 
 import org.codehaus.jettison.AbstractXMLStreamWriter;
 import org.codehaus.jettison.Node;
-import org.codehaus.jettison.XsonNamespaceContext;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;

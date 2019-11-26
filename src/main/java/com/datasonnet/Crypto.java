@@ -1,4 +1,4 @@
-package com.datasonnet.portx;
+package com.datasonnet;
 
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.engines.BlowfishEngine;

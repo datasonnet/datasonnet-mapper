@@ -1,4 +1,4 @@
-package com.datasonnet.portx.badgerfish;
+package com.datasonnet.badgerfish;
 
 import java.util.Collections;
 import java.util.HashMap;

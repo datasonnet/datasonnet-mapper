@@ -1,4 +1,4 @@
-package com.datasonnet.portx.badgerfish;
+package com.datasonnet.badgerfish;
 
 import org.codehaus.jettison.Convention;
 import org.codehaus.jettison.Node;
@@ -9,9 +9,7 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class BadgerFishConvention implements Convention {

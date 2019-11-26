@@ -1,7 +1,7 @@
-package com.datasonnet.portx;
+package com.datasonnet;
 
-import com.datasonnet.portx.spi.DataFormatPlugin;
-import com.datasonnet.portx.spi.UjsonUtil;
+import com.datasonnet.spi.DataFormatPlugin;
+import com.datasonnet.spi.UjsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;

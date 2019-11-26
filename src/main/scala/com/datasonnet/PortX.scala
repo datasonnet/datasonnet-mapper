@@ -3,7 +3,8 @@ package com.datasonnet
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, Period, ZoneId, ZoneOffset}
 
-import com.datasonnet.portx.spi.{DataFormatPlugin, UnsupportedMimeTypeException}
+import com.datasonnet
+import com.datasonnet.spi.{DataFormatPlugin, DataFormatService, UnsupportedMimeTypeException, UnsupportedParameterException}
 import com.datasonnet.wrap.Library.{builtin, builtin0, library}
 import sjsonnet.Std.builtinWithDefaults
 import sjsonnet.{EvalScope, Expr, Materializer, Val}
@@ -113,32 +114,32 @@ object PortX {
     "Crypto" -> library(
       builtin("hash", "value", "algorithm") {
         (ev, fs, value: String, algorithm: String) =>
-          com.datasonnet.portx.Crypto.hash(value, algorithm)
+          Crypto.hash(value, algorithm)
       },
       builtin("hmac", "value", "secret", "algorithm") {
         (ev, fs, value: String, secret: String, algorithm: String) =>
-          com.datasonnet.portx.Crypto.hmac(value, secret, algorithm)
+          datasonnet.Crypto.hmac(value, secret, algorithm)
       },
       builtin("encrypt", "value", "password") {
         (ev, fs, value: String, password: String) =>
-          com.datasonnet.portx.Crypto.encrypt(value, password)
+          datasonnet.Crypto.encrypt(value, password)
       },
       builtin("decrypt", "value", "password") {
         (ev, fs, value: String, password: String) =>
-          com.datasonnet.portx.Crypto.decrypt(value, password)
+          datasonnet.Crypto.decrypt(value, password)
       },
     ),
 
     "JsonPath" -> library(
       builtin("select", "json", "path") {
         (ev, fs, json: Val, path: String) =>
-          Materializer.reverse(ujson.read(com.datasonnet.portx.JsonPath.select(ujson.write(Materializer.apply(json)(ev)), path)))
+          Materializer.reverse(ujson.read(JsonPath.select(ujson.write(Materializer.apply(json)(ev)), path)))
       },
     )
   )
 
   def read(data: String, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {
-    val plugin = com.datasonnet.portx.spi.DataFormatService.getInstance().getPluginFor(mimeType)
+    val plugin = DataFormatService.getInstance().getPluginFor(mimeType)
     if (plugin == null) {
       throw new UnsupportedMimeTypeException("No suitable plugin found for mime type: " + mimeType)
     }
@@ -147,7 +148,7 @@ object PortX {
   }
 
   def write(json: Val, mimeType: String, params: Val.Obj, ev: EvalScope): String = {
-    val plugin = com.datasonnet.portx.spi.DataFormatService.getInstance().getPluginFor(mimeType)
+    val plugin = DataFormatService.getInstance().getPluginFor(mimeType)
     if (plugin == null) {
       throw new UnsupportedMimeTypeException("No suitable plugin found for mime type: " + mimeType);
     }
@@ -164,7 +165,7 @@ object PortX {
     //Convert to Java map
     for ((k, v) <- scalaParams) {
       if (!supportedParams.containsKey(k)) {
-        Failure(new com.datasonnet.portx.spi.UnsupportedParameterException("The parameter " + k + " is not supported by plugin " + plugin.getPluginId))
+        Failure(new UnsupportedParameterException("The parameter " + k + " is not supported by plugin " + plugin.getPluginId))
       }
       javaParams.put(k, toJavaObject(v))
     }

@@ -1,4 +1,4 @@
-package com.datasonnet.portx;
+package com.datasonnet;
 
 public class JsonPath {
 

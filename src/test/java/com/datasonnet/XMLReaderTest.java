@@ -1,12 +1,12 @@
 package com.datasonnet;
 
-import com.datasonnet.portx.spi.DataFormatService;
+import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.ArrayList;
