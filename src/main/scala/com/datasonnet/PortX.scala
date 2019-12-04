@@ -74,9 +74,9 @@ object PortX {
                           "data" -> None,
                           "mimeType" -> None,
                           "params" -> Some(Expr.Null(0))) { (args, ev) =>
-        val data = args("data").asInstanceOf[Val.Str].value
-        val mimeType = args("mimeType").asInstanceOf[Val.Str].value
-        val params = if (args("params") == Val.Null) null else args("params").asInstanceOf[Val.Obj]
+        val data = args("data").cast[Val.Str].value
+        val mimeType = args("mimeType").cast[Val.Str].value
+        val params = if (args("params") == Val.Null) null else args("params").cast[Val.Obj]
         read(data, mimeType, params, ev)
       },
       builtinWithDefaults("write",
@@ -84,8 +84,8 @@ object PortX {
         "mimeType" -> None,
         "params" -> Some(Expr.Null(0))) { (args, ev) =>
         val data = args("data")
-        val mimeType = args("mimeType").asInstanceOf[Val.Str].value
-        val params = if (args("params") == Val.Null) null else args("params").asInstanceOf[Val.Obj]
+        val mimeType = args("mimeType").cast[Val.Str].value
+        val params = if (args("params") == Val.Null) null else args("params").cast[Val.Obj]
         write(data, mimeType, params, ev)
       },
 
