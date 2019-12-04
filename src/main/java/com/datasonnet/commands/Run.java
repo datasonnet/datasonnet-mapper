@@ -3,8 +3,8 @@ package com.datasonnet.commands;
 import com.datasonnet.Document;
 import com.datasonnet.Mapper;
 import com.datasonnet.StringDocument;
-import com.datasonnet.portx.spi.DataFormatPlugin;
-import com.datasonnet.portx.spi.DataFormatService;
+import com.datasonnet.spi.DataFormatPlugin;
+import com.datasonnet.spi.DataFormatService;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
@@ -29,14 +29,14 @@ public class Run implements Callable<Void> {
             index = "0",
             description = "Map file (mime-type is autodetected by suffix, defaulting to JSON)"
     )
-    private File datasonnet;
+    File datasonnet;
 
     @CommandLine.Parameters(
             index = "1",
             arity = "0..1",
             description = "Input data file (if omitted reads from standard input)"
     )
-    private File input;
+    File input;
 
     @CommandLine.Option(names = {"-a", "--argument"}, split = ",", description = "argument name and value (as JSON)")
     Map<String, String> arguments = new HashMap<>();
@@ -53,18 +53,10 @@ public class Run implements Callable<Void> {
     @CommandLine.Option(names = {"-o", "--output-type"}, description = "Handle the output as this format. Defaults to JSON.")
     String outputType = "application/json";
 
-    private Map<String, String> suffixMimeTypes = new HashMap() {{
-        for(List<DataFormatPlugin> plugins : DataFormatService.getInstance().findPlugins().values()) {
-            for(DataFormatPlugin plugin : plugins) {
-                putIfAbsent(plugin.getPluginId().toLowerCase(), plugin.getSupportedMimeTypes()[0]);
-            }
-        }
-    }};
-
     @Override
     public Void call() throws Exception {
         Mapper mapper = new Mapper(Main.readFile(datasonnet), combinedArguments().keySet(), imports(), !alreadyWrapped);
-        Document result = mapper.transform(new StringDocument(payload(), mimeType(datasonnet)), combinedArguments(), outputType);
+        Document result = mapper.transform(new StringDocument(payload(), suffix(datasonnet)), combinedArguments(), outputType);
         System.out.println(result.contents());
         return null;
     }
@@ -76,10 +68,6 @@ public class Run implements Callable<Void> {
         } else {
             return "";  // no suffix
         }
-    }
-
-    private String mimeType(File file) {
-        return suffixMimeTypes.getOrDefault(suffix(file), "application/json");
     }
 
     private String payload() throws IOException {
@@ -104,7 +92,7 @@ public class Run implements Callable<Void> {
             for(Map.Entry<String, File> entry : argumentFiles.entrySet()) {
                 File file = entry.getValue();
                 String contents = Main.readFile(file);
-                put(entry.getKey(), new StringDocument(contents, mimeType(file)));
+                put(entry.getKey(), new StringDocument(contents, suffix(file)));
             }
         }};
     }

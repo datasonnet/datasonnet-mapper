@@ -75,8 +75,8 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         return value;
     }
 
-    public String[] getSupportedMimeTypes() {
-        return new String[] { "application/csv", "text/csv" };
+    public String[] getSupportedIdentifiers() {
+        return new String[] { "application/csv", "text/csv", "csv" };
     }
 
     private CsvSchema.Builder getBuilder(Map<String, Object> params) {
