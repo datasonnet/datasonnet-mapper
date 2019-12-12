@@ -6,7 +6,7 @@ public interface DataFormatPlugin {
     ujson.Value read(String input, Map<String, Object> params) throws Exception;
     String write(ujson.Value input, Map<String, Object> params) throws Exception;
 
-    String[] getSupportedMimeTypes();
+    String[] getSupportedIdentifiers();
 
     Map<String, String> getReadParameters();
     Map<String, String> getWriteParameters();

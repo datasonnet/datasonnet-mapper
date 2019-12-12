@@ -1,29 +1,41 @@
 package com.datasonnet.spi;
 
-import com.datasonnet.spi.DataFormatPlugin;
-import com.datasonnet.spi.DataFormatService;
+import com.datasonnet.XMLFormatPlugin;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DataFormatPluginsTest {
 
     @Test
-    void testDataFormatPlugins() throws Exception {
+    void initialState() {
         DataFormatService service = new DataFormatService();
         assertNull(service.getPluginFor("application/xml"));
-        Map<String, List<DataFormatPlugin>> plugins = service.findPlugins();
-        assertTrue(plugins.containsKey("application/xml"));
-        assertFalse(plugins.containsKey("blah/blah"));
-        List<DataFormatPlugin> xmlPlugins = plugins.get("application/xml");
-        assertTrue(xmlPlugins.size() > 0);
-        DataFormatPlugin xmlPlugin = xmlPlugins.get(0);
-        service.registerPlugin("application/xml", xmlPlugin);
+        assertNotNull(service.getPluginFor("application/json"));
+    }
+
+    @Test
+    void xmlBuiltInDiscovered() {
+        DataFormatService service = new DataFormatService();
+        List<DataFormatPlugin> plugins = service.findPlugins();
+        assertTrue(plugins.stream().anyMatch((plugin) -> plugin instanceof XMLFormatPlugin));
+    }
+
+    @Test
+    void namedRegistrationWorks() {
+        DataFormatService service = new DataFormatService();
+        service.registerPluginFor("application/xml", new XMLFormatPlugin());
         assertNotNull(service.getPluginFor("application/xml"));
+    }
+
+    @Test
+    void automaticRegistrationWorks() {
+        DataFormatService service = new DataFormatService();
         service.findAndRegisterPlugins();
         assertNotNull(service.getPluginFor("application/csv"));
+        assertNotNull(service.getPluginFor("application/xml"));
+        assertEquals(service.getPluginFor("xml"), service.getPluginFor("application/xml"));
     }
 }

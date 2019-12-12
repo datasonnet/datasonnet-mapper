@@ -146,8 +146,8 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         return reader;
     }
 
-    public String[] getSupportedMimeTypes() {
-        return new String[] { "application/xml" };
+    public String[] getSupportedIdentifiers() {
+        return new String[] { "application/xml", "xml" };
     }
 
     @Override
