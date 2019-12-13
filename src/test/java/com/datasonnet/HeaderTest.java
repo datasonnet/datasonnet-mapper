@@ -1,6 +1,6 @@
 package com.datasonnet;
 
-import com.datasonnet.portx.spi.DataFormatService;
+import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

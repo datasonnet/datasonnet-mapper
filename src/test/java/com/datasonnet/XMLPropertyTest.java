@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 
-import com.datasonnet.portx.spi.DataFormatService;
+import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.Dictionary;
 import com.datasonnet.util.XMLDocumentUtils;
 import com.datasonnet.util.XMLGenerator;
