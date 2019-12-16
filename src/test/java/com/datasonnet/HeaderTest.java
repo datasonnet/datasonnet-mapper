@@ -8,9 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class HeaderTest {
 
@@ -39,5 +37,20 @@ public class HeaderTest {
 
         assertTrue(mapped.startsWith("\"greetings\"|\"name\""));
         assertTrue(mapped.trim().endsWith("\"Hello\"|\"World\""));
+    }
+
+    @Test
+    void testDotMimeType() throws Exception {
+        Document payload = new StringDocument(
+                "TestResource",
+                "application/test.test"
+        );
+        String ds = TestResourceReader.readFileAsString("dotMimeTypeTest.ds");
+
+        Mapper mapper = new Mapper(ds, new ArrayList<>(), true);
+        String mapped = mapper.transform(payload, new HashMap<>(), "text/plain").contents();
+        assertTrue(mapped.endsWith("HelloWorld"));
+        mapped = mapper.transform(payload, new HashMap<>(), "application/test.test").contents();
+        assertTrue(mapped.endsWith("GoodByeWorld"));
     }
 }

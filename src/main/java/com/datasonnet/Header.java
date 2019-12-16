@@ -1,9 +1,14 @@
 package com.datasonnet;
 
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.dataformat.javaprop.*;
+import com.fasterxml.jackson.dataformat.javaprop.util.JPropNode;
+import com.fasterxml.jackson.dataformat.javaprop.util.JPropPathSplitter;
 
 public class Header {
     public static String DATASONNET_HEADER = "/** DataSonnet";
@@ -25,8 +30,39 @@ public class Header {
             headerCommentSection = headerCommentSection.replace(DATASONNET_HEADER, "").replace("*/","");
 
             JavaPropsMapper mapper = new JavaPropsMapper();
+            JavaPropsSchema schema = new JavaPropsSchema() {
+                class HeaderSplitter extends JPropPathSplitter
+                {
+                    protected final char _pathSeparatorChar = '.';
+
+                    public HeaderSplitter()
+                    {
+                        super(true);
+                    }
+
+                    @Override
+                    public JPropNode splitAndAdd(JPropNode parent,
+                                                 String key, String value)
+                    {
+                        JPropNode curr = parent;
+                        String[] segments = key.split("(?<!" + Pattern.quote("\\") + ")" + Pattern.quote("" + _pathSeparatorChar));
+                        for (String segment : segments) {
+                            curr = _addSegment(curr, segment.replaceAll("\\\\", ""));
+                        }
+                        return curr.setValue(value);
+                    }
+                }
+
+                @Override
+                public JPropPathSplitter pathSplitter() {
+                    return new HeaderSplitter();
+                };
+            };
+
             try {
-                Map propsMap = mapper.readValue(headerCommentSection, Map.class);
+                Properties props = new Properties();
+                props.load(new StringReader(headerCommentSection));
+                Map propsMap = mapper.readPropertiesAs(props, schema, Map.class);
                 if (propsMap.containsKey(DATASONNET_VERSION)) {
                     header.setVersion((String)propsMap.get(DATASONNET_VERSION));
                 }

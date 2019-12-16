@@ -36,9 +36,15 @@ The header is optional; if omitted, all default settings will be used.
 
 The data format properties control the data format plugins behavior. The property names must start with `dataformat.<MIME_TYPE>.payload|output|*|<VAR_NAME>` where `<MIME_TYPE>` is the mime type supported by the DataSonnet. If a property is not recognized, an error will be raised.
 
-The wildcard `*` is used for default values, if a parameter for payload, output, or variable is not defned explicitly.
+IMPORTANT: if the mime type contains the dot (`.`) character, it must be escaped with double backslash (`\\`). For example, `dataformat.application/vnd\\.ms-excel.payload.param=xyz`.
 
-For the list of the supported data formats and their configurable properties, see the "Data Formats" section.
+The wildcard `*` is used for default values, if a parameter for payload, output, or variable is not defned explicitly, for example:
+
+------------
+dataformat.application/csv.*.Separator=|
+------------
+
+For the list of the supported data formats and their configurable properties, see the xref:dataformats.adoc[Data Formats] section.
 
 
 
