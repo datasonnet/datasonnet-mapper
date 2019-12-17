@@ -1,6 +1,6 @@
 /** DataSonnet
 version=1.0
-dataformat.application/xml.output.NamespaceDeclarations.c=http://example.com/1
-dataformat.application/xml.output.NamespaceDeclarations.=http://example.com/2
+output.application/xml.NamespaceDeclarations.c=http://example.com/1
+output.application/xml.NamespaceDeclarations.=http://example.com/2
 */
 payload

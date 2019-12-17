@@ -33,7 +33,8 @@ public class XMLReaderTest {
     void testOverrideNamespaces() throws Exception {
         String xml = "<a xmlns='http://example.com/1' xmlns:b='http://example.com/2'><b:b/></a>";
         // note how b is bound to the default namespace, which means the 'b' above needs to be auto-rebound
-        String jsonnet = "/** DataSonnet\nversion=1.0\ndataformat.application/xml.payload.NamespaceDeclarations.b=http://example.com/1\n*/\npayload";
+
+        String jsonnet = "/** DataSonnet\nversion=1.0\ninput.payload.application/xml.NamespaceDeclarations.b=http://example.com/1\n*/\npayload";
 
         Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
         String mapped = mapper.transform(new StringDocument(xml, "application/xml"), new HashMap<>(), "application/json").contents();

@@ -1,7 +1,7 @@
 /** DataSonnet
 version=1.0
-dataformat.application/test\\.test.payload.TestParam=HelloWorld
-dataformat.application/test\\.test.output.TestParam=GoodByeWorld
+input.payload.application/test\\.test.TestParam=HelloWorld
+output.application/test\\.test.TestParam=GoodByeWorld
 */
 payload
 

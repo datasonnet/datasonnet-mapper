@@ -149,7 +149,7 @@ public class XMLWriterTest {
 
         Mapper mapper = new Mapper("/** DataSonnet\n" +
                 "version=1.0\n" +
-                "dataformat.application/xml.output.OmitXmlDeclaration=true\n" +
+                "output.application/xml.OmitXmlDeclaration=true\n" +
                 "*/\n" +
                 "payload", new ArrayList<>(), true);
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
@@ -158,7 +158,7 @@ public class XMLWriterTest {
 
         mapper = new Mapper("/** DataSonnet\n" +
                 "version=1.0\n" +
-                "dataformat.application/xml.output.OmitXmlDeclaration=false\n" +
+                "output.application/xml.OmitXmlDeclaration=false\n" +
                 "*/\n" +
                 "payload", new ArrayList<>(), true);
 

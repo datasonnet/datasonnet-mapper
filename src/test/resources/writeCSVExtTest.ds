@@ -1,10 +1,9 @@
 /** DataSonnet
 version=1.0
-dataformat.application/csv.output.UseHeader=false
-dataformat.application/csv.output.Quote='
-dataformat.application/csv.output.Separator=|
-dataformat.application/csv.output.Escape=\
-dataformat.application/csv.output.NewLine=\n
+output.application/csv.UseHeader=false
+output.application/csv.Quote='
+output.application/csv.Separator=|
+output.application/csv.Escape=\\
+output.application/csv.NewLine=\n
 */
-
 payload

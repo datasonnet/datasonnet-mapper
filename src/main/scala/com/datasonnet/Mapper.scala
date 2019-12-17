@@ -93,17 +93,10 @@ object Mapper {
     (name -> jsonnetLibrary)
   }
 
-  def getParams(name: String, mimeType: String, header: Header): util.Map[String, Object] = {
-      val dfParams = header.getDataFormatParameters().getOrDefault(mimeType, Collections.emptyMap())
-      val mergedParams = dfParams.getOrDefault(Header.DATAFORMAT_DEFAULT, new util.HashMap[String, Object]())
-      mergedParams.putAll(dfParams.getOrDefault(name, new util.HashMap[String, Object]()))
-      mergedParams
-  }
-
   def input(name: String, data: Document, header: Header): Expr = {
     val plugin = DataFormatService.getInstance().getPluginFor(data.mimeType)
     if (plugin != null) {
-      val json = plugin.read(data.contents(), getParams(name, data.mimeType, header))
+      val json = plugin.read(data.contents(), header.getDataFormatParameters(name, data.mimeType, true).asInstanceOf[util.Map[String, AnyRef]])
       Materializer.toExpr(json)
     } else {
       throw new IllegalArgumentException("The input mime type " + data.mimeType + " is not supported")
@@ -113,14 +106,13 @@ object Mapper {
   def output(output: ujson.Value, mimeType: String, header: Header): Document = {
     val plugin = DataFormatService.getInstance().getPluginFor(mimeType)
     if (plugin != null) {
-      val str = plugin.write(output, getParams(Header.DATASONNET_OUTPUT, mimeType, header))
+      val str = plugin.write(output, header.getDataFormatParameters(Header.DATASONNET_OUTPUT, mimeType, false).asInstanceOf[util.Map[String, AnyRef]])
       new StringDocument(str, mimeType)
     } else {
       throw new IllegalArgumentException("The output mime type " + mimeType + " is not supported")
     }
   }
 }
-
 
 class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imports: java.util.Map[String, String], needsWrapper: Boolean) {
 

@@ -1,9 +1,9 @@
 /** DataSonnet
 version=1.0
-dataformat.application/xml.payload.NamespaceDeclarations.datasonnet=http://www.modusbox.com
-dataformat.application/xml.payload.NamespaceSeparator=%
-dataformat.application/xml.payload.TextValueKey=__text
-dataformat.application/xml.payload.AttributeCharacter=*
+input.payload.application/xml.NamespaceDeclarations.datasonnet=http://www.modusbox.com
+input.payload.application/xml.NamespaceSeparator=%
+input.payload.application/xml.TextValueKey=__text
+input.payload.application/xml.AttributeCharacter=*
 */
 
 payload

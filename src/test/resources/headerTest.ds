@@ -1,9 +1,9 @@
 /** DataSonnet
 version=1.0
-dataformat.application/xml.payload.NamespaceSeparator=:
-dataformat.application/xml.*.TextValueKey=__text
-dataformat.application/csv.output.Quote="
-dataformat.application/csv.*.Separator=|
+input.payload.application/xml.NamespaceSeparator=:
+input.*.application/xml.TextValueKey=__text
+*.application/csv.Separator=|
+output.application/csv.Quote="
 */
 [
     {
