@@ -2,7 +2,9 @@ package com.datasonnet
 
 import java.io.{File, PrintWriter, StringWriter}
 import java.util
+import java.util.Collections
 
+import com.datasonnet.header.Header
 import com.datasonnet.spi.DataFormatService
 import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
 import fastparse.{IndexedParserInput, Parsed}
@@ -92,26 +94,11 @@ object Mapper {
   }
 
   def getParams(name: String, mimeType: String, header: Header): util.Map[String, Object] = {
-    if (header != null) {
-      val dfParams = header.getDataFormatParameters().get(mimeType);
-      if (dfParams != null) {
-        val mergedParams = dfParams.getOrDefault(Header.DATAFORMAT_DEFAULT, new util.HashMap[String, Object]())
-        mergedParams.putAll(dfParams.getOrDefault(name, new util.HashMap[String, Object]()))
-        mergedParams
-      } else new util.HashMap[String, Object]()
-    } else new util.HashMap[String, Object]()
+      val dfParams = header.getDataFormatParameters().getOrDefault(mimeType, Collections.emptyMap())
+      val mergedParams = dfParams.getOrDefault(Header.DATAFORMAT_DEFAULT, new util.HashMap[String, Object]())
+      mergedParams.putAll(dfParams.getOrDefault(name, new util.HashMap[String, Object]()))
+      mergedParams
   }
-
-  // TODO: will we require a header (or have a default header) on next release? I believe we should, as it is our last chance for a big required change, in which case
-  // the prepareForInput and prepareForOutput methods can be entirely removed!
-  // NOTE: this means there needs to be a match check between input and config, with JSON special cased as always allowed.
-  // this should be done by checking the plugin against the JSON plugin, as currently done.
-
-//  def input(data: Document): Expr = {
-    // TODO once support for the header is integrated, if there is a header covering the input, call read.
-    // otherwise, call this method, which special cases the JSON plugin and treats every other identifier identically.
-
-//    val json = DataFormatService.getInstance().prepareForInput(data)
 
   def input(name: String, data: Document, header: Header): Expr = {
     val plugin = DataFormatService.getInstance().getPluginFor(data.mimeType)
@@ -122,12 +109,6 @@ object Mapper {
       throw new IllegalArgumentException("The input mime type " + data.mimeType + " is not supported")
     }
   }
-
-//  def output(output: ujson.Value, mimeType: String): Document = {
-    // TODO once support for the header is integrated, if there is a header covering the output, call write.
-    // otherwise, call this method, which special cases the JSON plugin and treats every other identifier identically.
-    // NOTE: even if output is not specified, if a header is used, the default output provided should be JSON and any other must be provided explicitly.
-//    val string = DataFormatService.getInstance().prepareForOutput(output, mimeType)
 
   def output(output: ujson.Value, mimeType: String, header: Header): Document = {
     val plugin = DataFormatService.getInstance().getPluginFor(mimeType)

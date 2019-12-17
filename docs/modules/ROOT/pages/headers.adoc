@@ -38,10 +38,25 @@ The data format properties control the data format plugins behavior. The propert
 
 IMPORTANT: if the mime type contains the dot (`.`) character, it must be escaped with double backslash (`\\`). For example, `dataformat.application/vnd\\.ms-excel.payload.param=xyz`.
 
-The wildcard `*` is used for default values, if a parameter for payload, output, or variable is not defned explicitly, for example:
+The wildcard `*` can be used to set the same parameter value for all inputs and output of the given format, instead of defining it explicitly. For example:
 
 ------------
 dataformat.application/csv.*.Separator=|
+------------
+
+is an equivalent of:
+
+------------
+dataformat.application/csv.payload.Separator=|
+dataformat.application/csv.myVar.Separator=|
+dataformat.application/csv.output.Separator=|
+------------
+
+An explicit setting will override the wildcard setting for a specific input or output. For example, if there are multiple CSV inputs that have separator `|` except one that has separator `,`, the following configuration can be used:
+
+------------
+dataformat.application/csv.*.Separator=|
+dataformat.application/csv.commaSeparatedVar.Separator=,
 ------------
 
 For the list of the supported data formats and their configurable properties, see the xref:dataformats.adoc[Data Formats] section.

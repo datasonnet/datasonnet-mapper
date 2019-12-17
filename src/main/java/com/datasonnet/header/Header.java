@@ -1,4 +1,4 @@
-package com.datasonnet;
+package com.datasonnet.header;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ public class Header {
     private String version = "1.0";
     private Map<String, Map<String, Map<String, Object>>> dataFormatParameters = new HashMap<>();
 
-    public static Header parseHeader(String dataSonnetDocument) {
+    public static Header parseHeader(String dataSonnetDocument) throws HeaderParseException {
         Header header = new Header();
 
         if (dataSonnetDocument.trim().startsWith(DATASONNET_HEADER)) {
@@ -70,7 +70,7 @@ public class Header {
                     header.setDataFormatParameters((Map)propsMap.get(DATAFORMAT_PREFIX));
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new HeaderParseException("Error parsing DataSonnet Header: ", e);
             }
         }
 
