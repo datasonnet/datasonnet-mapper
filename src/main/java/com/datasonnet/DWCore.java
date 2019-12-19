@@ -11,25 +11,6 @@ import java.util.regex.Pattern;
 
 public class DWCore {
 
-    public static Boolean isInteger(Val value){
-        if(value.prettyName() == "string"){
-            try {
-                Integer.parseInt(((Val.Str)value).value());
-            } catch(NumberFormatException e) {
-                return false;
-            }
-            return true;
-        }
-        else if(value.prettyName() == "number"){
-            double temp = ((Val.Num) value).value();
-            if(temp == (int) temp){
-                return true;
-            }
-            return false;
-        }
-        return false;
-    }
-
 
     public static String match(String str, String regex) {
 

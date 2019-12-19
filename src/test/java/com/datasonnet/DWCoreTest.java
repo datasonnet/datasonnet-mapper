@@ -56,14 +56,20 @@ public class DWCoreTest {
          */
     }
 
-    /* TODO
     @Test
     void testDW_distinctBy(){
-        Mapper mapper = new Mapper(lib+pack+".distinctBy({\"name\": \"Jake\"}, function(key,value) key ==\"name\")", new ArrayList<>(), true);
+        Mapper mapper = new Mapper(lib+pack+".distinctBy([0, 1, 2, 3, 3, 2, 1, 4], function(item,index) item)", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("true", value);
+        assertEquals("[0,1,2,3,4]", value);
+
+        mapper = new Mapper(lib+pack+".distinctBy([0, 1, 2, 3, 3, 2, 1, 4], function(item,index) item > 3)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[0,4]", value);
+
+        mapper = new Mapper(lib + pack + ".distinctBy({\"a\":0, \"b\":1, \"c\":0}, function(value, key) value)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{a:0,b:1}", value);
     }
-    */
 
     @Test
     void testDW_endsWith(){
@@ -80,14 +86,20 @@ public class DWCoreTest {
         assertEquals("[3,4,5]", value);
     }
 
-    /* TODO
     @Test
     void testDW_filterObject(){
-        Mapper mapper = new Mapper(lib+pack+".filterObject()", new ArrayList<>(), true);
+        Mapper mapper = new Mapper(lib+pack+".filterObject({\"a\": 1, \"b\": 2}, function(value,key,index) index == 0)", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("[3,4,5]", value);
+        assertEquals("{a:1}", value);
+
+        mapper = new Mapper(lib+pack+".filterObject({\"a\": 1, \"b\": 2}, function(value,key,index) value ==0)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{}", value);
+
+        mapper = new Mapper(lib+pack+".filterObject({\"a\": 1, \"b\": 2}, function(value,key,index) key == 'a' )", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{a:1}", value);
     }
-    */
 
     @Test
     void testDW_find(){
@@ -121,14 +133,25 @@ public class DWCoreTest {
         assertEquals("1", value);
     }
 
-    /*TODO
+    //TODO
     @Test
-    void testDW_groupBy(){
-        Mapper mapper = new Mapper(lib+pack+".groupBy(null)\n", new ArrayList<>(), true);
+    void testDW_groupBy() {
+        Mapper mapper = new Mapper(lib + pack + ".groupBy([   " +
+                "   { \"name\": \"Foo\", \"language\": \"Java\" },\n" +
+                "   { \"name\": \"Bar\", \"language\": \"Scala\" },\n" +
+                "   { \"name\": \"FooBar\", \"language\": \"Java\" }], function(item,index) item.language)\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("1", value);
+        assertEquals("{" +
+                    "Java:[" +
+                        "{language:Java,name:Foo}," +
+                        "{language:Java,name:FooBar}]," +
+                    "Scala:[{language:Scala,name:Bar}]" +
+                "}", value);
+
+        mapper = new Mapper(lib + pack + ".groupBy({ \"a\" : \"b\", \"c\" : \"d\", \"e\": \"b\"}, function(value,key) value)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{b:{a:b,e:b},d:{c:d}}", value);
     }
-    */
 
     @Test
     void testDW_isBlank(){
@@ -199,6 +222,10 @@ public class DWCoreTest {
         mapper = new Mapper(lib+pack+".isInteger(1.0)\n", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("true", value);
+
+        mapper = new Mapper(lib+pack+".isInteger(1.9)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
     }
 
     /*TODO
@@ -258,14 +285,17 @@ public class DWCoreTest {
         assertEquals("null", value);
     }
 
-    /*TODO
     @Test
     void testDW_mapObject(){
-        Mapper mapper = new Mapper(lib+pack+".mapObject()\n", new ArrayList<>(), true);
+        Mapper mapper = new Mapper(lib+pack+".mapObject({\"a\":\"b\",\"c\":\"d\"}, function(value,key,index) { [value] : { [key]: index} } )\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("hello world", value);
+        assertEquals("{b:{a:0},d:{c:1}}", value);
+
+        mapper = new Mapper(lib+pack+".mapObject({\"basic\": 9.99, \"premium\": 53, \"vip\": 398.99}, function(value,key,index) {[key]: (value + 5)} )\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{basic:14.99,premium:58,vip:403.99}", value);
     }
-     */
+
 
     @Test
     void testDW_match(){
@@ -357,22 +387,33 @@ public class DWCoreTest {
         assertEquals("1", value);
     }
 
-    /*TODO
     @Test
     void testDW_orderBy() {
-        Mapper mapper = new Mapper(lib + pack + ".mod(3,2)\n", new ArrayList<>(), true);
+
+        Mapper mapper = new Mapper(lib + pack + ".orderBy([0,5,1,3,2,1], function(item) item)\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("1", value);
+        assertEquals("[0,1,1,2,3,5]", value);
+
+        mapper = new Mapper(lib + pack + ".orderBy([\"b\",\"a\"], function(item) item)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[a,b]", value);
+
+        mapper = new Mapper(lib + pack + ".orderBy([{ letter: \"e\" }, { letter: \"d\" }], function(item) item.letter)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[{letter:d},{letter:e}]", value);
     }
 
-    TODO
     @Test
     void testDW_pluck() {
-        Mapper mapper = new Mapper(lib + pack + ".mod(3,2)\n", new ArrayList<>(), true);
+        Mapper mapper = new Mapper(lib + pack + ".pluck({\"a\":\"b\",\"c\":\"d\"}, function(value,key,index) index )\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("1", value);
+        assertEquals("[0,1]", value);
+
+        mapper = new Mapper(lib + pack + ".pluck({\"a\":\"b\",\"c\":\"d\"}, function(value,key,index) { [value] : { [key]: index} }\n)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[{b:{a:0}},{d:{c:1}}]", value);
+
     }
-    */
 
     @Test
     void testDW_pow() {
@@ -406,14 +447,12 @@ public class DWCoreTest {
     }
     */
 
-    /*TODO
     @Test
     void testDW_readURL() {
-        Mapper mapper = new Mapper(lib + pack + ".read()\n", new ArrayList<>(), true);
+        Mapper mapper = new Mapper(lib + pack + ".readUrl(\"https://jsonplaceholder.typicode.com/posts/1\").id\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("15", value);
+        assertEquals("1", value);
     }
-    */
 
     /*TODO
     @Test
@@ -562,6 +601,5 @@ public class DWCoreTest {
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[[1,a],[2,b]]", value);
     }
-
 
 }
