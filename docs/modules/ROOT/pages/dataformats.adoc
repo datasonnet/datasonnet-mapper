@@ -111,7 +111,6 @@ DS.Formats.read(payload.embeddedXMLValue, "application/xml")
 
 Providing an optional `params` object allows for additional control over JSON generation. The `params` is a JSON object where following properties can be set:
 
-
 [%header, cols=3*a]
 |===
 |Parameter
