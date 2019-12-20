@@ -1,5 +1,6 @@
 package com.datasonnet.header;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashMap;
@@ -69,7 +70,7 @@ public class Header {
                     header.setVersion((String)propsMap.get(DATASONNET_VERSION));
                 }
                 header.dataFormatParameters = propsMap;
-            } catch (Exception e) {
+            } catch (IOException e) {
                 throw new HeaderParseException("Error parsing DataSonnet Header: ", e);
             }
         }
@@ -85,39 +86,37 @@ public class Header {
         this.version = version;
     }
 
-    public Map<String, Map<String, Object>> getDefaultParameters(String mimeType) {
-        Map mergedParams = new HashMap();
-
-        Map defaultParams = (Map)dataFormatParameters.getOrDefault(Header.DATAFORMAT_DEFAULT, Collections.emptyMap());
-        Map defMimeTypeParams = (Map)defaultParams.getOrDefault(mimeType, Collections.emptyMap());
-        mergedParams.putAll(defMimeTypeParams);
-
-        return mergedParams;
+    public Map<String, Object> getDefaultParameters(String mimeType) {
+        Map defaultParams = getOrEmpty(dataFormatParameters, Header.DATAFORMAT_DEFAULT);
+        Map defMimeTypeParams = getOrEmpty(defaultParams, mimeType);
+        return Collections.unmodifiableMap(defMimeTypeParams);
     }
 
-    public Map<String, Map<String, Object>> getInputParameters(String name, String mimeType) {
-        Map mergedParams = getDefaultParameters(mimeType);
+    public Map<String, Object> getInputParameters(String name, String mimeType) {
+        Map input = getOrEmpty(dataFormatParameters, Header.DATASONNET_INPUT);
+        Map defaultInput = getOrEmpty(input, Header.DATAFORMAT_DEFAULT);
+        Map defaultInputMimeTypeParams = getOrEmpty(defaultInput, mimeType);
 
-        Map input = (Map)dataFormatParameters.getOrDefault(Header.DATASONNET_INPUT, Collections.emptyMap());
-        Map defaultInput = (Map)input.getOrDefault(Header.DATAFORMAT_DEFAULT, Collections.emptyMap());
-        Map mimeTypeParams = (Map)defaultInput.getOrDefault(mimeType, Collections.emptyMap());
-        mergedParams.putAll(mimeTypeParams);
+        Map paramInput = getOrEmpty(input, name);
+        Map mimeTypeParams = getOrEmpty(paramInput, mimeType);
 
-        Map paramInput = (Map)input.getOrDefault(name, Collections.emptyMap());
-        mimeTypeParams = (Map)paramInput.getOrDefault(mimeType, Collections.emptyMap());
-        mergedParams.putAll(mimeTypeParams);
-
-        return mergedParams;
+        return overlay(overlay(getDefaultParameters(mimeType), defaultInputMimeTypeParams),
+                       mimeTypeParams);
     }
 
-    public Map<String, Map<String, Object>> getOutputParameters(String mimeType) {
-        Map mergedParams = getDefaultParameters(mimeType);
+    public Map<String, Object> getOutputParameters(String mimeType) {
+        Map output = getOrEmpty(dataFormatParameters, Header.DATASONNET_OUTPUT);
+        Map mimeTypeParams = getOrEmpty(output, mimeType);
 
-        Map output = (Map)dataFormatParameters.getOrDefault(Header.DATASONNET_OUTPUT, Collections.emptyMap());
-        Map mimeTypeParams = (Map)output.getOrDefault(mimeType, Collections.emptyMap());
-        mergedParams.putAll(mimeTypeParams);
-
-        return mergedParams;
+        return overlay(getDefaultParameters(mimeType), mimeTypeParams);
     }
 
+    private Map<String, Object> getOrEmpty(Map<String, Object> map, String key) {
+        return (Map)map.getOrDefault(key, Collections.emptyMap());
+    }
+    private Map<String, Object> overlay(Map<String, Object> defaults, Map<String, Object> overlay) {
+        Map<String, Object> output = new HashMap(defaults);
+        output.putAll(overlay);
+        return output;
+    }
 }

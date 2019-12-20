@@ -30,7 +30,7 @@ version=1.0
 }
 ------------------------
 
-The header is optional; if omitted, all default settings will be used.
+The header is optional; if omitted, all default settings will be used. The default version is *1.0*. For the data format-specific defaults see the xref:dataformats.adoc[Data Formats] section.
 
 ## Data Format Properties
 

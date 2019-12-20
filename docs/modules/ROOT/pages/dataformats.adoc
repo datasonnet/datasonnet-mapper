@@ -104,7 +104,7 @@ Providing an optional `params` object allows for additional control over JSON ge
 * `NamespaceSeparator` - replaces default `:` separator between the prefix and the local name
 * `TextValueKey` - replaces default `$` as a key prefix for the text value property
 * `CdataValueKey` - replaces default `#` as a key prefix for the CDATA value property
-* `AttributeCharacter` - replaces `@` as a property key prefix which designates an XML element attribute
+* `AttributeCharacter` - replaces default `@` as a property key prefix which designates an XML element attribute
 * `NamespaceDeclarations` - a JSON object with a map of internal prefixes to the namespaces
 * `RootElement` - if set, the output will be wrapped in a root element with the given name
 
