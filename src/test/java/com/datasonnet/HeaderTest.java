@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class HeaderTest {
 
@@ -53,4 +54,23 @@ public class HeaderTest {
         mapped = mapper.transform(payload, new HashMap<>(), "application/test.test").contents();
         assertTrue(mapped.endsWith("GoodByeWorld"));
     }
+
+    @Test
+    void testIllegalParameter() throws Exception {
+        Document payload = new StringDocument(
+                "TestResource",
+                "application/test.test"
+        );
+        String ds = TestResourceReader.readFileAsString("illegalParameter.ds");
+
+        Mapper mapper = new Mapper(ds, new ArrayList<>(), true);
+
+        try {
+            String mapped = mapper.transform(payload, new HashMap<>(), "text/plain").contents();
+            fail("Must fail to transform");
+        } catch(IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("The parameter 'BadParam' not supported by plugin TEST"), "Found message: " + e.getMessage());
+        }
+    }
+
 }

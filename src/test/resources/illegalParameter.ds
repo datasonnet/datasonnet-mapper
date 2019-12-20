@@ -1,0 +1,6 @@
+/** DataSonnet
+version=1.0
+input.payload.application/test\\.test.BadParam=HelloWorld
+*/
+payload
+

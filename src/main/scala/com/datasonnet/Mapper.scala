@@ -5,7 +5,7 @@ import java.util
 import java.util.Collections
 
 import com.datasonnet.header.Header
-import com.datasonnet.spi.DataFormatService
+import com.datasonnet.spi.{DataFormatPlugin, DataFormatService}
 import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
 import fastparse.{IndexedParserInput, Parsed}
 import sjsonnet.Expr.Member.Visibility
@@ -96,7 +96,9 @@ object Mapper {
   def input(name: String, data: Document, header: Header): Expr = {
     val plugin = DataFormatService.getInstance().getPluginFor(data.mimeType)
     if (plugin != null) {
-      val json = plugin.read(data.contents(), header.getInputParameters(name, data.mimeType).asInstanceOf[util.Map[String, AnyRef]])
+      val params = header.getInputParameters(name, data.mimeType)
+      checkParams(params, plugin.getReadParameters(), plugin.getPluginId)
+      val json = plugin.read(data.contents(), params.asInstanceOf[util.Map[String, AnyRef]])
       Materializer.toExpr(json)
     } else {
       throw new IllegalArgumentException("The input mime type " + data.mimeType + " is not supported")
@@ -106,10 +108,20 @@ object Mapper {
   def output(output: ujson.Value, mimeType: String, header: Header): Document = {
     val plugin = DataFormatService.getInstance().getPluginFor(mimeType)
     if (plugin != null) {
-      val str = plugin.write(output, header.getOutputParameters(mimeType).asInstanceOf[util.Map[String, AnyRef]])
+      val params = header.getOutputParameters(mimeType)
+      checkParams(params, plugin.getWriteParameters(), plugin.getPluginId)
+      val str = plugin.write(output, params.asInstanceOf[util.Map[String, AnyRef]])
       new StringDocument(str, mimeType)
     } else {
       throw new IllegalArgumentException("The output mime type " + mimeType + " is not supported")
+    }
+  }
+
+  def checkParams(params: util.Map[_, _], supportedParams: util.Map[_, _], pluginId: String) = {
+    for (paramName <- params.keySet().toArray) {
+      if (!supportedParams.containsKey(paramName)) {
+        throw new IllegalArgumentException("The parameter '" + paramName + "' not supported by plugin " + pluginId)
+      }
     }
   }
 }
