@@ -78,6 +78,10 @@ public class XMLFormatPlugin implements DataFormatPlugin {
             if (names.length() != 1) {
                 throw new IllegalArgumentException("Object must have only one root element; has " + names.toString());
             }
+            Object o = input.get(names.get(0).toString());
+            if (!(o instanceof JSONObject)) {
+                throw new IllegalArgumentException("Value of \"" + names.get(0) + "\" must be an object");
+            }
         }
 
         try (StringWriter output = new StringWriter()){
