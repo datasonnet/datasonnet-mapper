@@ -5,6 +5,7 @@ import com.datasonnet.badgerfish.*;
 import com.datasonnet.spi.DataFormatPlugin;
 import com.datasonnet.spi.UjsonUtil;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.jettison.json.JSONException;
 import ujson.Value;
@@ -38,6 +39,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
     public static String AUTO_EMPTY_ELEMENTS = "AutoEmptyElements";
     public static String NULL_AS_EMPTY_ELEMENT = "NullAsEmptyElement";
     public static String ENCODING = "Encoding";
+    public static String ROOT_ELEMENT = "RootElement";
 
 
     public XMLFormatPlugin() {
@@ -65,6 +67,19 @@ public class XMLFormatPlugin implements DataFormatPlugin {
 
     public String write(Value inputXML, Map<String, Object> params) throws Exception {
         JSONObject input = new JSONObject(UjsonUtil.jsonObjectValueTo(inputXML));
+
+        if (params.containsKey(ROOT_ELEMENT)) {
+            JSONObject root = new JSONObject();
+            root.put(params.get(ROOT_ELEMENT).toString(), input);
+            input = root;
+        } else {
+            //Check that input has only one root element
+            JSONArray names = input.names();
+            if (names.length() != 1) {
+                throw new IllegalArgumentException("Object must have only one root element; has " + names.toString());
+            }
+        }
+
         try (StringWriter output = new StringWriter()){
             XMLStreamWriter2 writer = createXMLOutputStream(params, output);
             XMLStreamReader2 reader = createInputStream(params, input);
