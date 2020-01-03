@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.datasonnet.document.Document;
+import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,9 +34,9 @@ public class MapperTest {
     @ParameterizedTest
     @MethodSource("variableProvider")
     void variables(String jsonnet, String json, String variable, String value, String expected) {
-        Map<String, Document> variables = Collections.singletonMap(variable, new StringDocument(value, "application/json"));
+        Map<String, Document<?>> variables = Collections.singletonMap(variable, new StringDocument(value, "application/json"));
         Mapper mapper = new Mapper(jsonnet, variables.keySet(), true);
-        assertEquals(expected, mapper.transform(new StringDocument(json, "application/json"), variables).contents());
+        assertEquals(expected, mapper.transform(new StringDocument(json, "application/json"), variables).getContents());
     }
 
     static Stream<String[]> variableProvider() {
@@ -113,11 +115,14 @@ public class MapperTest {
         DataFormatService.getInstance().findAndRegisterPlugins();
         Mapper mapper = new Mapper("argument", Arrays.asList("argument"), true);
 
-        Map<String, Document> map = Collections.singletonMap("argument", new StringDocument("value", "text/plain"));
+        Map<String, Document<?>> map = Collections.singletonMap("argument", new StringDocument("value", "text/plain"));
 
         Document mapped = mapper.transform(new StringDocument("{}", "application/json"), map, "text/plain");
 
-        assertEquals(new StringDocument("value", "text/plain"), mapped);
+        //assertEquals(new StringDocument("value", "text/plain"), mapped);
+        assertEquals("value", mapped.getContents().toString());
+        assertEquals("text/plain", mapped.getMimeType());
+
     }
 
     @Test

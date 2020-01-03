@@ -1,5 +1,7 @@
 package com.datasonnet;
 
+import com.datasonnet.document.Document;
+import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import com.datasonnet.Mapper;
@@ -28,7 +30,7 @@ public class CSVReaderTest {
         Mapper mapper = new Mapper("{ fName: payload[0][\"First Name\"] }", Collections.emptyList(), true);
         Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
 
-        assertEquals("{\"fName\":\"Eugene\"}", mapped.contents());
+        assertEquals("{\"fName\":\"Eugene\"}", mapped.getContents());
     }
 
     @Test
@@ -42,7 +44,7 @@ public class CSVReaderTest {
         Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
         Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
 
-        assertEquals("{\"fName\":\"Eugene\",\"num\":\"234\"}", mapped.contents());
+        assertEquals("{\"fName\":\"Eugene\",\"num\":\"234\"}", mapped.getContents());
     }
 
 

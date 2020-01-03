@@ -1,5 +1,6 @@
-package com.datasonnet;
+package com.datasonnet.plugins;
 
+import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatPlugin;
 import com.datasonnet.spi.UjsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,13 +20,13 @@ import java.util.Map;
 public class PlainTextFormatPlugin implements DataFormatPlugin {
     public PlainTextFormatPlugin() { }
 
-    public Value read(String input, Map<String, Object> params) {
-        return UjsonUtil.stringValueOf(input);
+    public Value read(Object input, Map<String, Object> params) {
+        return UjsonUtil.stringValueOf(input.toString());
     }
 
-    public String write(Value input, Map<String, Object> params) {
+    public StringDocument write(Value input, Map<String, Object> params, String mimeType) {
         if(input instanceof Str) {
-            return UjsonUtil.stringValueTo((Str) input);
+            return new StringDocument(UjsonUtil.stringValueTo((Str) input), mimeType);
         } else {
             throw new IllegalArgumentException("Only strings can be written as plain text.");
         }

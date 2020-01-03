@@ -1,5 +1,6 @@
-package com.datasonnet;
+package com.datasonnet.plugins;
 
+import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatPlugin;
 import com.datasonnet.spi.UjsonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -28,7 +29,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
 
     }
 
-    public Value read(String input, Map<String, Object> params) throws IOException {
+    public Value read(Object input, Map<String, Object> params) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         CsvSchema.Builder builder = this.getBuilder(params);
@@ -41,14 +42,14 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         csvMapper.enable(CsvParser.Feature.WRAP_AS_ARRAY);
 
         // Read data from CSV file
-        List readAll = useHeader ? csvMapper.readerFor(Map.class).with(csvSchema).readValues(input).readAll() :
-                csvMapper.readerFor(List.class).with(csvSchema).readValues(input).readAll();
+        List readAll = useHeader ? csvMapper.readerFor(Map.class).with(csvSchema).readValues(input.toString()).readAll() :
+                csvMapper.readerFor(List.class).with(csvSchema).readValues(input.toString()).readAll();
         String jsonStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(readAll);
 
         return UjsonUtil.jsonObjectValueOf(jsonStr);
     }
 
-    public String write(Value input, Map<String, Object> params) throws IOException {
+    public StringDocument write(Value input, Map<String, Object> params, String mimeType) throws IOException {
         CsvSchema.Builder builder = this.getBuilder(params);
 
         JsonNode jsonTree = new ObjectMapper().readTree(UjsonUtil.jsonObjectValueTo(input));
@@ -73,7 +74,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         CsvMapper csvMapper = new CsvMapper();
         String value = csvMapper.writerFor(JsonNode.class)
                 .with(csvSchema).writeValueAsString(jsonTree);
-        return value;
+        return new StringDocument(value, mimeType);
     }
 
     public String[] getSupportedIdentifiers() {

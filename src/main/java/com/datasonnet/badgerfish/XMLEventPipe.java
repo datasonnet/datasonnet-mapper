@@ -1,4 +1,4 @@
-package com.datasonnet;
+package com.datasonnet.badgerfish;
 
 import javax.xml.stream.XMLStreamException;
 import org.codehaus.stax2.XMLStreamReader2;

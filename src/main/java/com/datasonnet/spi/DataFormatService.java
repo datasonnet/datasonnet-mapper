@@ -1,7 +1,7 @@
 package com.datasonnet.spi;
 
-import com.datasonnet.Document;
-import com.datasonnet.JSONFormatPlugin;
+import com.datasonnet.document.Document;
+import com.datasonnet.plugins.JSONFormatPlugin;
 import ujson.Str;
 import ujson.Value;
 
@@ -71,19 +71,20 @@ public class DataFormatService {
         registerPlugins(findPlugins());
     }
 
-    public Value prepareForInput(Document data) {
-        DataFormatPlugin plugin = this.getPluginFor(data.mimeType());
+
+/*    public Value prepareForInput(Document data) {
+        DataFormatPlugin plugin = this.getPluginFor(data.getMimeType());
         if(plugin instanceof JSONFormatPlugin) {
-            return UjsonUtil.jsonObjectValueOf(data.contents());
+            return UjsonUtil.jsonObjectValueOf(data.getContents().toString());
         } else {
-            return UjsonUtil.stringValueOf(data.contents());
+            return UjsonUtil.stringValueOf(data.getContents().toString());
         }
     }
 
     public String prepareForOutput(Value json, String identifier) throws Exception {
         DataFormatPlugin plugin = this.getPluginFor(identifier);
         if(plugin instanceof JSONFormatPlugin) {
-            return plugin.write(json, new HashMap<>());
+            return plugin.write(json, new HashMap<>(), "application/json").getContents().toString();
         } else {
             if(json instanceof Str) {
                 return UjsonUtil.stringValueTo((Str) json);
@@ -92,5 +93,5 @@ public class DataFormatService {
             }
 
         }
-    }
+    }*/
 }

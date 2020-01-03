@@ -75,7 +75,7 @@ object PortX {
     "Formats" -> library(
       builtinWithDefaults("read",
                           "data" -> None,
-                          "mimeType" -> None,
+                          "getMimeType" -> None,
                           "params" -> Some(Expr.Null(0))) { (args, ev) =>
         val data = args("data").cast[Val.Str].value
         val mimeType = args("mimeType").cast[Val.Str].value
@@ -84,7 +84,7 @@ object PortX {
       },
       builtinWithDefaults("write",
         "data" -> None,
-        "mimeType" -> None,
+        "getMimeType" -> None,
         "params" -> Some(Expr.Null(0))) { (args, ev) =>
         val data = args("data")
         val mimeType = args("mimeType").cast[Val.Str].value
@@ -216,7 +216,7 @@ object PortX {
       throw new UnsupportedMimeTypeException("No suitable plugin found for mime type: " + mimeType);
     }
     val javaParams = if (params != null) toJavaParams(ev, params, plugin) else new java.util.HashMap[String, Object]()
-    plugin.write(Materializer.apply(json)(ev), javaParams)
+    plugin.write(Materializer.apply(json)(ev), javaParams, mimeType).getContents.toString
   }
 
   def toJavaParams(ev: EvalScope, params: Val.Obj, plugin: DataFormatPlugin): java.util.Map[String, Object] = {

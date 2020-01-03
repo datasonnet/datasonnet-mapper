@@ -1,3 +1,3 @@
-com.datasonnet.CSVFormatPlugin
-com.datasonnet.XMLFormatPlugin
-com.datasonnet.PlainTextFormatPlugin
+com.datasonnet.plugins.CSVFormatPlugin
+com.datasonnet.plugins.XMLFormatPlugin
+com.datasonnet.plugins.PlainTextFormatPlugin

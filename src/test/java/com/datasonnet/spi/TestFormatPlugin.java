@@ -1,5 +1,7 @@
 package com.datasonnet.spi;
 
+import com.datasonnet.document.Document;
+import com.datasonnet.document.StringDocument;
 import ujson.Value;
 
 import java.util.Collections;
@@ -11,13 +13,13 @@ public class TestFormatPlugin implements DataFormatPlugin {
     public static String TEST_PARAM = "TestParam";
 
     @Override
-    public Value read(String input, Map<String, Object> params) throws Exception {
-        return UjsonUtil.stringValueOf(params.get(TEST_PARAM).toString());
+    public Value read(Object input, Map<String, Object> params) throws Exception {
+        return UjsonUtil.stringValueOf("In 'read' Test Param Is " + params.get(TEST_PARAM));
     }
 
     @Override
-    public String write(Value input, Map<String, Object> params) throws Exception {
-        return params.get(TEST_PARAM).toString();
+    public Document write(Value input, Map<String, Object> params, String mimeType) throws Exception {
+        return new StringDocument("In 'write' Test Param Is " + params.get(TEST_PARAM), mimeType);
     }
 
     @Override

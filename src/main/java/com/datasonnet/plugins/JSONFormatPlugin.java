@@ -1,5 +1,7 @@
-package com.datasonnet;
+package com.datasonnet.plugins;
 
+import com.datasonnet.document.Document;
+import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatPlugin;
 import com.datasonnet.spi.UjsonUtil;
 import ujson.Str;
@@ -12,12 +14,12 @@ import java.util.Map;
 public class JSONFormatPlugin implements DataFormatPlugin {
     public JSONFormatPlugin() { }
 
-    public Value read(String input, Map<String, Object> params) {
-        return UjsonUtil.jsonObjectValueOf(input);
+    public Value read(Object input, Map<String, Object> params) {
+        return UjsonUtil.jsonObjectValueOf(input.toString());
     }
 
-    public String write(Value input, Map<String, Object> params) {
-        return UjsonUtil.jsonObjectValueTo(input);
+    public Document write(Value input, Map<String, Object> params, String mimeType) {
+        return new StringDocument(UjsonUtil.jsonObjectValueTo(input), mimeType);
     }
 
     public String[] getSupportedIdentifiers() {

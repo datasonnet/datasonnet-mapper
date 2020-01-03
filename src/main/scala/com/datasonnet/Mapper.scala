@@ -4,6 +4,7 @@ import java.io.{PrintWriter, StringWriter}
 import java.util
 import java.util.Collections
 
+import com.datasonnet.document.{Document, StringDocument}
 import com.datasonnet.header.Header
 import com.datasonnet.spi.DataFormatService
 import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
@@ -17,17 +18,12 @@ import scala.collection.JavaConverters._
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
-
-case class StringDocument(contents: String, mimeType: String) extends Document
-
 object Mapper {
   def wrap(jsonnet: String, argumentNames: Iterable[String])=
     (Seq("payload") ++ argumentNames).mkString("function(", ",", ")\n") + jsonnet
 
-
-
-
   val location = raw"\.\(([a-zA-Z-_\.]*):(\d+):(\d+)\)|([a-zA-Z-]+):(\d+):(\d+)".r
+
   def expandErrorLineNumber(error: String, lineOffset: Int) = location.replaceAllIn(error, _ match {
     case location(filename, frow, fcolumn, token, trow, tcolumn) => {
       if (token != null) {
@@ -39,7 +35,6 @@ object Mapper {
       }
     }
   })
-
 
   def evaluate(evaluator: Evaluator, cache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]], jsonnet: String, libraries: Map[String, Val], lineOffset: Int): Try[Val] = {
 
@@ -92,25 +87,26 @@ object Mapper {
     (name -> jsonnetLibrary)
   }
 
-  def input(name: String, data: Document, header: Header): Expr = {
-    val plugin = DataFormatService.getInstance().getPluginFor(data.mimeType)
+  def input(name: String, data: Document[_], header: Header): Expr = {
+    val plugin = DataFormatService.getInstance().getPluginFor(data.getMimeType)
     if (plugin != null) {
-      val params = header.getInputParameters(name, data.mimeType)
+      val params = header.getInputParameters(name, data.getMimeType)
       checkParams(params, plugin.getReadParameters(), plugin.getPluginId)
-      val json = plugin.read(data.contents(), params.asInstanceOf[util.Map[String, AnyRef]])
+      val json = plugin.read(data.getContents(), params.asInstanceOf[util.Map[String, AnyRef]])
       Materializer.toExpr(json)
     } else {
-      throw new IllegalArgumentException("The input mime type " + data.mimeType + " is not supported")
+      throw new IllegalArgumentException("The input mime type " + data.getMimeType + " is not supported")
     }
   }
 
-  def output(output: ujson.Value, mimeType: String, header: Header): Document = {
+  def output(output: ujson.Value, mimeType: String, header: Header): Document[_] = {
     val plugin = DataFormatService.getInstance().getPluginFor(mimeType)
     if (plugin != null) {
       val params = header.getOutputParameters(mimeType)
       checkParams(params, plugin.getWriteParameters(), plugin.getPluginId)
-      val str = plugin.write(output, params.asInstanceOf[util.Map[String, AnyRef]])
-      new StringDocument(str, mimeType)
+//      val str = plugin.write(output, params.asInstanceOf[util.Map[String, AnyRef]])
+//      new StringDocument(str, mimeType)
+      plugin.write(output, params.asInstanceOf[util.Map[String, AnyRef]], mimeType)
     } else {
       throw new IllegalArgumentException("The output mime type " + mimeType + " is not supported")
     }
@@ -190,19 +186,19 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   private val mapIndex = new IndexedParserInput(jsonnet);
 
   def transform(payload: String): String = {
-    transform(new StringDocument(payload, "application/json"), new java.util.HashMap(), "application/json").contents
+    transform(new StringDocument(payload, "application/json"), new java.util.HashMap(), "application/json").getContents.toString
   }
 
-  def transform(payload: Document, arguments: java.util.Map[String, Document]): Document = {
+  def transform(payload: Document[_], arguments: java.util.Map[String, Document[_]]): Document[_] = {
     transform(payload, arguments,"application/json")
   }
 
-  def transform(payload: Document, arguments: java.util.Map[String, Document], outputMimeType: String): Document = {
+  def transform(payload: Document[_], arguments: java.util.Map[String, Document[_]], outputMimeType: String): Document[_] = {
 
     val data = Mapper.input("payload", payload, header)
 
     //val parsedArguments = arguments.asScala.view.mapValues { Mapper.input(_, header) }
-    val parsedArguments = arguments.asScala.view.toMap[String, Document].map { case (name, data) => (name, Mapper.input(name, data, header)) }
+    val parsedArguments = arguments.asScala.view.toMap[String, Document[_]].map { case (name, data) => (name, Mapper.input(name, data, header)) }
 
     val first +: rest = function.params.args
 
