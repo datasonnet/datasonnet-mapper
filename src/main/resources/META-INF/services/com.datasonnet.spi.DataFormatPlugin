@@ -1,3 +1,5 @@
 com.datasonnet.plugins.CSVFormatPlugin
 com.datasonnet.plugins.XMLFormatPlugin
 com.datasonnet.plugins.PlainTextFormatPlugin
+com.datasonnet.plugins.JavaFormatPlugin
+

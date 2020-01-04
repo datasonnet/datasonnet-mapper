@@ -4,6 +4,7 @@ package com.datasonnet.plugins;
 import com.datasonnet.badgerfish.*;
 import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatPlugin;
+import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.UjsonUtil;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -22,6 +23,7 @@ import org.codehaus.stax2.ri.Stax2WriterAdapter;
 
 import javax.xml.stream.*;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -49,7 +51,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         System.setProperty("javax.xml.stream.XMLOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");
     }
 
-    public Value read(Object inputXML, Map<String, Object> params) throws Exception {
+    public Value read(Object inputXML, Map<String, Object> params) throws PluginException {
         if(params == null) {
             params = Collections.emptyMap();
         }
@@ -64,29 +66,17 @@ public class XMLFormatPlugin implements DataFormatPlugin {
             pipe.pipe();
 
             return UjsonUtil.jsonObjectValueOf(output.toString());
+        } catch (IOException e) {
+            throw new PluginException("Unable to create reader", e);
+        } catch (XMLStreamException e) {
+            throw new PluginException(e);
         }
     }
 
-    public StringDocument write(Value inputXML, Map<String, Object> params, String mimeType) throws Exception {
-        JSONObject input = new JSONObject(UjsonUtil.jsonObjectValueTo(inputXML));
-
-        if (params.containsKey(ROOT_ELEMENT)) {
-            JSONObject root = new JSONObject();
-            root.put(params.get(ROOT_ELEMENT).toString(), input);
-            input = root;
-        } else {
-            //Check that input has only one root element
-            JSONArray names = input.names();
-            if (names.length() != 1) {
-                throw new IllegalArgumentException("Object must have only one root element; has " + names.toString());
-            }
-            Object o = input.get(names.get(0).toString());
-            if (!(o instanceof JSONObject)) {
-                throw new IllegalArgumentException("Value of \"" + names.get(0) + "\" must be an object");
-            }
-        }
-
-        try (StringWriter output = new StringWriter()){
+    public StringDocument write(Value inputXML, Map<String, Object> params, String mimeType) throws PluginException {
+        try {
+            JSONObject input = new JSONObject(UjsonUtil.jsonObjectValueTo(inputXML));
+            StringWriter output = new StringWriter();
             XMLStreamWriter2 writer = createXMLOutputStream(params, output);
             XMLStreamReader2 reader = createInputStream(params, input);
 
@@ -94,6 +84,8 @@ public class XMLFormatPlugin implements DataFormatPlugin {
             pipe.pipe();
 
             return new StringDocument(output.toString(), mimeType);
+        } catch (Exception e) {
+            throw new PluginException(e);
         }
     }
 

@@ -5,8 +5,8 @@ import com.datasonnet.document.Document;
 import java.util.Map;
 
 public interface DataFormatPlugin {
-    ujson.Value read(Object input, Map<String, Object> params) throws Exception;
-    Document write(ujson.Value input, Map<String, Object> params, String mimeType) throws Exception;
+    ujson.Value read(Object input, Map<String, Object> params) throws PluginException;
+    Document write(ujson.Value input, Map<String, Object> params, String mimeType) throws PluginException;
 
     String[] getSupportedIdentifiers();
 

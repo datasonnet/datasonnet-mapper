@@ -1,0 +1,11 @@
+/** DataSonnet
+version=1.0
+output.application/java.OutputClass=com.datasonnet.javatest.Gizmo
+*/
+{
+    "name": payload.pojoName,
+    "quantity": payload.pojoQuantity,
+    "inStock": payload.pojoInStock,
+    "colors": payload.pojoColors,
+    "manufacturer": payload.pojoManufacturer
+}

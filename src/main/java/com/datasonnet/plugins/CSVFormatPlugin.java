@@ -2,7 +2,9 @@ package com.datasonnet.plugins;
 
 import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatPlugin;
+import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.UjsonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -29,7 +31,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
 
     }
 
-    public Value read(Object input, Map<String, Object> params) throws IOException {
+    public Value read(Object input, Map<String, Object> params) throws PluginException {
 
         ObjectMapper mapper = new ObjectMapper();
         CsvSchema.Builder builder = this.getBuilder(params);
@@ -42,17 +44,27 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         csvMapper.enable(CsvParser.Feature.WRAP_AS_ARRAY);
 
         // Read data from CSV file
-        List readAll = useHeader ? csvMapper.readerFor(Map.class).with(csvSchema).readValues(input.toString()).readAll() :
-                csvMapper.readerFor(List.class).with(csvSchema).readValues(input.toString()).readAll();
-        String jsonStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(readAll);
-
-        return UjsonUtil.jsonObjectValueOf(jsonStr);
+        try {
+            List readAll = useHeader ? csvMapper.readerFor(Map.class).with(csvSchema).readValues(input.toString()).readAll() :
+                    csvMapper.readerFor(List.class).with(csvSchema).readValues(input.toString()).readAll();
+            String jsonStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(readAll);
+            return UjsonUtil.jsonObjectValueOf(jsonStr);
+        } catch (JsonProcessingException jpe) {
+            throw new PluginException("Unable to convert CSV to JSON", jpe);
+        } catch (IOException ioe) {
+            throw new PluginException("Unable to read CSV input", ioe);
+        }
     }
 
-    public StringDocument write(Value input, Map<String, Object> params, String mimeType) throws IOException {
+    public StringDocument write(Value input, Map<String, Object> params, String mimeType) throws PluginException {
         CsvSchema.Builder builder = this.getBuilder(params);
 
-        JsonNode jsonTree = new ObjectMapper().readTree(UjsonUtil.jsonObjectValueTo(input));
+        JsonNode jsonTree = null;
+        try {
+            jsonTree = new ObjectMapper().readTree(UjsonUtil.jsonObjectValueTo(input));
+        } catch (JsonProcessingException e) {
+            throw new PluginException("Unable to read JSON Tree", e);
+        }
         boolean useHeader = params != null && params.get(USE_HEADER) != null ? new Boolean(params.get(USE_HEADER).toString()) : true;
 
         if (useHeader) {
@@ -72,8 +84,13 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         CsvSchema csvSchema = builder.build();
 
         CsvMapper csvMapper = new CsvMapper();
-        String value = csvMapper.writerFor(JsonNode.class)
-                .with(csvSchema).writeValueAsString(jsonTree);
+        String value = null;
+        try {
+            value = csvMapper.writerFor(JsonNode.class)
+                    .with(csvSchema).writeValueAsString(jsonTree);
+        } catch (JsonProcessingException e) {
+            throw new PluginException("Unable to write CSV output", e);
+        }
         return new StringDocument(value, mimeType);
     }
 

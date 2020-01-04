@@ -13,12 +13,12 @@ public class TestFormatPlugin implements DataFormatPlugin {
     public static String TEST_PARAM = "TestParam";
 
     @Override
-    public Value read(Object input, Map<String, Object> params) throws Exception {
+    public Value read(Object input, Map<String, Object> params) throws PluginException {
         return UjsonUtil.stringValueOf("In 'read' Test Param Is " + params.get(TEST_PARAM));
     }
 
     @Override
-    public Document write(Value input, Map<String, Object> params, String mimeType) throws Exception {
+    public Document write(Value input, Map<String, Object> params, String mimeType) throws PluginException {
         return new StringDocument("In 'write' Test Param Is " + params.get(TEST_PARAM), mimeType);
     }
 
