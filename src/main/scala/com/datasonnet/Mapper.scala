@@ -186,7 +186,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   private val mapIndex = new IndexedParserInput(jsonnet);
 
   def transform(payload: String): String = {
-    transform(new StringDocument(payload, "application/json"), new java.util.HashMap(), "application/json").getContents.toString
+    transform(new StringDocument(payload, "application/json"), new java.util.HashMap(), "application/json").asInstanceOf[StringDocument].getContents
   }
 
   def transform(payload: Document[_], arguments: java.util.Map[String, Document[_]]): Document[_] = {
