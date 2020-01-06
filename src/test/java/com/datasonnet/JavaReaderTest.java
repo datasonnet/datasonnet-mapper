@@ -10,9 +10,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JavaReaderTest {
     @BeforeAll
@@ -32,6 +35,9 @@ public class JavaReaderTest {
         manufacturer.setManufacturerName("ACME Corp.");
         manufacturer.setManufacturerCode("ACME123");
         theGizmo.setManufacturer(manufacturer);
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        theGizmo.setDate(df.parse("2020-01-06"));
 
         Document data = new JavaObjectDocument(theGizmo);
 

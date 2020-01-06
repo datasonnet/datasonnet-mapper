@@ -1,5 +1,6 @@
 package com.datasonnet.javatest;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -9,6 +10,7 @@ public class Gizmo {
     private List<String> colors;
     private boolean inStock;
     private Manufacturer manufacturer;
+    private Date date;
 
     public String getName() {
         return name;
@@ -50,6 +52,14 @@ public class Gizmo {
         this.manufacturer = manufacturer;
     }
 
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
     @Override
     public String toString() {
         return "Gizmo{" +
@@ -58,6 +68,7 @@ public class Gizmo {
                 ", colors=" + colors +
                 ", inStock=" + inStock +
                 ", manufacturer=" + manufacturer +
+                ", date=" + date +
                 '}';
     }
 
@@ -70,11 +81,12 @@ public class Gizmo {
                 isInStock() == gizmo.isInStock() &&
                 Objects.equals(getName(), gizmo.getName()) &&
                 Objects.equals(getColors(), gizmo.getColors()) &&
+                Objects.equals(date, gizmo.getDate()) &&
                 Objects.equals(getManufacturer(), gizmo.getManufacturer());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getQuantity(), getColors(), isInStock(), getManufacturer());
+        return Objects.hash(getName(), getQuantity(), getColors(), isInStock(), getManufacturer(), getDate());
     }
 }

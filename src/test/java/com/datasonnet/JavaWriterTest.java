@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,6 +46,9 @@ public class JavaWriterTest {
         assertEquals(Arrays.asList("red","white","blue"), gizmo.getColors());
         assertEquals("ACME Corp.", gizmo.getManufacturer().getManufacturerName());
         assertEquals("ACME123", gizmo.getManufacturer().getManufacturerCode());
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        assertEquals("2020-01-06", df.format(gizmo.getDate()));
 
         mapping = mapping.substring(mapping.lastIndexOf("*/") + 2);
 

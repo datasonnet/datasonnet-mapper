@@ -10,5 +10,6 @@
     "manufacturerName": "ACME Corp."
   },
   "pojoName": "gizmo",
-  "pojoQuantity": 123
+  "pojoQuantity": 123,
+  "pojoDate": "2020-01-06"
 }

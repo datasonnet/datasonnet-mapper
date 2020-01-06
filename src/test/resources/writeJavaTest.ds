@@ -1,11 +1,13 @@
 /** DataSonnet
 version=1.0
 output.application/java.OutputClass=com.datasonnet.javatest.Gizmo
+output.application/java.DateFormat=yyyy-MM-dd
 */
 {
     "name": payload.pojoName,
     "quantity": payload.pojoQuantity,
     "inStock": payload.pojoInStock,
     "colors": payload.pojoColors,
-    "manufacturer": payload.pojoManufacturer
+    "manufacturer": payload.pojoManufacturer,
+    "date": payload.pojoDate
 }
