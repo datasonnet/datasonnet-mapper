@@ -49,12 +49,10 @@ public class JavaFormatPlugin implements DataFormatPlugin {
 
             JavaType valueType = null;
 
-            if (node.isObject()) {
-                if (params != null && params.containsKey(OUTPUT_CLASS)) {
-                    valueType = mapper.getTypeFactory().constructFromCanonical(params.get(OUTPUT_CLASS).toString());
-                } else {
-                    valueType = mapper.getTypeFactory().constructRawMapType(HashMap.class);
-                }
+            if (params != null && params.containsKey(OUTPUT_CLASS)) {
+                valueType = mapper.getTypeFactory().constructFromCanonical(params.get(OUTPUT_CLASS).toString());
+            } else if (node.isObject()) {
+                valueType = mapper.getTypeFactory().constructRawMapType(HashMap.class);
             } else if (node.isArray()) {
                 valueType = mapper.getTypeFactory().constructRawCollectionType(List.class);
             } else if (node.isTextual()) {
@@ -72,7 +70,7 @@ public class JavaFormatPlugin implements DataFormatPlugin {
     }
 
     public String[] getSupportedIdentifiers() {
-        return new String[] { "application/java", "java" };
+        return new String[] { "application/x-java-object", "application/java", "java" };
     }
 
     @Override

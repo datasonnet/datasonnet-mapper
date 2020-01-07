@@ -20,7 +20,4 @@ public class StringDocument implements Document<String> {
         return mimeType;
     }
 
-    public boolean equals(StringDocument document) {
-        return (contents.equals(document.getContents()) && mimeType.equalsIgnoreCase(document.getMimeType()));
-    }
 }

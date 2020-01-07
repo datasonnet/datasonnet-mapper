@@ -17,8 +17,4 @@ public class JavaObjectDocument implements Document<Object> {
     public String getMimeType() {
         return "application/java";
     }
-
-    public boolean equals(JavaObjectDocument document) {
-        return (contents.equals(document.getContents()) && "application/java".equalsIgnoreCase(document.getMimeType()));
-    }
 }
