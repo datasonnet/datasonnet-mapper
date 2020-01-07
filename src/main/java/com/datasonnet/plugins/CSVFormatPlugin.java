@@ -59,7 +59,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
     public StringDocument write(Value input, Map<String, Object> params, String mimeType) throws PluginException {
         CsvSchema.Builder builder = this.getBuilder(params);
 
-        JsonNode jsonTree = null;
+        final JsonNode jsonTree;
         try {
             jsonTree = new ObjectMapper().readTree(UjsonUtil.jsonObjectValueTo(input));
         } catch (JsonProcessingException e) {
