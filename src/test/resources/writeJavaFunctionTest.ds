@@ -1,0 +1,17 @@
+local params = {
+    "OutputClass": "com.datasonnet.javatest.Gizmo",
+    "DateFormat": "yyyy-MM-dd"
+};
+
+local obj = {
+    "name": payload.pojoName,
+    "quantity": payload.pojoQuantity,
+    "inStock": payload.pojoInStock,
+    "colors": payload.pojoColors,
+    "manufacturer": payload.pojoManufacturer,
+    "date": payload.pojoDate
+};
+
+{
+    test: DS.Formats.write(obj, "application/java", params)
+}
