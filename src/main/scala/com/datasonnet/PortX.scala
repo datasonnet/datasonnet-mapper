@@ -135,7 +135,31 @@ object PortX {
         (ev, fs, json: Val, path: String) =>
           Materializer.reverse(ujson.read(JsonPath.select(ujson.write(Materializer.apply(json)(ev)), path)))
       },
+    ),
+
+    "Regex" -> library(
+      builtin("regexFullMatch", "expr", "str") {
+        (ev, fs, expr: String, str: String) =>
+          Materializer.reverse(Regex.regexFullMatch(expr, str))
+      },
+      builtin("regexPartialMatch", "expr", "str") {
+        (ev, fs, expr: String, str: String) =>
+          Materializer.reverse(Regex.regexPartialMatch(expr, str))
+      },
+      builtin("regexQuoteMeta", "str") {
+        (ev, fs, str: String) =>
+          Regex.regexQuoteMeta(str)
+      },
+      builtin("regexReplace", "str", "pattern", "replace") {
+        (ev, fs, str: String, pattern: String, replace: String) =>
+          Regex.regexReplace(str, pattern, replace)
+      },
+      builtin("regexGlobalReplace", "str", "pattern", "replace") {
+        (ev, fs, str: String, pattern: String, replace: String) =>
+          Regex.regexGlobalReplace(str, pattern, replace)
+      },
     )
+
   )
 
   def read(data: String, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {
