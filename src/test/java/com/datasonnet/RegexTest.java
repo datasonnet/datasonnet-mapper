@@ -1,12 +1,19 @@
 package com.datasonnet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.re2j.Matcher;
+import com.google.re2j.Pattern;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.skyscreamer.jsonassert.JSONAssert;
+import ujson.Value;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,7 +43,9 @@ public class RegexTest {
                 new String[] { "DS.Regex.regexFullMatch(@'h(?P<mid>.*)o', 'hello')", "{\"captures\":[\"ell\"],\"namedCaptures\":{\"mid\":\"ell\"},\"string\":\"hello\"}"},
                 new String[] { "DS.Regex.regexPartialMatch(@'e', 'hello')", "{\"string\":\"hello\",\"captures\":[],\"namedCaptures\":{}\n}"},
                 new String[] { "DS.Regex.regexPartialMatch(@'e(.*)o', 'hello')", "{\"captures\":[\"ll\"],\"namedCaptures\":{},\"string\":\"hello\"}"},
-                new String[] { "DS.Regex.regexPartialMatch(@'e(?P<mid>.*)o', 'hello')", "{\"captures\":[\"ll\"],\"namedCaptures\":{\"mid\":\"ll\"},\"string\":\"hello\"}"}
+                new String[] { "DS.Regex.regexPartialMatch(@'e(?P<mid>.*)o', 'hello')", "{\"captures\":[\"ll\"],\"namedCaptures\":{\"mid\":\"ll\"},\"string\":\"hello\"}"},
+                new String[] { "DS.Regex.regexScan(@'(?P<user>[a-z]*)@(?P<domain>[a-z]*).org', 'modus@datasonnet.org,box@datasonnet.org')",
+                        "{\n\"string\":\"modus@datasonnet.org,box@datasonnet.org\",\n\"captures\":[[\"modus\",\"datasonnet\"],[\"box\",\"datasonnet\"]],\n\"namedCaptures\":[{\n\"domain\":\"datasonnet\",\n\"user\":\"modus\"\n},{\n\"domain\":\"datasonnet\",\n\"user\":\"box\"\n}]\n}\n"}
         );
     }
 

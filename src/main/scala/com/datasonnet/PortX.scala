@@ -146,6 +146,10 @@ object PortX {
         (ev, fs, expr: String, str: String) =>
           Materializer.reverse(Regex.regexPartialMatch(expr, str))
       },
+      builtin("regexScan", "expr", "str") {
+        (ev, fs, expr: String, str: String) =>
+          Materializer.reverse(Regex.regexScan(expr, str))
+      },
       builtin("regexQuoteMeta", "str") {
         (ev, fs, str: String) =>
           Regex.regexQuoteMeta(str)

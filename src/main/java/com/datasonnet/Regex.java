@@ -22,6 +22,45 @@ public class Regex {
         return regexMatch(expr, str, false);
     }
 
+    public static Value regexScan(String expr, String str) {
+        Pattern pattern = Pattern.compile(expr);
+        Matcher matcher = pattern.matcher(str);
+
+        boolean hasMatch = matcher.find();
+        if (!hasMatch) {
+            return Value.Null();
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode regexMatch = mapper.createObjectNode();
+        regexMatch.put("string", str);
+
+        ArrayNode capturesNode = mapper.createArrayNode();
+        ArrayNode namedCapturesNode = mapper.createArrayNode();
+
+        do {
+            ArrayNode nextFindNode = capturesNode.addArray();
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                nextFindNode.add(matcher.group(i));
+            }
+
+            Map<String, Integer> namedGroups = getNamedGroupsFromMatcher(matcher);
+            if (!namedGroups.isEmpty()) {
+                ObjectNode nextCaptureGroup = namedCapturesNode.addObject();
+                for (Map.Entry<String, Integer> namedGroup : namedGroups.entrySet()) {
+                    nextCaptureGroup.put(namedGroup.getKey(), matcher.group(namedGroup.getValue()));
+                }
+            }
+        } while (matcher.find());
+
+        regexMatch.set("captures", capturesNode);
+        regexMatch.set("namedCaptures", namedCapturesNode);
+
+        System.out.println("SCAN IS " + regexMatch.toPrettyString());
+
+        return UjsonUtil.jsonObjectValueOf(regexMatch.toString());
+    }
+
     public static String regexQuoteMeta(String str) {
         return Pattern.quote(str);
     }
