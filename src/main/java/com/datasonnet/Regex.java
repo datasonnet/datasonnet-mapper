@@ -56,8 +56,6 @@ public class Regex {
         regexMatch.set("captures", capturesNode);
         regexMatch.set("namedCaptures", namedCapturesNode);
 
-        System.out.println("SCAN IS " + regexMatch.toPrettyString());
-
         return UjsonUtil.jsonObjectValueOf(regexMatch.toString());
     }
 
