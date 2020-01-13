@@ -786,8 +786,6 @@ DS.Util.mapToObject(payload, function(x) x.language.name, function(v) v.language
 
 ## Regex
 
-The regular expressions library based on the https://github.com/google/re2j[Google RE2/J] implementation.
-
 ### `regexFullMatch(string pattern, string input)`
 Matches the entire input against the pattern (anchored start and end). If there's no match, returns `null`. If there's a match, returns a JSON object which has the following structure.
 - `string` - the original input string;

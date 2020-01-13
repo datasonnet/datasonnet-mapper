@@ -2,78 +2,53 @@ package com.datasonnet;
 
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RegexTest {
 
-    @Test
-    void testRegexFullMatch() throws JSONException {
-        Mapper mapper = new Mapper("DS.Regex.regexFullMatch(@'world', 'hello')", Collections.emptyList(), Collections.emptyMap(),true);
+    @ParameterizedTest
+    @MethodSource("jsonAssertProvider")
+    void testRegexJSON(String jsonnet, String expected) throws JSONException {
+        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), Collections.emptyMap(), true);
         String result = mapper.transform("{}");
-        assertEquals("null", result);
-
-        mapper = new Mapper("DS.Regex.regexFullMatch(@'h.*o', 'hello')", Collections.emptyList(), Collections.emptyMap(),true);
-        result = mapper.transform("{}");
-        JSONAssert.assertEquals("{\"string\":\"hello\",\"captures\":[],\"namedCaptures\":{}\n}", result, true);
-
-        mapper = new Mapper("DS.Regex.regexFullMatch(@'h(.*)o', 'hello')", Collections.emptyList(), Collections.emptyMap(),true);
-        result = mapper.transform("{}");
-        JSONAssert.assertEquals("{\"captures\":[\"ell\"],\"namedCaptures\":{},\"string\":\"hello\"}", result, true);
-
-        mapper = new Mapper("DS.Regex.regexFullMatch(@'h(?P<mid>.*)o', 'hello')", Collections.emptyList(), Collections.emptyMap(),true);
-        result = mapper.transform("{}");
-        JSONAssert.assertEquals("{\"captures\":[\"ell\"],\"namedCaptures\":{\"mid\":\"ell\"},\"string\":\"hello\"}", result, true);
+        JSONAssert.assertEquals(expected, result, true);
     }
 
-    @Test
-    void testRegexPartialMatch() throws JSONException {
-        Mapper mapper = new Mapper("DS.Regex.regexPartialMatch(@'world', 'hello')", Collections.emptyList(), Collections.emptyMap(),true);
+    @ParameterizedTest
+    @MethodSource("assertEqualsProvider")
+    void testRegexStr(String jsonnet, String expected) throws JSONException {
+        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), Collections.emptyMap(), true);
         String result = mapper.transform("{}");
-        assertEquals("null", result);
-
-        mapper = new Mapper("DS.Regex.regexPartialMatch(@'e', 'hello')", Collections.emptyList(), Collections.emptyMap(),true);
-        result = mapper.transform("{}");
-        JSONAssert.assertEquals("{\"string\":\"hello\",\"captures\":[],\"namedCaptures\":{}\n}", result, true);
-
-        mapper = new Mapper("DS.Regex.regexPartialMatch(@'e(.*)o', 'hello')", Collections.emptyList(), Collections.emptyMap(),true);
-        result = mapper.transform("{}");
-        JSONAssert.assertEquals("{\"captures\":[\"ll\"],\"namedCaptures\":{},\"string\":\"hello\"}", result, true);
-
-        mapper = new Mapper("DS.Regex.regexPartialMatch(@'e(?P<mid>.*)o', 'hello')", Collections.emptyList(), Collections.emptyMap(),true);
-        result = mapper.transform("{}");
-        JSONAssert.assertEquals("{\"captures\":[\"ll\"],\"namedCaptures\":{\"mid\":\"ll\"},\"string\":\"hello\"}", result, true);
+        assertEquals(expected, result);
     }
 
-    @Test
-    void testRegexQuoteMeta() {
-        Mapper mapper = new Mapper("DS.Regex.regexQuoteMeta(@'1.5-2.0?')", Collections.emptyList(), Collections.emptyMap(),true);
-        String result = mapper.transform("{}");
-        assertEquals("\"1\\\\.5-2\\\\.0\\\\?\"", result);
+    static Stream<String[]> jsonAssertProvider() {
+        return Stream.of(
+                new String[] { "DS.Regex.regexFullMatch(@'h.*o', 'hello')", "{\"string\":\"hello\",\"captures\":[],\"namedCaptures\":{}\n}"},
+                new String[] { "DS.Regex.regexFullMatch(@'h(.*)o', 'hello')", "{\"captures\":[\"ell\"],\"namedCaptures\":{},\"string\":\"hello\"}"},
+                new String[] { "DS.Regex.regexFullMatch(@'h(?P<mid>.*)o', 'hello')", "{\"captures\":[\"ell\"],\"namedCaptures\":{\"mid\":\"ell\"},\"string\":\"hello\"}"},
+                new String[] { "DS.Regex.regexPartialMatch(@'e', 'hello')", "{\"string\":\"hello\",\"captures\":[],\"namedCaptures\":{}\n}"},
+                new String[] { "DS.Regex.regexPartialMatch(@'e(.*)o', 'hello')", "{\"captures\":[\"ll\"],\"namedCaptures\":{},\"string\":\"hello\"}"},
+                new String[] { "DS.Regex.regexPartialMatch(@'e(?P<mid>.*)o', 'hello')", "{\"captures\":[\"ll\"],\"namedCaptures\":{\"mid\":\"ll\"},\"string\":\"hello\"}"}
+        );
     }
 
-    @Test
-    void testRegexReplace() {
-        Mapper mapper = new Mapper("DS.Regex.regexReplace('wishyfishyisishy', @'ish', 'and')", Collections.emptyList(), Collections.emptyMap(),true);
-        String result = mapper.transform("{}");
-        assertEquals("\"wandyfishyisishy\"", result);
-
-        mapper = new Mapper("DS.Regex.regexReplace('yabba dabba doo', @'b+', 'd')", Collections.emptyList(), Collections.emptyMap(),true);
-        result = mapper.transform("{}");
-        assertEquals("\"yada dabba doo\"", result);
-    }
-
-    @Test
-    void testRegexGlobalReplace() {
-        Mapper mapper = new Mapper("DS.Regex.regexGlobalReplace('wishyfishyisishy', @'ish', 'and')", Collections.emptyList(), Collections.emptyMap(),true);
-        String result = mapper.transform("{}");
-        assertEquals("\"wandyfandyisandy\"", result);
-
-        mapper = new Mapper("DS.Regex.regexGlobalReplace('yabba dabba doo', @'b+', 'd')", Collections.emptyList(), Collections.emptyMap(),true);
-        result = mapper.transform("{}");
-        assertEquals("\"yada dada doo\"", result);
+    static Stream<String[]> assertEqualsProvider() {
+        return Stream.of(
+                new String[] { "DS.Regex.regexFullMatch(@'world', 'hello')", "null"},
+                new String[] { "DS.Regex.regexPartialMatch(@'world', 'hello')", "null"},
+                new String[] { "DS.Regex.regexQuoteMeta(@'1.5-2.0?')", "\"1\\\\.5-2\\\\.0\\\\?\""},
+                new String[] { "DS.Regex.regexReplace('wishyfishyisishy', @'ish', 'and')", "\"wandyfishyisishy\""},
+                new String[] { "DS.Regex.regexReplace('yabba dabba doo', @'b+', 'd')", "\"yada dabba doo\""},
+                new String[] { "DS.Regex.regexGlobalReplace('wishyfishyisishy', @'ish', 'and')", "\"wandyfandyisandy\""},
+                new String[] { "DS.Regex.regexGlobalReplace('yabba dabba doo', @'b+', 'd')", "\"yada dada doo\""}
+        );
     }
 }

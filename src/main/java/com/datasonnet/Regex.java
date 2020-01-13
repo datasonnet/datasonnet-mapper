@@ -6,12 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.re2j.Matcher;
 import com.google.re2j.Pattern;
-import scala.Function1;
-import scala.collection.mutable.ArrayBuffer;
-import scala.collection.mutable.LinkedHashMap;
-import ujson.Obj;
 import ujson.Value;
-import upickle.core.Visitor;
 
 import java.lang.reflect.Field;
 import java.util.Collections;
@@ -64,7 +59,7 @@ public class Regex {
         regexMatch.set("captures", capturesNode);
 
         ObjectNode namedCapturesNode = mapper.createObjectNode();
-        Map<String, Integer> namedGroups = getNamedGroups(matcher);
+        Map<String, Integer> namedGroups = getNamedGroupsFromMatcher(matcher);
         for (Map.Entry<String, Integer> namedGroup : namedGroups.entrySet()) {
             namedCapturesNode.put(namedGroup.getKey(), matcher.group(namedGroup.getValue()));
         }
@@ -74,7 +69,7 @@ public class Regex {
         return UjsonUtil.jsonObjectValueOf(regexMatch.toString());
     }
 
-    private static Map<String, Integer> getNamedGroups(Matcher matcher) {
+    private static Map<String, Integer> getNamedGroupsFromMatcher(Matcher matcher) {
         try {
             Field namedGroupsMapField = Matcher.class.getDeclaredField("namedGroups");
             namedGroupsMapField.setAccessible(true);
