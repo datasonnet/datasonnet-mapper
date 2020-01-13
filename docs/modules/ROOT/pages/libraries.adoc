@@ -784,3 +784,99 @@ DS.Util.mapToObject(payload, function(x) x.language.name, function(v) v.language
 };
 ------------------------
 
+## Regex
+
+The regular expressions library based on the https://github.com/google/re2j[Google RE2/J] implementation.
+
+### `regexFullMatch(string pattern, string input)`
+Matches the entire input against the pattern (anchored start and end). If there's no match, returns `null`. If there's a match, returns a JSON object which has the following structure.
+- `string` - the original input string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexFullMatch(@'h(?P<mid>.*)o', 'hello');
+------------------------
+.Result
+------------------------
+{
+  "captures": [
+    "ell"
+  ],
+  "namedCaptures": {
+    "mid": "ell"
+  },
+  "string": "hello"
+}
+------------------------
+
+### `regexPartialMatch(string pattern, string input)`
+Matches the input against the pattern (unanchored). If there's no match, returns `null`. If there's a match, returns a JSON object which has the following structure.
+- `string` - the original input string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexPartialMatch(@'e(?P<mid>.*)o', 'hello')
+------------------------
+.Result
+------------------------
+{
+  "captures": [
+    "ll"
+  ],
+  "namedCaptures": {
+    "mid": "ll"
+  },
+  "string": "hello"
+}
+------------------------
+
+### `regexQuoteMeta(string str)`
+Returns a literal pattern string for the specified string.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexQuoteMeta(@'1.5-2.0?')
+------------------------
+.Result
+------------------------
+"1\\.5-2\\.0\\?"
+------------------------
+
+### `regexReplace(string str, string pattern, string replacement)`
+Returns the input with the first match replaced by `replacement` string.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexReplace('wishyfishyisishy', @'ish', 'and')
+------------------------
+.Result
+------------------------
+"wandyfishyisishy"
+------------------------
+
+### `regexGlobalReplace(string str, string pattern, string replacement)`
+Returns the input with all matches replaced by `replacement` string.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexGlobalReplace('wishyfishyisishy', @'ish', 'and')
+------------------------
+.Result
+------------------------
+"wandyfandyisandy"
+------------------------
+
