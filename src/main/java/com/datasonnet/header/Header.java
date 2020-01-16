@@ -1,16 +1,16 @@
 package com.datasonnet.header;
 
+import com.fasterxml.jackson.dataformat.javaprop.JavaPropsMapper;
+import com.fasterxml.jackson.dataformat.javaprop.JavaPropsSchema;
+import com.fasterxml.jackson.dataformat.javaprop.util.JPropNode;
+import com.fasterxml.jackson.dataformat.javaprop.util.JPropPathSplitter;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Pattern;
-
-import com.fasterxml.jackson.dataformat.javaprop.*;
-import com.fasterxml.jackson.dataformat.javaprop.util.JPropNode;
-import com.fasterxml.jackson.dataformat.javaprop.util.JPropPathSplitter;
 
 public class Header {
     public static String DATASONNET_HEADER = "/** DataSonnet";
@@ -48,7 +48,8 @@ public class Header {
                                                  String key, String value)
                     {
                         JPropNode curr = parent;
-                        String[] segments = key.split("(?<!" + Pattern.quote("\\") + ")" + Pattern.quote("" + _pathSeparatorChar));
+                        // split on the path separator character not preceded by a backslash
+                        String[] segments = key.split("(?<!\\\\)" + Pattern.quote("" + _pathSeparatorChar));
                         for (String segment : segments) {
                             curr = _addSegment(curr, segment.replaceAll("\\\\", ""));
                         }
@@ -70,8 +71,8 @@ public class Header {
                     header.setVersion((String)propsMap.get(DATASONNET_VERSION));
                 }
                 header.dataFormatParameters = propsMap;
-            } catch (IOException e) {
-                throw new HeaderParseException("Error parsing DataSonnet Header: ", e);
+            } catch (IOException|IllegalArgumentException e) {
+                throw new HeaderParseException("Error parsing DataSonnet Header: " + e.getMessage(), e);
             }
         }
 

@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class HeaderTest {
 
@@ -50,9 +49,9 @@ public class HeaderTest {
 
         Mapper mapper = new Mapper(ds, new ArrayList<>(), true);
         String mapped = mapper.transform(payload, new HashMap<>(), "text/plain").contents();
-        assertTrue(mapped.endsWith("HelloWorld"));
+        assertEquals("HelloWorld", mapped);
         mapped = mapper.transform(payload, new HashMap<>(), "application/test.test").contents();
-        assertTrue(mapped.endsWith("GoodByeWorld"));
+        assertEquals("GoodByeWorld", mapped);
     }
 
     @Test

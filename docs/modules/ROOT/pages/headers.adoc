@@ -43,7 +43,9 @@ The input properties format must be `input.<INPUT_NAME>|*.<MIME_TYPE>.<MIME_TYPE
 
 If a property is not recognized, an error will be raised.
 
-IMPORTANT: if the mime type contains the dot (`.`) character, it must be escaped with double backslash (`\\`). For example, `dataformat.application/vnd\\.ms-excel.payload.param=xyz`.
+IMPORTANT: if the mime type contains the dot (`.`) character, it must be escaped with a backslash (`\`). For example, `dataformat.application/vnd\.ms-excel.payload.param=xyz`.
+
+Keys may not contain double backslashes (`\\`), though values may.
 
 The wildcard `*` can be used to set the same parameter value for all inputs and output of the given format, instead of defining it explicitly. For example:
 
