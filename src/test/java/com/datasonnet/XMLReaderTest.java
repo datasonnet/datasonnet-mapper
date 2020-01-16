@@ -2,10 +2,7 @@ package com.datasonnet;
 
 import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
-<<<<<<< HEAD
-import org.junit.Before;
-=======
->>>>>>> Support for DataSonnet headers
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 

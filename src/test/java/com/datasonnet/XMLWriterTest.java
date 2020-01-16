@@ -179,9 +179,11 @@ public class XMLWriterTest {
             assertTrue(e.getMessage().contains("Object must have only one root element"), "Found message: " + e.getMessage());
         }
 
-        mapper = new Mapper("local params = {\n" +
-                "    \"RootElement\" : \"TestRoot\",\n" +
-                "};DS.Formats.write(payload, \"application/xml\", params)", new ArrayList<>(), true);
+        mapper = new Mapper("/** DataSonnet\n" +
+                "version=1.0\n" +
+                "output.application/xml.RootElement=TestRoot\n" +
+                "*/\n" +
+                "payload", new ArrayList<>(), true);
         try {
             String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), new HashMap<>(), "application/xml").contents();
         } catch(IllegalArgumentException e) {

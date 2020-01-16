@@ -193,6 +193,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         writeParams.put(OMIT_XML_DECLARATION, "Omits <?xml ... ?> declaration from the output");
         writeParams.put(AUTO_EMPTY_ELEMENTS, "Automatically output empty elements, when a start element is immediately followed by matching end element.");
         writeParams.put(NULL_AS_EMPTY_ELEMENT, "Creates empty elements for null values");
+        writeParams.put(ROOT_ELEMENT, "Root element wrapper");
         return writeParams;
     }
 
