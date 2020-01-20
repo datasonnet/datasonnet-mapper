@@ -6,19 +6,25 @@ import org.junit.jupiter.api.Test;
 import java.io.StringReader;
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class PropertiesTest {
 
     @Test
     void simpleExample() {
         String header = "version 1\n    output.application/xml\\.extra.NamespaceDeclarations.ア1  =   http://example.com/1\n" +
-                "     other\\tstuff   :Г";
+                "     other\\tstuff   :Г\n" +
+                "    # commented: header\n" +
+                "    uncommented: header";
         Properties properties = makeProperties(header);
         assertEquals("1", properties.getProperty("version"));
         assertEquals("http://example.com/1", properties.getProperty("output.application/xml\\.extra.NamespaceDeclarations.ア1"));
         assertEquals("Г", properties.getProperty("other\tstuff"));
+        // all three of these last effectively check the same thing, but by demonstrating different specific things
+        // that do not happen
+        assertNull(properties.getProperty("commented"));
+        assertNull(properties.getProperty("# commented"));
+        assertEquals(4, properties.size());  // version, the xml namespace, other stuff, and uncommented, but not commented
     }
 
     private Properties makeProperties(String header) {
