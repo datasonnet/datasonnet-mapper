@@ -1,13 +1,13 @@
-local params = {
-    "UseHeader": false,
-    "Quote": "'",
-    "Separator": "|",
-    "Escape": "\\",
-    "NewLine": "\n"
-};
-local csvFile = DS.Formats.read(payload, "application/csv", params);
+/** DataSonnet
+version=1.0
+input.payload.application/csv.UseHeader=false
+input.payload.application/csv.Quote='
+input.payload.application/csv.Separator=|
+input.payload.application/csv.Escape=\
+input.payload.application/csv.NewLine=\n
+*/
 
 {
-    fName: csvFile[0][0],
-    num: csvFile[0][3]
+    fName: payload[0][0],
+    num: payload[0][3]
 }

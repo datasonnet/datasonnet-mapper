@@ -121,7 +121,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         XMLOutputFactory2 outputFactory = (XMLOutputFactory2) XMLOutputFactory.newInstance();
 
         if (params.containsKey(AUTO_EMPTY_ELEMENTS)) {
-            outputFactory.setProperty(XMLOutputFactory2.P_AUTOMATIC_EMPTY_ELEMENTS, (Boolean) params.get(AUTO_EMPTY_ELEMENTS));
+            outputFactory.setProperty(XMLOutputFactory2.P_AUTOMATIC_EMPTY_ELEMENTS, new Boolean(params.get(AUTO_EMPTY_ELEMENTS).toString()));
         }
 
         return (XMLStreamWriter2) outputFactory.createXMLStreamWriter(output, "UTF-8");
@@ -134,7 +134,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
             config.setNamespaceBindings((Map)params.get(NAMESPACE_DECLARATIONS));
         }
         if (params.containsKey(NULL_AS_EMPTY_ELEMENT)) {
-            config.setNullAsEmptyElement((Boolean)params.get(NULL_AS_EMPTY_ELEMENT));
+            config.setNullAsEmptyElement(new Boolean(params.get(NULL_AS_EMPTY_ELEMENT).toString()));
         }
         if (params.containsKey(NAMESPACE_SEPARATOR)) {
             config.setNamespaceSeparator((String)params.get(NAMESPACE_SEPARATOR));
@@ -153,7 +153,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
     }
 
     private XMLStreamReader2 filterReader(Map<String, Object> params, XMLStreamReader2 reader) throws XMLStreamException {
-        if ((Boolean) params.getOrDefault(OMIT_XML_DECLARATION, false)) {
+        if (new Boolean(params.getOrDefault(OMIT_XML_DECLARATION, "false").toString())) {
             XMLInputFactory2 inputFactory = (XMLInputFactory2) XMLInputFactory.newFactory();
             reader = (XMLStreamReader2) inputFactory.createFilteredReader(reader, new StreamFilter() {
                 @Override
@@ -191,6 +191,9 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         writeParams.put(ENCODING, "XML encoding");
         writeParams.put(XML_VERSION, "XML version");
         writeParams.put(OMIT_XML_DECLARATION, "Omits <?xml ... ?> declaration from the output");
+        writeParams.put(AUTO_EMPTY_ELEMENTS, "Automatically output empty elements, when a start element is immediately followed by matching end element.");
+        writeParams.put(NULL_AS_EMPTY_ELEMENT, "Creates empty elements for null values");
+        writeParams.put(ROOT_ELEMENT, "Root element wrapper");
         return writeParams;
     }
 

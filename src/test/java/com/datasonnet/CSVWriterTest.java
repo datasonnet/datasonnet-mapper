@@ -3,6 +3,7 @@ package com.datasonnet;
 import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import com.datasonnet.Mapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -14,6 +15,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CSVWriterTest {
 
+    @BeforeAll
+    static void registerPlugins() throws Exception {
+        DataFormatService.getInstance().findAndRegisterPlugins();
+    }
+    
     @Test
     void testCSVWriter() throws URISyntaxException, IOException {
 
@@ -22,9 +28,7 @@ public class CSVWriterTest {
                 "application/json"
         );
 
-        DataFormatService.getInstance().findAndRegisterPlugins();
-
-        Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/csv\")", new ArrayList<>(), true);
+        Mapper mapper = new Mapper("payload", new ArrayList<>(), true);
         Document mapped = mapper.transform(data, new HashMap<>(), "application/csv");
         String expected = TestResourceReader.readFileAsString("writeCSVTest.csv");
         assertEquals(expected.trim(), mapped.contents().trim());
@@ -36,11 +40,9 @@ public class CSVWriterTest {
                 TestResourceReader.readFileAsString("writeCSVExtTest.json"),
                 "application/json"
         );
-        String jsonnet = TestResourceReader.readFileAsString("writeCSVExtTest.ds");
+        String datasonnet = TestResourceReader.readFileAsString("writeCSVExtTest.ds");
 
-        DataFormatService.getInstance().findAndRegisterPlugins();
-
-        Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
+        Mapper mapper = new Mapper(datasonnet, new ArrayList<>(), true);
         Document mapped = mapper.transform(data, new HashMap<>(), "application/csv");
         String expected = TestResourceReader.readFileAsString("writeCSVExtTest.csv");
         assertEquals(expected.trim(), mapped.contents().trim());

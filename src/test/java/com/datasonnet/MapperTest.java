@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.datasonnet.spi.DataFormatService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -110,6 +111,7 @@ public class MapperTest {
 
     @Test
     void nonJsonArguments() {
+        DataFormatService.getInstance().findAndRegisterPlugins();
         Mapper mapper = new Mapper("argument", Arrays.asList("argument"), true);
 
         Map<String, Document> map = new HashMap<>();

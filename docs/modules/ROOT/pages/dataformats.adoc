@@ -101,12 +101,45 @@ DS.Formats.read(payload, "application/xml")
 
 Providing an optional `params` object allows for additional control over JSON generation. The `params` is a JSON object where following properties can be set:
 
-* `NamespaceSeparator` - replaces default `:` separator between the prefix and the local name
-* `TextValueKey` - replaces default `$` as a key prefix for the text value property
-* `CdataValueKey` - replaces default `#` as a key prefix for the CDATA value property
-* `AttributeCharacter` - replaces `@` as a property key prefix which designates an XML element attribute
-* `NamespaceDeclarations` - a JSON object with a map of internal prefixes to the namespaces
-* `RootElement` - if set, the output will be wrapped in a root element with the given name
+
+[%header, cols=3*a]
+|===
+|Parameter
+|Description
+|Default value
+
+|`NamespaceSeparator`
+| Separator between the prefix and the local name
+| `:`
+
+|`TextValueKey`
+|Key prefix for the text value property
+|`$`
+
+|`CdataValueKey`
+|Key prefix for the CDATA value property
+|`#`
+
+|`AttributeCharacter`
+|Property key prefix which designates an XML element attribute
+|`@`
+
+|`NamespaceDeclarations`
+|Map of internal prefixes to the namespaces which overrides namespaces declarations in the input. Multiple values are allowed, for example:
+
+```
+"NamespaceDeclarations" : {
+    "datasonnet" : "http://www.datasonnet.com",
+    "test" : "urn:com.foo.bar",
+    "": "http://www.modusbox.com"
+}
+```
+|
+
+|`RootElement`
+|if set, the output will be wrapped in a root element with the given name
+|
+|===
 
 *Example*
 
@@ -148,6 +181,46 @@ DS.Formats.read(payload, "application/xml", params);
 ### `write`
 Converts the input JSON object into XML using the Badgerfish convention.
 
+[IMPORTANT]
+====
+
+The input JSON must have a single key which will be mapped to the root element of the resulting XML.
+
+.Correct:
+[subs="quotes"]
+------------------
+{
+  *"person"*: {
+    "firstName": "John",
+    "lastName": "Doe",
+    "title": "Rookie DataSonnet mapper"
+  }
+}
+------------------
+
+.Incorrect:
+------------------
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "title": "Rookie DataSonnet mapper"
+}
+------------------
+.Incorrect:
+------------------
+{
+  "person": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "title": "Rookie DataSonnet mapper"
+  },
+  "anotherKey": "anotherValue"
+}
+------------------
+====
+
+*Example*
+
 .Payload
 ------------------------
 {
@@ -176,11 +249,33 @@ DS.Formats.write(payload, "application/xml")
 
 Providing a `params` object allows for more control over generated XML. In addition to the parameters described in the `read` section, the following XML output-only parameters are supported:
 
-* `XmlVersion` - overrides the default XML version 1.0
-* `Encoding` - overrides the default `UTF-8` encoding
-* `AutoEmptyElements` - if set to `true`, empty elements are mapped to self-closing tags. If set to `false`, start- and end tags are generated.
-* `NullAsEmptyElement` - if set to `true`, element with null value is treated as empty element. Otherwise null values are skipped.
-* `OmitXmlDeclaration` - if set to `true`, XML declaration is not written in the resulting output.
+[%header, cols=3*a]
+|===
+|Parameter
+|Description
+|Default value
+
+|`XmlVersion`
+|XML version in the XML declaration
+|1.0
+
+|`Encoding`
+|XML encoding
+|`UTF-8`
+
+|`AutoEmptyElements`
+| If set to `true`, empty elements are mapped to self-closing tags. If set to `false`, start- and end tags are generated.
+|`true`
+
+|`NullAsEmptyElement`
+|If set to `true`, element with null value is treated as empty element. Otherwise null values are skipped.
+|`true`
+
+|`OmitXmlDeclaration`
+|If set to `true`, XML declaration is not written in the resulting output.
+|`false`
+
+|===
 
 .Payload
 ------------------------
@@ -254,11 +349,32 @@ Christopher,Marlow,"(987)654-3210"
 
 Providing an optional `params` object allows more control over the format of the input CSV. The `params` is a JSON object where following properties can be set:
 
-* `UseHeader` - if set to `true`, the first row of CSV will be interpreted as a list of column headers and will map to the JSON object property names
-* `Quote` - specifies the quote character
-* `Separator` - CSV separator character
-* `Escape` - CSV escape character
-* `NewLine` - new line character combination
+[%header, cols=3*a]
+|===
+|Parameter
+|Description
+|Default value
+
+|`UseHeader`
+|If set to `true`, the first row of CSV will be interpreted as a list of column headers and will map to the JSON object property names
+|`true`
+
+|`Quote`
+|specifies the quote character
+|`"`
+
+|`Separator`
+|CSV separator character
+|`,`
+
+|`Escape`
+|CSV escape character
+|`\\`
+
+|`NewLine`
+|New line character combination
+|`\n`
+|===
 
 *Example*
 

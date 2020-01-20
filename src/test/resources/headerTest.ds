@@ -1,0 +1,14 @@
+/** DataSonnet
+version=1.0
+input.payload.application/xml.NamespaceSeparator=:
+input.*.application/xml.TextValueKey=__text
+*.application/csv.Separator=|
+output.application/csv.Quote="
+*/
+[
+    {
+        greetings: payload["test:root"].__text,
+        name: myVar["test:myvar"].__text
+    }
+]
+
