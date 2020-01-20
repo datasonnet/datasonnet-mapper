@@ -2,6 +2,7 @@ package com.datasonnet.plugins;
 
 
 import com.datasonnet.badgerfish.*;
+import com.datasonnet.document.Document;
 import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatPlugin;
 import com.datasonnet.spi.PluginException;
@@ -56,9 +57,9 @@ public class XMLFormatPlugin implements DataFormatPlugin {
             params = Collections.emptyMap();
         }
 
-        try(Reader input = new StringReader(inputXML.toString());
-            StringWriter output = new StringWriter();
-            ) {
+        try (Reader input = new StringReader(inputXML.toString());
+             StringWriter output = new StringWriter();
+        ) {
             XMLStreamReader2 reader = createInputStream(input);
             XMLStreamWriter2 writer = createJSONOutputStream(params, output);
 
@@ -76,6 +77,23 @@ public class XMLFormatPlugin implements DataFormatPlugin {
     public StringDocument write(Value inputXML, Map<String, Object> params, String mimeType) throws PluginException {
         try {
             JSONObject input = new JSONObject(UjsonUtil.jsonObjectValueTo(inputXML));
+
+            if (params.containsKey(ROOT_ELEMENT)) {
+                JSONObject root = new JSONObject();
+                root.put(params.get(ROOT_ELEMENT).toString(), input);
+                input = root;
+            } else {
+                //Check that input has only one root element
+                JSONArray names = input.names();
+                if (names.length() != 1) {
+                    throw new IllegalArgumentException("Object must have only one root element; has " + names.toString());
+                }
+                Object o = input.get(names.get(0).toString());
+                if (!(o instanceof JSONObject)) {
+                    throw new IllegalArgumentException("Value of \"" + names.get(0) + "\" must be an object");
+                }
+            }
+
             StringWriter output = new StringWriter();
             XMLStreamWriter2 writer = createXMLOutputStream(params, output);
             XMLStreamReader2 reader = createInputStream(params, input);
@@ -106,7 +124,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         convention.setEncoding((String) params.getOrDefault(ENCODING, WstxOutputProperties.DEFAULT_OUTPUT_ENCODING));
         convention.setVersion((String) params.getOrDefault(XML_VERSION, WstxOutputProperties.DEFAULT_XML_VERSION));
 
-        XMLStreamReader2 reader =  Stax2ReaderAdapter.wrapIfNecessary(new BadgerFishXMLStreamReader(input, convention));
+        XMLStreamReader2 reader = Stax2ReaderAdapter.wrapIfNecessary(new BadgerFishXMLStreamReader(input, convention));
 
         return filterReader(params, reader);
     }
@@ -125,22 +143,22 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         BadgerFishConfiguration config = new BadgerFishConfiguration();
 
         if (params.containsKey(NAMESPACE_DECLARATIONS)) {
-            config.setNamespaceBindings((Map)params.get(NAMESPACE_DECLARATIONS));
+            config.setNamespaceBindings((Map) params.get(NAMESPACE_DECLARATIONS));
         }
         if (params.containsKey(NULL_AS_EMPTY_ELEMENT)) {
             config.setNullAsEmptyElement(new Boolean(params.get(NULL_AS_EMPTY_ELEMENT).toString()));
         }
         if (params.containsKey(NAMESPACE_SEPARATOR)) {
-            config.setNamespaceSeparator((String)params.get(NAMESPACE_SEPARATOR));
+            config.setNamespaceSeparator((String) params.get(NAMESPACE_SEPARATOR));
         }
         if (params.containsKey(TEXT_VALUE_KEY)) {
-            config.setTextValueKey((String)params.get(TEXT_VALUE_KEY));
+            config.setTextValueKey((String) params.get(TEXT_VALUE_KEY));
         }
         if (params.containsKey(CDATA_VALUE_KEY)) {
-            config.setCdataValueKey((String)params.get(CDATA_VALUE_KEY));
+            config.setCdataValueKey((String) params.get(CDATA_VALUE_KEY));
         }
         if (params.containsKey(ATTRIBUTE_CHARACTER)) {
-            config.setAttributeCharacter((String)params.get(ATTRIBUTE_CHARACTER));
+            config.setAttributeCharacter((String) params.get(ATTRIBUTE_CHARACTER));
         }
 
         return config;
@@ -160,7 +178,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
     }
 
     public String[] getSupportedIdentifiers() {
-        return new String[] { "application/xml", "xml" };
+        return new String[]{"application/xml", "xml"};
     }
 
     @Override
