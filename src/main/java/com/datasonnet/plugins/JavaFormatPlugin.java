@@ -27,6 +27,7 @@ public class JavaFormatPlugin implements DataFormatPlugin {
 
     public JavaFormatPlugin() { }
 
+    @Override
     public Value read(Object input, Map<String, Object> params) throws PluginException {
         ObjectMapper mapper = new ObjectMapper();
         DateFormat df = new SimpleDateFormat(params.containsKey(DATE_FORMAT) ? (String)params.get(DATE_FORMAT) : DEFAULT_DATE_FORMAT);
@@ -39,13 +40,14 @@ public class JavaFormatPlugin implements DataFormatPlugin {
         }
     }
 
+    @Override
     public Document write(Value input, Map<String, Object> params, String mimeType) throws PluginException {
         try {
             String jsonString = UjsonUtil.jsonObjectValueTo(input);
             ObjectMapper mapper = new ObjectMapper();
-            DateFormat df = new SimpleDateFormat(params.containsKey(DATE_FORMAT) ? (String)params.get(DATE_FORMAT) : DEFAULT_DATE_FORMAT);
+            DateFormat df = new SimpleDateFormat(params.containsKey(DATE_FORMAT) ? (String) params.get(DATE_FORMAT) : DEFAULT_DATE_FORMAT);
             mapper.setDateFormat(df);
-            JsonNode node = mapper.readTree(jsonString);
+            final JsonNode node = mapper.readTree(jsonString);
 
             JavaType valueType = null;
 
@@ -64,11 +66,14 @@ public class JavaFormatPlugin implements DataFormatPlugin {
             }
 
             return new JavaObjectDocument(mapper.readValue(jsonString, valueType));
-        } catch (Exception e) {
-            throw new PluginException(e);
+        } catch (JsonProcessingException jpe) {
+            throw new PluginException("Unable to read JSON tree: " + jpe);
+        } catch (IllegalArgumentException e) {
+            throw new PluginException("Unable to construct value: " + e);
         }
     }
 
+    @Override
     public String[] getSupportedIdentifiers() {
         return new String[] { "application/x-java-object", "application/java", "java" };
     }
@@ -88,6 +93,7 @@ public class JavaFormatPlugin implements DataFormatPlugin {
         return writeParams;
     }
 
+    @Override
     public String getPluginId() {
         return "Java";
     }

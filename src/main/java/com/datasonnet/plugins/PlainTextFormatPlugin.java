@@ -20,10 +20,12 @@ import java.util.Map;
 public class PlainTextFormatPlugin implements DataFormatPlugin {
     public PlainTextFormatPlugin() { }
 
+    @Override
     public Value read(Object input, Map<String, Object> params) {
         return UjsonUtil.stringValueOf(input.toString());
     }
 
+    @Override
     public StringDocument write(Value input, Map<String, Object> params, String mimeType) {
         if(input instanceof Str) {
             return new StringDocument(UjsonUtil.stringValueTo((Str) input), mimeType);
@@ -32,6 +34,7 @@ public class PlainTextFormatPlugin implements DataFormatPlugin {
         }
     }
 
+    @Override
     public String[] getSupportedIdentifiers() {
         return new String[] { "text/plain", "txt" };
     }
@@ -46,6 +49,7 @@ public class PlainTextFormatPlugin implements DataFormatPlugin {
         return Collections.emptyMap();
     }
 
+    @Override
     public String getPluginId() {
         return "Text";
     }

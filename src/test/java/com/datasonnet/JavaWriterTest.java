@@ -82,7 +82,21 @@ public class JavaWriterTest {
 
         Map map = (Map)result;
         assertTrue(map.get("test") instanceof java.lang.String);
-        assertEquals("Gizmo{name='gizmo', quantity=123, colors=[red, white, blue], inStock=true, manufacturer=Manufacturer{manufacturerName='ACME Corp.', manufacturerCode='ACME123'}, date=Mon Jan 06 00:00:00 MST 2020}",
-                map.get("test"));
+
+        Gizmo theGizmo = new Gizmo();
+        theGizmo.setName("gizmo");
+        theGizmo.setQuantity(123);
+        theGizmo.setInStock(true);
+        theGizmo.setColors(Arrays.asList("red","white","blue"));
+
+        Manufacturer manufacturer = new Manufacturer();
+        manufacturer.setManufacturerName("ACME Corp.");
+        manufacturer.setManufacturerCode("ACME123");
+        theGizmo.setManufacturer(manufacturer);
+
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        theGizmo.setDate(df.parse("2020-01-06"));
+
+        assertEquals(theGizmo.toString(), map.get("test"));
     }
 }

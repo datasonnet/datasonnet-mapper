@@ -14,14 +14,17 @@ import java.util.Map;
 public class JSONFormatPlugin implements DataFormatPlugin {
     public JSONFormatPlugin() { }
 
+    @Override
     public Value read(Object input, Map<String, Object> params) {
         return UjsonUtil.jsonObjectValueOf(input.toString());
     }
 
+    @Override
     public Document write(Value input, Map<String, Object> params, String mimeType) {
         return new StringDocument(UjsonUtil.jsonObjectValueTo(input), mimeType);
     }
 
+    @Override
     public String[] getSupportedIdentifiers() {
         return new String[] { "application/json", "json" };
     }
@@ -36,6 +39,7 @@ public class JSONFormatPlugin implements DataFormatPlugin {
         return Collections.emptyMap();
     }
 
+    @Override
     public String getPluginId() {
         return "JSON";
     }

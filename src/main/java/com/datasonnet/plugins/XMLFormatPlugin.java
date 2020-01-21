@@ -52,6 +52,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         System.setProperty("javax.xml.stream.XMLOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");
     }
 
+    @Override
     public Value read(Object inputXML, Map<String, Object> params) throws PluginException {
         if(params == null) {
             params = Collections.emptyMap();
@@ -74,6 +75,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         }
     }
 
+    @Override
     public StringDocument write(Value inputXML, Map<String, Object> params, String mimeType) throws PluginException {
         try {
             JSONObject input = new JSONObject(UjsonUtil.jsonObjectValueTo(inputXML));
@@ -177,6 +179,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         return reader;
     }
 
+    @Override
     public String[] getSupportedIdentifiers() {
         return new String[]{"application/xml", "xml"};
     }
@@ -209,6 +212,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         return Collections.unmodifiableMap(writeParams);
     }
 
+    @Override
     public String getPluginId() {
         return "XML";
     }

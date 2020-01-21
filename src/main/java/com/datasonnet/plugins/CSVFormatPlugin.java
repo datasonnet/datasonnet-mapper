@@ -31,6 +31,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
 
     }
 
+    @Override
     public Value read(Object input, Map<String, Object> params) throws PluginException {
 
         ObjectMapper mapper = new ObjectMapper();
@@ -56,6 +57,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         }
     }
 
+    @Override
     public StringDocument write(Value input, Map<String, Object> params, String mimeType) throws PluginException {
         CsvSchema.Builder builder = this.getBuilder(params);
 
@@ -84,16 +86,17 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         CsvSchema csvSchema = builder.build();
 
         CsvMapper csvMapper = new CsvMapper();
-        String value = null;
+
         try {
-            value = csvMapper.writerFor(JsonNode.class)
+            final String value = csvMapper.writerFor(JsonNode.class)
                     .with(csvSchema).writeValueAsString(jsonTree);
+            return new StringDocument(value, mimeType);
         } catch (JsonProcessingException e) {
             throw new PluginException("Unable to write CSV output", e);
         }
-        return new StringDocument(value, mimeType);
     }
 
+    @Override
     public String[] getSupportedIdentifiers() {
         return new String[] { "application/csv", "text/csv", "csv" };
     }
@@ -137,6 +140,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         return getReadParameters();
     }
 
+    @Override
     public String getPluginId() {
         return "CSV";
     }
