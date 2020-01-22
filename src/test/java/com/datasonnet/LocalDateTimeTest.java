@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -15,7 +14,7 @@ public class LocalDateTimeTest {
 
     @Test
     void testOffset() {
-        Mapper mapper = new Mapper("DS.LocalDateTime.offset(\"2019-07-22T21:00:00\", \"P1Y1D\")", new ArrayList<>(), true);
+        Mapper mapper = new Mapper("DS.LocalDateTime.offset(\"2019-07-22T21:00:00\", \"P1Y1D\")", Collections.emptyList(), true);
         String offsetDate = mapper.transform("{}").replaceAll("\"", "");
         assertTrue("2020-07-23T21:00:00".equals(offsetDate));
 //        System.out.println("Offset date is " + offsetDate);
@@ -25,7 +24,7 @@ public class LocalDateTimeTest {
     void testNow() {
         Instant before = Instant.now();
 
-        Mapper mapper = new Mapper("DS.LocalDateTime.now()", new ArrayList<>(), true);
+        Mapper mapper = new Mapper("DS.LocalDateTime.now()", Collections.emptyList(), true);
         // getting rid of quotes so the Instant parser works
         String mapped = mapper.transform("{}").replaceAll("\"", "");
         String today = java.time.LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
@@ -38,7 +37,7 @@ public class LocalDateTimeTest {
 
     @Test
     void testFormat() {
-        Mapper mapper = new Mapper("DS.LocalDateTime.format(\"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\", \"d MMM uuuu\")", new ArrayList<>(), true);
+        Mapper mapper = new Mapper("DS.LocalDateTime.format(\"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\", \"d MMM uuuu\")", Collections.emptyList(), true);
         String formattedDate = mapper.transform("{}").replaceAll("\"", "");
         //System.out.println("Formatted date is " + formattedDate);
         assertTrue("4 Jul 2019".equals(formattedDate));
@@ -46,7 +45,7 @@ public class LocalDateTimeTest {
 
     @Test
     void testCompare() {
-        Mapper mapper = new Mapper("DS.LocalDateTime.compare(\"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\", \"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\")", new ArrayList<>(), true);
+        Mapper mapper = new Mapper("DS.LocalDateTime.compare(\"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\", \"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\")", Collections.emptyList(), true);
         String compareResult = mapper.transform("{}").replaceAll("\"", "");
         //System.out.println("Formatted date is " + formattedDate);
         assertTrue("0".equals(compareResult));

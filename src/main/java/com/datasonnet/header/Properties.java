@@ -3,6 +3,7 @@ package com.datasonnet.header;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -138,7 +139,7 @@ public class Properties extends java.util.Properties {
         if(isContinuation(current)) {
             lines.add(current.toString());
         }
-        return lines;
+        return Collections.unmodifiableList(lines);
     }
 
     private void clear(StringBuffer current) {

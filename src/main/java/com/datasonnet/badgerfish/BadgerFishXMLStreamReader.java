@@ -12,6 +12,7 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 

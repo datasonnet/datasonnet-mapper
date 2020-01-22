@@ -1,11 +1,11 @@
 package com.datasonnet
 
-import java.io.{File, PrintWriter, StringWriter}
+import java.io.{PrintWriter, StringWriter}
 import java.util
 import java.util.Collections
 
 import com.datasonnet.header.Header
-import com.datasonnet.spi.{DataFormatPlugin, DataFormatService}
+import com.datasonnet.spi.DataFormatService
 import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
 import fastparse.{IndexedParserInput, Parsed}
 import sjsonnet.Expr.Member.Visibility
@@ -16,7 +16,6 @@ import sjsonnet._
 import scala.collection.JavaConverters._
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
-import scala.util.chaining._
 
 
 case class StringDocument(contents: String, mimeType: String) extends Document
@@ -137,7 +136,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   def lineOffset = if (needsWrapper) 1 else 0
 
   def this(jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) {
-    this(jsonnet, argumentNames, new java.util.HashMap[String, String](), needsWrapper)
+    this(jsonnet, argumentNames, Collections.emptyMap(), needsWrapper)
   }
 
   def importer(parent: Path, path: String): Option[(Path, String)] = for {

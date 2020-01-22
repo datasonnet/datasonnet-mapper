@@ -24,6 +24,7 @@ import javax.xml.stream.*;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
 
     public Value read(String inputXML, Map<String, Object> params) throws Exception {
         if(params == null) {
-            params = new HashMap<>();
+            params = Collections.emptyMap();
         }
 
         try(Reader input = new StringReader(inputXML);
@@ -177,7 +178,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         readParams.put(TEXT_VALUE_KEY, "Json object key for the text value");
         readParams.put(CDATA_VALUE_KEY, "Json object key for the CDATA value");
         readParams.put(ATTRIBUTE_CHARACTER, "A prefix for attribute keys");
-        return readParams;
+        return Collections.unmodifiableMap(readParams);
     }
 
     @Override
@@ -194,7 +195,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         writeParams.put(AUTO_EMPTY_ELEMENTS, "Automatically output empty elements, when a start element is immediately followed by matching end element.");
         writeParams.put(NULL_AS_EMPTY_ELEMENT, "Creates empty elements for null values");
         writeParams.put(ROOT_ELEMENT, "Root element wrapper");
-        return writeParams;
+        return Collections.unmodifiableMap(writeParams);
     }
 
     public String getPluginId() {
