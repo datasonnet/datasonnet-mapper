@@ -1,8 +1,7 @@
 package com.datasonnet.plugins;
 
 
-import com.datasonnet.badgerfish.*;
-import com.datasonnet.document.Document;
+import com.datasonnet.xml.*;
 import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatPlugin;
 import com.datasonnet.spi.PluginException;
