@@ -17,15 +17,13 @@ public class UtilLibraryTest {
         String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").contents();
         assertEquals(mappedJson, "[\"hello\",\"world\"]");
 
-//TODO these won't work until sjsonnet supports key functions
+        mapper = new Mapper("DS.Util.duplicates(payload.complex, function(x) x.language.name)", Collections.emptyList(), true);
+        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").contents();
+        assertEquals(mappedJson, "[{\"language\":{\"name\":\"Java8\",\"version\":\"1.8.0\"}}]");
 
-//        mapper = new Mapper("DS.Util.duplicates(payload.complex, function(x) x.language.name)", Collections.emptyList(), true);
-//        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").contents();
-//        assertEquals(mappedJson, "[{\"language\":{\"name\":\"Java8\",\"version\":\"1.8.0\"}}]");
-//
-//        mapper = new Mapper("DS.Util.duplicates(payload.moreComplex, function(x) std.substr(x.language.version, 0, 3))", Collections.emptyList(), true);
-//        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").contents();
-//        assertEquals(mappedJson, "[{\"language\":{\"name\":\"Java1.8\",\"version\":\"1.8_152\"}}]");
+        mapper = new Mapper("DS.Util.duplicates(payload.moreComplex, function(x) std.substr(x.language.version, 0, 3))", Collections.emptyList(), true);
+        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").contents();
+        assertEquals(mappedJson, "[{\"language\":{\"name\":\"Java1.8\",\"version\":\"1.8_152\"}}]");
     }
 
     @Test
