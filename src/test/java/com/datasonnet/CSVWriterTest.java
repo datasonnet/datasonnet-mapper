@@ -47,4 +47,32 @@ public class CSVWriterTest {
         assertEquals(expected.trim(), mapped.contents().trim());
     }
 
+    @Test
+    void testCSVWriteFunction() throws URISyntaxException, IOException {
+
+        Document data = new StringDocument(
+                TestResourceReader.readFileAsString("writeCSVTest.json"),
+                "application/json"
+        );
+
+        Mapper mapper = new Mapper("{ embeddedCSVValue: DS.Formats.write(payload, \"application/csv\") }", Collections.emptyList(), true);
+        Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
+        String expected = "{\"embeddedCSVValue\":\"\\\"First Name\\\",\\\"Last Name\\\",Phone\\nWilliam,Shakespeare,\\\"(123)456-7890\\\"\\nChristopher,Marlow,\\\"(987)654-3210\\\"\\n\"}";
+        assertEquals(expected.trim(), mapped.contents().trim());
+    }
+
+    @Test
+    void testCSVWriteFunctionExt() throws IOException, URISyntaxException {
+        Document data = new StringDocument(
+                TestResourceReader.readFileAsString("writeCSVExtTest.json"),
+                "application/json"
+        );
+        String datasonnet = TestResourceReader.readFileAsString("writeCSVFunctionExtTest.ds");
+
+        Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
+        String expected = "{\"embeddedCSVValue\":\"'William'|'Shakespeare'|'(123)456-7890'\\n'Christopher'|'Marlow'|'(987)654-3210'\\n\"}";
+        assertEquals(expected.trim(), mapped.contents().trim());
+    }
+
 }
