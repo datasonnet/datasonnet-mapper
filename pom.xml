@@ -6,7 +6,7 @@
 
     <groupId>com.datasonnet</groupId>
     <artifactId>datasonnet-mapper</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3-PreserveOrder-SNAPSHOT</version>
 
     <licenses>
         <license>
@@ -199,6 +199,8 @@
             <groupId>com.lihaoyi</groupId>
             <artifactId>sjsonnet_2.13</artifactId>
             <version>0.2.3</version>
+            <scope>system</scope>
+            <systemPath>/Users/eberman/Dev/git/ModusBox/sjsonnet/out/sjsonnet/2.13.0/jvm/assembly/dest/out.jar</systemPath>
         </dependency>
 
         <dependency>
