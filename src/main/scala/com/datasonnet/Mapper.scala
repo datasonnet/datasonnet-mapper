@@ -216,8 +216,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
       (name, argument, i)
     }.toVector
 
-    //TODO Pass preserveOrder parameter from headers
-    val materialized = try Materializer.apply(function.copy(params = Params(firstMaterialized +: values)), true)(evaluator)
+    val materialized = try Materializer.apply(function.copy(params = Params(firstMaterialized +: values)), header.isPreserveOrder)(evaluator)
     catch {
       // if there's a parse error it must be in an import, so the offset is 0
       case Error(msg, stack, underlying) if msg.contains("had Parse error")=> throw new IllegalArgumentException("Problem executing map: " + Mapper.expandErrorLineNumber(msg, 0))

@@ -150,5 +150,14 @@ public class MapperTest {
         String mapped = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json").contents();
 
         assertEquals("{\"z\":\"z\",\"a\":\"a\",\"v2\":\"v2value\",\"v1\":\"v1value\",\"y\":\"y\",\"t\":\"t\"}", mapped.trim());
+
+        datasonnet = "/** DataSonnet\n" +
+                     "version=1.0\n" +
+                     "output.preserveOrder=false\n*/\n" + datasonnet;
+
+        mapper = new Mapper(datasonnet, variables.keySet(), true);
+        mapped = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json").contents();
+
+        assertEquals("{\"a\":\"a\",\"t\":\"t\",\"v1\":\"v1value\",\"v2\":\"v2value\",\"y\":\"y\",\"z\":\"z\"}", mapped.trim());
     }
 }
