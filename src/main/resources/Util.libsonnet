@@ -266,18 +266,15 @@
      */
     duplicates(arr, keyF=defaultF, set=true)::
         local aggregates = std.foldl(function(aggregate, x)
-//                                       aggregate + if (std.setMember(x, aggregate.found, keyF)) then
-                                         aggregate + if (std.setMember(x, aggregate.found)) then
+                                       aggregate + if (std.setMember(x, aggregate.found, keyF)) then
                                                    { duplicates: aggregate.duplicates + [x] } else
-//                                                   { found: std.set(aggregate.found + [x], keyF) },
-                                                   { found: std.set(aggregate.found + [x]) },
+                                                   { found: std.set(aggregate.found + [x], keyF) },
                                        arr, {
                                               found: [],
                                               duplicates: []
                                             },
                                        );
-//        if set then std.set(aggregates.duplicates, keyF) else aggregates.duplicates,
-        if set then std.set(aggregates.duplicates) else aggregates.duplicates,
+        if set then std.set(aggregates.duplicates, keyF) else aggregates.duplicates,
 
     /*
      * Returns sum of all elements in the array
