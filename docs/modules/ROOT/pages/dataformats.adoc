@@ -4,7 +4,7 @@
 
 ## Generic Read and Write Functions
 
-The `Formats` library contains `read`, and `write` functions for parsng and generating data in other data formats, e.g. XML or CSV. The XML and CSV plugins are built into the standard DataSonnet distributions while other formats can be supported by implementing `DataFormatPlugin` interface.
+The `Formats` library contains `read`, and `write` functions for serializing and deserializing data in other formats, e.g. XML or CSV. The XML and CSV plugins are built into the standard DataSonnet distributions while other formats can be supported by implementing `DataFormatPlugin` interface.
 
 These functions can be used if the data contains embedded data in other formats, for example:
 
@@ -44,7 +44,7 @@ Outputs the data into specified data format and accepts additional parameters wh
 
 *Example*
 ------------------------
-DS.Formats.write(payload.embeddedXMLValue, "application/csv")
+DS.Formats.write(payload.embeddedXMLValue, "application/xml")
 ------------------------
 
 *Example*
@@ -60,7 +60,7 @@ local params = {
     "AutoEmptyElements": false
 };
 
-DS.Formats.write(payload.embeddedXMLValue, "application/xml", params);
+DS.Formats.write(payload.someObj, "application/xml", params);
 ------------------------
 
 ## XML Format
