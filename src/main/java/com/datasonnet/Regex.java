@@ -14,15 +14,15 @@ import java.util.Map;
 
 public class Regex {
 
-    public static Value regexFullMatch(String expr, String str) {
+    public static Value regexFullMatch(String expr, String str) throws RegexException {
         return regexMatch(expr, str, true);
     }
 
-    public static Value regexPartialMatch(String expr, String str) {
+    public static Value regexPartialMatch(String expr, String str) throws RegexException {
         return regexMatch(expr, str, false);
     }
 
-    public static Value regexScan(String expr, String str) {
+    public static Value regexScan(String expr, String str) throws RegexException {
         Pattern pattern = Pattern.compile(expr);
         Matcher matcher = pattern.matcher(str);
 
@@ -76,7 +76,7 @@ public class Regex {
         return isGlobal ? matcher.replaceAll(replace) : matcher.replaceFirst(replace);
     }
 
-    private static Value regexMatch(String expr, String str, boolean isFull) {
+    private static Value regexMatch(String expr, String str, boolean isFull) throws RegexException {
         Pattern pattern = Pattern.compile(expr);
         Matcher matcher = pattern.matcher(str);
 
@@ -106,14 +106,15 @@ public class Regex {
         return UjsonUtil.jsonObjectValueOf(regexMatch.toString());
     }
 
-    private static Map<String, Integer> getNamedGroupsFromMatcher(Matcher matcher) {
+    private static Map<String, Integer> getNamedGroupsFromMatcher(Matcher matcher) throws RegexException {
         try {
             Field namedGroupsMapField = Matcher.class.getDeclaredField("namedGroups");
             namedGroupsMapField.setAccessible(true);
             return (Map<String, Integer>) namedGroupsMapField.get(matcher);
-        } catch (Exception e) {
-            //TODO log the error?
-            return Collections.emptyMap();
+        } catch (NoSuchFieldException e) {
+            throw new RegexException("Unable to retrieve named groups", e);
+        } catch (IllegalAccessException e) {
+            throw new RegexException("Unable to retrieve named groups", e);
         }
     }
 }
