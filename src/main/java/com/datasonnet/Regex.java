@@ -1,6 +1,7 @@
 package com.datasonnet;
 
 import com.datasonnet.spi.UjsonUtil;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,7 +28,7 @@ public class Regex {
     }
 
     public static Value regexScan(String expr, String str) throws RegexException {
-        ObjectNode regexMatch = scan(expr, str);
+        ArrayNode regexMatch = scan(expr, str);
 
         return regexMatch != null ? UjsonUtil.jsonObjectValueOf(regexMatch.toString()) : Value.Null();
     }
@@ -44,15 +45,16 @@ public class Regex {
         return replace(str, pattern, replace, true);
     }
 
-    public static String regexGlobalReplace(String str, String pattern, Function<String, String> replace) {
+    public static String regexGlobalReplace(String str, String pattern, Function<Value, String> replace) throws RegexException {
         Pattern p = Pattern.compile(pattern);
-        Matcher m = p.matcher(str);
+        Matcher matcher = p.matcher(str);
         StringBuffer sb = new StringBuffer();
-        while (m.find()) {
-            String match = m.group();
-            m.appendReplacement(sb, replace.apply(match));
+
+        while (matcher.find()) {
+            ObjectNode nextMatch = getRegexMatch(matcher);
+            matcher.appendReplacement(sb, replace.apply(UjsonUtil.jsonObjectValueOf(nextMatch.toString())));
         }
-        m.appendTail(sb);
+        matcher.appendTail(sb);
         return sb.toString();
     }
 
@@ -70,64 +72,57 @@ public class Regex {
             return Value.Null();
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode regexMatch = mapper.createObjectNode();
-        regexMatch.put("string", str);
-
-        ArrayNode capturesNode = mapper.createArrayNode();
-        for (int i = 1; i <= matcher.groupCount(); i++) {
-            capturesNode.add(matcher.group(i));
-        }
-        regexMatch.set("captures", capturesNode);
-
-        ObjectNode namedCapturesNode = mapper.createObjectNode();
-        Map<String, Integer> namedGroups = getNamedGroupsFromMatcher(matcher);
-        for (Map.Entry<String, Integer> namedGroup : namedGroups.entrySet()) {
-            namedCapturesNode.put(namedGroup.getKey(), matcher.group(namedGroup.getValue()));
-        }
-
-        regexMatch.set("namedCaptures", namedCapturesNode);
-
-        return UjsonUtil.jsonObjectValueOf(regexMatch.toString());
+        return UjsonUtil.jsonObjectValueOf(getRegexMatch(matcher).toString());
     }
 
-    private static ObjectNode scan(String expr, String str) throws RegexException {
+    private static ArrayNode scan(String expr, String str) throws RegexException {
         Pattern pattern = Pattern.compile(expr);
         Matcher matcher = pattern.matcher(str);
 
+        return scan(matcher);
+    }
+
+    private static ArrayNode scan(Matcher matcher) throws RegexException {
         boolean hasMatch = matcher.find();
         if (!hasMatch) {
             return null;
         }
 
         ObjectMapper mapper = new ObjectMapper();
-        ObjectNode regexMatch = mapper.createObjectNode();
-        regexMatch.put("string", str);
-
-        ArrayNode capturesNode = mapper.createArrayNode();
-        ArrayNode namedCapturesNode = mapper.createArrayNode();
+        ArrayNode matchesNode = mapper.createArrayNode();
 
         do {
-            ArrayNode nextFindNode = capturesNode.addArray();
-            for (int i = 1; i <= matcher.groupCount(); i++) {
-                nextFindNode.add(matcher.group(i));
-            }
-
-            Map<String, Integer> namedGroups = getNamedGroupsFromMatcher(matcher);
-            if (!namedGroups.isEmpty()) {
-                ObjectNode nextCaptureGroup = namedCapturesNode.addObject();
-                for (Map.Entry<String, Integer> namedGroup : namedGroups.entrySet()) {
-                    nextCaptureGroup.put(namedGroup.getKey(), matcher.group(namedGroup.getValue()));
-                }
-            }
+            matchesNode.add(getRegexMatch(matcher));
         } while (matcher.find());
+
+        return matchesNode;
+    }
+
+    private static ObjectNode getRegexMatch(Matcher matcher) throws RegexException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        ObjectNode regexMatch = mapper.createObjectNode();
+        regexMatch.put("string", matcher.group());
+
+        ArrayNode capturesNode = mapper.createArrayNode();
+        ObjectNode namedCapturesNode = mapper.createObjectNode();
+
+        for (int i = 1; i <= matcher.groupCount(); i++) {
+            capturesNode.add(matcher.group(i));
+        }
+
+        Map<String, Integer> namedGroups = getNamedGroupsFromMatcher(matcher);
+        if (!namedGroups.isEmpty()) {
+            for (Map.Entry<String, Integer> namedGroup : namedGroups.entrySet()) {
+                namedCapturesNode.put(namedGroup.getKey(), matcher.group(namedGroup.getValue()));
+            }
+        }
 
         regexMatch.set("captures", capturesNode);
         regexMatch.set("namedCaptures", namedCapturesNode);
 
         return regexMatch;
     }
-
     private static Map<String, Integer> getNamedGroupsFromMatcher(Matcher matcher) throws RegexException {
         try {
             Field namedGroupsMapField = Matcher.class.getDeclaredField("namedGroups");

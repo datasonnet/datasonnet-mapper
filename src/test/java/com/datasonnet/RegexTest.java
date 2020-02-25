@@ -44,11 +44,11 @@ public class RegexTest {
                 new String[] { "DS.Regex.regexFullMatch(@'h.*o', 'hello')", "{\"string\":\"hello\",\"captures\":[],\"namedCaptures\":{}\n}"},
                 new String[] { "DS.Regex.regexFullMatch(@'h(.*)o', 'hello')", "{\"captures\":[\"ell\"],\"namedCaptures\":{},\"string\":\"hello\"}"},
                 new String[] { "DS.Regex.regexFullMatch(@'h(?P<mid>.*)o', 'hello')", "{\"captures\":[\"ell\"],\"namedCaptures\":{\"mid\":\"ell\"},\"string\":\"hello\"}"},
-                new String[] { "DS.Regex.regexPartialMatch(@'e', 'hello')", "{\"string\":\"hello\",\"captures\":[],\"namedCaptures\":{}\n}"},
-                new String[] { "DS.Regex.regexPartialMatch(@'e(.*)o', 'hello')", "{\"captures\":[\"ll\"],\"namedCaptures\":{},\"string\":\"hello\"}"},
-                new String[] { "DS.Regex.regexPartialMatch(@'e(?P<mid>.*)o', 'hello')", "{\"captures\":[\"ll\"],\"namedCaptures\":{\"mid\":\"ll\"},\"string\":\"hello\"}"},
+                new String[] { "DS.Regex.regexPartialMatch(@'e', 'hello')", "{\"string\":\"e\",\"captures\":[],\"namedCaptures\":{}\n}"},
+                new String[] { "DS.Regex.regexPartialMatch(@'e(.*)o', 'hello')", "{\"captures\":[\"ll\"],\"namedCaptures\":{},\"string\":\"ello\"}"},
+                new String[] { "DS.Regex.regexPartialMatch(@'e(?P<mid>.*)o', 'hello')", "{\"captures\":[\"ll\"],\"namedCaptures\":{\"mid\":\"ll\"},\"string\":\"ello\"}"},
                 new String[] { "DS.Regex.regexScan(@'(?P<user>[a-z]*)@(?P<domain>[a-z]*).org', 'modus@datasonnet.org,box@datasonnet.org')",
-                        "{\n\"string\":\"modus@datasonnet.org,box@datasonnet.org\",\n\"captures\":[[\"modus\",\"datasonnet\"],[\"box\",\"datasonnet\"]],\n\"namedCaptures\":[{\n\"domain\":\"datasonnet\",\n\"user\":\"modus\"\n},{\n\"domain\":\"datasonnet\",\n\"user\":\"box\"\n}]\n}\n"}
+                        "[{\"captures\":[\"modus\",\"datasonnet\"],\"namedCaptures\":{\"domain\":\"datasonnet\",\"user\":\"modus\"},\"string\":\"modus@datasonnet.org\"},{\"captures\":[\"box\",\"datasonnet\"],\"namedCaptures\":{\"domain\":\"datasonnet\",\"user\":\"box\"},\"string\":\"box@datasonnet.org\"}]"}
         );
     }
 
@@ -71,4 +71,5 @@ public class RegexTest {
         String result = mapper.transform("{}");
         assertEquals("\"xxx4yyy16zzz36aaa\"", result);
     }
+
 }

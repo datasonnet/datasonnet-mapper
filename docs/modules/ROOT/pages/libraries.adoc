@@ -785,8 +785,9 @@ DS.Util.mapToObject(payload, function(x) x.language.name, function(v) v.language
 ## Regex
 
 ### `regexFullMatch(string pattern, string input)`
-Matches the entire input against the pattern (anchored start and end). If there's no match, returns `null`. If there's a match, returns a JSON object which has the following structure.
-- `string` - the original input string;
+Matches the entire input against the pattern (anchored start and end). If there's no match, returns `null`. If there's a match, returns a JSON object which has the following structure:
+
+- `string` - the matched string;
 - `captures` - array of captured subgroups in the match, if any;
 - `namedCaptures` - map of named subgroups, if any;
 
@@ -810,8 +811,9 @@ DS.Regex.regexFullMatch(@'h(?P<mid>.*)o', 'hello');
 ------------------------
 
 ### `regexPartialMatch(string pattern, string input)`
-Matches the input against the pattern (unanchored). If there's no match, returns `null`. If there's a match, returns a JSON object which has the following structure.
-- `string` - the original input string;
+Matches the input against the pattern (unanchored). If there's no match, returns `null`. If there's a match, returns a JSON object which has the following structure:
+
+- `string` - the matched string;
 - `captures` - array of captured subgroups in the match, if any;
 - `namedCaptures` - map of named subgroups, if any;
 
@@ -830,15 +832,16 @@ DS.Regex.regexPartialMatch(@'e(?P<mid>.*)o', 'hello')
   "namedCaptures": {
     "mid": "ll"
   },
-  "string": "hello"
+  "string": "ello"
 }
 ------------------------
 
 ### `regexScan(string pattern, string input)`
-Finds all matches of the input against the pattern. If there are any matches, returns a JSON object which has the following structure.
-- `string` - the original input string;
-- `captures` - array of arrays of captured subgroups per find, if any;
-- `namedCaptures` - array of maps of named subgroups, if any;
+Finds all matches of the input against the pattern. If there are any matches, returns an array of JSON objects which have the following structure:
+
+- `string` - the matched string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
 
 *Example*
 
@@ -848,17 +851,30 @@ DS.Regex.regexScan(@'(?P<user>[a-z]*)@(?P<domain>[a-z]*).org', 'modus@datasonnet
 ------------------------
 .Result
 ------------------------
-{
-  "string" : "modus@datasonnet.org,box@datasonnet.org",
-  "captures" : [ [ "modus", "datasonnet" ], [ "box", "datasonnet" ] ],
-  "namedCaptures" : [ {
-    "domain" : "datasonnet",
-    "user" : "modus"
-  }, {
-    "domain" : "datasonnet",
-    "user" : "box"
-  } ]
-}
+[
+    {
+        "captures": [
+            "modus",
+            "datasonnet"
+        ],
+        "namedCaptures": {
+            "domain": "datasonnet",
+            "user": "modus"
+        },
+        "string": "modus@datasonnet.org"
+    },
+    {
+        "captures": [
+            "box",
+            "datasonnet"
+        ],
+        "namedCaptures": {
+            "domain": "datasonnet",
+            "user": "box"
+        },
+        "string": "box@datasonnet.org"
+    }
+]
 ------------------------
 
 ### `regexQuoteMeta(string str)`
@@ -904,13 +920,17 @@ DS.Regex.regexGlobalReplace('wishyfishyisishy', @'ish', 'and')
 ------------------------
 
 ### `regexGlobalReplace(string str, string pattern, function replacement)`
-Returns the input with all matches replaced by the result of the `replacement` function. The function must take string argument and return string result.
+Returns the input with all matches replaced by the result of the `replacement` function. The function must return string result and take a single object as an argument in the following structure:
+
+- `string` - the matched string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
 
 *Example*
 
 .DataSonnet map:
 ------------------------
-local square(str) = std.toString(std.pow(std.parseInt(str), 2));
+local square(obj) = std.toString(std.pow(std.parseInt(obj.string), 2));
 
 DS.Regex.regexGlobalReplace("xxx2yyy4zzz6aaa", "\\d", square)
 ------------------------
