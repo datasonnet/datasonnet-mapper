@@ -2,12 +2,13 @@ package com.datasonnet
 
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, Period, ZoneId, ZoneOffset}
+import java.util.function.Function
 
 import com.datasonnet
 import com.datasonnet.spi.{DataFormatPlugin, DataFormatService, UnsupportedMimeTypeException, UnsupportedParameterException}
 import com.datasonnet.wrap.Library.{builtin, builtin0, library}
 import sjsonnet.Std.builtinWithDefaults
-import sjsonnet.{EvalScope, Expr, Materializer, Val}
+import sjsonnet.{Applyer, Error, EvalScope, Expr, Materializer, Val}
 
 import scala.util.Failure
 
@@ -158,9 +159,27 @@ object PortX {
         (ev, fs, str: String, pattern: String, replace: String) =>
           Regex.regexReplace(str, pattern, replace)
       },
-      builtin("regexGlobalReplace", "str", "pattern", "replace") {
-        (ev, fs, str: String, pattern: String, replace: String) =>
-          Regex.regexGlobalReplace(str, pattern, replace)
+      builtinWithDefaults("regexGlobalReplace", "str" -> None, "pattern" -> None, "replace" -> None) { (args, ev) =>
+        val replace = args("replace")
+        val str = args("str").asInstanceOf[Val.Str].value
+        val pattern = args("pattern").asInstanceOf[Val.Str].value
+
+        replace match {
+          case replaceStr: Val.Str => Regex.regexGlobalReplace(str, pattern, replaceStr.value)
+          case replaceF: Val.Func => {
+            val func = new Function[String, String] {
+              override def apply(t: String): String = {
+                Applyer(replaceF, ev, null).apply(Val.Lazy(Val.Str(t))) match {
+                  case resultStr: Val.Str => resultStr.value
+                  case _  => throw new Error.Delegate("The result of the replacement function must be a String")
+                }
+              }
+            }
+            Regex.regexGlobalReplace(str, pattern, func)
+          }
+
+          case _ => throw new Error.Delegate("'replace' parameter must be either String or Function")
+        }
       },
     )
 

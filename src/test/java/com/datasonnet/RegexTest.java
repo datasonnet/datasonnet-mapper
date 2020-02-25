@@ -1,5 +1,6 @@
 package com.datasonnet;
 
+import com.datasonnet.util.TestResourceReader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -12,7 +13,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.skyscreamer.jsonassert.JSONAssert;
 import ujson.Value;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -59,5 +62,13 @@ public class RegexTest {
                 new String[] { "DS.Regex.regexGlobalReplace('wishyfishyisishy', @'ish', 'and')", "\"wandyfandyisandy\""},
                 new String[] { "DS.Regex.regexGlobalReplace('yabba dabba doo', @'b+', 'd')", "\"yada dada doo\""}
         );
+    }
+
+    @Test
+    void testRegexGlobalReplaceWithFunction() throws Exception {
+        String jsonnet = TestResourceReader.readFileAsString("regexGlobalReplaceWithFunction.ds");
+        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), Collections.emptyMap(), true);
+        String result = mapper.transform("{}");
+        assertEquals("\"xxx4yyy16zzz36aaa\"", result);
     }
 }

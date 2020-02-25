@@ -905,3 +905,19 @@ DS.Regex.regexGlobalReplace('wishyfishyisishy', @'ish', 'and')
 "wandyfandyisandy"
 ------------------------
 
+### `regexGlobalReplace(string str, string pattern, function replacement)`
+Returns the input with all matches replaced by the result of the `replacement` function. The function must take string argument and return string result.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+local square(str) = std.toString(std.pow(std.parseInt(str), 2));
+
+DS.Regex.regexGlobalReplace("xxx2yyy4zzz6aaa", "\\d", square)
+------------------------
+.Result
+------------------------
+"xxx4yyy16zzz36aaa"
+------------------------
+
