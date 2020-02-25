@@ -5,7 +5,7 @@ import com.datasonnet.Mapper;
 import picocli.CommandLine;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(
@@ -26,7 +26,7 @@ public class Validate implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        Mapper mapper = new Mapper(Main.readFile(datasonnet), new ArrayList<>(), !includesFunction);
+        Mapper mapper = new Mapper(Main.readFile(datasonnet), Collections.emptyList(), !includesFunction);
         System.out.println("Validates!");
         return null;
     }

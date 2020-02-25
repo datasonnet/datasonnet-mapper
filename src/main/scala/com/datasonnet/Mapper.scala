@@ -1,7 +1,10 @@
 package com.datasonnet
 
-import java.io.{File, PrintWriter, StringWriter}
+import java.io.{PrintWriter, StringWriter}
+import java.util
+import java.util.Collections
 
+import com.datasonnet.header.Header
 import com.datasonnet.spi.DataFormatService
 import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
 import fastparse.{IndexedParserInput, Parsed}
@@ -13,7 +16,6 @@ import sjsonnet._
 import scala.collection.JavaConverters._
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
-import scala.util.chaining._
 
 
 case class StringDocument(contents: String, mimeType: String) extends Document
@@ -90,31 +92,42 @@ object Mapper {
     (name -> jsonnetLibrary)
   }
 
-  // TODO: will we require a header (or have a default header) on next release? I believe we should, as it is our last chance for a big required change, in which case
-  // the prepareForInput and prepareForOutput methods can be entirely removed!
-  // NOTE: this means there needs to be a match check between input and config, with JSON special cased as always allowed.
-  // this should be done by checking the plugin against the JSON plugin, as currently done.
-
-  def input(data: Document): Expr = {
-    // TODO once support for the header is integrated, if there is a header covering the input, call read.
-    // otherwise, call this method, which special cases the JSON plugin and treats every other identifier identically.
-    val json = DataFormatService.getInstance().prepareForInput(data)
-
-    Materializer.toExpr(json)
+  def input(name: String, data: Document, header: Header): Expr = {
+    val plugin = DataFormatService.getInstance().getPluginFor(data.mimeType)
+    if (plugin != null) {
+      val params = header.getInputParameters(name, data.mimeType)
+      checkParams(params, plugin.getReadParameters(), plugin.getPluginId)
+      val json = plugin.read(data.contents(), params.asInstanceOf[util.Map[String, AnyRef]])
+      Materializer.toExpr(json)
+    } else {
+      throw new IllegalArgumentException("The input mime type " + data.mimeType + " is not supported")
+    }
   }
 
-  def output(output: ujson.Value, mimeType: String): Document = {
-    // TODO once support for the header is integrated, if there is a header covering the output, call write.
-    // otherwise, call this method, which special cases the JSON plugin and treats every other identifier identically.
-    // NOTE: even if output is not specified, if a header is used, the default output provided should be JSON and any other must be provided explicitly.
-    val string = DataFormatService.getInstance().prepareForOutput(output, mimeType)
-    new StringDocument(string, mimeType)
+  def output(output: ujson.Value, mimeType: String, header: Header): Document = {
+    val plugin = DataFormatService.getInstance().getPluginFor(mimeType)
+    if (plugin != null) {
+      val params = header.getOutputParameters(mimeType)
+      checkParams(params, plugin.getWriteParameters(), plugin.getPluginId)
+      val str = plugin.write(output, params.asInstanceOf[util.Map[String, AnyRef]])
+      new StringDocument(str, mimeType)
+    } else {
+      throw new IllegalArgumentException("The output mime type " + mimeType + " is not supported")
+    }
   }
 
+  def checkParams(params: util.Map[_, _], supportedParams: util.Map[_, _], pluginId: String) = {
+    for (paramName <- params.keySet().toArray) {
+      if (!supportedParams.containsKey(paramName)) {
+        throw new IllegalArgumentException("The parameter '" + paramName + "' not supported by plugin " + pluginId)
+      }
+    }
+  }
 }
 
-
 class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imports: java.util.Map[String, String], needsWrapper: Boolean) {
+
+  var header = Header.parseHeader(jsonnet);
 
   if(needsWrapper) {
     jsonnet = Mapper.wrap(jsonnet, argumentNames.asScala)
@@ -123,7 +136,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   def lineOffset = if (needsWrapper) 1 else 0
 
   def this(jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) {
-    this(jsonnet, argumentNames, new java.util.HashMap[String, String](), needsWrapper)
+    this(jsonnet, argumentNames, Collections.emptyMap(), needsWrapper)
   }
 
   def importer(parent: Path, path: String): Option[(Path, String)] = for {
@@ -186,10 +199,10 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
 
   def transform(payload: Document, arguments: java.util.Map[String, Document], outputMimeType: String): Document = {
 
-    val data = Mapper.input(payload)
+    val data = Mapper.input("payload", payload, header)
 
-    val parsedArguments = arguments.asScala.view.mapValues { Mapper.input(_) }
-
+    //val parsedArguments = arguments.asScala.view.mapValues { Mapper.input(_, header) }
+    val parsedArguments = arguments.asScala.view.toMap[String, Document].map { case (name, data) => (name, Mapper.input(name, data, header)) }
 
     val first +: rest = function.params.args
 
@@ -213,6 +226,6 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
         throw new IllegalArgumentException("Problem executing map: " + Mapper.expandErrorLineNumber(s.toString, lineOffset).replace("\t", "    "))
     }
 
-    Mapper.output(materialized, outputMimeType)
+    Mapper.output(materialized, outputMimeType, header)
   }
 }

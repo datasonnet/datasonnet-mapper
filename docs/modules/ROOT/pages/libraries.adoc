@@ -606,8 +606,6 @@ Parses a string which contains a double number and returns its numeric represent
 ### `duplicates(array arr, function keyF=id, boolean set=true)`
 Returns an array containing duplicate elements from input array. An optional key function returns a value which will be used as a comparison key. If `set` parameter is set to true, only the first duplicate value will be included.
 
-WARNING: The parameter `keyF` is ignored. This is a known issue and will be resolved once the new version of the `sjsonnet` library is released. The below example will not work, for now `duplicates` can only work with primitive types.
-
 *Example*
 
 .Payload

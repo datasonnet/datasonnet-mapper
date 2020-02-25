@@ -2,7 +2,7 @@ package com.datasonnet;
 
 import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
-import org.junit.Before;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -11,8 +11,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.skyscreamer.jsonassert.JSONAssert;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 
 public class XMLReaderTest {
 
@@ -30,11 +29,11 @@ public class XMLReaderTest {
     void testOverrideNamespaces() throws Exception {
         String xml = "<a xmlns='http://example.com/1' xmlns:b='http://example.com/2'><b:b/></a>";
         // note how b is bound to the default namespace, which means the 'b' above needs to be auto-rebound
-        //String jsonnet = "DS.Formats.readExt(payload, \"application/xml\", {NamespaceDeclarations: {b: \"http://example.com/1\"}})";
-        String jsonnet = "DS.Formats.read(payload, \"application/xml\", {NamespaceDeclarations: {b: \"http://example.com/1\"}})";
 
-        Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
-        String mapped = mapper.transform(new StringDocument(xml, "application/xml"), new HashMap<>(), "application/json").contents();
+        String jsonnet = "/** DataSonnet\nversion=1.0\ninput.payload.application/xml.NamespaceDeclarations.b=http://example.com/1\n*/\npayload";
+
+        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+        String mapped = mapper.transform(new StringDocument(xml, "application/xml"), Collections.emptyMap(), "application/json").contents();
 
         // the b namespace must have been remapped
         assertThat(mapped, not(containsString("b:b")));
@@ -44,7 +43,6 @@ public class XMLReaderTest {
         // must include both namespaces
         assertThat(mapped, containsString("http://example.com/1"));
         assertThat(mapped, containsString("http://example.com/2"));
-
     }
 
     @Test
@@ -53,8 +51,8 @@ public class XMLReaderTest {
         String jsonnet = TestResourceReader.readFileAsString("readXMLExtTest.ds");
         String expectedJson = TestResourceReader.readFileAsString("readXMLExtTest.json");
 
-        Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
-        String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), new HashMap<>(), "application/json").contents();
+        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+        String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), Collections.emptyMap(), "application/json").contents();
 
         JSONAssert.assertEquals(expectedJson, mappedJson, false);
     }
@@ -78,8 +76,9 @@ public class XMLReaderTest {
         String xmlData = TestResourceReader.readFileAsString(inputFileName);
         String expectedJson = TestResourceReader.readFileAsString(expectedFileName);
 
-        Mapper mapper = new Mapper("DS.Formats.read(payload, \"application/xml\")", new ArrayList<>(), true);
-        String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), new HashMap<>(), "application/json").contents();
+
+        Mapper mapper = new Mapper("payload", Collections.emptyList(), true);
+        String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), Collections.emptyMap(), "application/json").contents();
 
         JSONAssert.assertEquals(expectedJson, mappedJson, false);
     }

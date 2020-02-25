@@ -4,15 +4,25 @@
 
 ## Generic Read and Write Functions
 
-The `Formats` library contains `read`, and `write` functions for input and output of other data formats, e.g. XML or CSV. The XML and CSV plugins are built into the standard DataSonnet distributions while other formats can be supported by implementing `DataFormatPlugin` interface.
+The `Formats` library contains `read`, and `write` functions for serializing and deserializing data in other formats, e.g. XML or CSV. The XML and CSV plugins are built into the standard DataSonnet distributions while other formats can be supported by implementing `DataFormatPlugin` interface.
 
-### `read(string xml, string inputMimeType, object params={})`
+These functions can be used if the data contains embedded data in other formats, for example:
+
+-----------------------
+{
+    "embeddedXMLValue": "<test>Hello</test>"
+}
+-----------------------
+
+If the payload or variable itself is in the format other than JSON, it will be automatically detected by the DataSonnet, therefore using the `read` will cause an error. The input and output of payload and variables is controlled by xref:headers.adoc[the headers].
+
+### `read(string input, string inputMimeType, object params={})`
 
 Reads input data in the specified mime type and accepts additional parameters which override default plugin behavior. The list and format of parameters is specific to a plugin implementation.
 
 *Example*
 ------------------------
-DS.Formats.read(payload, "application/xml")
+DS.Formats.read(payload.embeddedXMLValue, "application/xml")
 ------------------------
 *Example*
 ------------------------
@@ -25,7 +35,7 @@ local params = {
     "AttributeCharacter": "*"
 };
 
-DS.Formats.read(payload, "application/xml", params);
+DS.Formats.read(payload.embeddedXMLValue, "application/xml", params);
 ------------------------
 
 ### `write(string output, string outputMimeType, object params={})`
@@ -34,7 +44,7 @@ Outputs the data into specified data format and accepts additional parameters wh
 
 *Example*
 ------------------------
-DS.Formats.write(payload, "application/csv")
+DS.Formats.write(payload.embeddedXMLValue, "application/xml")
 ------------------------
 
 *Example*
@@ -50,7 +60,7 @@ local params = {
     "AutoEmptyElements": false
 };
 
-DS.Formats.write(payload, "application/xml", params);
+DS.Formats.write(payload.someObj, "application/xml", params);
 ------------------------
 
 ## XML Format
@@ -73,7 +83,7 @@ Converts input XML string to a JSON object using http://wiki.open311.org/JSON_an
 
 *Example*
 
-.Payload
+.Embedded XML value
 ------------------------
 <?xml version="1.0" encoding="UTF-8"?>
 <test:root xmlns:test="http://www.modusbox.com">
@@ -82,7 +92,7 @@ Converts input XML string to a JSON object using http://wiki.open311.org/JSON_an
 ------------------------
 .DataSonnet map:
 ------------------------
-DS.Formats.read(payload, "application/xml")
+DS.Formats.read(payload.embeddedXMLValue, "application/xml")
 ------------------------
 .Result
 ------------------------
@@ -101,16 +111,49 @@ DS.Formats.read(payload, "application/xml")
 
 Providing an optional `params` object allows for additional control over JSON generation. The `params` is a JSON object where following properties can be set:
 
-* `NamespaceSeparator` - replaces default `:` separator between the prefix and the local name
-* `TextValueKey` - replaces default `$` as a key prefix for the text value property
-* `CdataValueKey` - replaces default `#` as a key prefix for the CDATA value property
-* `AttributeCharacter` - replaces `@` as a property key prefix which designates an XML element attribute
-* `NamespaceDeclarations` - a JSON object with a map of internal prefixes to the namespaces
-* `RootElement` - if set, the output will be wrapped in a root element with the given name
+
+[%header, cols=3*a]
+|===
+|Parameter
+|Description
+|Default value
+
+|`NamespaceSeparator`
+| Separator between the prefix and the local name
+| `:`
+
+|`TextValueKey`
+|Key prefix for the text value property
+|`$`
+
+|`CdataValueKey`
+|Key prefix for the CDATA value property
+|`#`
+
+|`AttributeCharacter`
+|Property key prefix which designates an XML element attribute
+|`@`
+
+|`NamespaceDeclarations`
+|Map of internal prefixes to the namespaces which overrides namespaces declarations in the input. Multiple values are allowed, for example:
+
+```
+"NamespaceDeclarations" : {
+    "datasonnet" : "http://www.datasonnet.com",
+    "test" : "urn:com.foo.bar",
+    "": "http://www.modusbox.com"
+}
+```
+|
+
+|`RootElement`
+|if set, the output will be wrapped in a root element with the given name
+|
+|===
 
 *Example*
 
-.Payload
+.Embedded XML value
 ------------------------
 <?xml version="1.0" encoding="UTF-8"?>
 <test:root xmlns:test="http://www.modusbox.com">
@@ -128,7 +171,7 @@ local params = {
     "AttributeCharacter": "*"
 };
 
-DS.Formats.read(payload, "application/xml", params);
+DS.Formats.read(payload.embeddedXMLValue, "application/xml", params);
 ------------------------
 .Result
 ------------------------
@@ -148,6 +191,46 @@ DS.Formats.read(payload, "application/xml", params);
 ### `write`
 Converts the input JSON object into XML using the Badgerfish convention.
 
+[IMPORTANT]
+====
+
+The input JSON must have a single key which will be mapped to the root element of the resulting XML.
+
+.Correct:
+[subs="quotes"]
+------------------
+{
+  *"person"*: {
+    "firstName": "John",
+    "lastName": "Doe",
+    "title": "Rookie DataSonnet mapper"
+  }
+}
+------------------
+
+.Incorrect:
+------------------
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "title": "Rookie DataSonnet mapper"
+}
+------------------
+.Incorrect:
+------------------
+{
+  "person": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "title": "Rookie DataSonnet mapper"
+  },
+  "anotherKey": "anotherValue"
+}
+------------------
+====
+
+*Example*
+
 .Payload
 ------------------------
 {
@@ -164,23 +247,46 @@ Converts the input JSON object into XML using the Badgerfish convention.
 ------------------------
 .DataSonnet map:
 ------------------------
-DS.Formats.write(payload, "application/xml")
+{
+    embeddedXMLValue: DS.Formats.write(payload, "application/xml")
+}
 ------------------------
 .Result
 ------------------------
-<?xml version="1.0" encoding="UTF-8"?>
-<test:root xmlns:test="http://www.modusbox.com">
-    <test:datasonnet version="1.0">Hello World</test:datasonnet>
-</test:root>
+{
+    "embeddedXMLValue": "<?xml version=\"1.0\" encoding=\"UTF-8\"?> <test:root xmlns:test=\"http://www.modusbox.com\"> <test:datasonnet version=\"1.0\">Hello World</test:datasonnet> </test:root>"
+}
 ------------------------
 
 Providing a `params` object allows for more control over generated XML. In addition to the parameters described in the `read` section, the following XML output-only parameters are supported:
 
-* `XmlVersion` - overrides the default XML version 1.0
-* `Encoding` - overrides the default `UTF-8` encoding
-* `AutoEmptyElements` - if set to `true`, empty elements are mapped to self-closing tags. If set to `false`, start- and end tags are generated.
-* `NullAsEmptyElement` - if set to `true`, element with null value is treated as empty element. Otherwise null values are skipped.
-* `OmitXmlDeclaration` - if set to `true`, XML declaration is not written in the resulting output.
+[%header, cols=3*a]
+|===
+|Parameter
+|Description
+|Default value
+
+|`XmlVersion`
+|XML version in the XML declaration
+|1.0
+
+|`Encoding`
+|XML encoding
+|`UTF-8`
+
+|`AutoEmptyElements`
+| If set to `true`, empty elements are mapped to self-closing tags. If set to `false`, start- and end tags are generated.
+|`true`
+
+|`NullAsEmptyElement`
+|If set to `true`, element with null value is treated as empty element. Otherwise null values are skipped.
+|`true`
+
+|`OmitXmlDeclaration`
+|If set to `true`, XML declaration is not written in the resulting output.
+|`false`
+
+|===
 
 .Payload
 ------------------------
@@ -210,26 +316,25 @@ local params = {
     "AutoEmptyElements": false
 };
 
-DS.Formats.write(payload, "application/xml", params);
+{
+    embeddedXMLValue: DS.Formats.write(payload, "application/xml")
+}
 ------------------------
 .Result
 ------------------------
-<?xml version="1.1" encoding="UTF-8"?>
-<datasonnet:root xmlns:test="http://www.modusbox.com">
-    <datasonnet:datasonnet version="1.0">Hello World</datasonnet:datasonnet>
-    <datasonnet:empty/>
-</datasonnet:root>
+{
+    "embeddedXMLValue": "<?xml version=\"1.1\" encoding=\"UTF-8\"?> <datasonnet:root xmlns:test=\"http://www.modusbox.com\"> <datasonnet:datasonnet version=\"1.0\">Hello World</datasonnet:datasonnet> <datasonnet:empty/> </datasonnet:root>"
 ------------------------
 
 ## CSV Format
 
 ### `read`
 
-Parses the CSV and converts it to a JSON array of objects. It expects the CSV payload to be in a default format, with first row as column headers, comma separator, double quote, backslash escape character and `\n` newline character. CSV headers are used as keys for the corresponding JSON object values.
+Parses the CSV and converts it to a JSON array of objects. It expects the CSV input to be in a default format, with first row as column headers, comma separator, double quote, backslash escape character and `\n` newline character. CSV headers are used as keys for the corresponding JSON object values.
 
 *Example*
 
-.Payload
+.Embedded CSV value
 ------------------------
 "First Name","Last Name",Phone
 William,Shakespeare,"(123)456-7890"
@@ -238,7 +343,7 @@ Christopher,Marlow,"(987)654-3210"
 .DataSonnet map:
 ------------------------
 {
-    local csvInput = DS.Formats.read(payload, "application/csv");
+    local csvInput = DS.Formats.read(payload.embeddedCSVValue, "application/csv");
 
     {
         name: csvInput[0]["First Name"] + " " + csvInput[0]["Last Name"]
@@ -254,15 +359,36 @@ Christopher,Marlow,"(987)654-3210"
 
 Providing an optional `params` object allows more control over the format of the input CSV. The `params` is a JSON object where following properties can be set:
 
-* `UseHeader` - if set to `true`, the first row of CSV will be interpreted as a list of column headers and will map to the JSON object property names
-* `Quote` - specifies the quote character
-* `Separator` - CSV separator character
-* `Escape` - CSV escape character
-* `NewLine` - new line character combination
+[%header, cols=3*a]
+|===
+|Parameter
+|Description
+|Default value
+
+|`UseHeader`
+|If set to `true`, the first row of CSV will be interpreted as a list of column headers and will map to the JSON object property names
+|`true`
+
+|`Quote`
+|specifies the quote character
+|`"`
+
+|`Separator`
+|CSV separator character
+|`,`
+
+|`Escape`
+|CSV escape character
+|`\\`
+
+|`NewLine`
+|New line character combination
+|`\n`
+|===
 
 *Example*
 
-.Payload
+.Embedded CSV value
 ------------------------
 'William'|'Shakespeare'|'(123)456-7890'
 'Christopher'|'Marlow'|'(987)654-3210'
@@ -277,7 +403,7 @@ local params = {
     "NewLine": "\n"
 };
 
-local csvInput = DS.Formats.read(payload, "application/csv", params);
+local csvInput = DS.Formats.read(payload.embeddedCSVValue, "application/csv", params);
 
 {
     name: csvInput[0][0] + " " + csvInput[0][1]
@@ -313,13 +439,15 @@ Creates a CSV out of an array of JSON objects, using default quote, separator, e
 ------------------------
 .DataSonnet map:
 ------------------------
-DS.Formats.write(payload, "application/csv")
+{
+    embeddedCSVValue: DS.Formats.write(payload, "application/csv")
+}
 ------------------------
 .Result
 ------------------------
-"First Name","Last Name",Phone
-William,Shakespeare,"(123)456-7890"
-Christopher,Marlow,"(987)654-3210"
+{
+    "embeddedCSVValue": "\"First Name\",\"Last Name\",Phone\nWilliam,Shakespeare,\"(123)456-7890\"\nChristopher,Marlow,\"(987)654-3210\"\n"
+}
 ------------------------
 
 Providing an optional `params` object allows for more control over the format of the output CSV. Quote, separator, escape and new line characters can be specified, CSV can be created without headers - in this case the input can be an array of arrays. In addition, a list of columns can be specified to override the JSON object names. In addition to the parameters described in the `read` section, the following CSV output-only parameters are supported:
@@ -352,12 +480,17 @@ local params = {
     "Escape": "\\",
     "NewLine": "\n"
 };
-DS.Formats.write(payload, "application/csv", params)
+
+{
+    embeddedCSVValue: DS.Formats.write(payload, "application/csv", params)
+}
 ------------------------
 .Result
 ------------------------
-'William'|'Shakespeare'|'(123)456-7890'
-'Christopher'|'Marlow'|'(987)654-3210'
+
+{
+    "embeddedCSVValue": "'William'|'Shakespeare'|'(123)456-7890'\n'Christopher'|'Marlow'|'(987)654-3210'\n"
+}
 ------------------------
 
 

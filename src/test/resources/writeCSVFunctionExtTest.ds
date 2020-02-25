@@ -1,0 +1,11 @@
+local params = {
+    "UseHeader": false,
+    "Quote": "'",
+    "Separator": "|",
+    "Escape": "\\",
+    "NewLine": "\n"
+};
+
+{
+    embeddedCSVValue: DS.Formats.write(payload, "application/csv", params)
+}

@@ -6,9 +6,12 @@ import java.util.function.Function
 
 import com.datasonnet
 import com.datasonnet.spi.{DataFormatPlugin, DataFormatService, UnsupportedMimeTypeException, UnsupportedParameterException}
-import com.datasonnet.wrap.Library.{builtin, builtin0, library}
+
 import sjsonnet.Std.builtinWithDefaults
 import sjsonnet.{Applyer, Error, EvalScope, Expr, Materializer, Val}
+import com.datasonnet.wrap.Library.library
+import sjsonnet.ReadWriter.StringRead
+import sjsonnet.Std._
 
 import scala.util.Failure
 
@@ -32,8 +35,14 @@ object PortX {
           datetimeObj.format(DateTimeFormatter.ofPattern(outputFormat))
       },
 
-      builtin("compare", "datetime1", "format1", "datetime2", "format2") {
-        (ev, fs, datetime1: String, format1: String, datetime2: String, format2: String) =>
+      builtin0("compare", "datetime1", "format1", "datetime2", "format2") {
+        (vals, ev, fs) =>
+          val strValSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead, StringRead))
+          val datetime1 = strValSeq(0).asInstanceOf[String]
+          val format1 = strValSeq(1).asInstanceOf[String]
+          val datetime2 = strValSeq(2).asInstanceOf[String]
+          val format2 = strValSeq(3).asInstanceOf[String]
+
           val datetimeObj1 = java.time.ZonedDateTime.parse(datetime1, DateTimeFormatter.ofPattern(format1))
           val datetimeObj2 = java.time.ZonedDateTime.parse(datetime2, DateTimeFormatter.ofPattern(format2))
           datetimeObj1.compareTo(datetimeObj2)
@@ -68,9 +77,9 @@ object PortX {
                           "data" -> None,
                           "mimeType" -> None,
                           "params" -> Some(Expr.Null(0))) { (args, ev) =>
-        val data = args("data").asInstanceOf[Val.Str].value
-        val mimeType = args("mimeType").asInstanceOf[Val.Str].value
-        val params = if (args("params") == Val.Null) null else args("params").asInstanceOf[Val.Obj]
+        val data = args("data").cast[Val.Str].value
+        val mimeType = args("mimeType").cast[Val.Str].value
+        val params = if (args("params") == Val.Null) null else args("params").cast[Val.Obj]
         read(data, mimeType, params, ev)
       },
       builtinWithDefaults("write",
@@ -78,8 +87,8 @@ object PortX {
         "mimeType" -> None,
         "params" -> Some(Expr.Null(0))) { (args, ev) =>
         val data = args("data")
-        val mimeType = args("mimeType").asInstanceOf[Val.Str].value
-        val params = if (args("params") == Val.Null) null else args("params").asInstanceOf[Val.Obj]
+        val mimeType = args("mimeType").cast[Val.Str].value
+        val params = if (args("params") == Val.Null) null else args("params").cast[Val.Obj]
         write(data, mimeType, params, ev)
       },
 
@@ -104,8 +113,14 @@ object PortX {
           datetimeObj.format(DateTimeFormatter.ofPattern(outputFormat))
       },
 
-      builtin("compare", "datetime1", "format1", "datetime2", "format2") {
-        (ev, fs, datetime1: String, format1: String, datetime2: String, format2: String) =>
+      builtin0("compare", "datetime1", "format1", "datetime2", "format2") {
+        (vals, ev, fs) =>
+          val strValSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead, StringRead))
+          val datetime1 = strValSeq(0).asInstanceOf[String]
+          val format1 = strValSeq(1).asInstanceOf[String]
+          val datetime2 = strValSeq(2).asInstanceOf[String]
+          val format2 = strValSeq(3).asInstanceOf[String]
+
           val datetimeObj1 = java.time.LocalDateTime.parse(datetime1, DateTimeFormatter.ofPattern(format1))
           val datetimeObj2 = java.time.LocalDateTime.parse(datetime2, DateTimeFormatter.ofPattern(format2))
           datetimeObj1.compareTo(datetimeObj2)

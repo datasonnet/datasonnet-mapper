@@ -1,0 +1,6 @@
+/** DataSonnet
+version=1.0
+output.application/xml.AutoEmptyElements=true
+output.application/xml.NullAsEmptyElement=true
+*/
+payload

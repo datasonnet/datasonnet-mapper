@@ -3,15 +3,20 @@ package com.datasonnet;
 import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import com.datasonnet.Mapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CSVReaderTest {
+
+    @BeforeAll
+    static void registerPlugins() throws Exception {
+        DataFormatService.getInstance().findAndRegisterPlugins();
+    }
 
     @Test
     void testCSVReader() throws URISyntaxException, IOException {
@@ -20,10 +25,8 @@ public class CSVReaderTest {
                 "application/csv"
         );
 
-        DataFormatService.getInstance().findAndRegisterPlugins();
-
-        Mapper mapper = new Mapper("local csvInput = DS.Formats.read(payload, \"application/csv\"); { fName: csvInput[0][\"First Name\"] }", new ArrayList<>(), true);
-        Document mapped = mapper.transform(data, new HashMap<>(), "application/json");
+        Mapper mapper = new Mapper("{ fName: payload[0][\"First Name\"] }", Collections.emptyList(), true);
+        Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
 
         assertEquals("{\"fName\":\"Eugene\"}", mapped.contents());
     }
@@ -36,10 +39,8 @@ public class CSVReaderTest {
         );
         String jsonnet = TestResourceReader.readFileAsString("readCSVExtTest.ds");
 
-        DataFormatService.getInstance().findAndRegisterPlugins();
-
-        Mapper mapper = new Mapper(jsonnet, new ArrayList<>(), true);
-        Document mapped = mapper.transform(data, new HashMap<>(), "application/json");
+        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+        Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
 
         assertEquals("{\"fName\":\"Eugene\",\"num\":\"234\"}", mapped.contents());
     }

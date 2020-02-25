@@ -10,6 +10,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import ujson.Value;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         ObjectMapper mapper = new ObjectMapper();
         CsvSchema.Builder builder = this.getBuilder(params);
 
-        boolean useHeader = params != null && params.get(USE_HEADER) != null ? (Boolean)params.get(USE_HEADER) : true;
+        boolean useHeader = params != null && params.get(USE_HEADER) != null ? new Boolean(params.get(USE_HEADER).toString()) : true;
 
         CsvSchema csvSchema = builder.build();
         CsvMapper csvMapper = new CsvMapper();
@@ -51,7 +52,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         CsvSchema.Builder builder = this.getBuilder(params);
 
         JsonNode jsonTree = new ObjectMapper().readTree(UjsonUtil.jsonObjectValueTo(input));
-        boolean useHeader = params != null && params.get(USE_HEADER) != null ? (Boolean)params.get(USE_HEADER) : true;
+        boolean useHeader = params != null && params.get(USE_HEADER) != null ? new Boolean(params.get(USE_HEADER).toString()) : true;
 
         if (useHeader) {
             if (params != null && params.containsKey(HEADERS)) {
@@ -82,7 +83,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
     private CsvSchema.Builder getBuilder(Map<String, Object> params) {
         CsvSchema.Builder builder = CsvSchema.builder();
 
-        boolean useHeader = params != null && params.get(USE_HEADER) != null ? (Boolean)params.get(USE_HEADER) : true;
+        boolean useHeader = params != null && params.get(USE_HEADER) != null ? new Boolean(params.get(USE_HEADER).toString()) : true;
         builder.setUseHeader(useHeader);
 
         if (params != null) {
@@ -110,7 +111,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         readParams.put(SEPARATOR_CHAR, "CSV separator character");
         readParams.put(ESCAPE_CHAR, "CSV escape character");
         readParams.put(NEW_LINE, "New line character");
-        return readParams;
+        return Collections.unmodifiableMap(readParams);
     }
 
     @Override
