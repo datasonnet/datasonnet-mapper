@@ -28,7 +28,9 @@ public class Regex {
     }
 
     public static Value regexScan(String expr, String str) throws RegexException {
-        ArrayNode regexMatch = scan(expr, str);
+        Pattern pattern = Pattern.compile(expr);
+        Matcher matcher = pattern.matcher(str);
+        ArrayNode regexMatch = scan(matcher);
 
         return regexMatch != null ? UjsonUtil.jsonObjectValueOf(regexMatch.toString()) : Value.Null();
     }
@@ -73,13 +75,6 @@ public class Regex {
         }
 
         return UjsonUtil.jsonObjectValueOf(getRegexMatch(matcher).toString());
-    }
-
-    private static ArrayNode scan(String expr, String str) throws RegexException {
-        Pattern pattern = Pattern.compile(expr);
-        Matcher matcher = pattern.matcher(str);
-
-        return scan(matcher);
     }
 
     private static ArrayNode scan(Matcher matcher) throws RegexException {
