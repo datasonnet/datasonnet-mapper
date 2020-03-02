@@ -79,7 +79,7 @@ public class Run implements Callable<Void> {
         }
     }
 
-    private Map<String, Document> combinedArguments() throws IOException {
+    private Map<String, Document<?>> combinedArguments() throws IOException {
         return Collections.unmodifiableMap(new HashMap<String, Document<?>>() {{
             for(Map.Entry<String, String> entry : arguments.entrySet()) {
                 put(entry.getKey(), new StringDocument(entry.getValue(), "application/json"));

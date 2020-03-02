@@ -60,7 +60,7 @@ public class CSVWriterTest {
         Mapper mapper = new Mapper("{ embeddedCSVValue: DS.Formats.write(payload, \"application/csv\") }", Collections.emptyList(), true);
         Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
         String expected = "{\"embeddedCSVValue\":\"\\\"First Name\\\",\\\"Last Name\\\",Phone\\nWilliam,Shakespeare,\\\"(123)456-7890\\\"\\nChristopher,Marlow,\\\"(987)654-3210\\\"\\n\"}";
-        assertEquals(expected.trim(), mapped.contents().trim());
+        assertEquals(expected.trim(), mapped.getContents().toString().trim());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class CSVWriterTest {
         Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
         Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
         String expected = "{\"embeddedCSVValue\":\"'William'|'Shakespeare'|'(123)456-7890'\\n'Christopher'|'Marlow'|'(987)654-3210'\\n\"}";
-        assertEquals(expected.trim(), mapped.contents().trim());
+        assertEquals(expected.trim(), mapped.getContents().toString().trim());
     }
 
 }
