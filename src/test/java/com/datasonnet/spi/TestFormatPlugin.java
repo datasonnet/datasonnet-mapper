@@ -8,13 +8,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TestFormatPlugin implements DataFormatPlugin {
+public class TestFormatPlugin implements DataFormatPlugin<String> {
 
     public static String TEST_PARAM = "TestParam";
 
     @Override
-    public Value read(Object input, Map<String, Object> params) throws PluginException {
-        return UjsonUtil.stringValueOf("In 'read' Test Param Is " + params.get(TEST_PARAM));
+    public Value read(String input, Map<String, Object> params) throws PluginException {
+        return UjsonUtil.stringValueOf(params.get(TEST_PARAM).toString());
     }
 
     @Override

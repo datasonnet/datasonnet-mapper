@@ -11,12 +11,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class JSONFormatPlugin implements DataFormatPlugin {
+public class JSONFormatPlugin implements DataFormatPlugin<String> {
     public JSONFormatPlugin() { }
 
     @Override
-    public Value read(Object input, Map<String, Object> params) {
-        return UjsonUtil.jsonObjectValueOf(input.toString());
+    public Value read(String input, Map<String, Object> params) {
+        return UjsonUtil.jsonObjectValueOf(input);
     }
 
     @Override

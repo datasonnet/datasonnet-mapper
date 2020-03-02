@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JavaFormatPlugin implements DataFormatPlugin {
+public class JavaFormatPlugin implements DataFormatPlugin<Object> {
     public static String OUTPUT_CLASS = "OutputClass";
     public static String DATE_FORMAT = "DateFormat";
 

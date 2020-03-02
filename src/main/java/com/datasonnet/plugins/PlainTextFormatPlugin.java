@@ -17,12 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class PlainTextFormatPlugin implements DataFormatPlugin {
+public class PlainTextFormatPlugin implements DataFormatPlugin<String> {
     public PlainTextFormatPlugin() { }
 
     @Override
-    public Value read(Object input, Map<String, Object> params) {
-        return UjsonUtil.stringValueOf(input.toString());
+    public Value read(String input, Map<String, Object> params) {
+        return UjsonUtil.stringValueOf(input);
     }
 
     @Override

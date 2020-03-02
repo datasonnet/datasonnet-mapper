@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CSVFormatPlugin implements DataFormatPlugin {
+public class CSVFormatPlugin implements DataFormatPlugin<String> {
 
     public static String USE_HEADER = "UseHeader";
     public static String QUOTE_CHAR = "Quote";
@@ -32,7 +32,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
     }
 
     @Override
-    public Value read(Object input, Map<String, Object> params) throws PluginException {
+    public Value read(String input, Map<String, Object> params) throws PluginException {
 
         ObjectMapper mapper = new ObjectMapper();
         CsvSchema.Builder builder = this.getBuilder(params);
@@ -46,8 +46,8 @@ public class CSVFormatPlugin implements DataFormatPlugin {
 
         // Read data from CSV file
         try {
-            List readAll = useHeader ? csvMapper.readerFor(Map.class).with(csvSchema).readValues(input.toString()).readAll() :
-                    csvMapper.readerFor(List.class).with(csvSchema).readValues(input.toString()).readAll();
+            List readAll = useHeader ? csvMapper.readerFor(Map.class).with(csvSchema).readValues(input).readAll() :
+                    csvMapper.readerFor(List.class).with(csvSchema).readValues(input).readAll();
             String jsonStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(readAll);
             return UjsonUtil.jsonObjectValueOf(jsonStr);
         } catch (JsonProcessingException jpe) {

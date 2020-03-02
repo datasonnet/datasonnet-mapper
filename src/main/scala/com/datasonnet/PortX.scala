@@ -207,7 +207,11 @@ object PortX {
       throw new UnsupportedMimeTypeException("No suitable plugin found for mime type: " + mimeType)
     }
     val javaParams = if (params != null) toJavaParams(ev, params, plugin) else new java.util.HashMap[String, Object]()
-    Materializer.reverse(plugin.read(data, javaParams))
+    val method = plugin.getClass.getMethod("read", classOf[String], classOf[java.util.Map[String, Object]]);
+    System.err.println(method.getParameterTypes)
+    val json = method.invoke(plugin, data, javaParams)
+
+    Materializer.reverse(json.asInstanceOf[ujson.Value])
   }
 
   def write(json: Val, mimeType: String, params: Val.Obj, ev: EvalScope): String = {
@@ -219,7 +223,7 @@ object PortX {
     plugin.write(Materializer.apply(json)(ev), javaParams, mimeType).getContents.toString
   }
 
-  def toJavaParams(ev: EvalScope, params: Val.Obj, plugin: DataFormatPlugin): java.util.Map[String, Object] = {
+  def toJavaParams(ev: EvalScope, params: Val.Obj, plugin: DataFormatPlugin[_]): java.util.Map[String, Object] = {
 
     val scalaParams = ujson.read(Materializer.apply(params)(ev)).obj;
     val javaParams = new java.util.HashMap[String, Object]()

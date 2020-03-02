@@ -90,10 +90,16 @@ object Mapper {
   def input(name: String, data: Document[_], header: Header): Expr = {
     val plugin = DataFormatService.getInstance().getPluginFor(data.getMimeType)
     if (plugin != null) {
+      // okay, so let me see... we need to know what sort of data we've been given, then match it up to the plugin
+      // this is a little odd! After all, we already have mime type. But what really drives it is kinda orthogonal
+      // to mime type.
       val params = header.getInputParameters(name, data.getMimeType)
       checkParams(params, plugin.getReadParameters(), plugin.getPluginId)
-      val json = plugin.read(data.getContents(), params.asInstanceOf[util.Map[String, AnyRef]])
-      Materializer.toExpr(json)
+      val method = plugin.getClass.getMethod("read", classOf[String], classOf[util.Map[String, Object]]);
+      System.err.println(method.getParameterTypes.mkString(", "))
+      val json = method.invoke(plugin, data.getContents(), params.asInstanceOf[util.Map[String, AnyRef]])
+//      val json = plugin.read(data.getContents(), params.asInstanceOf[util.Map[String, AnyRef]])
+      Materializer.toExpr(json.asInstanceOf[ujson.Value])
     } else {
       throw new IllegalArgumentException("The input mime type " + data.getMimeType + " is not supported")
     }

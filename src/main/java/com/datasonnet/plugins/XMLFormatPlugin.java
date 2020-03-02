@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class XMLFormatPlugin implements DataFormatPlugin {
+public class XMLFormatPlugin implements DataFormatPlugin<String> {
     public static String NAMESPACE_DECLARATIONS = "NamespaceDeclarations";
     public static String NAMESPACE_SEPARATOR = "NamespaceSeparator";
     public static String TEXT_VALUE_KEY = "TextValueKey";
@@ -52,12 +52,12 @@ public class XMLFormatPlugin implements DataFormatPlugin {
     }
 
     @Override
-    public Value read(Object inputXML, Map<String, Object> params) throws PluginException {
-        if(params == null) {
+    public Value read(String inputXML, Map<String, Object> params) throws PluginException {
+        if (params == null) {
             params = Collections.emptyMap();
         }
 
-        try (Reader input = new StringReader(inputXML.toString());
+        try (Reader input = new StringReader(inputXML);
              StringWriter output = new StringWriter();
         ) {
             XMLStreamReader2 reader = createInputStream(input);
@@ -66,7 +66,9 @@ public class XMLFormatPlugin implements DataFormatPlugin {
             XMLEventPipe pipe = new XMLEventPipe(reader, writer);
             pipe.pipe();
 
-            return UjsonUtil.jsonObjectValueOf(output.toString());
+
+            Value value = UjsonUtil.jsonObjectValueOf(output.toString());
+            return value;
         } catch (IOException e) {
             throw new PluginException("Unable to create reader", e);
         } catch (XMLStreamException e) {
