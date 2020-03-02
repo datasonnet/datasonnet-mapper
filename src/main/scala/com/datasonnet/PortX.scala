@@ -2,13 +2,16 @@ package com.datasonnet
 
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, Period, ZoneId, ZoneOffset}
+import java.util.function.Function
 
 import com.datasonnet
 import com.datasonnet.spi.{DataFormatPlugin, DataFormatService, UnsupportedMimeTypeException, UnsupportedParameterException}
+import sjsonnet.Std.builtinWithDefaults
+import sjsonnet.{Applyer, Error, EvalScope, Expr, Materializer, Val}
 import com.datasonnet.wrap.Library.library
 import sjsonnet.ReadWriter.StringRead
 import sjsonnet.Std._
-import sjsonnet.{EvalScope, Expr, Materializer, Val}
+import ujson.Value
 
 import scala.util.Failure
 
@@ -148,7 +151,54 @@ object PortX {
         (ev, fs, json: Val, path: String) =>
           Materializer.reverse(ujson.read(JsonPath.select(ujson.write(Materializer.apply(json)(ev)), path)))
       },
+    ),
+
+    "Regex" -> library(
+      builtin("regexFullMatch", "expr", "str") {
+        (ev, fs, expr: String, str: String) =>
+          Materializer.reverse(Regex.regexFullMatch(expr, str))
+      },
+      builtin("regexPartialMatch", "expr", "str") {
+        (ev, fs, expr: String, str: String) =>
+          Materializer.reverse(Regex.regexPartialMatch(expr, str))
+      },
+      builtin("regexScan", "expr", "str") {
+        (ev, fs, expr: String, str: String) =>
+          Materializer.reverse(Regex.regexScan(expr, str))
+      },
+      builtin("regexQuoteMeta", "str") {
+        (ev, fs, str: String) =>
+          Regex.regexQuoteMeta(str)
+      },
+      builtin("regexReplace", "str", "pattern", "replace") {
+        (ev, fs, str: String, pattern: String, replace: String) =>
+          Regex.regexReplace(str, pattern, replace)
+      },
+      builtinWithDefaults("regexGlobalReplace", "str" -> None, "pattern" -> None, "replace" -> None) { (args, ev) =>
+        val replace = args("replace")
+        val str = args("str").asInstanceOf[Val.Str].value
+        val pattern = args("pattern").asInstanceOf[Val.Str].value
+
+        replace match {
+          case replaceStr: Val.Str => Regex.regexGlobalReplace(str, pattern, replaceStr.value)
+          case replaceF: Val.Func => {
+            val func = new Function[Value, String] {
+              override def apply(t: Value): String = {
+                val v = Materializer.reverse(t)
+                Applyer(replaceF, ev, null).apply(Val.Lazy(v)) match {
+                  case resultStr: Val.Str => resultStr.value
+                  case _  => throw new Error.Delegate("The result of the replacement function must be a String")
+                }
+              }
+            }
+            Regex.regexGlobalReplace(str, pattern, func)
+          }
+
+          case _ => throw new Error.Delegate("'replace' parameter must be either String or Function")
+        }
+      },
     )
+
   )
 
   def read(data: String, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {

@@ -782,3 +782,160 @@ DS.Util.mapToObject(payload, function(x) x.language.name, function(v) v.language
 };
 ------------------------
 
+## Regex
+
+### `regexFullMatch(string pattern, string input)`
+Matches the entire input against the pattern (anchored start and end). If there's no match, returns `null`. If there's a match, returns a JSON object which has the following structure:
+
+- `string` - the matched string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexFullMatch(@'h(?P<mid>.*)o', 'hello');
+------------------------
+.Result
+------------------------
+{
+  "captures": [
+    "ell"
+  ],
+  "namedCaptures": {
+    "mid": "ell"
+  },
+  "string": "hello"
+}
+------------------------
+
+### `regexPartialMatch(string pattern, string input)`
+Matches the input against the pattern (unanchored). If there's no match, returns `null`. If there's a match, returns a JSON object which has the following structure:
+
+- `string` - the matched string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexPartialMatch(@'e(?P<mid>.*)o', 'hello')
+------------------------
+.Result
+------------------------
+{
+  "captures": [
+    "ll"
+  ],
+  "namedCaptures": {
+    "mid": "ll"
+  },
+  "string": "ello"
+}
+------------------------
+
+### `regexScan(string pattern, string input)`
+Finds all matches of the input against the pattern. If there are any matches, returns an array of JSON objects which have the following structure:
+
+- `string` - the matched string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexScan(@'(?P<user>[a-z]*)@(?P<domain>[a-z]*).org', 'modus@datasonnet.org,box@datasonnet.org')
+------------------------
+.Result
+------------------------
+[
+    {
+        "captures": [
+            "modus",
+            "datasonnet"
+        ],
+        "namedCaptures": {
+            "domain": "datasonnet",
+            "user": "modus"
+        },
+        "string": "modus@datasonnet.org"
+    },
+    {
+        "captures": [
+            "box",
+            "datasonnet"
+        ],
+        "namedCaptures": {
+            "domain": "datasonnet",
+            "user": "box"
+        },
+        "string": "box@datasonnet.org"
+    }
+]
+------------------------
+
+### `regexQuoteMeta(string str)`
+Returns a literal pattern string for the specified string.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexQuoteMeta(@'1.5-2.0?')
+------------------------
+.Result
+------------------------
+"1\\.5-2\\.0\\?"
+------------------------
+
+### `regexReplace(string str, string pattern, string replacement)`
+Returns the input with the first match replaced by `replacement` string.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexReplace('wishyfishyisishy', @'ish', 'and')
+------------------------
+.Result
+------------------------
+"wandyfishyisishy"
+------------------------
+
+### `regexGlobalReplace(string str, string pattern, string replacement)`
+Returns the input with all matches replaced by `replacement` string.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexGlobalReplace('wishyfishyisishy', @'ish', 'and')
+------------------------
+.Result
+------------------------
+"wandyfandyisandy"
+------------------------
+
+### `regexGlobalReplace(string str, string pattern, function replacement)`
+Returns the input with all matches replaced by the result of the `replacement` function. The function must return string result and take a single object as an argument in the following structure:
+
+- `string` - the matched string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
+
+*Example*
+
+.DataSonnet map:
+------------------------
+local square(obj) = std.toString(std.pow(std.parseInt(obj.string), 2));
+
+DS.Regex.regexGlobalReplace("xxx2yyy4zzz6aaa", "\\d", square)
+------------------------
+.Result
+------------------------
+"xxx4yyy16zzz36aaa"
+------------------------
+
