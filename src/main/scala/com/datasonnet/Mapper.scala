@@ -155,7 +155,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
 
   private val parseCache = collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]()
 
-  val evaluator = new NoFileEvaluator(jsonnet, DataSonnetPath("."), parseCache, importer)
+  val evaluator = new NoFileEvaluator(jsonnet, DataSonnetPath("."), parseCache, importer, header.isPreserveOrder)
 
   private val libraries = Map(
     "DS" -> Mapper.objectify(
@@ -213,7 +213,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
       (name, argument, i)
     }.toVector
 
-    val materialized = try Materializer.apply(function.copy(params = Params(firstMaterialized +: values)), header.isPreserveOrder)(evaluator)
+    val materialized = try Materializer.apply(function.copy(params = Params(firstMaterialized +: values)))(evaluator)
     catch {
       // if there's a parse error it must be in an import, so the offset is 0
       case Error(msg, stack, underlying) if msg.contains("had Parse error")=> throw new IllegalArgumentException("Problem executing map: " + Mapper.expandErrorLineNumber(msg, 0))
