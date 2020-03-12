@@ -77,17 +77,14 @@ object Mapper {
     }
   )
 
-  def objectify(objects: Map[String, Val.Obj]): Val = {
-    val builder = mutable.LinkedHashMap.newBuilder[String, Val.Obj.Member]
-    for (o <- objects) {
-      builder += (o._1 -> Obj.Member(false, Visibility.Hidden, (self: Obj, sup: Option[Obj], _, _) => o._2))
-    }
-    new Obj(
-      builder.result(),
-      _ => (),
-      None
-    )
-  }
+  def objectify(objects: Map[String, Val]) = new Val.Obj(
+    mutable.LinkedHashMap() ++ objects.map{
+      case (key, value) =>
+        (key, Val.Obj.Member(false, Visibility.Hidden, (self: Val.Obj, sup: Option[Val.Obj], _, _) => value))
+    },
+    _ => (),
+    None
+  )
 
   def library(evaluator: Evaluator, name: String, cache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]): (String, Val) = {
     val jsonnetLibrarySource = Source.fromURL(getClass.getResource(s"/$name.libsonnet")).mkString
