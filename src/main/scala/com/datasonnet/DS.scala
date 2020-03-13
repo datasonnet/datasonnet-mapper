@@ -75,7 +75,7 @@ object DS {
     "Formats" -> library(
       builtinWithDefaults("read",
                           "data" -> None,
-                          "getMimeType" -> None,
+                          "mimeType" -> None,
                           "params" -> Some(Expr.Null(0))) { (args, ev) =>
         val data = args("data").cast[Val.Str].value
         val mimeType = args("mimeType").cast[Val.Str].value
@@ -84,7 +84,7 @@ object DS {
       },
       builtinWithDefaults("write",
         "data" -> None,
-        "getMimeType" -> None,
+        "mimeType" -> None,
         "params" -> Some(Expr.Null(0))) { (args, ev) =>
         val data = args("data")
         val mimeType = args("mimeType").cast[Val.Str].value
