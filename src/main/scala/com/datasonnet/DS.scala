@@ -226,7 +226,7 @@ object DS {
     val javaParams = if (params != null) toJavaParams(ev, params, plugin) else new java.util.HashMap[String, Object]()
     val output = plugin.write(Materializer.apply(json)(ev), javaParams, mimeType)
     if (output.canGetContentsAs(classOf[String])) {
-      output.getContents()
+      output.getContentsAsString()
     } else {
       throw new UnsupportedOperationException("The data format plugin for " + mimeType +
         " does not return output that can be rendered as a String, which is required for conversions inside" +

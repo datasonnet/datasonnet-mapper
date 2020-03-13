@@ -18,7 +18,12 @@ public abstract class AbstractBaseDocument implements Document {
     }
 
     @Override
-    public String getContents() {
+    public String getContentsAsString() {
         return (String) getContentsAs(String.class);
+    }
+
+    @Override
+    public Object getContentsAsObject() {
+        return getContentsAs(Object.class);
     }
 }

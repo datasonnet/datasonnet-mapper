@@ -213,7 +213,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
       new StringDocument(payload, "application/json"),
       new java.util.HashMap(),
       "application/json"
-    ).getContents()
+    ).getContentsAsString()
   }
 
   def transform(payload: Document, arguments: java.util.Map[String, Document]): Document = {

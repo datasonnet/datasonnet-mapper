@@ -44,7 +44,7 @@ public class JavaReaderTest {
         String mapping = TestResourceReader.readFileAsString("readJavaTest.ds");
 
         Mapper mapper = new Mapper(mapping, new ArrayList<>(), true);
-        String mapped = mapper.transform(data, new HashMap<>(), "application/json").getContents();
+        String mapped = mapper.transform(data, new HashMap<>(), "application/json").getContentsAsString();
 
         String expectedJson = TestResourceReader.readFileAsString("javaTest.json");
         JSONAssert.assertEquals(expectedJson, mapped, false);

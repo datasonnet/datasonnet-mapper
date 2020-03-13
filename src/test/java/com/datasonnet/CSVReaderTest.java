@@ -30,7 +30,7 @@ public class CSVReaderTest {
         Mapper mapper = new Mapper("{ fName: payload[0][\"First Name\"] }", Collections.emptyList(), true);
         Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
 
-        assertEquals("{\"fName\":\"Eugene\"}", mapped.getContents());
+        assertEquals("{\"fName\":\"Eugene\"}", mapped.getContentsAsString());
     }
 
     @Test
@@ -44,7 +44,7 @@ public class CSVReaderTest {
         Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
         Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
 
-        assertEquals("{\"fName\":\"Eugene\",\"num\":\"234\"}", mapped.getContents());
+        assertEquals("{\"fName\":\"Eugene\",\"num\":\"234\"}", mapped.getContentsAsString());
     }
 
 

@@ -19,7 +19,7 @@ public class TestFormatPlugin implements DataFormatPlugin<String> {
 
     @Override
     public Document write(Value input, Map<String, Object> params, String mimeType) throws PluginException {
-        return new StringDocument("In 'write' Test Param Is " + params.get(TEST_PARAM), mimeType);
+        return new StringDocument(params.get(TEST_PARAM).toString(), mimeType);
     }
 
     @Override

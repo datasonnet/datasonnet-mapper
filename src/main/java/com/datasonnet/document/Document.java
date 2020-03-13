@@ -5,7 +5,10 @@ public interface Document {
 
     public Object getContentsAs(Class klass);
 
-    public String getContents();
+    public String getContentsAsString();
+
+    public Object getContentsAsObject();
 
     public String getMimeType();
+
 }

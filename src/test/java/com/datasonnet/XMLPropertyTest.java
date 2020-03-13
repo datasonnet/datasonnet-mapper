@@ -35,7 +35,7 @@ public class XMLPropertyTest {
     public void reversible(@From(XMLGenerator.class) @Dictionary("xml.dict") Document dom) throws Exception {
         String xml = XMLDocumentUtils.documentToString(dom);
         Mapper mapper = new Mapper("DS.Formats.write(DS.Formats.read(payload, \"application/xml\"), \"application/xml\")", Collections.emptyList(), true);
-        String output = mapper.transform(new StringDocument(xml, "application/xml"), Collections.emptyMap(), "application/xml").getContents();
+        String output = mapper.transform(new StringDocument(xml, "application/xml"), Collections.emptyMap(), "application/xml").getContentsAsString();
         DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document parsed = db.parse(new ByteArrayInputStream(output.getBytes("UTF-8")));
         assertTrue("For input " + xml + " found output " + output, dom.isEqualNode(parsed));

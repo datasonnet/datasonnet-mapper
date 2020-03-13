@@ -15,15 +15,15 @@ public class UtilLibraryTest {
         String jsonData = TestResourceReader.readFileAsString("utilLibDuplicatesTest.json");
 
         Mapper mapper = new Mapper("DS.Util.duplicates(payload.primitive)", Collections.emptyList(), true);
-        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContents();
+        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
         assertEquals(mappedJson, "[\"hello\",\"world\"]");
 
         mapper = new Mapper("DS.Util.duplicates(payload.complex, function(x) x.language.name)", Collections.emptyList(), true);
-        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContents();
+        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
         assertEquals(mappedJson, "[{\"language\":{\"name\":\"Java8\",\"version\":\"1.8.0\"}}]");
 
         mapper = new Mapper("DS.Util.duplicates(payload.moreComplex, function(x) std.substr(x.language.version, 0, 3))", Collections.emptyList(), true);
-        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContents();
+        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
         assertEquals(mappedJson, "[{\"language\":{\"name\":\"Java1.8\",\"version\":\"1.8_152\"}}]");
     }
 
@@ -37,7 +37,7 @@ public class UtilLibraryTest {
     void testReverse() throws Exception {
         String jsonData = "[\"a\",\"b\",\"c\",\"d\"]";
         Mapper mapper = new Mapper("DS.Util.reverse(payload)", Collections.emptyList(), true);
-        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContents();
+        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
 
         assertEquals(mappedJson, "[\"d\",\"c\",\"b\",\"a\"]");
     }
@@ -67,7 +67,7 @@ public class UtilLibraryTest {
         String ds = TestResourceReader.readFileAsString(dsFileName);
 
         Mapper mapper = new Mapper(ds, Collections.emptyList(), true);
-        String mappedJson = mapper.transform(new StringDocument(input, "application/json"), Collections.emptyMap(), "application/json").getContents();
+        String mappedJson = mapper.transform(new StringDocument(input, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
 
         assertEquals(mappedJson, "true");
     }

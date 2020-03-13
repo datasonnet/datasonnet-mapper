@@ -1,7 +1,6 @@
 package com.datasonnet;
 
 import com.datasonnet.document.Document;
-import com.datasonnet.document.JavaObjectDocument;
 import com.datasonnet.document.StringDocument;
 import com.datasonnet.javatest.Gizmo;
 import com.datasonnet.javatest.Manufacturer;
@@ -9,7 +8,6 @@ import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,7 +35,7 @@ public class JavaWriterTest {
         Mapper mapper = new Mapper(mapping, new ArrayList<>(), true);
         Document mapped = mapper.transform(data, new HashMap<>(), "application/java");
 
-        Object result = mapped.getContents();
+        Object result = mapped.getContentsAsString();
         assertTrue(result instanceof Gizmo);
 
         Gizmo gizmo = (Gizmo)result;
@@ -57,7 +55,7 @@ public class JavaWriterTest {
         mapper = new Mapper(mapping, new ArrayList<>(), true);
         mapped = mapper.transform(data, new HashMap<>(), "application/java");
 
-        result = mapped.getContents();
+        result = mapped.getContentsAsString();
         assertTrue(result instanceof java.util.HashMap);
 
         Map gizmoMap = (Map)result;
@@ -77,8 +75,8 @@ public class JavaWriterTest {
         Mapper mapper = new Mapper(mapping, new ArrayList<>(), true);
         Document mapped = mapper.transform(data, new HashMap<>(), "application/java");
 
-        Object result = mapped.getContents();
-        assertTrue(result instanceof java.util.HashMap);
+        Object result = mapped.getContentsAsObject();
+        assertTrue(result instanceof java.util.Map);
 
         Map map = (Map)result;
         assertTrue(map.get("test") instanceof java.lang.String);
