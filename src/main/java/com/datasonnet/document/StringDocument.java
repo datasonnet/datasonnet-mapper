@@ -1,6 +1,6 @@
 package com.datasonnet.document;
 
-public class StringDocument implements Document<String> {
+public class StringDocument extends AbstractBaseDocument {
 
     private String contents;
     private String mimeType;
@@ -11,8 +11,19 @@ public class StringDocument implements Document<String> {
     }
 
     @Override
-    public String getContents() {
-        return contents;
+    public boolean canGetContentsAs(Class klass) {
+        if(String.class.equals(klass)) {
+            return true;
+        }
+        return super.canGetContentsAs(klass);
+    }
+
+    @Override
+    public Object getContentsAs(Class klass) {
+        if(canGetContentsAs(klass)) {
+            return contents;
+        }
+        return super.getContentsAs(klass);
     }
 
     @Override

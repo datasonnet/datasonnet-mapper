@@ -4,9 +4,9 @@ import java.io.{PrintWriter, StringWriter}
 import java.util
 import java.util.Collections
 
-import com.datasonnet.document.{Document, StringDocument}
+import com.datasonnet.document.{AbstractBaseDocument, Document, StringDocument}
 import com.datasonnet.header.Header
-import com.datasonnet.spi.DataFormatService
+import com.datasonnet.spi.{DataFormatPlugin, DataFormatService}
 import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
 import fastparse.{IndexedParserInput, Parsed}
 import sjsonnet.Expr.Member.Visibility
@@ -87,25 +87,42 @@ object Mapper {
     (name -> jsonnetLibrary)
   }
 
-  def input(name: String, data: Document[_], header: Header): Expr = {
+  def pluginAccepts(plugin: DataFormatPlugin[_]) = List(classOf[String], classOf[Object]).find((klass) => try {
+    plugin.getClass.getMethod("read", klass, classOf[util.Map[String, Object]])
+    true
+  } catch {
+    case _ => false
+  }).getOrElse(throw new UnsupportedOperationException("Illegal Data Format Plugin: Must Only Take String or Object"))
+
+  def input(name: String, data: Document, header: Header): Expr = {
     val plugin = DataFormatService.getInstance().getPluginFor(data.getMimeType)
     if (plugin != null) {
-      // okay, so let me see... we need to know what sort of data we've been given, then match it up to the plugin
-      // this is a little odd! After all, we already have mime type. But what really drives it is kinda orthogonal
-      // to mime type.
       val params = header.getInputParameters(name, data.getMimeType)
       checkParams(params, plugin.getReadParameters(), plugin.getPluginId)
-      val method = plugin.getClass.getMethod("read", classOf[String], classOf[util.Map[String, Object]]);
-      System.err.println(method.getParameterTypes.mkString(", "))
-      val json = method.invoke(plugin, data.getContents(), params.asInstanceOf[util.Map[String, AnyRef]])
-//      val json = plugin.read(data.getContents(), params.asInstanceOf[util.Map[String, AnyRef]])
+
+      val accepts = pluginAccepts(plugin);
+      val contents = if (data.canGetContentsAs(accepts)) {
+        data.getContentsAs(accepts)
+      } else {
+        throw new IllegalArgumentException("The data format plugin for " + data.getMimeType +
+          " does not support any of the data forms compatible with this type")
+      }
+
+      val json = accepts match {
+        case k if k == classOf[String] =>
+          plugin.asInstanceOf[DataFormatPlugin[String]].read(contents.asInstanceOf[String], params)
+        case k if k == classOf[Object] =>
+          plugin.asInstanceOf[DataFormatPlugin[Object]].read(contents, params)  // already Object
+        case _ => ???  // not possible, we check above for possibilities
+      }
+
       Materializer.toExpr(json.asInstanceOf[ujson.Value])
     } else {
       throw new IllegalArgumentException("The input mime type " + data.getMimeType + " is not supported")
     }
   }
 
-  def output(output: ujson.Value, mimeType: String, header: Header): Document[_] = {
+  def output(output: ujson.Value, mimeType: String, header: Header): Document = {
     val plugin = DataFormatService.getInstance().getPluginFor(mimeType)
     if (plugin != null) {
       val params = header.getOutputParameters(mimeType)
@@ -161,7 +178,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
 
   private val libraries = Map(
     "DS" -> Mapper.objectify(
-      PortX.libraries + Mapper.library(evaluator, "Util", parseCache)
+      DS.libraries + Mapper.library(evaluator, "Util", parseCache)
     )
   )
 
@@ -192,19 +209,26 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   private val mapIndex = new IndexedParserInput(jsonnet);
 
   def transform(payload: String): String = {
-    transform(new StringDocument(payload, "application/json"), new java.util.HashMap(), "application/json").asInstanceOf[StringDocument].getContents
+    transform(
+      new StringDocument(payload, "application/json"),
+      new java.util.HashMap(),
+      "application/json"
+    ).getContents()
   }
 
-  def transform(payload: Document[_], arguments: java.util.Map[String, Document[_]]): Document[_] = {
+  def transform(payload: Document, arguments: java.util.Map[String, Document]): Document = {
     transform(payload, arguments,"application/json")
   }
 
-  def transform(payload: Document[_], arguments: java.util.Map[String, Document[_]], outputMimeType: String): Document[_] = {
+  def transform(payload: Document, arguments: java.util.Map[String, Document], outputMimeType: String): Document = {
 
+    // okay, okay, so at this point we: 1) figure out if we can get an object or a string
+    // then 2) we see if the converter we get for the mime type is compatible...
+    // hrmmm, any reason we can't filter by type? Whatevfer, that's internal, don't worry about it
     val data = Mapper.input("payload", payload, header)
 
     //val parsedArguments = arguments.asScala.view.mapValues { Mapper.input(_, header) }
-    val parsedArguments = arguments.asScala.view.toMap[String, Document[_]].map { case (name, data) => (name, Mapper.input(name, data, header)) }
+    val parsedArguments = arguments.asScala.view.toMap[String, Document].map { case (name, data) => (name, Mapper.input(name, data, header)) }
 
     val first +: rest = function.params.args
 
@@ -219,7 +243,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
     val materialized = try Materializer.apply(function.copy(params = Params(firstMaterialized +: values)))(evaluator)
     catch {
       // if there's a parse error it must be in an import, so the offset is 0
-      case Error(msg, stack, underlying) if msg.contains("had Parse error")=> throw new IllegalArgumentException("Problem executing map: " + Mapper.expandErrorLineNumber(msg, 0))
+      case Error(msg, stack, underlying) if msg.contains("had Parse error") => throw new IllegalArgumentException("Problem executing map: " + Mapper.expandErrorLineNumber(msg, 0))
       case e: Throwable =>
         val s = new StringWriter()
         val p = new PrintWriter(s)

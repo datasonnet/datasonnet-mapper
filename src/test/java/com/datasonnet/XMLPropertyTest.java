@@ -12,8 +12,8 @@ import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
-import org.w3c.dom.Document;
 
+import org.w3c.dom.Document;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
@@ -35,10 +35,10 @@ public class XMLPropertyTest {
     public void reversible(@From(XMLGenerator.class) @Dictionary("xml.dict") Document dom) throws Exception {
         String xml = XMLDocumentUtils.documentToString(dom);
         Mapper mapper = new Mapper("DS.Formats.write(DS.Formats.read(payload, \"application/xml\"), \"application/xml\")", Collections.emptyList(), true);
-        com.datasonnet.document.Document<?> output = mapper.transform(new StringDocument(xml, "application/xml"), Collections.emptyMap(), "application/xml");
+        String output = mapper.transform(new StringDocument(xml, "application/xml"), Collections.emptyMap(), "application/xml").getContents();
         DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document parsed = db.parse(new ByteArrayInputStream(output.getContents().toString().getBytes("UTF-8")));
-        assertTrue("For input " + xml + " found output " + output.getContents(), dom.isEqualNode(parsed));
+        Document parsed = db.parse(new ByteArrayInputStream(output.getBytes("UTF-8")));
+        assertTrue("For input " + xml + " found output " + output, dom.isEqualNode(parsed));
 
         // okay, so this doesn't work because of ordering differences... let me see... we could sort both the same?
         // go ahead and pass on it for now

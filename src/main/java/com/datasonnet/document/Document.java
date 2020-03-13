@@ -1,6 +1,11 @@
 package com.datasonnet.document;
 
-public interface Document<T> {
-    public T getContents();
+public interface Document {
+    public boolean canGetContentsAs(Class klass);
+
+    public Object getContentsAs(Class klass);
+
+    public String getContents();
+
     public String getMimeType();
 }

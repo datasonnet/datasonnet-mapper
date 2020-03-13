@@ -31,10 +31,10 @@ public class HeaderTest {
         );
         String ds = TestResourceReader.readFileAsString("headerTest.ds");
 
-        Map<String, Document<?>> variables = Collections.singletonMap("myVar", myVar);
+        Map<String, Document> variables = Collections.singletonMap("myVar", myVar);
 
         Mapper mapper = new Mapper(ds, variables.keySet(), true);
-        String mapped = mapper.transform(payload, variables, "application/csv").getContents().toString();
+        String mapped = mapper.transform(payload, variables, "application/csv").getContents();
 
         assertTrue(mapped.startsWith("\"greetings\"|\"name\""));
         assertTrue(mapped.trim().endsWith("\"Hello\"|\"World\""));
@@ -49,9 +49,9 @@ public class HeaderTest {
         String ds = TestResourceReader.readFileAsString("dotMimeTypeTest.ds");
 
         Mapper mapper = new Mapper(ds, Collections.emptyList(), true);
-        String mapped = mapper.transform(payload, Collections.emptyMap(), "text/plain").getContents().toString();
+        String mapped = mapper.transform(payload, Collections.emptyMap(), "text/plain").getContents();
         assertEquals("HelloWorld", mapped);
-        mapped = mapper.transform(payload, Collections.emptyMap(), "application/test.test").getContents().toString();
+        mapped = mapper.transform(payload, Collections.emptyMap(), "application/test.test").getContents();
         assertEquals("GoodByeWorld", mapped);
     }
 
@@ -66,7 +66,7 @@ public class HeaderTest {
         Mapper mapper = new Mapper(ds, Collections.emptyList(), true);
 
         try {
-            String mapped = mapper.transform(payload, Collections.emptyMap(), "text/plain").getContents().toString();
+            String mapped = mapper.transform(payload, Collections.emptyMap(), "text/plain").getContents();
             fail("Must fail to transform");
         } catch(IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("The parameter 'BadParam' not supported by plugin TEST"), "Found message: " + e.getMessage());

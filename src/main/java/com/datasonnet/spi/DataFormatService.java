@@ -70,28 +70,5 @@ public class DataFormatService {
     public void findAndRegisterPlugins() {
         registerPlugins(findPlugins());
     }
-
-
-/*    public Value prepareForInput(Document data) {
-        DataFormatPlugin plugin = this.getPluginFor(data.getMimeType());
-        if(plugin instanceof JSONFormatPlugin) {
-            return UjsonUtil.jsonObjectValueOf(data.getContents().toString());
-        } else {
-            return UjsonUtil.stringValueOf(data.getContents().toString());
-        }
-    }
-
-    public String prepareForOutput(Value json, String identifier) throws Exception {
-        DataFormatPlugin plugin = this.getPluginFor(identifier);
-        if(plugin instanceof JSONFormatPlugin) {
-            return plugin.write(json, new HashMap<>(), "application/json").getContents().toString();
-        } else {
-            if(json instanceof Str) {
-                return UjsonUtil.stringValueTo((Str) json);
-            } else {
-                throw new IllegalArgumentException("Non-JSON output must be a single string");
-            }
-
-        }
-    }*/
+    
 }

@@ -16,7 +16,7 @@ import ujson.Value
 import scala.util.Failure
 
 
-object PortX {
+object DS {
 
   val libraries = Map(
     "ZonedDateTime" -> library(
@@ -207,11 +207,15 @@ object PortX {
       throw new UnsupportedMimeTypeException("No suitable plugin found for mime type: " + mimeType)
     }
     val javaParams = if (params != null) toJavaParams(ev, params, plugin) else new java.util.HashMap[String, Object]()
-    val method = plugin.getClass.getMethod("read", classOf[String], classOf[java.util.Map[String, Object]]);
-    System.err.println(method.getParameterTypes)
-    val json = method.invoke(plugin, data, javaParams)
+    val json = try {
+      plugin.getClass.getMethod("read", classOf[String], classOf[java.util.Map[String, Object]])
+      plugin.asInstanceOf[DataFormatPlugin[String]].read(data, javaParams)
+    } catch {
+      case _ => throw new UnsupportedOperationException("The data format plugin for " + mimeType +
+        " does not take Strings, which is required for conversions inside DataSonnet code")
+    }
 
-    Materializer.reverse(json.asInstanceOf[ujson.Value])
+    Materializer.reverse(json)
   }
 
   def write(json: Val, mimeType: String, params: Val.Obj, ev: EvalScope): String = {
@@ -220,7 +224,14 @@ object PortX {
       throw new UnsupportedMimeTypeException("No suitable plugin found for mime type: " + mimeType);
     }
     val javaParams = if (params != null) toJavaParams(ev, params, plugin) else new java.util.HashMap[String, Object]()
-    plugin.write(Materializer.apply(json)(ev), javaParams, mimeType).getContents.toString
+    val output = plugin.write(Materializer.apply(json)(ev), javaParams, mimeType)
+    if (output.canGetContentsAs(classOf[String])) {
+      output.getContents()
+    } else {
+      throw new UnsupportedOperationException("The data format plugin for " + mimeType +
+        " does not return output that can be rendered as a String, which is required for conversions inside" +
+        "DataSonnet code")
+    }
   }
 
   def toJavaParams(ev: EvalScope, params: Val.Obj, plugin: DataFormatPlugin[_]): java.util.Map[String, Object] = {

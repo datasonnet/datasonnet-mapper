@@ -27,7 +27,7 @@ public interface DataFormatPlugin<T> {
     // or do we sometimes give it a string. I think the former sounds good?
     // okay, so now we've got java type erasure to deal with
     ujson.Value read(T input, Map<String, Object> params) throws PluginException;
-    Document<T> write(ujson.Value input, Map<String, Object> params, String mimeType) throws PluginException;
+    Document write(ujson.Value input, Map<String, Object> params, String mimeType) throws PluginException;
 
     String[] getSupportedIdentifiers();
 
