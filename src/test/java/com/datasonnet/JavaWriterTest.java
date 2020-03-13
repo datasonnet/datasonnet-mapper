@@ -17,6 +17,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 
 public class JavaWriterTest {
     @BeforeAll
@@ -35,7 +37,7 @@ public class JavaWriterTest {
         Mapper mapper = new Mapper(mapping, new ArrayList<>(), true);
         Document mapped = mapper.transform(data, new HashMap<>(), "application/java");
 
-        Object result = mapped.getContentsAsString();
+        Object result = mapped.getContentsAsObject();
         assertTrue(result instanceof Gizmo);
 
         Gizmo gizmo = (Gizmo)result;
@@ -55,7 +57,7 @@ public class JavaWriterTest {
         mapper = new Mapper(mapping, new ArrayList<>(), true);
         mapped = mapper.transform(data, new HashMap<>(), "application/java");
 
-        result = mapped.getContentsAsString();
+        result = mapped.getContentsAsObject();
         assertTrue(result instanceof java.util.HashMap);
 
         Map gizmoMap = (Map)result;
@@ -73,28 +75,13 @@ public class JavaWriterTest {
         //Test calling write() function
         String mapping = TestResourceReader.readFileAsString("writeJavaFunctionTest.ds");
         Mapper mapper = new Mapper(mapping, new ArrayList<>(), true);
-        Document mapped = mapper.transform(data, new HashMap<>(), "application/java");
+        try {
+            mapper.transform(data, new HashMap<>(), "application/java");
+            fail("Should not succeed");
+        } catch(Exception e) {
+            assertTrue(e.getMessage().contains("does not return output that can be rendered as a String"), "Failed with wrong message: " + e.getMessage());
+        }
 
-        Object result = mapped.getContentsAsObject();
-        assertTrue(result instanceof java.util.Map);
 
-        Map map = (Map)result;
-        assertTrue(map.get("test") instanceof java.lang.String);
-
-        Gizmo theGizmo = new Gizmo();
-        theGizmo.setName("gizmo");
-        theGizmo.setQuantity(123);
-        theGizmo.setInStock(true);
-        theGizmo.setColors(Arrays.asList("red","white","blue"));
-
-        Manufacturer manufacturer = new Manufacturer();
-        manufacturer.setManufacturerName("ACME Corp.");
-        manufacturer.setManufacturerCode("ACME123");
-        theGizmo.setManufacturer(manufacturer);
-
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-        theGizmo.setDate(df.parse("2020-01-06"));
-
-        assertEquals(theGizmo.toString(), map.get("test"));
     }
 }
