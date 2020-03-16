@@ -3,10 +3,13 @@ package com.datasonnet.wrap
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet._
 
+import scala.collection.mutable
+
 
 object Library {
   def library(functions: (String, Val.Func)*): Val.Obj = new Val.Obj(
-    functions
+    mutable.LinkedHashMap[String, Val.Obj.Member] (
+      functions
       .map{
         case (k, v) =>
           (
@@ -17,8 +20,7 @@ object Library {
               (self: Val.Obj, sup: Option[Val.Obj], _, _) => v
             )
           )
-      }
-      .toMap,
+      }: _*),
     _ => (),
     None
   )

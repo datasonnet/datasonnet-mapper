@@ -10,10 +10,11 @@ import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
 import fastparse.{IndexedParserInput, Parsed}
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet.Expr.Params
-import sjsonnet.Val.Lazy
+import sjsonnet.Val._
 import sjsonnet._
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
@@ -70,18 +71,17 @@ object Mapper {
     roots flatMap {
       case (key, value) =>
         if (indices.contains(key))
-          Seq((indices(key), (_: Option[Val.Obj], _: Option[Val.Obj]) => Lazy(value)))
+          Seq((indices(key), (_: Option[Obj], _: Option[Obj]) => Lazy(value)))
         else
           Seq()
     }
   )
 
   def objectify(objects: Map[String, Val]) = new Val.Obj(
-    objects.map{
+    mutable.LinkedHashMap() ++ objects.map{
       case (key, value) =>
         (key, Val.Obj.Member(false, Visibility.Hidden, (self: Val.Obj, sup: Option[Val.Obj], _, _) => value))
-    }
-    .toMap,
+    },
     _ => (),
     None
   )
@@ -155,11 +155,11 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
 
   private val parseCache = collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]()
 
-  val evaluator = new NoFileEvaluator(jsonnet, DataSonnetPath("."), parseCache, importer)
+  val evaluator = new NoFileEvaluator(jsonnet, DataSonnetPath("."), parseCache, importer, header.isPreserveOrder)
 
   private val libraries = Map(
     "DS" -> Mapper.objectify(
-      PortX.libraries + Mapper.library(evaluator, "Util", parseCache)
+      PortX.libraries + ("Util" -> Mapper.library(evaluator, "Util", parseCache)._2.asInstanceOf[Val.Obj])
     )
   )
 
@@ -176,8 +176,8 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   private val function = (for {
     evaluated <- Mapper.evaluate(evaluator, parseCache, jsonnet, libraries, lineOffset)
     verified <- evaluated match {
-      case f: Val.Func => {
-        val topLevelF = f.asInstanceOf[Val.Func]
+      case f: Func => {
+        val topLevelF = f.asInstanceOf[Func]
         if (topLevelF.params.args.size < 1)
           Failure(new IllegalArgumentException("Top Level Function must have at least one argument."))
         else
@@ -212,7 +212,6 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
       val argument: Option[Expr] = parsedArguments.get(name).orElse(default)
       (name, argument, i)
     }.toVector
-
 
     val materialized = try Materializer.apply(function.copy(params = Params(firstMaterialized +: values)))(evaluator)
     catch {

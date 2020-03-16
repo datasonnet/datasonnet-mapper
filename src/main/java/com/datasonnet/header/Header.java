@@ -17,10 +17,10 @@ public class Header {
     public static String DATASONNET_VERSION = "version";
     public static String DATASONNET_OUTPUT = "output";
     public static String DATASONNET_INPUT = "input";
+    public static String DATASONNET_OUTPUT_PRESERVE_ORDER = "preserveOrder";
 
     public static String DATAFORMAT_PREFIX = "dataformat";
     public static String DATAFORMAT_DEFAULT = "*";
-
 
     private String version = "1.0";
     private Map dataFormatParameters = Collections.emptyMap();
@@ -85,6 +85,12 @@ public class Header {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public boolean isPreserveOrder() {
+        Map output = getOrEmpty(dataFormatParameters, Header.DATASONNET_OUTPUT);
+        boolean preserveOrder = new Boolean(output.getOrDefault(Header.DATASONNET_OUTPUT_PRESERVE_ORDER, "true").toString());
+        return preserveOrder;
     }
 
     public Map<String, Object> getDefaultParameters(String mimeType) {
