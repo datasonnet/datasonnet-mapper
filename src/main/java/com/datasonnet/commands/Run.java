@@ -43,14 +43,14 @@ public class Run implements Callable<Void> {
     List<File> importFiles = new ArrayList<>();
 
     @CommandLine.Option(names = {"-n", "--no-wrap"}, description = "Do not wrap in a function call. Only use this if your transformation is already a top-level function.")
-    boolean alreadyWrapped;
+    boolean alreadyWrapped = false;
 
     @CommandLine.Option(names = {"-o", "--output-type"}, description = "Handle the output as this format. Defaults to JSON.")
     String outputType = "application/json";
 
     @Override
     public Void call() throws Exception {
-        Mapper mapper = new Mapper(Main.readFile(datasonnet), combinedArguments().keySet(), imports(), !alreadyWrapped);
+        Mapper mapper = new Mapper(Main.readFile(datasonnet), combinedArguments().keySet(), imports(), !alreadyWrapped, true);
         Document result = mapper.transform(new StringDocument(payload(), suffix(datasonnet)), combinedArguments(), outputType);
         String contents = result.getContentsAsString();
         System.out.println(contents);

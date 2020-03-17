@@ -21,7 +21,7 @@ public class MapperTest {
     @ParameterizedTest
     @MethodSource("simpleProvider")
     void simple(String jsonnet, String json, String expected) {
-        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+        Mapper mapper = new Mapper(jsonnet);
         assertEquals(expected, mapper.transform(json));
     }
 
@@ -115,7 +115,7 @@ public class MapperTest {
     @Test
     void nonJsonArguments() {
         Mapper mapper = new Mapper("argument", Arrays.asList("argument"), true);
-        mapper.findAndRegisterPlugins();
+
 
         Map<String, Document> map = Collections.singletonMap("argument", new StringDocument("value", "text/plain"));
 
@@ -147,7 +147,7 @@ public class MapperTest {
         variables.put("v1", new StringDocument("v1value", "text/plain"));
 
         Mapper mapper = new Mapper(datasonnet, variables.keySet(), true);
-        mapper.findAndRegisterPlugins();
+
 
         String mapped = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json").getContentsAsString();
 
@@ -158,7 +158,7 @@ public class MapperTest {
                      "output.preserveOrder=false\n*/\n" + datasonnet;
 
         mapper = new Mapper(datasonnet, variables.keySet(), true);
-        mapper.findAndRegisterPlugins();
+
 
         mapped = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json").getContentsAsString();
 

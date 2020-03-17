@@ -29,7 +29,7 @@ public class HeaderTest {
         Map<String, Document> variables = Collections.singletonMap("myVar", myVar);
 
         Mapper mapper = new Mapper(ds, variables.keySet(), true);
-        mapper.findAndRegisterPlugins();
+
 
         String mapped = mapper.transform(payload, variables, "application/csv").getContentsAsString();
 
@@ -45,8 +45,8 @@ public class HeaderTest {
         );
         String ds = TestResourceReader.readFileAsString("dotMimeTypeTest.ds");
 
-        Mapper mapper = new Mapper(ds, Collections.emptyList(), true);
-        mapper.findAndRegisterPlugins();
+        Mapper mapper = new Mapper(ds);
+
 
         String mapped = mapper.transform(payload, Collections.emptyMap(), "text/plain").getContentsAsString();
         assertEquals("HelloWorld", mapped);
@@ -62,8 +62,8 @@ public class HeaderTest {
         );
         String ds = TestResourceReader.readFileAsString("illegalParameter.ds");
 
-        Mapper mapper = new Mapper(ds, Collections.emptyList(), true);
-        mapper.findAndRegisterPlugins();
+        Mapper mapper = new Mapper(ds);
+
 
         try {
             String mapped = mapper.transform(payload, Collections.emptyMap(), "text/plain").getContentsAsString();

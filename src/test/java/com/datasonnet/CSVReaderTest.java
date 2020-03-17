@@ -22,8 +22,8 @@ public class CSVReaderTest {
                 "application/csv"
         );
 
-        Mapper mapper = new Mapper("{ fName: payload[0][\"First Name\"] }", Collections.emptyList(), true);
-        mapper.findAndRegisterPlugins();
+        Mapper mapper = new Mapper("{ fName: payload[0][\"First Name\"] }");
+
 
         Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
 
@@ -38,8 +38,8 @@ public class CSVReaderTest {
         );
         String jsonnet = TestResourceReader.readFileAsString("readCSVExtTest.ds");
 
-        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
-        mapper.findAndRegisterPlugins();
+        Mapper mapper = new Mapper(jsonnet);
+
 
         Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
 

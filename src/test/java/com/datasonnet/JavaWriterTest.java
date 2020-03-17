@@ -30,8 +30,8 @@ public class JavaWriterTest {
 
         Document data = new StringDocument(json, "application/json");
 
-        Mapper mapper = new Mapper(mapping, new ArrayList<>(), true);
-        mapper.findAndRegisterPlugins();
+        Mapper mapper = new Mapper(mapping);
+
 
         Document mapped = mapper.transform(data, new HashMap<>(), "application/java");
 
@@ -52,8 +52,8 @@ public class JavaWriterTest {
         //Test with default output, i.e. java.util.HashMap
         mapping = mapping.substring(mapping.lastIndexOf("*/") + 2);
 
-        mapper = new Mapper(mapping, new ArrayList<>(), true);
-        mapper.findAndRegisterPlugins();
+        mapper = new Mapper(mapping);
+
 
         mapped = mapper.transform(data, new HashMap<>(), "application/java");
 
@@ -74,8 +74,8 @@ public class JavaWriterTest {
 
         //Test calling write() function
         String mapping = TestResourceReader.readFileAsString("writeJavaFunctionTest.ds");
-        Mapper mapper = new Mapper(mapping, new ArrayList<>(), true);
-        mapper.findAndRegisterPlugins();
+        Mapper mapper = new Mapper(mapping);
+
 
         try {
             mapper.transform(data, new HashMap<>(), "application/java");

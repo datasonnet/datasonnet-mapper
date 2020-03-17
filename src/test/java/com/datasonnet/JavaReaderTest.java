@@ -39,8 +39,8 @@ public class JavaReaderTest {
 
         String mapping = TestResourceReader.readFileAsString("readJavaTest.ds");
 
-        Mapper mapper = new Mapper(mapping, new ArrayList<>(), true);
-        mapper.findAndRegisterPlugins();
+        Mapper mapper = new Mapper(mapping);
+
 
         String mapped = mapper.transform(data, new HashMap<>(), "application/json").getContentsAsString();
 

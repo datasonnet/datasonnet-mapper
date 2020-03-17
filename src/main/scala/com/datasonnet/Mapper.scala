@@ -144,7 +144,7 @@ object Mapper {
   }
 }
 
-class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imports: java.util.Map[String, String], needsWrapper: Boolean) {
+class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imports: java.util.Map[String, String], needsWrapper: Boolean, autoRegisterDataFormats: Boolean) {
 
   var header = Header.parseHeader(jsonnet);
 
@@ -154,9 +154,15 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
 
   def lineOffset = if (needsWrapper) 1 else 0
 
-  def this(jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) {
-    this(jsonnet, argumentNames, Collections.emptyMap(), needsWrapper)
+  def this(jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean, autoRegisterDataFormats: Boolean) {
+    this(jsonnet, argumentNames, Collections.emptyMap(), needsWrapper, autoRegisterDataFormats)
   }
+
+  def this(jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) {
+    this(jsonnet, argumentNames, Collections.emptyMap(), needsWrapper, true)
+  }
+
+  def this(jsonnet: String) = this(jsonnet, Collections.emptyList(), Collections.emptyMap(), true, true)
 
   private def importer(parent: Path, path: String): Option[(Path, String)] = for {
     resolved <- parent match {
@@ -178,6 +184,10 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   val evaluator = new NoFileEvaluator(jsonnet, DataSonnetPath("."), parseCache, importer, header.isPreserveOrder)
 
   val dataFormats = new DataFormatService()
+
+  if (autoRegisterDataFormats) {
+    dataFormats.findAndRegisterPlugins()
+  }
 
   def registerPlugin(plugin: DataFormatPlugin[_]) = dataFormats.registerPlugin(plugin)
 
