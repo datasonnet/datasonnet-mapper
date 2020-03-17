@@ -4,8 +4,9 @@ import java.io.{PrintWriter, StringWriter}
 import java.util
 import java.util.Collections
 
+import com.datasonnet.document.{AbstractBaseDocument, Document, StringDocument}
 import com.datasonnet.header.Header
-import com.datasonnet.spi.DataFormatService
+import com.datasonnet.spi.{DataFormatPlugin, DataFormatService}
 import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
 import fastparse.{IndexedParserInput, Parsed}
 import sjsonnet.Expr.Member.Visibility
@@ -18,17 +19,12 @@ import scala.collection.mutable
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
-
-case class StringDocument(contents: String, mimeType: String) extends Document
-
 object Mapper {
   def wrap(jsonnet: String, argumentNames: Iterable[String])=
     (Seq("payload") ++ argumentNames).mkString("function(", ",", ")\n") + jsonnet
 
-
-
-
   val location = raw"\.\(([a-zA-Z-_\.]*):(\d+):(\d+)\)|([a-zA-Z-]+):(\d+):(\d+)".r
+
   def expandErrorLineNumber(error: String, lineOffset: Int) = location.replaceAllIn(error, _ match {
     case location(filename, frow, fcolumn, token, trow, tcolumn) => {
       if (token != null) {
@@ -40,7 +36,6 @@ object Mapper {
       }
     }
   })
-
 
   def evaluate(evaluator: Evaluator, cache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]], jsonnet: String, libraries: Map[String, Val], lineOffset: Int): Try[Val] = {
 
@@ -92,15 +87,38 @@ object Mapper {
     (name -> jsonnetLibrary)
   }
 
+  def pluginAccepts(plugin: DataFormatPlugin[_]) = List(classOf[String], classOf[Object]).find((klass) => try {
+    plugin.getClass.getMethod("read", klass, classOf[util.Map[String, Object]])
+    true
+  } catch {
+    case _ => false
+  }).getOrElse(throw new UnsupportedOperationException("Illegal Data Format Plugin: Must Only Take String or Object"))
+
   def input(name: String, data: Document, header: Header): Expr = {
-    val plugin = DataFormatService.getInstance().getPluginFor(data.mimeType)
+    val plugin = DataFormatService.getInstance().getPluginFor(data.getMimeType)
     if (plugin != null) {
-      val params = header.getInputParameters(name, data.mimeType)
+      val params = header.getInputParameters(name, data.getMimeType)
       checkParams(params, plugin.getReadParameters(), plugin.getPluginId)
-      val json = plugin.read(data.contents(), params.asInstanceOf[util.Map[String, AnyRef]])
-      Materializer.toExpr(json)
+
+      val accepts = pluginAccepts(plugin);
+      val contents = if (data.canGetContentsAs(accepts)) {
+        data.getContentsAs(accepts)
+      } else {
+        throw new IllegalArgumentException("The data format plugin for " + data.getMimeType +
+          " does not support any of the data forms compatible with this type")
+      }
+
+      val json = accepts match {
+        case k if k == classOf[String] =>
+          plugin.asInstanceOf[DataFormatPlugin[String]].read(contents.asInstanceOf[String], params)
+        case k if k == classOf[Object] =>
+          plugin.asInstanceOf[DataFormatPlugin[Object]].read(contents, params)  // already Object
+        case _ => ???  // not possible, we check above for possibilities
+      }
+
+      Materializer.toExpr(json.asInstanceOf[ujson.Value])
     } else {
-      throw new IllegalArgumentException("The input mime type " + data.mimeType + " is not supported")
+      throw new IllegalArgumentException("The input mime type " + data.getMimeType + " is not supported")
     }
   }
 
@@ -109,8 +127,9 @@ object Mapper {
     if (plugin != null) {
       val params = header.getOutputParameters(mimeType)
       checkParams(params, plugin.getWriteParameters(), plugin.getPluginId)
-      val str = plugin.write(output, params.asInstanceOf[util.Map[String, AnyRef]])
-      new StringDocument(str, mimeType)
+//      val str = plugin.write(output, params.asInstanceOf[util.Map[String, AnyRef]])
+//      new StringDocument(str, mimeType)
+      plugin.write(output, params.asInstanceOf[util.Map[String, AnyRef]], mimeType)
     } else {
       throw new IllegalArgumentException("The output mime type " + mimeType + " is not supported")
     }
@@ -157,9 +176,9 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
 
   val evaluator = new NoFileEvaluator(jsonnet, DataSonnetPath("."), parseCache, importer, header.isPreserveOrder)
 
-  private val libraries = Map(
+  private val libraries:  Map[String, Val] = Map(
     "DS" -> Mapper.objectify(
-      PortX.libraries + ("Util" -> Mapper.library(evaluator, "Util", parseCache)._2.asInstanceOf[Val.Obj])
+      DS.libraries + Mapper.library(evaluator, "Util", parseCache)
     )
   )
 
@@ -190,7 +209,11 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   private val mapIndex = new IndexedParserInput(jsonnet);
 
   def transform(payload: String): String = {
-    transform(new StringDocument(payload, "application/json"), new java.util.HashMap(), "application/json").contents
+    transform(
+      new StringDocument(payload, "application/json"),
+      new java.util.HashMap(),
+      "application/json"
+    ).getContentsAsString()
   }
 
   def transform(payload: Document, arguments: java.util.Map[String, Document]): Document = {
@@ -199,6 +222,9 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
 
   def transform(payload: Document, arguments: java.util.Map[String, Document], outputMimeType: String): Document = {
 
+    // okay, okay, so at this point we: 1) figure out if we can get an object or a string
+    // then 2) we see if the converter we get for the mime type is compatible...
+    // hrmmm, any reason we can't filter by type? Whatevfer, that's internal, don't worry about it
     val data = Mapper.input("payload", payload, header)
 
     //val parsedArguments = arguments.asScala.view.mapValues { Mapper.input(_, header) }
@@ -216,7 +242,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
     val materialized = try Materializer.apply(function.copy(params = Params(firstMaterialized +: values)))(evaluator)
     catch {
       // if there's a parse error it must be in an import, so the offset is 0
-      case Error(msg, stack, underlying) if msg.contains("had Parse error")=> throw new IllegalArgumentException("Problem executing map: " + Mapper.expandErrorLineNumber(msg, 0))
+      case Error(msg, stack, underlying) if msg.contains("had Parse error") => throw new IllegalArgumentException("Problem executing map: " + Mapper.expandErrorLineNumber(msg, 0))
       case e: Throwable =>
         val s = new StringWriter()
         val p = new PrintWriter(s)

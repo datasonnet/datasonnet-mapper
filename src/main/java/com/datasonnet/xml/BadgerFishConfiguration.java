@@ -1,4 +1,4 @@
-package com.datasonnet.badgerfish;
+package com.datasonnet.xml;
 
 import javax.xml.namespace.NamespaceContext;
 import java.util.Collections;

@@ -1,6 +1,6 @@
 package com.datasonnet.spi;
 
-import com.datasonnet.XMLFormatPlugin;
+import com.datasonnet.plugins.XMLFormatPlugin;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

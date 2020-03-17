@@ -1,7 +1,10 @@
-package com.datasonnet;
+package com.datasonnet.plugins;
 
+import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatPlugin;
+import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.UjsonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
@@ -15,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CSVFormatPlugin implements DataFormatPlugin {
+public class CSVFormatPlugin implements DataFormatPlugin<String> {
 
     public static String USE_HEADER = "UseHeader";
     public static String QUOTE_CHAR = "Quote";
@@ -28,7 +31,8 @@ public class CSVFormatPlugin implements DataFormatPlugin {
 
     }
 
-    public Value read(String input, Map<String, Object> params) throws IOException {
+    @Override
+    public Value read(String input, Map<String, Object> params) throws PluginException {
 
         ObjectMapper mapper = new ObjectMapper();
         CsvSchema.Builder builder = this.getBuilder(params);
@@ -41,17 +45,28 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         csvMapper.enable(CsvParser.Feature.WRAP_AS_ARRAY);
 
         // Read data from CSV file
-        List readAll = useHeader ? csvMapper.readerFor(Map.class).with(csvSchema).readValues(input).readAll() :
-                csvMapper.readerFor(List.class).with(csvSchema).readValues(input).readAll();
-        String jsonStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(readAll);
-
-        return UjsonUtil.jsonObjectValueOf(jsonStr);
+        try {
+            List readAll = useHeader ? csvMapper.readerFor(Map.class).with(csvSchema).readValues(input).readAll() :
+                    csvMapper.readerFor(List.class).with(csvSchema).readValues(input).readAll();
+            String jsonStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(readAll);
+            return UjsonUtil.jsonObjectValueOf(jsonStr);
+        } catch (JsonProcessingException jpe) {
+            throw new PluginException("Unable to convert CSV to JSON", jpe);
+        } catch (IOException ioe) {
+            throw new PluginException("Unable to read CSV input", ioe);
+        }
     }
 
-    public String write(Value input, Map<String, Object> params) throws IOException {
+    @Override
+    public StringDocument write(Value input, Map<String, Object> params, String mimeType) throws PluginException {
         CsvSchema.Builder builder = this.getBuilder(params);
 
-        JsonNode jsonTree = new ObjectMapper().readTree(UjsonUtil.jsonObjectValueTo(input));
+        final JsonNode jsonTree;
+        try {
+            jsonTree = new ObjectMapper().readTree(UjsonUtil.jsonObjectValueTo(input));
+        } catch (JsonProcessingException e) {
+            throw new PluginException("Unable to read JSON Tree", e);
+        }
         boolean useHeader = params != null && params.get(USE_HEADER) != null ? new Boolean(params.get(USE_HEADER).toString()) : true;
 
         if (useHeader) {
@@ -71,11 +86,17 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         CsvSchema csvSchema = builder.build();
 
         CsvMapper csvMapper = new CsvMapper();
-        String value = csvMapper.writerFor(JsonNode.class)
-                .with(csvSchema).writeValueAsString(jsonTree);
-        return value;
+
+        try {
+            final String value = csvMapper.writerFor(JsonNode.class)
+                    .with(csvSchema).writeValueAsString(jsonTree);
+            return new StringDocument(value, mimeType);
+        } catch (JsonProcessingException e) {
+            throw new PluginException("Unable to write CSV output", e);
+        }
     }
 
+    @Override
     public String[] getSupportedIdentifiers() {
         return new String[] { "application/csv", "text/csv", "csv" };
     }
@@ -119,6 +140,7 @@ public class CSVFormatPlugin implements DataFormatPlugin {
         return getReadParameters();
     }
 
+    @Override
     public String getPluginId() {
         return "CSV";
     }

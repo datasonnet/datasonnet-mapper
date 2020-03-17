@@ -1,7 +1,7 @@
 package com.datasonnet.spi;
 
-import com.datasonnet.Document;
-import com.datasonnet.JSONFormatPlugin;
+import com.datasonnet.document.Document;
+import com.datasonnet.plugins.JSONFormatPlugin;
 import ujson.Str;
 import ujson.Value;
 
@@ -70,27 +70,5 @@ public class DataFormatService {
     public void findAndRegisterPlugins() {
         registerPlugins(findPlugins());
     }
-
-    public Value prepareForInput(Document data) {
-        DataFormatPlugin plugin = this.getPluginFor(data.mimeType());
-        if(plugin instanceof JSONFormatPlugin) {
-            return UjsonUtil.jsonObjectValueOf(data.contents());
-        } else {
-            return UjsonUtil.stringValueOf(data.contents());
-        }
-    }
-
-    public String prepareForOutput(Value json, String identifier) throws Exception {
-        DataFormatPlugin plugin = this.getPluginFor(identifier);
-        if(plugin instanceof JSONFormatPlugin) {
-            return plugin.write(json, new HashMap<>());
-        } else {
-            if(json instanceof Str) {
-                return UjsonUtil.stringValueTo((Str) json);
-            } else {
-                throw new IllegalArgumentException("Non-JSON output must be a single string");
-            }
-
-        }
-    }
+    
 }

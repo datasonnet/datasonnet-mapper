@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.datasonnet.document.Document;
+import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.BeforeAll;
@@ -41,7 +43,7 @@ public class MapperTest {
     void variables(String jsonnet, String json, String variable, String value, String expected) {
         Map<String, Document> variables = Collections.singletonMap(variable, new StringDocument(value, "application/json"));
         Mapper mapper = new Mapper(jsonnet, variables.keySet(), true);
-        assertEquals(expected, mapper.transform(new StringDocument(json, "application/json"), variables).contents());
+        assertEquals(expected, mapper.transform(new StringDocument(json, "application/json"), variables).getContentsAsString());
     }
 
     static Stream<String[]> variableProvider() {
@@ -124,7 +126,10 @@ public class MapperTest {
 
         Document mapped = mapper.transform(new StringDocument("{}", "application/json"), map, "text/plain");
 
-        assertEquals(new StringDocument("value", "text/plain"), mapped);
+        //assertEquals(new StringDocument("value", "text/plain"), mapped);
+        assertEquals("value", mapped.getContentsAsString());
+        assertEquals("text/plain", mapped.getMimeType());
+
     }
 
     @Test
@@ -147,7 +152,7 @@ public class MapperTest {
         variables.put("v1", new StringDocument("v1value", "text/plain"));
 
         Mapper mapper = new Mapper(datasonnet, variables.keySet(), true);
-        String mapped = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json").contents();
+        String mapped = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json").getContentsAsString();
 
         assertEquals("{\"z\":\"z\",\"a\":\"a\",\"v2\":\"v2value\",\"v1\":\"v1value\",\"y\":\"y\",\"t\":\"t\"}", mapped.trim());
 
@@ -156,7 +161,7 @@ public class MapperTest {
                      "output.preserveOrder=false\n*/\n" + datasonnet;
 
         mapper = new Mapper(datasonnet, variables.keySet(), true);
-        mapped = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json").contents();
+        mapped = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json").getContentsAsString();
 
         assertEquals("{\"a\":\"a\",\"t\":\"t\",\"v1\":\"v1value\",\"v2\":\"v2value\",\"y\":\"y\",\"z\":\"z\"}", mapped.trim());
     }

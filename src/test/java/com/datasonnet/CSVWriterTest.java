@@ -1,5 +1,7 @@
 package com.datasonnet;
 
+import com.datasonnet.document.Document;
+import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import com.datasonnet.Mapper;
@@ -28,9 +30,9 @@ public class CSVWriterTest {
         );
 
         Mapper mapper = new Mapper("payload", Collections.emptyList(), true);
-        Document mapped = mapper.transform(data, Collections.emptyMap(), "application/csv");
+        String mapped = mapper.transform(data, Collections.emptyMap(), "application/csv").getContentsAsString();
         String expected = TestResourceReader.readFileAsString("writeCSVTest.csv");
-        assertEquals(expected.trim(), mapped.contents().trim());
+        assertEquals(expected.trim(), mapped.trim());
     }
 
     @Test
@@ -42,9 +44,9 @@ public class CSVWriterTest {
         String datasonnet = TestResourceReader.readFileAsString("writeCSVExtTest.ds");
 
         Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
-        Document mapped = mapper.transform(data, Collections.emptyMap(), "application/csv");
+        String mapped = mapper.transform(data, Collections.emptyMap(), "application/csv").getContentsAsString();
         String expected = TestResourceReader.readFileAsString("writeCSVExtTest.csv");
-        assertEquals(expected.trim(), mapped.contents().trim());
+        assertEquals(expected.trim(), mapped.trim());
     }
 
     @Test
@@ -56,9 +58,9 @@ public class CSVWriterTest {
         );
 
         Mapper mapper = new Mapper("{ embeddedCSVValue: DS.Formats.write(payload, \"application/csv\") }", Collections.emptyList(), true);
-        Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
+        String mapped = mapper.transform(data, Collections.emptyMap(), "application/json").getContentsAsString();
         String expected = "{\"embeddedCSVValue\":\"\\\"First Name\\\",\\\"Last Name\\\",Phone\\nWilliam,Shakespeare,\\\"(123)456-7890\\\"\\nChristopher,Marlow,\\\"(987)654-3210\\\"\\n\"}";
-        assertEquals(expected.trim(), mapped.contents().trim());
+        assertEquals(expected.trim(), mapped.trim());
     }
 
     @Test
@@ -70,9 +72,9 @@ public class CSVWriterTest {
         String datasonnet = TestResourceReader.readFileAsString("writeCSVFunctionExtTest.ds");
 
         Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
-        Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
+        String mapped = mapper.transform(data, Collections.emptyMap(), "application/json").getContentsAsString();
         String expected = "{\"embeddedCSVValue\":\"'William'|'Shakespeare'|'(123)456-7890'\\n'Christopher'|'Marlow'|'(987)654-3210'\\n\"}";
-        assertEquals(expected.trim(), mapped.contents().trim());
+        assertEquals(expected.trim(), mapped.trim());
     }
 
 }

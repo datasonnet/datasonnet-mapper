@@ -65,6 +65,10 @@ DS.Formats.write(payload.someObj, "application/xml", params);
 
 ## XML Format
 
+### MIME types and identifiers
+    * `application/xml`
+    * `xml`
+
 ### `read`
 Converts input XML string to a JSON object using http://wiki.open311.org/JSON_and_XML_Conversion/#the-badgerfish-convention[BadgerFish convention]:
 
@@ -110,7 +114,6 @@ DS.Formats.read(payload.embeddedXMLValue, "application/xml")
 ------------------------
 
 Providing an optional `params` object allows for additional control over JSON generation. The `params` is a JSON object where following properties can be set:
-
 
 [%header, cols=3*a]
 |===
@@ -328,6 +331,11 @@ local params = {
 
 ## CSV Format
 
+### MIME types and identifiers
+* `application/csv`
+* `text/csv`
+* `csv`
+
 ### `read`
 
 Parses the CSV and converts it to a JSON array of objects. It expects the CSV input to be in a default format, with first row as column headers, comma separator, double quote, backslash escape character and `\n` newline character. CSV headers are used as keys for the corresponding JSON object values.
@@ -493,4 +501,53 @@ local params = {
 }
 ------------------------
 
+## Java Objects
 
+### `read`
+
+Converts POJO to JSON format using https://github.com/FasterXML/jackson[Jackson ObjectMapper].
+
+The following read parameters are supported:
+
+[%header, cols=3*a]
+|===
+|Parameter
+|Description
+|Default value
+
+|`DateFormat`
+|Converts POJO date / time fields to JSON strings using specified date format. See https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html[SimpleDateFormat] for details.
+|`yyyy-MM-dd'T'HH:mm:ss.SSSZ`
+
+|===
+
+### `write`
+
+Converts JSON objects to Java POJOs using https://github.com/FasterXML/jackson[Jackson ObjectMapper].
+
+The following write parameters are supported:
+
+[%header, cols=3*a]
+|===
+|Parameter
+|Description
+|Default value
+
+|`DateFormat`
+|Converts POJO date / time fields to JSON strings using specified date format. See https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html[SimpleDateFormat] for details.
+|`yyyy-MM-dd'T'HH:mm:ss.SSSZ`
+
+|`OutputClass`
+|Produces an instance of specified class. If parameter is not set, the following conversion rules are used:
+
+- Objects -> `java.util.HashMap`
+- Arrays -> `java.util.ArrayList`
+- String values -> `java.lang.String`
+- Boolean values -> `java.lang.Boolean`
+- Numerical values -> `java.lang.Number`
+
+|
+
+|===
+
+IMPORTANT: It is not recommended to call `DS.Formats.write(...)` directly in the DataSonnet code, because it will produce a String representation of a POJO, i.e. `pojo.toString()`. Normally POJO outputs are expected to be the end results of the transformations and are controlled by the appropriate xref:headers.adoc[headers] at the beginning of the transformation code.

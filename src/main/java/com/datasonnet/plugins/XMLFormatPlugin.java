@@ -1,8 +1,10 @@
-package com.datasonnet;
+package com.datasonnet.plugins;
 
 
-import com.datasonnet.badgerfish.*;
+import com.datasonnet.xml.*;
+import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatPlugin;
+import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.UjsonUtil;
 
 import org.codehaus.jettison.json.JSONArray;
@@ -21,6 +23,7 @@ import org.codehaus.stax2.ri.Stax2WriterAdapter;
 
 import javax.xml.stream.*;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -28,7 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class XMLFormatPlugin implements DataFormatPlugin {
+public class XMLFormatPlugin implements DataFormatPlugin<String> {
     public static String NAMESPACE_DECLARATIONS = "NamespaceDeclarations";
     public static String NAMESPACE_SEPARATOR = "NamespaceSeparator";
     public static String TEXT_VALUE_KEY = "TextValueKey";
@@ -48,51 +51,62 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         System.setProperty("javax.xml.stream.XMLOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");
     }
 
-    public Value read(String inputXML, Map<String, Object> params) throws Exception {
-        if(params == null) {
+    @Override
+    public Value read(String inputXML, Map<String, Object> params) throws PluginException {
+        if (params == null) {
             params = Collections.emptyMap();
         }
 
-        try(Reader input = new StringReader(inputXML);
-            StringWriter output = new StringWriter();
-            ) {
+        try (Reader input = new StringReader(inputXML);
+             StringWriter output = new StringWriter();
+        ) {
             XMLStreamReader2 reader = createInputStream(input);
             XMLStreamWriter2 writer = createJSONOutputStream(params, output);
 
             XMLEventPipe pipe = new XMLEventPipe(reader, writer);
             pipe.pipe();
 
-            return UjsonUtil.jsonObjectValueOf(output.toString());
+
+            Value value = UjsonUtil.jsonObjectValueOf(output.toString());
+            return value;
+        } catch (IOException e) {
+            throw new PluginException("Unable to create reader", e);
+        } catch (XMLStreamException e) {
+            throw new PluginException(e);
         }
     }
 
-    public String write(Value inputXML, Map<String, Object> params) throws Exception {
-        JSONObject input = new JSONObject(UjsonUtil.jsonObjectValueTo(inputXML));
+    @Override
+    public StringDocument write(Value inputXML, Map<String, Object> params, String mimeType) throws PluginException {
+        try {
+            JSONObject input = new JSONObject(UjsonUtil.jsonObjectValueTo(inputXML));
 
-        if (params.containsKey(ROOT_ELEMENT)) {
-            JSONObject root = new JSONObject();
-            root.put(params.get(ROOT_ELEMENT).toString(), input);
-            input = root;
-        } else {
-            //Check that input has only one root element
-            JSONArray names = input.names();
-            if (names.length() != 1) {
-                throw new IllegalArgumentException("Object must have only one root element; has " + names.toString());
+            if (params.containsKey(ROOT_ELEMENT)) {
+                JSONObject root = new JSONObject();
+                root.put(params.get(ROOT_ELEMENT).toString(), input);
+                input = root;
+            } else {
+                //Check that input has only one root element
+                JSONArray names = input.names();
+                if (names.length() != 1) {
+                    throw new IllegalArgumentException("Object must have only one root element; has " + names.toString());
+                }
+                Object o = input.get(names.get(0).toString());
+                if (!(o instanceof JSONObject)) {
+                    throw new IllegalArgumentException("Value of \"" + names.get(0) + "\" must be an object");
+                }
             }
-            Object o = input.get(names.get(0).toString());
-            if (!(o instanceof JSONObject)) {
-                throw new IllegalArgumentException("Value of \"" + names.get(0) + "\" must be an object");
-            }
-        }
 
-        try (StringWriter output = new StringWriter()){
+            StringWriter output = new StringWriter();
             XMLStreamWriter2 writer = createXMLOutputStream(params, output);
             XMLStreamReader2 reader = createInputStream(params, input);
 
             XMLEventPipe pipe = new XMLEventPipe(reader, writer);
             pipe.pipe();
 
-            return output.toString();
+            return new StringDocument(output.toString(), mimeType);
+        } catch (Exception e) {
+            throw new PluginException(e);
         }
     }
 
@@ -113,7 +127,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         convention.setEncoding((String) params.getOrDefault(ENCODING, WstxOutputProperties.DEFAULT_OUTPUT_ENCODING));
         convention.setVersion((String) params.getOrDefault(XML_VERSION, WstxOutputProperties.DEFAULT_XML_VERSION));
 
-        XMLStreamReader2 reader =  Stax2ReaderAdapter.wrapIfNecessary(new BadgerFishXMLStreamReader(input, convention));
+        XMLStreamReader2 reader = Stax2ReaderAdapter.wrapIfNecessary(new BadgerFishXMLStreamReader(input, convention));
 
         return filterReader(params, reader);
     }
@@ -132,22 +146,22 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         BadgerFishConfiguration config = new BadgerFishConfiguration();
 
         if (params.containsKey(NAMESPACE_DECLARATIONS)) {
-            config.setNamespaceBindings((Map)params.get(NAMESPACE_DECLARATIONS));
+            config.setNamespaceBindings((Map) params.get(NAMESPACE_DECLARATIONS));
         }
         if (params.containsKey(NULL_AS_EMPTY_ELEMENT)) {
             config.setNullAsEmptyElement(new Boolean(params.get(NULL_AS_EMPTY_ELEMENT).toString()));
         }
         if (params.containsKey(NAMESPACE_SEPARATOR)) {
-            config.setNamespaceSeparator((String)params.get(NAMESPACE_SEPARATOR));
+            config.setNamespaceSeparator((String) params.get(NAMESPACE_SEPARATOR));
         }
         if (params.containsKey(TEXT_VALUE_KEY)) {
-            config.setTextValueKey((String)params.get(TEXT_VALUE_KEY));
+            config.setTextValueKey((String) params.get(TEXT_VALUE_KEY));
         }
         if (params.containsKey(CDATA_VALUE_KEY)) {
-            config.setCdataValueKey((String)params.get(CDATA_VALUE_KEY));
+            config.setCdataValueKey((String) params.get(CDATA_VALUE_KEY));
         }
         if (params.containsKey(ATTRIBUTE_CHARACTER)) {
-            config.setAttributeCharacter((String)params.get(ATTRIBUTE_CHARACTER));
+            config.setAttributeCharacter((String) params.get(ATTRIBUTE_CHARACTER));
         }
 
         return config;
@@ -166,8 +180,9 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         return reader;
     }
 
+    @Override
     public String[] getSupportedIdentifiers() {
-        return new String[] { "application/xml", "xml" };
+        return new String[]{"application/xml", "xml"};
     }
 
     @Override
@@ -198,6 +213,7 @@ public class XMLFormatPlugin implements DataFormatPlugin {
         return Collections.unmodifiableMap(writeParams);
     }
 
+    @Override
     public String getPluginId() {
         return "XML";
     }

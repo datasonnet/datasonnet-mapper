@@ -1,4 +1,4 @@
-package com.datasonnet.badgerfish;
+package com.datasonnet.xml;
 
 import org.codehaus.jettison.Convention;
 import org.codehaus.jettison.Node;

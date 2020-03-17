@@ -2,23 +2,22 @@ package com.datasonnet
 
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, Period, ZoneId, ZoneOffset}
+import java.util.Collections
 import java.util.function.Function
 
 import com.datasonnet
-import com.datasonnet.spi.{DataFormatPlugin, DataFormatService, UnsupportedMimeTypeException, UnsupportedParameterException}
+import com.datasonnet.spi.{DataFormatPlugin, DataFormatService}
 import sjsonnet.Std.builtinWithDefaults
 import sjsonnet.{Applyer, Error, EvalScope, Expr, Materializer, Val}
 import com.datasonnet.wrap.Library.library
+import pprint.PPrinter
 import sjsonnet.ReadWriter.StringRead
 import sjsonnet.Std._
 import ujson.Value
 
-import scala.util.Failure
+object DS {
 
-
-object PortX {
-
-  val libraries = Map(
+  val libraries:  Map[String, Val] = Map(
     "ZonedDateTime" -> library(
       builtin0("now") { (vals, ev, fs) => Instant.now().toString() },
 
@@ -79,7 +78,11 @@ object PortX {
                           "params" -> Some(Expr.Null(0))) { (args, ev) =>
         val data = args("data").cast[Val.Str].value
         val mimeType = args("mimeType").cast[Val.Str].value
-        val params = if (args("params") == Val.Null) null else args("params").cast[Val.Obj]
+        val params = if (args("params") == Val.Null) {
+          Mapper.objectify(Map.empty)
+        } else {
+          args("params").cast[Val.Obj]
+        }
         read(data, mimeType, params, ev)
       },
       builtinWithDefaults("write",
@@ -88,7 +91,11 @@ object PortX {
         "params" -> Some(Expr.Null(0))) { (args, ev) =>
         val data = args("data")
         val mimeType = args("mimeType").cast[Val.Str].value
-        val params = if (args("params") == Val.Null) null else args("params").cast[Val.Obj]
+        val params = if (args("params") == Val.Null) {
+          Mapper.objectify(Map.empty)
+        } else {
+          args("params").cast[Val.Obj]
+        }
         write(data, mimeType, params, ev)
       },
 
@@ -204,31 +211,49 @@ object PortX {
   def read(data: String, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {
     val plugin = DataFormatService.getInstance().getPluginFor(mimeType)
     if (plugin == null) {
-      throw new UnsupportedMimeTypeException("No suitable plugin found for mime type: " + mimeType)
+      throw new Error.Delegate("No suitable plugin found for mime type: " + mimeType)
     }
-    val javaParams = if (params != null) toJavaParams(ev, params, plugin) else new java.util.HashMap[String, Object]()
-    Materializer.reverse(plugin.read(data, javaParams))
+    val javaParams = toJavaReadParams(ev, params, plugin)
+    val json = try {
+      plugin.getClass.getMethod("read", classOf[String], classOf[java.util.Map[String, Object]])
+      plugin.asInstanceOf[DataFormatPlugin[String]].read(data, javaParams)
+    } catch {
+      case _ => throw new Error.Delegate("The data format plugin for " + mimeType +
+        " does not take Strings, which is required for conversions inside DataSonnet code")
+    }
+
+    Materializer.reverse(json)
   }
 
   def write(json: Val, mimeType: String, params: Val.Obj, ev: EvalScope): String = {
     val plugin = DataFormatService.getInstance().getPluginFor(mimeType)
     if (plugin == null) {
-      throw new UnsupportedMimeTypeException("No suitable plugin found for mime type: " + mimeType);
+      throw new Error.Delegate("No suitable plugin found for mime type: " + mimeType);
     }
-    val javaParams = if (params != null) toJavaParams(ev, params, plugin) else new java.util.HashMap[String, Object]()
-    plugin.write(Materializer.apply(json)(ev), javaParams)
+    val javaParams = toJavaWriteParams(ev, params, plugin)
+    val output = plugin.write(Materializer.apply(json)(ev), javaParams, mimeType)
+    if (output.canGetContentsAs(classOf[String])) {
+      output.getContentsAsString()
+    } else {
+      throw new Error.Delegate("The data format plugin for " + mimeType +
+        " does not return output that can be rendered as a String, which is required for conversions inside" +
+        "DataSonnet code")
+    }
   }
 
-  def toJavaParams(ev: EvalScope, params: Val.Obj, plugin: DataFormatPlugin): java.util.Map[String, Object] = {
+  def toJavaReadParams(ev: EvalScope, params: Val.Obj, plugin: DataFormatPlugin[_]) =
+    toJavaParams(ev, params, plugin.getReadParameters(), plugin)
 
+  def toJavaWriteParams(ev: EvalScope, params: Val.Obj, plugin: DataFormatPlugin[_]) =
+    toJavaParams(ev, params, plugin.getWriteParameters(), plugin)
+
+  def toJavaParams(ev: EvalScope, params: Val.Obj, supported: java.util.Map[String, String], plugin: DataFormatPlugin[_]) = {
     val scalaParams = ujson.read(Materializer.apply(params)(ev)).obj;
     val javaParams = new java.util.HashMap[String, Object]()
-    val supportedParams = plugin.getReadParameters()
-
     //Convert to Java map
     for ((k, v) <- scalaParams) {
-      if (!supportedParams.containsKey(k)) {
-        Failure(new UnsupportedParameterException("The parameter " + k + " is not supported by plugin " + plugin.getPluginId))
+      if (!supported.containsKey(k)) {
+        throw new Error.Delegate("The parameter " + k + " is not supported by plugin " + plugin.getPluginId)
       }
       javaParams.put(k, toJavaObject(v))
     }
