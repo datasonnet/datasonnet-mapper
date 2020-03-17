@@ -17,7 +17,7 @@ import ujson.Value
 
 object DS {
 
-  val libraries = Map(
+  val libraries:  Map[String, Val] = Map(
     "ZonedDateTime" -> library(
       builtin0("now") { (vals, ev, fs) => Instant.now().toString() },
 

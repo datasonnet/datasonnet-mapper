@@ -1,0 +1,8 @@
+{
+    z: payload.z,
+    a: payload.a,
+    v2: v2,
+    v1: v1,
+    y: payload.y,
+    t: payload.t
+}

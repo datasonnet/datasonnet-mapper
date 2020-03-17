@@ -77,7 +77,26 @@ dataformat.application/csv.commaSeparatedVar.Separator=,
 
 For the list of the supported data formats and their configurable properties, see the xref:dataformats.adoc[Data Formats] section.
 
+## Miscellaneous Properties
 
+[%header, cols=4*a]
+|===
+|Header
+|Description
+|Required
+|Default value
+
+|`version`
+| DataSonnet language version. Currently this property has no effect on the DataSonnet behavior.
+| no
+| `1.0`
+
+|`output.preserveOrder`
+|Controls whether order of fields as they appear in the mapping will be preserved in the resulting JSON.
+| no
+|`true`
+
+|===
 
 
 
