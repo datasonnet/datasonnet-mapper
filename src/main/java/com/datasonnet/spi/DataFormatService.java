@@ -9,19 +9,10 @@ import java.util.*;
 
 public class DataFormatService {
 
-    private static DataFormatService service;
-
     private Map<String, List<DataFormatPlugin>> pluginRegistry = new HashMap<>();
 
-    DataFormatService() {
+    public DataFormatService() {
         registerPlugin(new JSONFormatPlugin());
-    }
-
-    public static synchronized DataFormatService getInstance() {
-        if (service == null) {
-            service = new DataFormatService();
-        }
-        return service;
     }
 
     public void registerPlugin(DataFormatPlugin plugin) {
@@ -63,12 +54,7 @@ public class DataFormatService {
         }};
     }
 
-    public List<String> getSupportedIdentifiers() {
-        return new ArrayList(pluginRegistry.keySet());
-    }
-
     public void findAndRegisterPlugins() {
         registerPlugins(findPlugins());
     }
-    
 }

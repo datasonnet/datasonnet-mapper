@@ -18,11 +18,6 @@ import java.util.stream.Stream;
 
 public class MapperTest {
 
-    @BeforeAll
-    static void registerPlugins() throws Exception {
-        DataFormatService.getInstance().findAndRegisterPlugins();
-    }
-
     @ParameterizedTest
     @MethodSource("simpleProvider")
     void simple(String jsonnet, String json, String expected) {
@@ -119,8 +114,8 @@ public class MapperTest {
 
     @Test
     void nonJsonArguments() {
-        DataFormatService.getInstance().findAndRegisterPlugins();
         Mapper mapper = new Mapper("argument", Arrays.asList("argument"), true);
+        mapper.findAndRegisterPlugins();
 
         Map<String, Document> map = Collections.singletonMap("argument", new StringDocument("value", "text/plain"));
 
@@ -152,6 +147,8 @@ public class MapperTest {
         variables.put("v1", new StringDocument("v1value", "text/plain"));
 
         Mapper mapper = new Mapper(datasonnet, variables.keySet(), true);
+        mapper.findAndRegisterPlugins();
+
         String mapped = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json").getContentsAsString();
 
         assertEquals("{\"z\":\"z\",\"a\":\"a\",\"v2\":\"v2value\",\"v1\":\"v1value\",\"y\":\"y\",\"t\":\"t\"}", mapped.trim());
@@ -161,6 +158,8 @@ public class MapperTest {
                      "output.preserveOrder=false\n*/\n" + datasonnet;
 
         mapper = new Mapper(datasonnet, variables.keySet(), true);
+        mapper.findAndRegisterPlugins();
+
         mapped = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json").getContentsAsString();
 
         assertEquals("{\"a\":\"a\",\"t\":\"t\",\"v1\":\"v1value\",\"v2\":\"v2value\",\"y\":\"y\",\"z\":\"z\"}", mapped.trim());

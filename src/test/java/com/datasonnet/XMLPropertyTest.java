@@ -26,10 +26,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(JUnitQuickcheck.class)
 public class XMLPropertyTest {
 
-    @BeforeAll
-    static void registerPlugins() throws Exception {
-        DataFormatService.getInstance().findAndRegisterPlugins();
-    }
+
 
     @Property
     public void reversible(@From(XMLGenerator.class) @Dictionary("xml.dict") Document dom) throws Exception {

@@ -16,11 +16,6 @@ import java.util.Collections;
 
 public class XMLReaderTest {
 
-    @BeforeAll
-    static void registerPlugins() throws Exception {
-        DataFormatService.getInstance().findAndRegisterPlugins();
-    }
-
     @Test
     void testNonAscii() throws Exception {
         mapAndAssert("xmlNonAscii.xml", "xmlNonAscii.json");
@@ -34,6 +29,8 @@ public class XMLReaderTest {
         String jsonnet = "/** DataSonnet\nversion=1.0\ninput.payload.application/xml.NamespaceDeclarations.b=http://example.com/1\n*/\npayload";
 
         Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         String mapped = mapper.transform(new StringDocument(xml, "application/xml"), Collections.emptyMap(), "application/json").getContentsAsString();
 
         // the b namespace must have been remapped
@@ -53,6 +50,8 @@ public class XMLReaderTest {
         String expectedJson = TestResourceReader.readFileAsString("readXMLExtTest.json");
 
         Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), Collections.emptyMap(), "application/json").getContentsAsString();
 
         JSONAssert.assertEquals(expectedJson, mappedJson, false);
@@ -77,8 +76,9 @@ public class XMLReaderTest {
         String xmlData = TestResourceReader.readFileAsString(inputFileName);
         String expectedJson = TestResourceReader.readFileAsString(expectedFileName);
 
-
         Mapper mapper = new Mapper("payload", Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), Collections.emptyMap(), "application/json").getContentsAsString();
         JSONAssert.assertEquals(expectedJson, mappedJson, false);
     }

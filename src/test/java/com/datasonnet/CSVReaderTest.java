@@ -15,11 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CSVReaderTest {
 
-    @BeforeAll
-    static void registerPlugins() throws Exception {
-        DataFormatService.getInstance().findAndRegisterPlugins();
-    }
-
     @Test
     void testCSVReader() throws URISyntaxException, IOException {
         Document data = new StringDocument(
@@ -28,6 +23,8 @@ public class CSVReaderTest {
         );
 
         Mapper mapper = new Mapper("{ fName: payload[0][\"First Name\"] }", Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
 
         assertEquals("{\"fName\":\"Eugene\"}", mapped.getContentsAsString());
@@ -42,6 +39,8 @@ public class CSVReaderTest {
         String jsonnet = TestResourceReader.readFileAsString("readCSVExtTest.ds");
 
         Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
 
         assertEquals("{\"fName\":\"Eugene\",\"num\":\"234\"}", mapped.getContentsAsString());

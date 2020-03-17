@@ -21,10 +21,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 
 public class JavaWriterTest {
-    @BeforeAll
-    static void registerPlugins() throws Exception {
-        DataFormatService.getInstance().findAndRegisterPlugins();
-    }
 
     @Test
     void testJavaWriter() throws Exception {
@@ -35,6 +31,8 @@ public class JavaWriterTest {
         Document data = new StringDocument(json, "application/json");
 
         Mapper mapper = new Mapper(mapping, new ArrayList<>(), true);
+        mapper.findAndRegisterPlugins();
+
         Document mapped = mapper.transform(data, new HashMap<>(), "application/java");
 
         Object result = mapped.getContentsAsObject();
@@ -55,6 +53,8 @@ public class JavaWriterTest {
         mapping = mapping.substring(mapping.lastIndexOf("*/") + 2);
 
         mapper = new Mapper(mapping, new ArrayList<>(), true);
+        mapper.findAndRegisterPlugins();
+
         mapped = mapper.transform(data, new HashMap<>(), "application/java");
 
         result = mapped.getContentsAsObject();
@@ -75,6 +75,8 @@ public class JavaWriterTest {
         //Test calling write() function
         String mapping = TestResourceReader.readFileAsString("writeJavaFunctionTest.ds");
         Mapper mapper = new Mapper(mapping, new ArrayList<>(), true);
+        mapper.findAndRegisterPlugins();
+
         try {
             mapper.transform(data, new HashMap<>(), "application/java");
             fail("Should not succeed");

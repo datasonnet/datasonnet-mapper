@@ -21,17 +21,14 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class XMLWriterTest {
 
-    @BeforeAll
-    static void registerPlugins() throws Exception {
-        DataFormatService.getInstance().findAndRegisterPlugins();
-    }
-
     @Test
     void testOverrideNamespaces() throws Exception {
         String json = "{\"b:a\":{\"@xmlns\":{\"b\":\"http://example.com/1\",\"b1\":\"http://example.com/2\"},\"b1:b\":{}}}";
         String datasonnet = TestResourceReader.readFileAsString("xmlOverrideNamespaces.ds");
 
         Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         String mapped = mapper.transform(new StringDocument(json, "application/json"), Collections.emptyMap(), "application/xml").getContentsAsString();
 
         // original mapping is gone
@@ -54,6 +51,8 @@ public class XMLWriterTest {
         String datasonnet = TestResourceReader.readFileAsString("xmlNamespaceBump.ds");
 
         Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         String mapped = mapper.transform(new StringDocument(json, "application/json"), Collections.emptyMap(), "application/xml").getContentsAsString();
 
 
@@ -76,6 +75,8 @@ public class XMLWriterTest {
         String expectedXml = TestResourceReader.readFileAsString("readXMLExtTest.xml");
 
         Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").getContentsAsString();
 
         Map<String, String> namespaces = new HashMap<>();
@@ -92,6 +93,8 @@ public class XMLWriterTest {
         String datasonnet = TestResourceReader.readFileAsString("xmlNonAscii.ds");
 
         Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").getContentsAsString();
 
         assertEquals(expectedXml, mappedXml);
@@ -107,6 +110,8 @@ public class XMLWriterTest {
         String datasonnet = TestResourceReader.readFileAsString("xmlNonAscii.ds");//Reuse existing one to avoid duplication
 
         Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").getContentsAsString();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
@@ -120,6 +125,8 @@ public class XMLWriterTest {
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"XmlVersion\" : \"1.1\"\n" +
                 "};DS.Formats.write(payload, \"application/xml\", params)", Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").getContentsAsString();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
@@ -132,6 +139,8 @@ public class XMLWriterTest {
         String datasonnet = TestResourceReader.readFileAsString("xmlEmptyElementsNull.ds");
 
         Mapper mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").getContentsAsString();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
@@ -140,6 +149,8 @@ public class XMLWriterTest {
         datasonnet = TestResourceReader.readFileAsString("xmlEmptyElementsNoNull.ds");
 
         mapper = new Mapper(datasonnet, Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").getContentsAsString();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
@@ -154,6 +165,8 @@ public class XMLWriterTest {
                 "output.application/xml.OmitXmlDeclaration=true\n" +
                 "*/\n" +
                 "payload", Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").getContentsAsString();
 
         assertFalse(mappedXml.contains("<?xml"));
@@ -163,6 +176,7 @@ public class XMLWriterTest {
                 "output.application/xml.OmitXmlDeclaration=false\n" +
                 "*/\n" +
                 "payload", Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
 
         mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").getContentsAsString();
 
@@ -174,6 +188,8 @@ public class XMLWriterTest {
         String jsonData = TestResourceReader.readFileAsString("xmlRoot.json");
 
         Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/xml\")", Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         try {
             String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").getContentsAsString();
             fail("Must fail to transform");
@@ -186,6 +202,8 @@ public class XMLWriterTest {
                 "output.application/xml.RootElement=TestRoot\n" +
                 "*/\n" +
                 "payload", Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         try {
             String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").getContentsAsString();
         } catch(IllegalArgumentException e) {
@@ -197,6 +215,8 @@ public class XMLWriterTest {
         String jsonData = TestResourceReader.readFileAsString("test.json");
 
         Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/xml\")", Collections.emptyList(), true);
+        mapper.findAndRegisterPlugins();
+
         String mappedXml = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/xml").getContentsAsString();
 
 
