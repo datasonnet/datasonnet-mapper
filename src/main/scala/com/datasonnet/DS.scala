@@ -17,7 +17,7 @@ import ujson.Value
 
 object DS {
 
-  val libraries:  Map[String, Val] = Map(
+  def libraries(dataFormats: DataFormatService):  Map[String, Val] = Map(
     "ZonedDateTime" -> library(
       builtin0("now") { (vals, ev, fs) => Instant.now().toString() },
 
@@ -83,7 +83,7 @@ object DS {
         } else {
           args("params").cast[Val.Obj]
         }
-        read(data, mimeType, params, ev)
+        read(dataFormats, data, mimeType, params, ev)
       },
       builtinWithDefaults("write",
         "data" -> None,
@@ -96,7 +96,7 @@ object DS {
         } else {
           args("params").cast[Val.Obj]
         }
-        write(data, mimeType, params, ev)
+        write(dataFormats, data, mimeType, params, ev)
       },
 
     ),
@@ -208,8 +208,8 @@ object DS {
 
   )
 
-  def read(data: String, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {
-    val plugin = DataFormatService.getInstance().getPluginFor(mimeType)
+  def read(dataFormats: DataFormatService, data: String, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {
+    val plugin = dataFormats.getPluginFor(mimeType)
     if (plugin == null) {
       throw new Error.Delegate("No suitable plugin found for mime type: " + mimeType)
     }
@@ -225,8 +225,8 @@ object DS {
     Materializer.reverse(json)
   }
 
-  def write(json: Val, mimeType: String, params: Val.Obj, ev: EvalScope): String = {
-    val plugin = DataFormatService.getInstance().getPluginFor(mimeType)
+  def write(dataFormats: DataFormatService, json: Val, mimeType: String, params: Val.Obj, ev: EvalScope): String = {
+    val plugin = dataFormats.getPluginFor(mimeType)
     if (plugin == null) {
       throw new Error.Delegate("No suitable plugin found for mime type: " + mimeType);
     }

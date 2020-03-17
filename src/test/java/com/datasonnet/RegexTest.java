@@ -26,7 +26,7 @@ public class RegexTest {
     @ParameterizedTest
     @MethodSource("jsonAssertProvider")
     void testRegexJSON(String jsonnet, String expected) throws JSONException {
-        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), Collections.emptyMap(), true);
+        Mapper mapper = new Mapper(jsonnet);
         String result = mapper.transform("{}");
         JSONAssert.assertEquals(expected, result, true);
     }
@@ -34,7 +34,7 @@ public class RegexTest {
     @ParameterizedTest
     @MethodSource("assertEqualsProvider")
     void testRegexStr(String jsonnet, String expected) throws JSONException {
-        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), Collections.emptyMap(), true);
+        Mapper mapper = new Mapper(jsonnet);
         String result = mapper.transform("{}");
         assertEquals(expected, result);
     }
@@ -67,7 +67,7 @@ public class RegexTest {
     @Test
     void testRegexGlobalReplaceWithFunction() throws Exception {
         String jsonnet = TestResourceReader.readFileAsString("regexGlobalReplaceWithFunction.ds");
-        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), Collections.emptyMap(), true);
+        Mapper mapper = new Mapper(jsonnet);
         String result = mapper.transform("{}");
         assertEquals("\"xxx4yyy16zzz36aaa\"", result);
     }

@@ -18,10 +18,6 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JavaReaderTest {
-    @BeforeAll
-    static void registerPlugins() throws Exception {
-        DataFormatService.getInstance().findAndRegisterPlugins();
-    }
 
     @Test
     void testJavaReader() throws Exception {
@@ -43,7 +39,9 @@ public class JavaReaderTest {
 
         String mapping = TestResourceReader.readFileAsString("readJavaTest.ds");
 
-        Mapper mapper = new Mapper(mapping, new ArrayList<>(), true);
+        Mapper mapper = new Mapper(mapping);
+
+
         String mapped = mapper.transform(data, new HashMap<>(), "application/json").getContentsAsString();
 
         String expectedJson = TestResourceReader.readFileAsString("javaTest.json");

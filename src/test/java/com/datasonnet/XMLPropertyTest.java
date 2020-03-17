@@ -26,15 +26,12 @@ import static org.junit.Assert.assertTrue;
 @RunWith(JUnitQuickcheck.class)
 public class XMLPropertyTest {
 
-    @BeforeAll
-    static void registerPlugins() throws Exception {
-        DataFormatService.getInstance().findAndRegisterPlugins();
-    }
+
 
     @Property
     public void reversible(@From(XMLGenerator.class) @Dictionary("xml.dict") Document dom) throws Exception {
         String xml = XMLDocumentUtils.documentToString(dom);
-        Mapper mapper = new Mapper("DS.Formats.write(DS.Formats.read(payload, \"application/xml\"), \"application/xml\")", Collections.emptyList(), true);
+        Mapper mapper = new Mapper("DS.Formats.write(DS.Formats.read(payload, \"application/xml\"), \"application/xml\")");
         String output = mapper.transform(new StringDocument(xml, "application/xml"), Collections.emptyMap(), "application/xml").getContentsAsString();
         DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document parsed = db.parse(new ByteArrayInputStream(output.getBytes("UTF-8")));

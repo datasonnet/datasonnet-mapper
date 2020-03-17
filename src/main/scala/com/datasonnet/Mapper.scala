@@ -94,8 +94,8 @@ object Mapper {
     case _ => false
   }).getOrElse(throw new UnsupportedOperationException("Illegal Data Format Plugin: Must Only Take String or Object"))
 
-  def input(name: String, data: Document, header: Header): Expr = {
-    val plugin = DataFormatService.getInstance().getPluginFor(data.getMimeType)
+  def input(dataFormats: DataFormatService, name: String, data: Document, header: Header): Expr = {
+    val plugin = dataFormats.getPluginFor(data.getMimeType)
     if (plugin != null) {
       val params = header.getInputParameters(name, data.getMimeType)
       checkParams(params, plugin.getReadParameters(), plugin.getPluginId)
@@ -122,8 +122,8 @@ object Mapper {
     }
   }
 
-  def output(output: ujson.Value, mimeType: String, header: Header): Document = {
-    val plugin = DataFormatService.getInstance().getPluginFor(mimeType)
+  def output(dataFormats: DataFormatService, output: ujson.Value, mimeType: String, header: Header): Document = {
+    val plugin = dataFormats.getPluginFor(mimeType)
     if (plugin != null) {
       val params = header.getOutputParameters(mimeType)
       checkParams(params, plugin.getWriteParameters(), plugin.getPluginId)
@@ -144,7 +144,7 @@ object Mapper {
   }
 }
 
-class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imports: java.util.Map[String, String], needsWrapper: Boolean) {
+class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imports: java.util.Map[String, String], needsWrapper: Boolean, autoRegisterDataFormats: Boolean) {
 
   var header = Header.parseHeader(jsonnet);
 
@@ -154,11 +154,17 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
 
   def lineOffset = if (needsWrapper) 1 else 0
 
-  def this(jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) {
-    this(jsonnet, argumentNames, Collections.emptyMap(), needsWrapper)
+  def this(jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean, autoRegisterDataFormats: Boolean) {
+    this(jsonnet, argumentNames, Collections.emptyMap(), needsWrapper, autoRegisterDataFormats)
   }
 
-  def importer(parent: Path, path: String): Option[(Path, String)] = for {
+  def this(jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) {
+    this(jsonnet, argumentNames, Collections.emptyMap(), needsWrapper, true)
+  }
+
+  def this(jsonnet: String) = this(jsonnet, Collections.emptyList(), Collections.emptyMap(), true, true)
+
+  private def importer(parent: Path, path: String): Option[(Path, String)] = for {
     resolved <- parent match {
       case DataSonnetPath("") => Some(path)
       case DataSonnetPath(p) => Some(p + "/" + path)
@@ -172,13 +178,34 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
     combined = (DataSonnetPath(resolved) -> contents)
   } yield combined
 
+
   private val parseCache = collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]()
 
   val evaluator = new NoFileEvaluator(jsonnet, DataSonnetPath("."), parseCache, importer, header.isPreserveOrder)
 
-  private val libraries:  Map[String, Val] = Map(
+  val dataFormats = new DataFormatService()
+
+  if (autoRegisterDataFormats) {
+    dataFormats.findAndRegisterPlugins()
+  }
+
+  def registerPlugin(plugin: DataFormatPlugin[_]) = dataFormats.registerPlugin(plugin)
+
+  def registerPluginFor(identifier: String, plugin: DataFormatPlugin[_]) =
+    dataFormats.registerPluginFor(identifier, plugin)
+
+  def registerPlugins(plugins: java.lang.Iterable[DataFormatPlugin[_]]) =
+    dataFormats.registerPlugins(plugins)
+
+  def getPluginFor(identifier: String) = dataFormats.getPluginFor(identifier)
+
+  def findPlugins = dataFormats.findPlugins()
+
+  def findAndRegisterPlugins() = dataFormats.findAndRegisterPlugins()
+
+  private val libraries = Map(
     "DS" -> Mapper.objectify(
-      DS.libraries + Mapper.library(evaluator, "Util", parseCache)
+      DS.libraries(dataFormats) + Mapper.library(evaluator, "Util", parseCache)
     )
   )
 
@@ -225,10 +252,12 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
     // okay, okay, so at this point we: 1) figure out if we can get an object or a string
     // then 2) we see if the converter we get for the mime type is compatible...
     // hrmmm, any reason we can't filter by type? Whatevfer, that's internal, don't worry about it
-    val data = Mapper.input("payload", payload, header)
+    val data = Mapper.input(dataFormats, "payload", payload, header)
 
     //val parsedArguments = arguments.asScala.view.mapValues { Mapper.input(_, header) }
-    val parsedArguments = arguments.asScala.view.toMap[String, Document].map { case (name, data) => (name, Mapper.input(name, data, header)) }
+    val parsedArguments = arguments.asScala.view.toMap[String, Document].map {
+      case (name, data) => (name, Mapper.input(dataFormats, name, data, header))
+    }
 
     val first +: rest = function.params.args
 
@@ -251,6 +280,6 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
         throw new IllegalArgumentException("Problem executing map: " + Mapper.expandErrorLineNumber(s.toString, lineOffset).replace("\t", "    "))
     }
 
-    Mapper.output(materialized, outputMimeType, header)
+    Mapper.output(dataFormats, materialized, outputMimeType, header)
   }
 }
