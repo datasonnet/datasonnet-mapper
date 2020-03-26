@@ -1,0 +1,15 @@
+/** DataSonnet
+version=1.0
+output.application/java.OutputClass=com.datasonnet.javatest.WsdlGeneratedObj
+*/
+{
+    testField: {
+        name: {
+            localPart: "testField",
+            namespaceURI: "http://com.datasonnet.test"
+        },
+        declaredType: null,
+        scope: null,
+        value: "Hello"
+    }
+}

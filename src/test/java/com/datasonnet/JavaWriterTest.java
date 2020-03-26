@@ -4,6 +4,7 @@ import com.datasonnet.document.Document;
 import com.datasonnet.document.StringDocument;
 import com.datasonnet.javatest.Gizmo;
 import com.datasonnet.javatest.Manufacturer;
+import com.datasonnet.javatest.WsdlGeneratedObj;
 import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.BeforeAll;
@@ -83,7 +84,16 @@ public class JavaWriterTest {
         } catch(Exception e) {
             assertTrue(e.getMessage().contains("does not return output that can be rendered as a String"), "Failed with wrong message: " + e.getMessage());
         }
+    }
 
+    @Test
+    void testJAXBElementMapping() throws Exception {
+        Document data = new StringDocument("{}", "application/json");
+        String mapping = TestResourceReader.readFileAsString("writeJAXBElement.ds");
+        Mapper mapper = new Mapper(mapping);
 
+        Document mapped = mapper.transform(data, new HashMap<>(), "application/java");
+        Object result = mapped.getContentsAsObject();
+        assertTrue(result instanceof WsdlGeneratedObj);
     }
 }
