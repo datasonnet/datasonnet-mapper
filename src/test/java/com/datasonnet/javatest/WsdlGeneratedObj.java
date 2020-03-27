@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.*;
 @XmlRootElement(name = "WsdlGeneratedObj")
 public class WsdlGeneratedObj {
     @XmlElementRef(name = "testField", namespace = "http://com.datasonnet.test", type = JAXBElement.class, required = true)
-    protected JAXBElement<Object> testField;
+    protected JAXBElement<TestField> testField;
 
     /**
      * Gets the value of the testField property.
@@ -20,7 +20,7 @@ public class WsdlGeneratedObj {
      *     {@link JAXBElement }{@code <}{@link Object }{@code >}
      *
      */
-    public JAXBElement<Object> getTestField() {
+    public JAXBElement<TestField> getTestField() {
         return testField;
     }
 
@@ -32,7 +32,7 @@ public class WsdlGeneratedObj {
      *     {@link JAXBElement }{@code <}{@link Object }{@code >}
      *
      */
-    public void setTestField(JAXBElement<Object> value) {
+    public void setTestField(JAXBElement<TestField> value) {
         this.testField = value;
     }
 }

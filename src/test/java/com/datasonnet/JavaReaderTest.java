@@ -5,6 +5,7 @@ import com.datasonnet.document.JavaObjectDocument;
 import com.datasonnet.document.StringDocument;
 import com.datasonnet.javatest.Gizmo;
 import com.datasonnet.javatest.Manufacturer;
+import com.datasonnet.javatest.TestField;
 import com.datasonnet.javatest.WsdlGeneratedObj;
 import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
@@ -55,15 +56,17 @@ public class JavaReaderTest {
 
     @Test
     void testJAXBElementMapping() throws Exception {
+        TestField testField = new TestField();
+        testField.setTest("HelloWorld");
         WsdlGeneratedObj obj = new WsdlGeneratedObj();
-        obj.setTestField(new JAXBElement<Object>(new QName("http://com.datasonnet.test", "testField"),
-                                                 Object.class,
-                                                "Hello World"));
+        obj.setTestField(new JAXBElement<TestField>(new QName("http://com.datasonnet.test", "testField"),
+                                                    TestField.class,
+                                                    testField));
         Document data = new JavaObjectDocument(obj);
         Mapper mapper = new Mapper("payload");
         Document mapped = mapper.transform(data, new HashMap<>(), "application/json");
 
         String result = mapped.getContentsAsString();
-        JSONAssert.assertEquals("{\"testField\":{\"value\":\"Hello World\"}}", result, true);
+        JSONAssert.assertEquals("{\"testField\":{\"value\":{\"test\":\"HelloWorld\"}}}", result, true);
     }
 }

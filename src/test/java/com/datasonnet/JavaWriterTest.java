@@ -96,6 +96,6 @@ public class JavaWriterTest {
         Object result = mapped.getContentsAsObject();
         assertTrue(result instanceof WsdlGeneratedObj);
 
-
+        //TODO Marshal to XML and assert?
     }
 }

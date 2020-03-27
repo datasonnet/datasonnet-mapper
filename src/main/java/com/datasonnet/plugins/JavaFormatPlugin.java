@@ -7,15 +7,11 @@ import com.datasonnet.jackson.JAXBElementSerializer;
 import com.datasonnet.spi.DataFormatPlugin;
 import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.UjsonUtil;
-import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import ujson.Value;
 
 import javax.xml.bind.JAXBElement;
