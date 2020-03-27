@@ -2,7 +2,7 @@ package com.datasonnet.plugins;
 
 import com.datasonnet.document.Document;
 import com.datasonnet.document.JavaObjectDocument;
-import com.datasonnet.document.StringDocument;
+import com.datasonnet.jackson.JAXBElementMixIn;
 import com.datasonnet.spi.DataFormatPlugin;
 import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.UjsonUtil;
@@ -12,16 +12,13 @@ import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import ujson.Value;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +34,14 @@ public class JavaFormatPlugin implements DataFormatPlugin<Object> {
     @Override
     public Value read(Object input, Map<String, Object> params) throws PluginException {
         ObjectMapper mapper = new ObjectMapper();
+
+        mapper.registerModule(new JaxbAnnotationModule());
+        mapper.addMixIn(JAXBElement.class, JAXBElementMixIn.class);
+
+        AnnotationIntrospector introspector
+                = new JaxbAnnotationIntrospector();
+        mapper.setAnnotationIntrospector(introspector);
+
         DateFormat df = new SimpleDateFormat(params.containsKey(DATE_FORMAT) ? (String)params.get(DATE_FORMAT) : DEFAULT_DATE_FORMAT);
         mapper.setDateFormat(df);
         try {
@@ -51,17 +56,9 @@ public class JavaFormatPlugin implements DataFormatPlugin<Object> {
     public Document write(Value input, Map<String, Object> params, String mimeType) throws PluginException {
         try {
             String jsonString = UjsonUtil.jsonObjectValueTo(input);
+
             ObjectMapper mapper = new ObjectMapper();
-
-            mapper.registerModule(new JaxbAnnotationModule());
-            mapper.addMixIn(JAXBElement.class, JavaFormatPlugin.JAXBElementMixIn.class);
-
-            mapper.setVisibility(mapper.getSerializationConfig()
-                    .getDefaultVisibilityChecker()
-                    .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
-                    .withGetterVisibility(JsonAutoDetect.Visibility.ANY)
-                    .withSetterVisibility(JsonAutoDetect.Visibility.ANY)
-                    .withCreatorVisibility(JsonAutoDetect.Visibility.ANY));
+            mapper.addMixIn(JAXBElement.class, JAXBElementMixIn.class);
 
             DateFormat df = new SimpleDateFormat(params.containsKey(DATE_FORMAT) ? (String) params.get(DATE_FORMAT) : DEFAULT_DATE_FORMAT);
             mapper.setDateFormat(df);
@@ -114,15 +111,5 @@ public class JavaFormatPlugin implements DataFormatPlugin<Object> {
     @Override
     public String getPluginId() {
         return "Java";
-    }
-
-    @JsonIgnoreProperties(value = {"globalScope", "typeSubstituted", "nil"})
-    public abstract class JAXBElementMixIn<T> {
-        @JsonCreator
-        public JAXBElementMixIn(@JsonProperty("name") QName name,
-                                @JsonProperty("declaredType") Class<T> declaredType,
-                                @JsonProperty("scope") Class scope,
-                                @JsonProperty("value") T value) {
-        }
     }
 }

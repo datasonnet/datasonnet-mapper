@@ -2,20 +2,25 @@ package com.datasonnet;
 
 import com.datasonnet.document.Document;
 import com.datasonnet.document.JavaObjectDocument;
+import com.datasonnet.document.StringDocument;
 import com.datasonnet.javatest.Gizmo;
 import com.datasonnet.javatest.Manufacturer;
+import com.datasonnet.javatest.WsdlGeneratedObj;
 import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JavaReaderTest {
 
@@ -46,5 +51,20 @@ public class JavaReaderTest {
 
         String expectedJson = TestResourceReader.readFileAsString("javaTest.json");
         JSONAssert.assertEquals(expectedJson, mapped, false);
+    }
+
+    @Test
+    void testJAXBElementMapping() throws Exception {
+        WsdlGeneratedObj obj = new WsdlGeneratedObj();
+        obj.setTestField(new JAXBElement<Object>(new QName("http://com.datasonnet.test", "testField"),
+                                                 Object.class,
+                                                "Hello World"));
+        Document data = new JavaObjectDocument(obj);
+        Mapper mapper = new Mapper("payload");
+        Document mapped = mapper.transform(data, new HashMap<>(), "application/json");
+
+        String result = mapped.getContentsAsString();
+
+        System.out.println("*** RESULT IS " + result);
     }
 }
