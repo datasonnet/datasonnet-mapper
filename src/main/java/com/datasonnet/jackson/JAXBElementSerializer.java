@@ -19,6 +19,8 @@ public class JAXBElementSerializer extends StdSerializer<JAXBElement> {
     @Override
     public void serialize(JAXBElement value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();
+        gen.writeObjectField("name", value.getName().toString());
+        gen.writeStringField("declaredType", value.getDeclaredType().getName());
         gen.writeObjectField("value", value.getValue());
         gen.writeEndObject();
     }

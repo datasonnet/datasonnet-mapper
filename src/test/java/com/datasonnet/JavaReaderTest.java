@@ -67,6 +67,6 @@ public class JavaReaderTest {
         Document mapped = mapper.transform(data, new HashMap<>(), "application/json");
 
         String result = mapped.getContentsAsString();
-        JSONAssert.assertEquals("{\"testField\":{\"value\":{\"test\":\"HelloWorld\"}}}", result, true);
+        JSONAssert.assertEquals("{\"testField\":{\"name\":\"{http://com.datasonnet.test}testField\",\"declaredType\":\"com.datasonnet.javatest.TestField\",\"value\":{\"test\":\"HelloWorld\"}}}", result, true);
     }
 }
