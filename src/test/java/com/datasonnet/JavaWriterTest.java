@@ -10,6 +10,10 @@ import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,6 +100,17 @@ public class JavaWriterTest {
         Object result = mapped.getContentsAsObject();
         assertTrue(result instanceof WsdlGeneratedObj);
 
-        //TODO Marshal to XML and assert?
+        JAXBContext jaxbContext = JAXBContext.newInstance(WsdlGeneratedObj.class );
+        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+
+        StringWriter sw = new StringWriter();
+        jaxbMarshaller.marshal(result, sw);
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<WsdlGeneratedObj xmlns:ns2=\"http://com.datasonnet.test\">\n" +
+                "    <ns2:testField>\n" +
+                "        <test>Hello World</test>\n" +
+                "    </ns2:testField>\n" +
+                "</WsdlGeneratedObj>\n", sw.toString());
     }
 }
