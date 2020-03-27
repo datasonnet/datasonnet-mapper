@@ -95,5 +95,7 @@ public class JavaWriterTest {
         Document mapped = mapper.transform(data, new HashMap<>(), "application/java");
         Object result = mapped.getContentsAsObject();
         assertTrue(result instanceof WsdlGeneratedObj);
+
+
     }
 }

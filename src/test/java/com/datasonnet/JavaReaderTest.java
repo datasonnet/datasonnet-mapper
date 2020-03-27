@@ -64,7 +64,6 @@ public class JavaReaderTest {
         Document mapped = mapper.transform(data, new HashMap<>(), "application/json");
 
         String result = mapped.getContentsAsString();
-
-        System.out.println("*** RESULT IS " + result);
+        JSONAssert.assertEquals("{\"testField\":{\"value\":\"Hello World\"}}", result, true);
     }
 }

@@ -3,6 +3,7 @@ package com.datasonnet.plugins;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.JavaObjectDocument;
 import com.datasonnet.jackson.JAXBElementMixIn;
+import com.datasonnet.jackson.JAXBElementSerializer;
 import com.datasonnet.spi.DataFormatPlugin;
 import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.UjsonUtil;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import ujson.Value;
@@ -34,16 +36,12 @@ public class JavaFormatPlugin implements DataFormatPlugin<Object> {
     @Override
     public Value read(Object input, Map<String, Object> params) throws PluginException {
         ObjectMapper mapper = new ObjectMapper();
-
-        mapper.registerModule(new JaxbAnnotationModule());
-        mapper.addMixIn(JAXBElement.class, JAXBElementMixIn.class);
-
-        AnnotationIntrospector introspector
-                = new JaxbAnnotationIntrospector();
-        mapper.setAnnotationIntrospector(introspector);
-
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(JAXBElement.class, new JAXBElementSerializer());
+        mapper.registerModule(module);
         DateFormat df = new SimpleDateFormat(params.containsKey(DATE_FORMAT) ? (String)params.get(DATE_FORMAT) : DEFAULT_DATE_FORMAT);
         mapper.setDateFormat(df);
+
         try {
             String jsonStr = mapper.writeValueAsString(input);
             return UjsonUtil.jsonObjectValueOf(jsonStr);
@@ -59,9 +57,9 @@ public class JavaFormatPlugin implements DataFormatPlugin<Object> {
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.addMixIn(JAXBElement.class, JAXBElementMixIn.class);
-
             DateFormat df = new SimpleDateFormat(params.containsKey(DATE_FORMAT) ? (String) params.get(DATE_FORMAT) : DEFAULT_DATE_FORMAT);
             mapper.setDateFormat(df);
+
             final JsonNode node = mapper.readTree(jsonString);
 
             JavaType valueType = null;

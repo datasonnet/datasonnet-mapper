@@ -6,6 +6,8 @@ output.application/java.OutputClass=com.datasonnet.javatest.WsdlGeneratedObj
     "testField": {
         "name": "{http://com.datasonnet.test}testField",
         "declaredType": "java.lang.Object",
-        "value": "Hello World",
+        "value": {
+            test: "Hello World"
+        }
     }
 }
