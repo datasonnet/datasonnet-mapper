@@ -4,11 +4,16 @@ import com.datasonnet.document.Document;
 import com.datasonnet.document.StringDocument;
 import com.datasonnet.javatest.Gizmo;
 import com.datasonnet.javatest.Manufacturer;
+import com.datasonnet.javatest.WsdlGeneratedObj;
 import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,7 +88,29 @@ public class JavaWriterTest {
         } catch(Exception e) {
             assertTrue(e.getMessage().contains("does not return output that can be rendered as a String"), "Failed with wrong message: " + e.getMessage());
         }
+    }
 
+    @Test
+    void testJAXBElementMapping() throws Exception {
+        Document data = new StringDocument("{}", "application/json");
+        String mapping = TestResourceReader.readFileAsString("writeJAXBElement.ds");
+        Mapper mapper = new Mapper(mapping);
 
+        Document mapped = mapper.transform(data, new HashMap<>(), "application/java");
+        Object result = mapped.getContentsAsObject();
+        assertTrue(result instanceof WsdlGeneratedObj);
+
+        JAXBContext jaxbContext = JAXBContext.newInstance(WsdlGeneratedObj.class );
+        Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+
+        StringWriter sw = new StringWriter();
+        jaxbMarshaller.marshal(result, sw);
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<WsdlGeneratedObj xmlns:ns2=\"http://com.datasonnet.test\">\n" +
+                "    <ns2:testField>\n" +
+                "        <test>Hello World</test>\n" +
+                "    </ns2:testField>\n" +
+                "</WsdlGeneratedObj>\n", sw.toString());
     }
 }
