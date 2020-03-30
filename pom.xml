@@ -42,6 +42,7 @@
         <junit.version>4.12</junit.version>
         <junit.jupiter.version>5.5.2</junit.jupiter.version>
         <jackson.version>2.10.0</jackson.version>
+        <jaxb.version>2.3.2</jaxb.version>
     </properties>
 
     <build>
@@ -367,14 +368,14 @@
 
         <!-- needed for JDK 9 and up -->
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.0</version>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>${jaxb.version}</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-            <version>2.3.0</version>
+            <version>${jaxb.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.activation</groupId>
