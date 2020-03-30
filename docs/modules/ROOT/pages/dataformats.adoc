@@ -550,8 +550,6 @@ The following write parameters are supported:
 
 |===
 
-IMPORTANT: It is not recommended to call `DS.Formats.write(...)` directly in the DataSonnet code, because it will produce a String representation of a POJO, i.e. `pojo.toString()`. Normally POJO outputs are expected to be the end results of the transformations and are controlled by the appropriate xref:headers.adoc[headers] at the beginning of the transformation code.
-
 ### `JAXBElement` serialization and deserialization
 
 When serializing or deserializing Java object with fields of type `JAXBElement`, the mapping has to include additional fields `value`, `name` and `declaredType`. For example, a JAXB-annotated class may look like this:
