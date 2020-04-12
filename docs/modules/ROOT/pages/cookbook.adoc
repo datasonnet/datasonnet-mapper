@@ -1,6 +1,6 @@
 # DataSonnet Cookbook
 :toc:
-:toclevels: 1
+:toclevels: 3
 =================
 
 ### Single Field to Single Field
@@ -964,3 +964,95 @@ payload + { "middleName": "NMN",
   "title": "Duke of Java"
 }
 -------------
+
+### Mapping between JSON and XML
+
+DataSonnet supports XML as an input and output format. xref:headers.adoc[Headers] can be used to control the behavior of the mapper.
+
+#### Reading XML
+Let's take the following XML input as an example:
+
+--------------
+<?xml version="1.0" encoding="UTF-8"?>
+<test:root xmlns:test="http://www.datasonnet.com">
+    <test:datasonnet version="1.0">Hello World</test:datasonnet>
+</test:root>
+--------------
+
+The internal representation of this input in DataSonnet would be:
+
+--------------
+{
+  "test:root": {
+    "@xmlns": {
+      "test": "http://www.datasonnet.com"
+    },
+    "test:datasonnet": {
+      "@version": "1.0",
+      "$": "Hello World"
+    }
+  }
+}
+--------------
+
+Our mapping can simply extract the value of the `<test:datasonnet>` elemeng, e.g.:
+
+--------------
+{
+  greeting: payload["test:root"]["test:datasonnet"]["$"]
+}
+--------------
+
+Note that HashMap-like notation is used to access the value, because colon `:` cannot be used in the DataSonnet identifier. In addition, the text value of the element is mapped to a dollar sign `$` which is not a valid identifier either. Let's use headers to fix this:
+
+--------------
+/** DataSonnet
+version=1.0
+input.payload.application/xml.NamespaceSeparator=_
+input.payload.application/xml.TextValueKey=__text
+*/
+
+{
+  greeting: payload.test_root.test_datasonnet.__text
+}
+--------------
+
+#### Writing XML
+
+To control the resulting XML, the `output` headers can be used. For example:
+
+--------------
+/** DataSonnet
+version=1.0
+output.application/xml.NamespaceDeclarations.datasonnet=http://www.modusbox.com
+output.application/xml.NamespaceSeparator=%
+output.application/xml.TextValueKey=__text
+output.application/xml.AttributeCharacter=*
+output.application/xml.XmlVersion=1.0
+*/
+
+{
+    "datasonnet%root": {
+        "*xmlns": {
+            "datasonnet": "http://www.modusbox.com"
+        },
+        "datasonnet%datasonnet": {
+            "*version": "1.0",
+            "__text": "Hello World"
+        }
+    }
+}
+--------------
+
+For more information and details see xref:headers.adoc[Headers] and xref:dataformats.adoc#XMLFormat[XML Data Format] sections.
+
+[IMPORTANT]
+======
+XML can only contain one root element. That means the mapping must only contain one top-level key. For example, the folowing mapping cannot be written as XML:
+----
+{
+  key1: value1,
+  key2: value2
+}
+----
+======
