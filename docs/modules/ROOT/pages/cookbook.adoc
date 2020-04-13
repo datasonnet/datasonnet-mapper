@@ -1044,7 +1044,7 @@ output.application/xml.XmlVersion=1.0
 }
 --------------
 
-For more information and details see xref:headers.adoc[Headers] and xref:dataformats.adoc#_xml-format[XML Data Format] sections.
+For more information and details see xref:headers.adoc[Headers] and xref:dataformats.adoc#xml-format[XML Data Format] sections.
 
 [IMPORTANT]
 ======
@@ -1139,4 +1139,4 @@ produces the following CSV:
 'Christopher'|'Marlow'|'Doctor Faustus'
 ----------
 
-For more information and details see xref:headers.adoc[Headers] and xref:dataformats.adoc#_csv_format[CSV Data Format] sections.
+For more information and details see xref:headers.adoc[Headers] and xref:dataformats.adoc#csv-format[CSV Data Format] sections.
