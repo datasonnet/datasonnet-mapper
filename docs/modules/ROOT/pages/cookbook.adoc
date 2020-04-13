@@ -965,7 +965,7 @@ payload + { "middleName": "NMN",
 }
 -------------
 
-### Mapping between JSON and XML
+### Reading and writing XML
 
 DataSonnet supports XML as an input and output format. xref:headers.adoc[Headers] can be used to control the behavior of the mapper.
 
@@ -1044,7 +1044,7 @@ output.application/xml.XmlVersion=1.0
 }
 --------------
 
-For more information and details see xref:headers.adoc[Headers] and xref:dataformats.adoc#XMLFormat[XML Data Format] sections.
+For more information and details see xref:headers.adoc[Headers] and xref:dataformats.adoc#_xml-format[XML Data Format] sections.
 
 [IMPORTANT]
 ======
@@ -1056,3 +1056,87 @@ XML can only contain one root element. That means the mapping must only contain 
 }
 ----
 ======
+
+### Reading and writing CSV
+
+#### Reading CSV
+
+The CSV files are represented as arrays of arrays or arrays of maps (if the CSV contains headers). For example, if the CSV input is:
+
+------------
+first_name,last_name,email
+Ryann,Thinn,rthinn0@seesaa.net
+Farley,Muckeen,fmuckeen1@macromedia.com
+Penelopa,Vasilic,pvasilic2@google.pl
+------------
+The mapping can access it as follows:
+
+------------
+{
+  firstPerson: {
+    firstName: payload[0]["first_name"], //Either "dot" or ["key"] notation can be used here
+    lastName: payload[0].last_name,
+    email: payload[0].email
+  }
+}
+------------
+
+Headers can be used to parse the CSV-like flat files. For example, the separator can be pipe `|` instead of comma and the file does not contain headers:
+
+------------
+Ryann|Thinn|rthinn0@seesaa.net
+Farley|Muckeen|fmuckeen1@macromedia.com
+Penelopa|Vasilic|pvasilic2@google.pl
+------------
+
+In this case the headers are required:
+
+-----------
+/** DataSonnet
+version=1.0
+input.payload.application/csv.UseHeader=false
+input.payload.application/csv.Separator=|
+*/
+
+{
+  firstPerson: {
+    firstName: payload[0][0],
+    lastName: payload[0][1],
+    email: payload[0][2]
+  }
+}
+-----------
+
+#### Writing CSV
+
+To produce a valid CSV, the mapping must result in array of arrays or array of objects with identical keys (in this case the keys from the first object will be used as CSV headers). Header can be used to override the default CSV file generation, i.e. set custom separator, quote character, etc. For example:
+
+-----------
+/** DataSonnet
+version=1.0
+output.application/csv.UseHeader=false
+output.application/csv.Quote='
+output.application/csv.Separator=|
+*/
+[
+  [
+    "William",
+    "Shakespeare",
+    "Hamlet"
+  ],
+  [
+    "Christopher",
+    "Marlowe",
+    "Doctor Faustus"
+  ]
+]
+-----------
+
+produces the following CSV:
+
+----------
+'William'|'Shakespeare'|'Hamlet'
+'Christopher'|'Marlow'|'Doctor Faustus'
+----------
+
+For more information and details see xref:headers.adoc[Headers] and xref:dataformats.adoc#_csv_format[CSV Data Format] sections.
