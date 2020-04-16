@@ -1,6 +1,7 @@
 * xref:index.adoc[Introduction]
 * xref:quickstart.adoc[Quick Start]
 * xref:dataformats.adoc[Data Formats]
+* xref:headers.adoc[DataSonnet Header]
 * xref:jsonnet-doc.adoc[Standard Library Documentation]
 * xref:libraries.adoc[Additional DataSonnet Libraries]
 * xref:cli.adoc[Command Line Interface]
