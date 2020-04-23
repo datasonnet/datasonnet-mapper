@@ -1,0 +1,1 @@
+* xref:camel:ROOT:index.adoc[Camel DataSonnet Component]

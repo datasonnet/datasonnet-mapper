@@ -5,3 +5,4 @@ start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/nav.adoc
 - modules/ROOT/nav-intellij.adoc
+- modules/ROOT/nav-camel.adoc
