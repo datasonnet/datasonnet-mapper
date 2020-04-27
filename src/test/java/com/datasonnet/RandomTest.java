@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.regex.Pattern;
@@ -16,20 +17,18 @@ public class RandomTest {
 
     @ParameterizedTest
     @MethodSource("numbersProvider")
-    void testRandomNumbers(String jsonnet, String minNum, String maxNum) throws Exception {
-        Number min = NumberFormat.getInstance().parse(minNum);
-        Number max = NumberFormat.getInstance().parse(maxNum);
+    void testRandomNumbers(String jsonnet, Number min, Number max) throws Exception {
         Mapper mapper = new Mapper(jsonnet);
         Number result = NumberFormat.getInstance().parse(mapper.transform("{}"));
         assertTrue(result.doubleValue() >= min.doubleValue() && result.doubleValue() <= max.doubleValue());
     }
 
-    static Stream<String[]> numbersProvider() {
+    static Stream<Object[]> numbersProvider() {
         return Stream.of(
-                new String[]{"DS.Random.randomInt(0,10)", "0", "10"},
-                new String[]{"DS.Random.randomInt()", String.valueOf(Integer.MIN_VALUE), String.valueOf(Integer.MAX_VALUE)},
-                new String[]{"DS.Random.randomDouble(0,10)", "0", "10"},
-                new String[]{"DS.Random.randomDouble()", String.valueOf(Double.MIN_VALUE), String.valueOf(Double.MAX_VALUE)}
+                new Object[]{"DS.Random.randomInt(0,10)", new Integer(0), new Integer(10)},
+                new Object[]{"DS.Random.randomInt()", new Integer(Integer.MIN_VALUE), new Integer(Integer.MAX_VALUE)},
+                new Object[]{"DS.Random.randomDouble(0,10)", new Double(0d), new Double(10d)},
+                new Object[]{"DS.Random.randomDouble()", new Double(-Double.MAX_VALUE), new Double(Double.MAX_VALUE)}
         );
     }
 
@@ -71,8 +70,6 @@ public class RandomTest {
         assertNotNull(str);
         assertTrue(str.length() == 10);
         assertTrue(alphaNumeric.matcher(str).matches());
-        assertFalse(alpha.matcher(str).matches());
-        assertFalse(numeric.matcher(str).matches());
 
         mapper = new Mapper("DS.Random.randomString(10, false, false, true)");
         str = mapper.transform(new StringDocument("{}", "application/json"),
