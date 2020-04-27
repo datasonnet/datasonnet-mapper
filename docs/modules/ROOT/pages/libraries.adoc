@@ -939,3 +939,50 @@ DS.Regex.regexGlobalReplace("xxx2yyy4zzz6aaa", "\\d", square)
 "xxx4yyy16zzz36aaa"
 ------------------------
 
+## Random
+
+### `randomUUID()`
+
+Returns a String representation of a randomly generated UUID. See https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html#randomUUID for details.
+
+### `randomInt(min = Integer.MIN_VALUE, max = Integer.MAX_VALUE)`
+
+Generates a random integer in the specified range. Parameters `min` and `max` are optional; if omitted, the range between `Integer.MIN_VALUE` and `Integer.MAX_VALUE` is used.
+
+### `randomDouble(min = Double.MIN_VALUE, max = Double.MAX_VALUE)`
+
+Generates a random double in the specified range. Parameters `min` and `max` are optional; if omitted, the range between `Double.MIN_VALUE` and `Double.MAX_VALUE` is used.
+
+### `randomString(length, includeAlpha = true, includeNumerical = true, includeOtherPrintableAscii = true)`
+
+Generates a random printable characters string of a given length. Optional boolean parameters control whether the string includes alphabetical, numerical or other printable ASCII characters. Non-visible ASCII or non-ASCII characters are not included.
+
+*Example*
+
+.DataSonnet map
+---------------
+{
+  randomUUID: DS.Random.randomUUID(),
+  randomInt: DS.Random.randomInt(),
+  randomIntBetween0and10: DS.Random.randomInt(0,10),
+  randomDouble: DS.Random.randomDouble(),
+  randomDoubleBetween0and1: DS.Random.randomDouble(0, 1),
+  randomString: DS.Random.randomString(15),
+  randomAlphaString: DS.Random.randomString(15, true, false, false),
+  randomAlphaNumericalString: DS.Random.randomString(15, true, true, false)
+}
+---------------
+.Result
+---------------
+{
+    "randomUUID":"57aa1731-1b9a-45a9-b76e-495ef51b0cd8",
+    "randomInt": 1019525178,
+    "randomIntBetween0and10": 4,
+    "randomDouble": -4.465838779969882E307,
+    "randomDoubleBetween0and1": 0.17641846841857922,
+    "randomString": "$PM07'g)l9)FDsC",
+    "randomAlphaString": "PpqMtVmunXUHAhz",
+    "randomAlphaNumericalString": "34jJXcPLdlrxVMa"
+}
+---------------
+

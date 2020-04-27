@@ -2,18 +2,17 @@ package com.datasonnet
 
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, Period, ZoneId, ZoneOffset}
-import java.util.Collections
 import java.util.function.Function
 
 import com.datasonnet
 import com.datasonnet.spi.{DataFormatPlugin, DataFormatService}
-import sjsonnet.Std.builtinWithDefaults
-import sjsonnet.{Applyer, Error, EvalScope, Expr, Materializer, Val}
 import com.datasonnet.wrap.Library.library
-import pprint.PPrinter
 import sjsonnet.ReadWriter.StringRead
-import sjsonnet.Std._
+import sjsonnet.Std.{builtinWithDefaults, _}
+import sjsonnet.{Applyer, Error, EvalScope, Expr, Materializer, Val}
 import ujson.Value
+
+import scala.util.Random
 
 object DS {
 
@@ -158,6 +157,69 @@ object DS {
         (ev, fs, json: Val, path: String) =>
           Materializer.reverse(ujson.read(JsonPath.select(ujson.write(Materializer.apply(json)(ev)), path)))
       },
+    ),
+
+    "Random" -> library(
+      builtin0("randomUUID") {
+        (vs, extVars, wd) =>
+          java.util.UUID.randomUUID().toString()
+      },
+      builtinWithDefaults("randomInt",
+        "min" -> Some(Expr.Num(0, Int.MinValue)),
+        "max" -> Some(Expr.Num(0, Int.MaxValue))) { (args, ev) =>
+        val min = args("min").cast[Val.Num].value.asInstanceOf[Int]
+        val max = args("max").cast[Val.Num].value.asInstanceOf[Int]
+
+        Random.between(min, max)
+      },
+      builtinWithDefaults("randomDouble",
+        "min" -> Some(Expr.Num(0, Double.MinValue)),
+        "max" -> Some(Expr.Num(0, Double.MaxValue))) { (args, ev) =>
+        val min = args("min").cast[Val.Num].value.asInstanceOf[Double]
+        val max = args("max").cast[Val.Num].value.asInstanceOf[Double]
+
+        val sample = Random.nextDouble()
+        (max * sample) + (min * (1d - sample))
+        //Random.between(min, max) - this for some reason always produces the same number
+      },
+
+      builtinWithDefaults("randomString",
+        "length" -> None,
+        "includeAlpha" -> Some(Expr.True(0)),
+        "includeNumbers" -> Some(Expr.True(0)),
+        "includeOther" -> Some(Expr.True(0))) { (args, ev) =>
+        val length = args("length").cast[Val.Num].value.asInstanceOf[Int]
+        val includeAlpha = args("includeAlpha") match {
+          case Val.False => false
+          case Val.True => true
+          case _ => throw Error.Delegate("includeAlpha has to be a boolean, got" + args("includeAlpha").getClass)
+        }
+        val includeNumbers = args("includeNumbers") match {
+          case Val.False => false
+          case Val.True => true
+          case _ => throw Error.Delegate("includeNumbers has to be a boolean, got" + args("includeNumbers").getClass)
+        }
+        val includeOther = args("includeOther") match {
+          case Val.False => false
+          case Val.True => true
+          case _ => throw Error.Delegate("includeOther has to be a boolean, got" + args("includeOther").getClass)
+        }
+        val alpha: Seq[Char] = ('a' to 'z') ++ ('A' to 'Z')
+        val num: Seq[Char] = ('0' to '9')
+        val other: Seq[Char] = ((' ' to '~') diff alpha) diff num
+
+        val charsList: Seq[Char] = (if (includeAlpha) alpha else Seq.empty[Char]) ++
+                                   (if (includeNumbers) num else Seq.empty[Char]) ++
+                                   (if (includeOther) other else Seq.empty[Char])
+
+        val sb = new StringBuilder
+        for (i <- 1 to length) {
+          val randomNum = util.Random.nextInt(charsList.length)
+          sb.append(charsList(randomNum))
+        }
+        sb.toString
+      },
+
     ),
 
     "Regex" -> library(
