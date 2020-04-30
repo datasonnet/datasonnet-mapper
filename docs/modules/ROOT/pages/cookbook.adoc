@@ -1003,7 +1003,7 @@ Our mapping can simply extract the value of the `<test:datasonnet>` elemeng, e.g
 }
 --------------
 
-Note that HashMap-like notation is used to access the value, because colon `:` cannot be used in the DataSonnet identifier. In addition, the text value of the element is mapped to a dollar sign `$` which is not a valid identifier either. Let's use headers to fix this:
+Note that `["_key_"]` syntax is used to look up the property instead of `._key_` syntax, because colon `:` cannot be used in the DataSonnet identifier. In addition, the text value of the element is mapped to a dollar sign `$` which is not a valid identifier either. Let's use headers to fix this:
 
 --------------
 /** DataSonnet

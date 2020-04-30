@@ -2,7 +2,7 @@
 :toc:
 :toclevels: 1
 
-DataSonnet is distributed as a JAR which contains all necessary classes and dependencies to use DataSonnet programmatically embedded in your projects. Use the following Maven snippet to add DataSOnnet as a dependency to your `pom.xml`:
+DataSonnet is distributed as a JAR which contains all necessary classes and dependencies to use DataSonnet programmatically embedded in your projects. Use the following Maven snippet to add DataSonnet as a dependency to your `pom.xml`:
 
 [source,xml]
 ----------
@@ -41,7 +41,7 @@ variables.put("varXml", new StringDocument(xmlVar, "application/xml"));
 variables.put("varTxt", new StringDocument(textVar, "text/plain"));
 
 Mapper mapper = new Mapper(datasonnetScript, variables.keySet());
-StringDocument transformedResult = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json");
+Document transformedResult = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json");
 String jsonResult = transformedResult.getContentsAsString();
 ------
 
@@ -55,5 +55,6 @@ The `transform` method accepts the following arguments:
 - payload - the instance of the `com.datasonnet.Document` which contains the data and the mime type;
 - variables - the instance of the `Map<String, com.datasonnet.Document>` which contains the additional variables.
 
-The result of the `transform` method invocation is the instance of the ``com.datasonnet.Document` object which contains the result of the mapping and its mime type.
+The result of the `transform` method invocation is the instance of the `com.datasonnet.Document` object which contains the result of the mapping and its mime type.
 
+There are overloaded `transform` methods which accept different sets of parameters; see the DataSonnet source code and documentation for details.
