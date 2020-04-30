@@ -79,4 +79,17 @@ public class RandomTest {
         assertTrue(str.length() == 10);
         assertFalse(alphaNumeric.matcher(str).matches());
     }
+
+    @Test
+    void testRandomCaching() throws Exception {
+        Mapper mapper = new Mapper(
+                " local rnd() = DS.Random.randomUUID();" +
+                " local randomStrings = { str1: rnd(), str2: rnd() };" +
+                        "assert randomStrings.str1 != randomStrings.str2 : \"Not really random!\";" +
+                        "randomStrings ");
+        String str = mapper.transform(new StringDocument("{}", "application/json"),
+                Collections.emptyMap(),
+                "application/json").getContentsAsString();
+        assertNotNull(str);
+    }
 }
