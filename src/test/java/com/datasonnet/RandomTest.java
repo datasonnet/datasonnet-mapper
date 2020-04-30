@@ -1,6 +1,7 @@
 package com.datasonnet;
 
 import com.datasonnet.document.StringDocument;
+import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -82,11 +83,8 @@ public class RandomTest {
 
     @Test
     void testRandomCaching() throws Exception {
-        Mapper mapper = new Mapper(
-                " local rnd() = DS.Random.randomUUID();" +
-                " local randomStrings = { str1: rnd(), str2: rnd() };" +
-                        "assert randomStrings.str1 != randomStrings.str2 : \"Not really random!\";" +
-                        "randomStrings ");
+        String datasonnet = TestResourceReader.readFileAsString("randomData.ds");
+        Mapper mapper = new Mapper(datasonnet);
         String str = mapper.transform(new StringDocument("{}", "application/json"),
                 Collections.emptyMap(),
                 "application/json").getContentsAsString();

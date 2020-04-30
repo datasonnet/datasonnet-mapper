@@ -1,0 +1,53 @@
+local uuid() = {
+  value: DS.Random.randomUUID()
+};
+local str() = {
+  value: DS.Random.randomString(10)
+};
+local int() = {
+  value: DS.Random.randomInt()
+};
+local double() = {
+  value: DS.Random.randomDouble()
+};
+
+local randomData = {
+  uuid1: uuid(),
+  uuid2: uuid(),
+  str1: str(),
+  str2: str(),
+  int1: int(),
+  int2: int(),
+  double1: double(),
+  double2: double(),
+};
+
+local randomData1 = {
+  uuid: uuid(),
+  str: str(),
+  int: int(),
+  double: double(),
+};
+
+local randomData2 = {
+  uuid: uuid(),
+  str: str(),
+  int: int(),
+  double: double(),
+};
+
+local randomArray = std.makeArray(2, function(x) DS.Random.randomUUID());
+
+assert randomData.uuid1.value != randomData.uuid2.value : "UUIDs are not unique!";
+assert randomData.str1.value != randomData.str2.value : "Strings are not unique!";
+assert randomData.int1.value != randomData.int2.value : "Ints are not unique!";
+assert randomData.double1.value != randomData.double2.value : "Doubles are not unique!";
+
+assert randomData1.uuid.value != randomData2.uuid.value : "UUIDs are not unique!";
+assert randomData1.str.value != randomData2.str.value : "Strings are not unique!";
+assert randomData1.int.value != randomData2.int.value : "Ints are not unique!";
+assert randomData1.double.value != randomData2.double.value : "Doubles are not unique!";
+
+assert randomArray[0] != randomArray[1];
+
+randomData
