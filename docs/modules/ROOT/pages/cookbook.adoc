@@ -1,6 +1,6 @@
 # DataSonnet Cookbook
 :toc:
-:toclevels: 1
+:toclevels: 3
 =================
 
 ### Single Field to Single Field
@@ -964,3 +964,179 @@ payload + { "middleName": "NMN",
   "title": "Duke of Java"
 }
 -------------
+
+### Reading and writing XML
+
+DataSonnet supports XML as an input and output format. xref:headers.adoc[Headers] can be used to control the behavior of the mapper.
+
+#### Reading XML
+Let's take the following XML input as an example:
+
+--------------
+<?xml version="1.0" encoding="UTF-8"?>
+<test:root xmlns:test="http://www.datasonnet.com">
+    <test:datasonnet version="1.0">Hello World</test:datasonnet>
+</test:root>
+--------------
+
+The internal representation of this input in DataSonnet would be:
+
+--------------
+{
+  "test:root": {
+    "@xmlns": {
+      "test": "http://www.datasonnet.com"
+    },
+    "test:datasonnet": {
+      "@version": "1.0",
+      "$": "Hello World"
+    }
+  }
+}
+--------------
+
+Our mapping can simply extract the value of the `<test:datasonnet>` elemeng, e.g.:
+
+--------------
+{
+  greeting: payload["test:root"]["test:datasonnet"]["$"]
+}
+--------------
+
+Note that `["_key_"]` syntax is used to look up the property instead of `._key_` syntax, because colon `:` cannot be used in the DataSonnet identifier. In addition, the text value of the element is mapped to a dollar sign `$` which is not a valid identifier either. Let's use headers to fix this:
+
+--------------
+/** DataSonnet
+version=1.0
+input.payload.application/xml.NamespaceSeparator=_
+input.payload.application/xml.TextValueKey=__text
+*/
+
+{
+  greeting: payload.test_root.test_datasonnet.__text
+}
+--------------
+
+#### Writing XML
+
+To control the resulting XML, the `output` headers can be used. For example:
+
+--------------
+/** DataSonnet
+version=1.0
+output.application/xml.NamespaceDeclarations.datasonnet=http://www.modusbox.com
+output.application/xml.NamespaceSeparator=%
+output.application/xml.TextValueKey=__text
+output.application/xml.AttributeCharacter=*
+output.application/xml.XmlVersion=1.0
+*/
+
+{
+    "datasonnet%root": {
+        "*xmlns": {
+            "datasonnet": "http://www.modusbox.com"
+        },
+        "datasonnet%datasonnet": {
+            "*version": "1.0",
+            "__text": "Hello World"
+        }
+    }
+}
+--------------
+
+For more information and details see xref:headers.adoc[Headers] and xref:dataformats.adoc#xml-format[XML Data Format] sections.
+
+[IMPORTANT]
+======
+XML can only contain one root element. That means the mapping must only contain one top-level key. For example, the folowing mapping cannot be written as XML:
+----
+{
+  key1: value1,
+  key2: value2
+}
+----
+======
+
+### Reading and writing CSV
+
+#### Reading CSV
+
+The CSV files are represented as arrays of arrays or arrays of maps (if the CSV contains headers). For example, if the CSV input is:
+
+------------
+first_name,last_name,email
+Ryann,Thinn,rthinn0@seesaa.net
+Farley,Muckeen,fmuckeen1@macromedia.com
+Penelopa,Vasilic,pvasilic2@google.pl
+------------
+The mapping can access it as follows:
+
+------------
+{
+  firstPerson: {
+    firstName: payload[0]["first_name"], //Either "dot" or ["key"] notation can be used here
+    lastName: payload[0].last_name,
+    email: payload[0].email
+  }
+}
+------------
+
+Headers can be used to parse the CSV-like flat files. For example, the separator can be pipe `|` instead of comma and the file does not contain headers:
+
+------------
+Ryann|Thinn|rthinn0@seesaa.net
+Farley|Muckeen|fmuckeen1@macromedia.com
+Penelopa|Vasilic|pvasilic2@google.pl
+------------
+
+In this case the headers are required:
+
+-----------
+/** DataSonnet
+version=1.0
+input.payload.application/csv.UseHeader=false
+input.payload.application/csv.Separator=|
+*/
+
+{
+  firstPerson: {
+    firstName: payload[0][0],
+    lastName: payload[0][1],
+    email: payload[0][2]
+  }
+}
+-----------
+
+#### Writing CSV
+
+To produce a valid CSV, the mapping must result in array of arrays or array of objects with identical keys (in this case the keys from the first object will be used as CSV headers). Header can be used to override the default CSV file generation, i.e. set custom separator, quote character, etc. For example:
+
+-----------
+/** DataSonnet
+version=1.0
+output.application/csv.UseHeader=false
+output.application/csv.Quote='
+output.application/csv.Separator=|
+*/
+[
+  [
+    "William",
+    "Shakespeare",
+    "Hamlet"
+  ],
+  [
+    "Christopher",
+    "Marlowe",
+    "Doctor Faustus"
+  ]
+]
+-----------
+
+produces the following CSV:
+
+----------
+'William'|'Shakespeare'|'Hamlet'
+'Christopher'|'Marlow'|'Doctor Faustus'
+----------
+
+For more information and details see xref:headers.adoc[Headers] and xref:dataformats.adoc#csv-format[CSV Data Format] sections.

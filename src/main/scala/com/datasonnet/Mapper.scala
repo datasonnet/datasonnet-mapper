@@ -162,6 +162,14 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
     this(jsonnet, argumentNames, Collections.emptyMap(), needsWrapper, true)
   }
 
+  def this(jsonnet: String, argumentNames: java.lang.Iterable[String]) {
+    this(jsonnet, argumentNames, Collections.emptyMap(), true, true)
+  }
+
+  def this(jsonnet: String, argumentNames: java.lang.Iterable[String], imports: java.util.Map[String, String]) {
+    this(jsonnet, argumentNames, imports, true, true)
+  }
+
   def this(jsonnet: String) = this(jsonnet, Collections.emptyList(), Collections.emptyMap(), true, true)
 
   private def importer(parent: Path, path: String): Option[(Path, String)] = for {

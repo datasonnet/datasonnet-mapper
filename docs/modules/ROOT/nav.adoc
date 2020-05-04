@@ -8,3 +8,4 @@
 ** xref:jar-cli.adoc[Using the CLI via a Jar]
 ** xref:docker-cli.adoc[Using the CLI via Docker]
 * xref:cookbook.adoc[Cookbook]
+* xref:jar-lib.adoc[Using DataSonnet Programmatically]
