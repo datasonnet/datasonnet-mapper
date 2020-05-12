@@ -520,7 +520,7 @@ The following read parameters are supported:
 |`yyyy-MM-dd'T'HH:mm:ss.SSSZ`
 
 |`FailOnEmptyBeans`
-|Controls whether exception is thrown if no serializer is found for a type. See https://github.com/FasterXML/jackson-databind/wiki/Serialization-Features[Jackson Serialization Features] for details.
+|If set to `true`, an exception is thrown if no serializer is found for a Java type. Setting it to `false` instructs DataSonnet to ignore the field that cannot be serialized. See https://github.com/FasterXML/jackson-databind/wiki/Serialization-Features[Jackson Serialization Features] for details.
 |`true`
 
 |===
