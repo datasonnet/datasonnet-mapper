@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import ujson.Value;
 
@@ -24,6 +25,7 @@ import java.util.Map;
 public class JavaFormatPlugin implements DataFormatPlugin<Object> {
     public static String OUTPUT_CLASS = "OutputClass";
     public static String DATE_FORMAT = "DateFormat";
+    public static String FAIL_ON_EMPTY_BEANS = "FailOnEmptyBeans";
 
     public static String DEFAULT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
@@ -37,6 +39,10 @@ public class JavaFormatPlugin implements DataFormatPlugin<Object> {
         mapper.registerModule(module);
         DateFormat df = new SimpleDateFormat(params.containsKey(DATE_FORMAT) ? (String)params.get(DATE_FORMAT) : DEFAULT_DATE_FORMAT);
         mapper.setDateFormat(df);
+
+        if (params.containsKey(FAIL_ON_EMPTY_BEANS)) {
+            mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, new Boolean(params.get(FAIL_ON_EMPTY_BEANS).toString()));
+        }
 
         try {
             String jsonStr = mapper.writeValueAsString(input);
@@ -91,6 +97,7 @@ public class JavaFormatPlugin implements DataFormatPlugin<Object> {
     public Map<String, String> getReadParameters() {
         Map<String, String> readParams = new HashMap<>();
         readParams.put(DATE_FORMAT, "Controls the date format for serializing/deserializing");
+        readParams.put(FAIL_ON_EMPTY_BEANS, "Controls whether exception is thrown if no serializer is found for a type");
         return readParams;
     }
 
