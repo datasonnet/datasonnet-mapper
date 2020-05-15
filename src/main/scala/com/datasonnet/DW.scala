@@ -6,12 +6,15 @@ import java.util.Scanner
 
 import com.datasonnet.spi.UjsonUtil
 import com.datasonnet.wrap.Library.library
+import fastparse.internal.Logger
+import org.slf4j.LoggerFactory
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet.ReadWriter.StringRead
 import sjsonnet.Std._
 import sjsonnet.{Applyer, Materializer, Val}
 
 import scala.util.Random
+import scala.util.matching.Regex
 
 object DW {
   val libraries = Map(
@@ -108,6 +111,20 @@ object DW {
           main.toUpperCase.endsWith(sub.toUpperCase);
       },
 
+      builtin("entriesOf", "obj"){
+        (ev,fs, obj: Val.Obj) =>
+
+          val out = collection.mutable.Buffer.empty[Val.Lazy]
+          for((key,hidden) <- obj.getVisibleKeys()){
+            val currentObj = scala.collection.mutable.Map[String, Val.Obj.Member]()
+            currentObj += ("key" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Str(key)).force))
+            currentObj += ("value" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+            //add key to currentObj
+            out.append(Val.Lazy(new Val.Obj(currentObj.toMap, _ => (), None)))
+          }
+          Val.Arr(out.toSeq)
+      },
+
       builtin("filter", "array", "funct"){
         (_,_, array: Val.Arr, funct: Applyer) =>
           Val.Arr(
@@ -136,14 +153,26 @@ object DW {
       builtin("find", "container", "value"){
         (ev,_, container: Val, value: Val) =>
           container match {
-            case _: Val.Str =>
-              value.prettyName match{
-                case "string" =>
-                  value //TODO String,String   String,regex
-                case _ => throw new IllegalArgumentException(
-                  "Expected (String,String), got: (String," + value.prettyName+")" );
+            case Val.Str(str) =>
+              val out = collection.mutable.Buffer.empty[Val.Lazy]
+              val sub = value.cast[Val.Str].value
+              if(sub.startsWith("/") && sub.endsWith("/")){
+                //REGEX
+                val pattern=sub.substring(1,sub.length-1).r
+                for(loc <- pattern.findAllMatchIn(str).map(_.start)){
+                  out+=(Val.Lazy(Val.Num(loc)))
+                }
               }
+              else{
+                //Normal String
+                var totalLength = 0;
 
+                for(loc <- sub.r.findAllMatchIn(str).map(_.start)){
+                  //totalLength+=newStr.length;
+                  out.append(Val.Lazy(Val.Num(loc)))
+                }
+              }
+              Val.Arr(out.toSeq)
             case Val.Arr(s) =>
               Val.Arr(
                 for(
@@ -316,6 +345,27 @@ object DW {
           acc
       },
 
+      builtin("distinctByT", "container", "funct") {
+        (ev, fs, container: Val, funct: Applyer) =>
+          container match {
+            case Val.Arr(s) =>
+              val out = collection.mutable.Buffer.empty[Val.Lazy]
+              for ((item, index) <- s.zipWithIndex) {
+                  out.append(item)
+              }
+              Val.Arr(out.toSeq)
+          }
+      },
+
+      builtin("keysOf", "obj"){
+        (_,_, obj: Val.Obj) =>
+          val out = collection.mutable.Buffer.empty[Val.Lazy]
+          for((key,hidden) <- obj.getVisibleKeys()){
+            out.append(Val.Lazy(Val.Str(key)))
+          }
+          Val.Arr(out.toSeq)
+      },
+
       builtin("lower", "str"){
         (_,_, str: String) =>
           str.toLowerCase();
@@ -419,6 +469,15 @@ object DW {
       builtin("mod", "num1", "num2"){
         (_,_, num1: Double, num2: Double) =>
           num1 % num2;
+      },
+
+      builtin("namesOf", "obj"){
+        (_,_, obj: Val.Obj) =>
+          val out = collection.mutable.Buffer.empty[Val.Lazy]
+          for((key,hidden) <- obj.getVisibleKeys()){
+            out.append(Val.Lazy(Val.Str(key)))
+          }
+          Val.Arr(out.toSeq)
       },
 
       builtin("orderBy", "value", "funct"){
@@ -526,9 +585,15 @@ object DW {
       },
 
       //TODO String,String String,Regex
-      builtin("splitBy", "value"){
-        (_,_, _: Val) =>
-          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      builtin("splitBy", "str", "value"){
+        (_,_, str: String, value: String) =>
+          val out = collection.mutable.Buffer.empty[Val.Lazy];
+          val regex=value.r;
+          for(words <- regex.split(str)){
+            out+=Val.Lazy(Val.Str(words))
+          }
+          //Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+          Val.Arr(out.toSeq)
       },
 
       builtin("sqrt", "num"){
@@ -612,6 +677,15 @@ object DW {
       builtin0("uuid") {
         (_, _, _) =>
           Materializer.reverse(UjsonUtil.jsonObjectValueOf(com.datasonnet.DWCore.uuid()));
+      },
+
+      builtin("valuesOf", "obj"){
+        (ev,fs, obj: Val.Obj) =>
+          val out = collection.mutable.Buffer.empty[Val.Lazy]
+          for((key,hidden) <- obj.getVisibleKeys()){
+            out.append(Val.Lazy(obj.value(key, -1)(fs, ev)))
+          }
+          Val.Arr(out.toSeq)
       },
 
       builtin("zip", "array1", "array2") {

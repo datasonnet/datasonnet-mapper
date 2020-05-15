@@ -1,22 +1,20 @@
 package com.datasonnet;
 
-import com.datasonnet.Mapper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sjsonnet.Val;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DWCoreTest {
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private String lib = "DW" +".";
-    private String pack = "Core";
+    private final String lib = "DW" +".";
+    private final String pack = "Core";
 
     @Test
     void testDW_abs(){
@@ -78,6 +76,14 @@ public class DWCoreTest {
         assertEquals("true", value);
     }
 
+    @Test
+    void testDW_entriesOf(){
+        String input="{\"test1\":\"x\",\"test2\":{\"inTest3\":\"x\",\"inTest4\":{}},\"test10\":[{},{}]}";
+        String compare="[{key:test2,value:{inTest3:x,inTest4:{}}},{key:test10,value:[{},{}]},{key:test1,value:x}]";
+        Mapper mapper = new Mapper(lib+pack+".entriesOf(" + input + ")", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals(compare, value);
+    }
 
     @Test
     void testDW_filter(){
@@ -107,17 +113,26 @@ public class DWCoreTest {
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[1,4]", value);
 
-        //TODO
+
+
+        mapper = new Mapper(lib+pack+".find(\"aba\", \"a\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[0,2]", value);
+
+        mapper = new Mapper(lib+pack+".find(\"I heart DataWeave\", \"/\\\\w*ea\\\\w*(\\\\b)/\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[2,8]", value);
+        /*TODO Regex version may need work, doesnt seem to be 1:1 with DW
+         */
     }
 
-    /*TODO
+    @Disabled
     @Test
-    void testDW_flatMap(){
-        Mapper mapper = new Mapper(lib+pack+".find([1,2,3,4,2,5], 2)", new ArrayList<>(), true);
+    void testDW_flatMap() {
+        Mapper mapper = new Mapper(lib + pack + ".find([1,2,3,4,2,5], 2)", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[1,4]", value);
     }
-     */
 
     @Test
     void testDW_flatten(){
@@ -133,7 +148,7 @@ public class DWCoreTest {
         assertEquals("1", value);
     }
 
-    //TODO
+    @Disabled
     @Test
     void testDW_groupBy() {
         Mapper mapper = new Mapper(lib + pack + ".groupBy([   " +
@@ -228,14 +243,14 @@ public class DWCoreTest {
         assertEquals("false", value);
     }
 
-    /*TODO
+    @Disabled
     @Test
     void testDW_isLeapYear(){
-        Mapper mapper = new Mapper(lib+pack+".isEven(2)\n", new ArrayList<>(), true);
+        Mapper mapper = new Mapper(lib+pack+".isLeapYear()\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("true", value);
     }
-    */
+
 
     @Test
     void testDW_isOdd(){
@@ -261,6 +276,13 @@ public class DWCoreTest {
         mapper = new Mapper(lib+pack+".joinBy([true,false,true], \"-\")\n", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("true-false-true", value);
+    }
+
+    @Test
+    void testDW_keysOf(){
+        Mapper mapper = new Mapper(lib+pack+".keysOf({ \"a\" : true, \"b\" : 1})\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[a,b]", value);
     }
 
     @Test
@@ -388,6 +410,13 @@ public class DWCoreTest {
     }
 
     @Test
+    void testDW_namesOf(){
+        Mapper mapper = new Mapper(lib+pack+".namesOf({ \"a\" : true, \"b\" : 1})\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[a,b]", value);
+    }
+
+    @Test
     void testDW_orderBy() {
 
         Mapper mapper = new Mapper(lib + pack + ".orderBy([0,5,1,3,2,1], function(item) item)\n", new ArrayList<>(), true);
@@ -438,14 +467,13 @@ public class DWCoreTest {
         assertTrue(dblVal >= 0 && dblVal <= 10);
     }
 
-    /*TODO
+    @Disabled
     @Test
     void testDW_read() {
         Mapper mapper = new Mapper(lib + pack + ".read()\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("15", value);
     }
-    */
 
     @Test
     void testDW_readURL() {
@@ -454,23 +482,23 @@ public class DWCoreTest {
         assertEquals("1", value);
     }
 
-    /*TODO
+    @Disabled
     @Test
     void testDW_reduce() {
-        Mapper mapper = new Mapper(lib + pack + ".read()\n", new ArrayList<>(), true);
+        Mapper mapper = new Mapper(lib + pack + ".reduce()\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("15", value);
     }
-    */
 
-    /*TODO
+
+    @Disabled
     @Test
     void testDW_replace() {
-        Mapper mapper = new Mapper(lib + pack + ".read()\n", new ArrayList<>(), true);
+        Mapper mapper = new Mapper(lib + pack + ".replace()\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("15", value);
     }
-    */
+
 
 
     @Test
@@ -480,14 +508,13 @@ public class DWCoreTest {
         assertEquals("2", value);
     }
 
-    /*TODO
+    @Disabled
     @Test
     void testDW_scan() {
         Mapper mapper = new Mapper(lib + pack + ".round(1.5)\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("2", value);
     }
-    */
 
     @Test
     void testDW_sizeOf() {
@@ -508,13 +535,33 @@ public class DWCoreTest {
         assertEquals("0", value);
     }
 
-    /*TODO
+    //@Disabled
     @Test
     void testDW_splitBy() {
-        Mapper mapper = new Mapper(lib + pack + ".startsWith(\"Hello World\", \"Hello\")\n", new ArrayList<>(), true);
+        String input ="{"+
+                "\"split1\": " + lib + pack + ".splitBy(\"a-b-c\",\"^*.b.\")," +
+                "\"split2\": " + lib + pack + ".splitBy(\"hello world\",\"\\\\s\")," +
+                "\"split3\": " + lib + pack + ".splitBy(\"no match\",\"^s\")," +
+                "\"split4\": " + lib + pack + ".splitBy(\"no match\",\"^n..\")," +
+                "\"split5\": " + lib + pack + ".splitBy(\"a1b2c3d4A1B2C3D\",\"^*[0-9A-Z]\")," +
+                "\"split6\": " + lib + pack + ".splitBy(\"a-b-c\",\"-\")," +
+                "\"split7\": " + lib + pack + ".splitBy(\"hello world\",\"\")," +
+                "\"split8\": " + lib + pack + ".splitBy(\"first,middle,last\",\",\")," +
+                "\"split9\": " + lib + pack + ".splitBy(\"no split\",\"NO\")" +
+                "}";
+        String comparison="{split1:[a,c]," +
+                "split2:[hello,world]," +
+                "split3:[no match]," +
+                "split4:[,match]," +
+                "split5:[a,b,c,d]," +
+                "split6:[a,b,c]," +
+                "split7:[h,e,l,l,o, ,w,o,r,l,d]," +
+                "split8:[first,middle,last]," +
+                "split9:[no split]}";
+        Mapper mapper = new Mapper(input, new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("true", value);
-    }*/
+        assertEquals(comparison, value);
+    }
 
     @Test
     void testDW_sqrt() {
@@ -593,6 +640,13 @@ public class DWCoreTest {
         Mapper mapper = new Mapper(lib + pack + ".uuid()\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals(5, value.split("-").length);
+    }
+
+    @Test
+    void testDW_valuesOf(){
+        Mapper mapper = new Mapper(lib+pack+".valuesOf({ \"a\" : true, \"b\" : 1, \"c\":[], \"d\":\"d\"})\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[true,1,[],d]", value);
     }
 
     @Test
