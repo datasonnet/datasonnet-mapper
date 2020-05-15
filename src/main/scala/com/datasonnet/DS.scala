@@ -204,8 +204,26 @@ object DS {
           case _ => throw new Error.Delegate("'replace' parameter must be either String or Function")
         }
       },
-    )
+    ),
 
+    "URL" -> library(
+      builtinWithDefaults("encode",
+        "data" -> None,
+        "encoding" -> Some(Expr.Str(0, "UTF-8"))) { (args, ev) =>
+        val data = args("data").cast[Val.Str].value
+        val encoding = args("encoding").cast[Val.Str].value
+
+        java.net.URLEncoder.encode(data, encoding)
+      },
+      builtinWithDefaults("decode",
+        "data" -> None,
+        "encoding" -> Some(Expr.Str(0, "UTF-8"))) { (args, ev) =>
+        val data = args("data").cast[Val.Str].value
+        val encoding = args("encoding").cast[Val.Str].value
+
+        java.net.URLDecoder.decode(data, encoding)
+      },
+    )
   )
 
   def read(dataFormats: DataFormatService, data: String, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {
