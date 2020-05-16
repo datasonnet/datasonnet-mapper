@@ -410,15 +410,22 @@ object DW {
           }
       },
 
-      builtin("match", "string", "regex") {
-        (_, _, string: String, regex: String) =>
-          Materializer.reverse(UjsonUtil.jsonObjectValueOf(com.datasonnet.DWCore.`match`(string, regex)))
-
+      builtin("match", "string", "reg") {
+        (_, _, string: String, reg: String) =>
+            val regex = reg.r
+            val out=collection.mutable.Buffer.empty[Val.Lazy]
+            for( word <- regex.findAllMatchIn(string)){
+              for(index <- 0 to word.groupCount){
+                out+=Val.Lazy(Val.Str(word.group(index)))
+              }
+            }
+          Val.Arr(out.toSeq)
       },
 
-      builtin("matches", "string", "regex") {
-        (_,_, string: String, regex: String) =>
-          com.datasonnet.DWCore.matches(string,regex).booleanValue()
+      builtin("matches", "string", "reg") {
+        (_,_, string: String, reg: String) =>
+            val regex = reg.r;
+            regex.matches(string);
       },
 
       builtin("max", "array"){
@@ -519,7 +526,6 @@ object DW {
           value.force
       },
 
-
       builtin("mod", "num1", "num2"){
         (_,_, num1: Double, num2: Double) =>
           num1 % num2;
@@ -561,7 +567,6 @@ object DW {
           }
       },
 
-
       builtin("pluck", "value", "funct"){
         (ev,fs, value: Val, funct: Applyer) =>
           value match{
@@ -602,17 +607,22 @@ object DW {
           Materializer.reverse(UjsonUtil.jsonObjectValueOf(out));
       },
 
-      //TODO
-      builtin("reduce", "array", "funct"){
-        (_,_, _: Val.Arr, _: Val.Func) =>
-
-          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      //TODO needs work
+      builtin("reduce", "array", "funct", "init"){
+        (_,_, array: Val.Arr, funct: Applyer, init: Val) =>
+          var acc: Val = init;
+          for(item <- array.value){
+            acc=funct.apply(item,Val.Lazy(acc));
+          }
+          acc
       },
 
 
       builtin("replace", "string", "regex", "replacement") {
-        (_,_, string: String, regex: String, replacement: String) =>
-          Materializer.reverse(UjsonUtil.jsonObjectValueOf(com.datasonnet.DWCore.replace(string, regex, replacement)));
+        (_,_, str: String, reg: String, replacement: String) =>
+            val regex = reg.r
+            regex.replaceAllIn(str,replacement)
+          //Materializer.reverse(UjsonUtil.jsonObjectValueOf(com.datasonnet.DWCore.replace(string, regex, replacement)));
       },
 
       builtin("round", "num") {

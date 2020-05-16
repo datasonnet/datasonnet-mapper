@@ -8,7 +8,11 @@
         DW.Core.contains(payload.contains.input2,payload.contains.input2_2)
     ),
     daysBetween:null,
-    distinctBy:null,
+    distinctBy:(
+        (DW.Core.distinctBy(payload.distinctBy.input1, function(v,i) v)==payload.distinctBy.output1) &&
+        (DW.Core.distinctBy(payload.distinctBy.input1, function(v,i) i)==payload.distinctBy.output2) &&
+        (DW.Core.distinctBy(payload.distinctBy.input2, function(v,k) v)==payload.distinctBy.output3)
+    ),
     endsWith:DW.Core.endsWith(payload.endsWith.input1, payload.endsWith.input2),
     entriesOf:(DW.Core.entriesOf(payload.entriesOf.input)==payload.entriesOf.output),
     filter:(DW.Core.filter(payload.filter.input, function(value,index) value >= 3)==payload.filter.output),
@@ -26,7 +30,10 @@
     ),
     flatten:(DW.Core.flatten(payload.flatten.input)==payload.flatten.output),
     floor:(DW.Core.floor(payload.floor.input)==payload.floor.output),
-    groupBy:null,
+    groupBy:(
+        (DW.Core.groupBy(payload.groupBy.input1, function(it,idx) it.language)==payload.groupBy.output1) &&
+        (DW.Core.groupBy(payload.groupBy.input2, function(v,k) v)==payload.groupBy.output2)
+    ),
     isBlank:(
         DW.Core.isBlank("") &&
         DW.Core.isBlank("    ") &&
@@ -45,12 +52,18 @@
     isOdd:(DW.Core.isOdd(payload.isOdd.input)),
     joinBy:(DW.Core.joinBy([1,2,3],"-")=="1-2-3"),
     keysOf:(DW.Core.keysOf(payload.keysOf.input)==payload.keysOf.output),
-    log:null,
+    log:"wontdo",
     lower:DW.Core.lower(payload.lower.input)==payload.lower.output,
     map:(DW.Core.map(['a','b','c'], function(value,index) value+'_'+index))[0]=="a_0",
-    mapObject:null,
-    match:null,
-    matches:null,
+    mapObject:(
+        (DW.Core.mapObject(payload.mapObject.input1, function(v,k,i) {[v]:{ [k]: i}})==payload.mapObject.output1) &&
+        (DW.Core.mapObject(payload.mapObject.input2, function(v,k,i) {[k]: (v+5)})==payload.mapObject.output2)
+    ),
+    match:(DW.Core.match(payload.match.input1,payload.match.input2)==payload.match.output),
+    matches:(
+        (DW.Core.matches(payload.matches.input1_1,payload.matches.input1_2)) &&
+        (DW.Core.matches(payload.matches.input1_1,payload.matches.input2_2)==false)
+    ),
     max:(
         (DW.Core.max(payload.max.input1)==payload.max.output1) &&
         (DW.Core.max(payload.max.input2)==payload.max.output2) &&
@@ -72,20 +85,36 @@
         (DW.Core.minBy(payload.minBy.input3, function(i) i)==payload.minBy.output3)
     ),
     mod:DW.Core.mod(payload.mod.input1,payload.mod.input2)==payload.mod.output,
-    namesOf:null,
-    native:null,
-    now:null,
-    orderBy:null,
-    pluck:null,
-    pow:DW.Core.pow(2,2)==4,
-    random:DW.Core.random()!=null,
-    randomint:DW.Core.randomint(10)!=null,
-    read:null,
-    readUrl:DW.Core.readUrl("http://httpbin.org/get").args=={},
-    reduce:null,
-    replace:null,
+    namesOf:DW.Core.namesOf(payload.namesOf.input)==payload.namesOf.output,
+    native:"wontdo",
+    now:DS.ZonedDateTime.now != null,
+    orderBy:(
+        (DW.Core.orderBy(payload.orderBy.input1, function(i)i)==payload.orderBy.output1) &&
+        (DW.Core.orderBy(payload.orderBy.input2, function(i)i)==payload.orderBy.output2) &&
+        (DW.Core.orderBy(payload.orderBy.input3, function(i)i.letter)==payload.orderBy.output3)
+    ),
+    pluck:(
+        (DW.Core.pluck(payload.pluck.input2,function(value,key,index) index) == payload.pluck.output1) &&
+        (DW.Core.pluck(payload.pluck.input2,function(value,key,index) { [value] : { [key]: index} })== payload.pluck.output2)
+    ),
+    pow:DW.Core.pow(payload.pow.input1,payload.pow.input2)==payload.pow.output,
+    random:DW.Core.random()!=payload.random.not_output,
+    randomint:DW.Core.randomint(payload.randomInt.input)!=payload.randomInt.not_output,
+    read:"???",
+    readUrl:DW.Core.readUrl(payload.readUrl.input)[payload.readUrl.key]==payload.readUrl.output,
+    reduce:(
+        (DW.Core.reduce(payload.reduce.input1, function(it,acc) it+acc, 0)==payload.reduce.output1) &&
+        (DW.Core.reduce(payload.reduce.input2, function(it,acc) acc+it, 0)==payload.reduce.output2) &&
+        (DW.Core.reduce(payload.reduce.input2, function(it,acc) acc+""+it, "")==payload.reduce.output3) &&
+        (DW.Core.reduce(payload.reduce.input3, function(it,acc) acc+it, null)==payload.reduce.output4)
+    ),
+    replace:(
+        (DW.Core.replace(payload.replace.input1_1,payload.replace.input1_2,payload.replace.input1_3)==payload.replace.output1) &&
+        (DW.Core.replace(payload.replace.input2_1,payload.replace.input2_2,payload.replace.input2_3)==payload.replace.output2) &&
+        (DW.Core.replace(payload.replace.input3_1,payload.replace.input3_2,payload.replace.input3_3)==payload.replace.output3)
+    ),
     round:DW.Core.round(payload.round.input)==payload.round.output,
-    scan:null,
+    scan:DW.Core.scan(payload.scan.input1,payload.scan.input2)==payload.scan.output,
     sizeOf:(
         DW.Core.sizeOf(payload.sizeOf.input1)==payload.sizeOf.output1 &&
         DW.Core.sizeOf(payload.sizeOf.input2)==payload.sizeOf.output2 &&
@@ -111,9 +140,9 @@
     upper:DW.Core.upper(payload.upper.output)==payload.upper.output,
     uuid:(DW.Core.uuid != null),
     valuesOf:(DW.Core.valuesOf(payload.valuesOf.input))==payload.valuesOf.output,
-    with:null,
-    write:null,
-    xsiType:null,
+    with:"wontdo",
+    write:"???",
+    xsiType:"wontdo",
     zip:(DW.Core.zip(payload.zip.input1,payload.zip.input2))==payload.zip.output
 }
 

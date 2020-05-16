@@ -12,41 +12,6 @@ import java.util.regex.Pattern;
 public class DWCore {
 
 
-    public static String match(String str, String regex) {
-
-        String content = "[";
-
-        // Create a Pattern object
-        Pattern r = Pattern.compile(regex);
-
-        // Now create matcher object.
-        Matcher m = r.matcher(str);
-        while(m.find()) {
-            for(int i=0; i<m.groupCount(); i++) {
-                content += "\"" + m.group(i) +"\",";
-            }
-        }
-        return content.substring(0,content.length()-1) + "]";
-    }
-
-    public static Boolean matches(String str, String regex){
-        return str.matches(regex);
-    }
-
-    public static String replace(String str, String regex, String replacement) {
-
-
-        // Create a Pattern object
-        Pattern r = Pattern.compile(regex);
-
-        // Now create matcher object.
-        Matcher m = r.matcher(str);
-        while(m.find()) {
-            return "\"" + m.replaceAll(replacement) +"\"";
-        }
-        return "\"" + str +"\"";
-    }
-
     public static String uuid(){
         int n = 36;
         // chose a Character random from this String

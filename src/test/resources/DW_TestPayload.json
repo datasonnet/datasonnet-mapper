@@ -19,7 +19,13 @@
     "input2_2": "[e-g]"
   },
   "daysBetween":{},
-  "distinctBy":{},
+  "distinctBy":{
+    "input1": [0, 1, 2, 3, 3, 2, 1, 4],
+    "input2": {"a":0, "b":1, "c":0},
+    "output1": [0,1,2,3,4],
+    "output2": [0, 1, 2, 3, 3, 2, 1, 4],
+    "output3": {"a":0,"b":1}
+  },
   "endsWith":{
     "input1": "Hello World!",
     "input2": "!"
@@ -73,7 +79,24 @@
     "input": 0.22,
     "output": 0
   },
-  "groupBy":{},
+  "groupBy":{
+    "input1": [
+      { "name": "Foo", "language": "Java" },
+      { "name": "Bar", "language": "Scala" },
+      { "name": "FooBar", "language": "Java"}
+    ],
+    "input2":{ "a" : "b", "c" : "d", "e": "b"},
+    "output1": {
+      "Java":[
+        {"name":"Foo","language":"Java"},
+        {"name":"FooBar","language":"Java"}
+      ],
+      "Scala":[
+        {"name":"Bar","language":"Scala"}
+      ]
+    },
+    "output2": {"b":{"a":"b","e":"b"},"d":{"c":"d"}}
+  },
   "isBlank":{},
   "isDecimal":{
     "input": 0.22
@@ -98,9 +121,22 @@
     "output": "hello world!"
   },
   "map":{},
-  "mapObject":{},
-  "match":{},
-  "matches":{},
+  "mapObject":{
+    "input1":{"a":"b","c":"d"},
+    "input2": {"basic": 9.99, "premium": 53, "vip": 398.99},
+    "output1":{"b":{"a":0},"d":{"c":1}},
+    "output2":{"basic":14.99,"premium":58,"vip":403.99}
+  },
+  "match":{
+    "input1": "me@mulesoft.com",
+    "input2": "([a-z]*)@([a-z]*).com",
+    "output": ["me@mulesoft.com","me","mulesoft"]
+  },
+  "matches":{
+    "input1_1": "admin123",
+    "input1_2": "a.*\\d+",
+    "input2_2": "^b.+"
+  },
   "max":{
     "input1": [false,true,false],
     "input2": ["a","d","c"],
@@ -138,26 +174,77 @@
     "input2": 2,
     "output": 0
   },
-  "namesOf":{},
+  "namesOf":{
+    "input":{ "a" : true, "b" : 1},
+    "output": ["a","b"]
+  },
   "native":{},
   "now":{},
-  "orderBy":{},
-  "pluck":{},
-  "pow":{},
-  "random":{},
-  "randomInt":{},
+  "orderBy":{
+    "input1": [0,5,1,3,2,1],
+    "input2": ["b","a"],
+    "input3": [{ "letter": "e" }, { "letter": "d" }],
+    "output1": [0,1,1,2,3,5],
+    "output2": ["a","b"],
+    "output3": [{ "letter":"d"},{ "letter": "e" }]
+  },
+  "pluck":{
+    "input1":{"a":"b","c":"d"},
+    "input2": {"a":"b","c":"d"},
+    "output1": [0,1],
+    "output2": [{"b":{"a":0}},{"d":{"c":1}}]
+  },
+  "pow":{
+    "input1": 2,
+    "input2": 2,
+    "output": 4
+  },
+  "random":{
+    "not_output": null
+  },
+  "randomInt":{
+    "input": 10,
+    "not_output": null
+  },
   "read":{},
-  "readUrl":{},
-  "reduce":{},
-  "replace":{},
+  "readUrl":{
+    "input": "http://httpbin.org/get?test=true",
+    "key": "args",
+    "output": {
+      "test": "true"
+    }
+  },
+  "reduce":{
+    "input1": [2,3],
+    "input2": [1,2,3,4],
+    "input3": [],
+    "output1": 5,
+    "output2": 10,
+    "output3": "1234",
+    "output4": null
+  },
+  "replace":{
+    "input1_1": "123-456-7890",
+    "input1_2": ".*-",
+    "input1_3": "",
+    "input2_1": "abc123def",
+    "input2_2": "[b13e]",
+    "input2_3": "-",
+    "input3_1": "admin123",
+    "input3_2": "123",
+    "input3_3": "ID",
+    "output1": "7890",
+    "output2": "a-c-2-d-f",
+    "output3": "adminID"
+
+  },
   "round":{
     "input": 0.22,
     "output": 0
   },
-  "message": "Hello World!",
   "scan":{
-    "input1": "",
-    "input2": "",
+    "input1": "anypt@mulesoft.com,max@mulesoft.com",
+    "input2": "([a-z]*)@([a-z]*).com",
     "output": [
       ["anypt@mulesoft.com","anypt","mulesoft"],
       ["max@mulesoft.com","max","mulesoft"]
