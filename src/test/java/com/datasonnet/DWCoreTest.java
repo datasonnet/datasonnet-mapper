@@ -43,14 +43,15 @@ public class DWCoreTest {
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("true", value);
 
-        /* TODO
+
         mapper = new Mapper(lib+pack+".contains(\"Hello World\" , \"World\")", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("true", value);
 
-        mapper = new Mapper(lib+pack+".contains(\"Hello World\" , REGEX)", new ArrayList<>(), true);
+        mapper = new Mapper(lib+pack+".contains(\"Hello World\" , \"[e-g]\")", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("true", value);
+        /* TODO
          */
     }
 
@@ -87,9 +88,14 @@ public class DWCoreTest {
 
     @Test
     void testDW_filter(){
-        Mapper mapper = new Mapper(lib+pack+".filter([0,1,2,3,4,5], function(value) value >= 3)", new ArrayList<>(), true);
+        Mapper mapper = new Mapper(lib+pack+".filter([0,1,2,3,4,5], function(value,index) value >= 3)", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[3,4,5]", value);
+
+        mapper = new Mapper(lib+pack+".filter([0,1,2,3,4,5], function(value,index) index >= 3)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[3,4,5]", value);
+
     }
 
     @Test
@@ -113,8 +119,6 @@ public class DWCoreTest {
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[1,4]", value);
 
-
-
         mapper = new Mapper(lib+pack+".find(\"aba\", \"a\")", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[0,2]", value);
@@ -126,12 +130,11 @@ public class DWCoreTest {
          */
     }
 
-    @Disabled
     @Test
     void testDW_flatMap() {
-        Mapper mapper = new Mapper(lib + pack + ".find([1,2,3,4,2,5], 2)", new ArrayList<>(), true);
+        Mapper mapper = new Mapper(lib + pack + ".flatMap([[3,5],[1,2,5]], function(value,index) value)", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("[1,4]", value);
+        assertEquals("[3,5,1,2,5]", value);
     }
 
     @Test
@@ -333,16 +336,15 @@ public class DWCoreTest {
         assertEquals("true", value);
     }
 
-
     @Test
     void testDW_max(){
-        Mapper mapper = new Mapper(lib+pack+".max([1,2,3,4,5])\n", new ArrayList<>(), true);
+        Mapper mapper = new Mapper(lib+pack+".max([1,2,5,33,9])\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("5", value);
+        assertEquals("33", value);
 
-        mapper = new Mapper(lib+pack+".max([\"a\",\"b\"])\n", new ArrayList<>(), true);
+        mapper = new Mapper(lib+pack+".max([\"a\",\"b\",\"d\",\"c\"])\n", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("b", value);
+        assertEquals("d", value);
 
         mapper = new Mapper(lib+pack+".max([true,false])\n", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
@@ -351,9 +353,9 @@ public class DWCoreTest {
 
     @Test
     void testDW_maxBy(){
-        Mapper mapper = new Mapper(lib+pack+".maxBy([1,2,3,4,5], function(item) item)\n", new ArrayList<>(), true);
+        Mapper mapper = new Mapper(lib+pack+".maxBy([1,2,5,33,9], function(item) item)\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("5", value);
+        assertEquals("33", value);
 
         mapper = new Mapper(lib+pack+".maxBy([\"a\",\"b\"], function(item) item)\n", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
@@ -508,12 +510,11 @@ public class DWCoreTest {
         assertEquals("2", value);
     }
 
-    @Disabled
     @Test
     void testDW_scan() {
-        Mapper mapper = new Mapper(lib + pack + ".round(1.5)\n", new ArrayList<>(), true);
+        Mapper mapper = new Mapper(lib + pack + ".scan(\"anypt@mulesoft.com,max@mulesoft.com\", \"([a-z]*)@([a-z]*).com\")\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("2", value);
+        assertEquals("[[anypt@mulesoft.com,anypt,mulesoft],[max@mulesoft.com,max,mulesoft]]", value);
     }
 
     @Test

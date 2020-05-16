@@ -9,6 +9,7 @@ import com.datasonnet.wrap.Library.library
 import fastparse.internal.Logger
 import org.slf4j.LoggerFactory
 import sjsonnet.Expr.Member.Visibility
+import sjsonnet.Expr.Params
 import sjsonnet.ReadWriter.StringRead
 import sjsonnet.Std._
 import sjsonnet.{Applyer, Materializer, Val}
@@ -54,14 +55,8 @@ object DW {
               if(size > 0) true else false
 
             case Val.Str(s) =>
-              value.prettyName match {
-                case "string" =>
-                  if(s.toUpperCase().contains(value.toString.toUpperCase())) true else false;
-                //TODO (string,regex)
-                case _ => throw new IllegalArgumentException(
-                  "Expected (string,string), got: (string," + value.prettyName + ")" );
-              }
-
+              val regex = value.cast[Val.Str].value.r
+              regex.findAllMatchIn(s).toSeq.nonEmpty;
             case _ => throw new IllegalArgumentException(
               "Expected Array or String, got: " + container.prettyName);
           }
@@ -129,8 +124,8 @@ object DW {
         (_,_, array: Val.Arr, funct: Applyer) =>
           Val.Arr(
             for(
-              v <- array.value
-              if funct.apply(v) == Val.True
+              (v,i) <- array.value.zipWithIndex
+              if funct.apply(v,Val.Lazy(Val.Num(i))) == Val.True
             ) yield Val.Lazy(v.force)
           )
 
@@ -187,19 +182,25 @@ object DW {
       },
 
       builtin("flatMap", "array", "funct"){
-        (_,_, array: Val, _: Val) =>
+        (_,_, array: Val, funct: Applyer) =>
           array match {
             case Val.Arr(s) =>
-              Val.Arr(
-                for(
-                  v <- s
-                ) yield Val.Lazy(v.force) //TODO
-              )
+              val out = collection.mutable.Buffer.empty[Val.Lazy]
+              for((v,i) <- s.zipWithIndex){
+                v.force match {
+                  case Val.Arr(inner) =>
+                    for((inV,inI) <- inner.zipWithIndex){
+                      out+=Val.Lazy(funct.apply(inV,Val.Lazy(Val.Num(inI))))
+                    }
+                  case _ =>  throw new IllegalArgumentException(
+                    "Expected Array of Arrays, got: Array of " + v.force.prettyName);
+                }
+              }
+              Val.Arr(out.toSeq);
             case Val.Null => Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
             case _ =>  throw new IllegalArgumentException(
               "Expected Array, got: " + array.prettyName);
           }
-          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
       },
 
       builtin("flatten", "array"){
@@ -421,12 +422,24 @@ object DW {
       },
 
       builtin("max", "array"){
-        (_,_, array: Val.Arr) =>
-
+        (ev,fs, array: Val.Arr) =>
           var value = array.value.head
-          for(x <- array.value){
-            if(value.force.toString < x.force.toString){
-              value = x
+          for (x <- array.value) {
+            value.force.prettyName match {
+              case "string" =>
+                if (value.force.cast[Val.Str].value < x.force.cast[Val.Str].value) {
+                  value = x
+                }
+              case "boolean" =>
+                if (x.force == Val.Lazy(Val.True).force) {
+                  value = x
+                }
+              case "number" =>
+                if (value.force.cast[Val.Num].value < x.force.cast[Val.Num].value) {
+                  value = x
+                }
+              case i => throw new IllegalArgumentException(
+                "Array must be of type string,boolean, or number; got: " + i);
             }
           }
           value.force
@@ -435,9 +448,23 @@ object DW {
       builtin("maxBy", "array", "funct"){
         (_,_, array: Val.Arr, funct: Applyer) =>
           var value = array.value.head
-          for(x <- array.value){
-            if(funct.apply(value).toString < funct.apply(x).toString){
-              value = x
+          val compareType=funct.apply(value).prettyName
+          for (x <- array.value) {
+            compareType match {
+              case "string" =>
+                if (funct.apply(value).toString < funct.apply(x).toString) {
+                  value = x
+                }
+              case "boolean" =>
+                if (funct.apply(x) == Val.Lazy(Val.True).force) {
+                  value = x
+                }
+              case "number" =>
+                if (funct.apply(value).cast[Val.Num].value < funct.apply(x).cast[Val.Num].value) {
+                  value = x
+                }
+              case i => throw new IllegalArgumentException(
+                "Array must be of type string,boolean, or number; got: " + i);
             }
           }
           value.force
@@ -446,9 +473,22 @@ object DW {
       builtin("min", "array"){
         (_,_, array: Val.Arr) =>
           var value = array.value.head
-          for(x <- array.value){
-            if(value.force.toString > x.force.toString){
-              value = x
+          for (x <- array.value) {
+            value.force.prettyName match {
+              case "string" =>
+                if (value.force.cast[Val.Str].value > x.force.cast[Val.Str].value) {
+                  value = x
+                }
+              case "boolean" =>
+                if (x.force == Val.Lazy(Val.False).force) {
+                  value = x
+                }
+              case "number" =>
+                if (value.force.cast[Val.Num].value > x.force.cast[Val.Num].value) {
+                  value = x
+                }
+              case i => throw new IllegalArgumentException(
+                "Array must be of type string,boolean, or number; got: " + i);
             }
           }
           value.force
@@ -457,9 +497,23 @@ object DW {
       builtin("minBy", "array", "funct"){
         (_,_, array: Val.Arr, funct: Applyer) =>
           var value = array.value.head
-          for(x <- array.value){
-            if(funct.apply(value).toString > funct.apply(x).toString){
-              value = x
+          val compareType=funct.apply(value).prettyName
+          for (x <- array.value) {
+            compareType match {
+              case "string" =>
+                if (funct.apply(value).cast[Val.Str].value > funct.apply(x).cast[Val.Str].value) {
+                  value = x
+                }
+              case "boolean" =>
+                if (funct.apply(x) == Val.Lazy(Val.False).force) {
+                  value = x
+                }
+              case "number" =>
+                if (funct.apply(value).cast[Val.Num].value > funct.apply(x).cast[Val.Num].value) {
+                  value = x
+                }
+              case i => throw new IllegalArgumentException(
+                "Array must be of type string,boolean, or number; got: " + i);
             }
           }
           value.force
@@ -566,10 +620,19 @@ object DW {
           Math.round(num).intValue()
       },
 
-      //TODO
-      builtin0("scan"){
-        (_,_,_) =>
-          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      builtin("scan", "str", "sub"){
+        (_,_, str: String, sub: String) =>
+          val regex = sub.r;
+          val out = collection.mutable.Buffer.empty[Val.Lazy]
+
+          for(item <- regex.findAllMatchIn(str)){
+            val subOut = collection.mutable.Buffer.empty[Val.Lazy]
+            for(index <- 0 to item.groupCount){
+              subOut+=Val.Lazy(Val.Str(item.group(index)))
+            }
+            out.append(Val.Lazy(Val.Arr(subOut.toSeq)))
+          }
+          Val.Arr(out.toSeq);
       },
 
       builtin("sizeOf", "value"){

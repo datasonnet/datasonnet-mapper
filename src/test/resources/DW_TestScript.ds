@@ -1,0 +1,125 @@
+{
+    abs:(DW.Core.abs(payload.abs.input) == payload.abs.output),
+    avg:(DW.Core.avg(payload.avg.input) == payload.avg.output),
+    ceil:(DW.Core.ceil(payload.ceil.input)==payload.ceil.output),
+    contains:(
+        DW.Core.contains(payload.contains.input1,payload.contains.input1_1) &&
+        DW.Core.contains(payload.contains.input2,payload.contains.input2_1) &&
+        DW.Core.contains(payload.contains.input2,payload.contains.input2_2)
+    ),
+    daysBetween:null,
+    distinctBy:null,
+    endsWith:DW.Core.endsWith(payload.endsWith.input1, payload.endsWith.input2),
+    entriesOf:(DW.Core.entriesOf(payload.entriesOf.input)==payload.entriesOf.output),
+    filter:(DW.Core.filter(payload.filter.input, function(value,index) value >= 3)==payload.filter.output),
+    filterObject:(
+        (DW.Core.filterObject(payload.filterObject.input, function(value,key,index) index == 0) == payload.filterObject.output1) &&
+        (DW.Core.filterObject(payload.filterObject.input, function(value,key,index) key == "testK") == payload.filterObject.output2)
+    ),
+    find:(
+        (DW.Core.find(payload.find.input1, payload.find.input1_1)==payload.find.output1) &&
+        (DW.Core.find(payload.find.input2, payload.find.input2_1)==payload.find.output2) &&
+        (DW.Core.find(payload.find.input2, payload.find.input2_2)==payload.find.output3)
+    ),
+    flatMap:(
+        (DW.Core.flatMap(payload.flatMap.input, function(v,i) v)==payload.flatMap.output)
+    ),
+    flatten:(DW.Core.flatten(payload.flatten.input)==payload.flatten.output),
+    floor:(DW.Core.floor(payload.floor.input)==payload.floor.output),
+    groupBy:null,
+    isBlank:(
+        DW.Core.isBlank("") &&
+        DW.Core.isBlank("    ") &&
+        DW.Core.isBlank(null)
+    ),
+    isDecimal:(DW.Core.isDecimal(payload.isDecimal.input)),
+    isEmpty:(
+        DW.Core.isEmpty("") &&
+        DW.Core.isEmpty({}) &&
+        DW.Core.isEmpty([]) &&
+        DW.Core.isEmpty(null)
+    ),
+    isEven:DW.Core.isEven(10),
+    isInteger:DW.Core.isInteger(1),
+    isLeapYear:null,
+    isOdd:(DW.Core.isOdd(payload.isOdd.input)),
+    joinBy:(DW.Core.joinBy([1,2,3],"-")=="1-2-3"),
+    keysOf:(DW.Core.keysOf(payload.keysOf.input)==payload.keysOf.output),
+    log:null,
+    lower:DW.Core.lower(payload.lower.input)==payload.lower.output,
+    map:(DW.Core.map(['a','b','c'], function(value,index) value+'_'+index))[0]=="a_0",
+    mapObject:null,
+    match:null,
+    matches:null,
+    max:(
+        (DW.Core.max(payload.max.input1)==payload.max.output1) &&
+        (DW.Core.max(payload.max.input2)==payload.max.output2) &&
+        (DW.Core.max(payload.max.input3)==payload.max.output3)
+    ),
+    maxBy:(
+        (DW.Core.maxBy(payload.maxBy.input1, function(i) i)==payload.maxBy.output1) &&
+        (DW.Core.maxBy(payload.maxBy.input2, function(i) i)==payload.maxBy.output2) &&
+        (DW.Core.maxBy(payload.maxBy.input3, function(i) i)==payload.maxBy.output3)
+    ),
+    min:(
+        (DW.Core.min(payload.min.input1)==payload.min.output1) &&
+        (DW.Core.min(payload.min.input2)==payload.min.output2) &&
+        (DW.Core.min(payload.min.input3)==payload.min.output3)
+    ),
+    minBy:(
+        (DW.Core.minBy(payload.minBy.input1, function(i) i)==payload.minBy.output1) &&
+        (DW.Core.minBy(payload.minBy.input2, function(i) i)==payload.minBy.output2) &&
+        (DW.Core.minBy(payload.minBy.input3, function(i) i)==payload.minBy.output3)
+    ),
+    mod:DW.Core.mod(payload.mod.input1,payload.mod.input2)==payload.mod.output,
+    namesOf:null,
+    native:null,
+    now:null,
+    orderBy:null,
+    pluck:null,
+    pow:DW.Core.pow(2,2)==4,
+    random:DW.Core.random()!=null,
+    randomint:DW.Core.randomint(10)!=null,
+    read:null,
+    readUrl:DW.Core.readUrl("http://httpbin.org/get").args=={},
+    reduce:null,
+    replace:null,
+    round:DW.Core.round(payload.round.input)==payload.round.output,
+    scan:null,
+    sizeOf:(
+        DW.Core.sizeOf(payload.sizeOf.input1)==payload.sizeOf.output1 &&
+        DW.Core.sizeOf(payload.sizeOf.input2)==payload.sizeOf.output2 &&
+        DW.Core.sizeOf(payload.sizeOf.input3)==payload.sizeOf.output3
+    ),
+    splitBy:(
+        DW.Core.splitBy(payload.splitBy.input1,payload.splitBy.input1_1)==payload.splitBy.output1 &&
+        DW.Core.splitBy(payload.splitBy.input1,payload.splitBy.input1_2)==payload.splitBy.output2
+    ),
+    sqrt:DW.Core.sqrt(payload.sqrt.input)==payload.sqrt.output,
+    startsWith:DW.Core.startsWith(payload.startsWith.input1,payload.startsWith.input2),
+    sum:DW.Core.sum(payload.sum.input)==payload.sum.output,
+    to:DW.Core.to(payload.to.input1,payload.to.input2)==payload.to.output,
+    trim:(DW.Core.trim(payload.trim.input)==payload.trim.output),
+    typeOf:(
+        (DW.Core.typeOf(payload.typeOf.input1) == payload.typeOf.output1) &&
+        (DW.Core.typeOf(payload.typeOf.input2) == payload.typeOf.output2) &&
+        (DW.Core.typeOf(payload.typeOf.input3) == payload.typeOf.output3) &&
+        (DW.Core.typeOf(payload.typeOf.input4) == payload.typeOf.output4) &&
+        (DW.Core.typeOf(payload.typeOf.input5) == payload.typeOf.output5)
+    ),
+    unzip:DW.Core.unzip(payload.unzip.input)==payload.unzip.output,
+    upper:DW.Core.upper(payload.upper.output)==payload.upper.output,
+    uuid:(DW.Core.uuid != null),
+    valuesOf:(DW.Core.valuesOf(payload.valuesOf.input))==payload.valuesOf.output,
+    with:null,
+    write:null,
+    xsiType:null,
+    zip:(DW.Core.zip(payload.zip.input1,payload.zip.input2))==payload.zip.output
+}
+
+
+
+
+
+
+

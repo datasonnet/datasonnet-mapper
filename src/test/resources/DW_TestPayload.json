@@ -1,0 +1,240 @@
+{
+  "abs":{
+    "input": -123,
+    "output": 123
+  },
+  "avg":{
+    "input":[2,7,4,8,3,2,2],
+    "output": 4
+  },
+  "ceil":{
+    "input": 0.22,
+    "output": 1
+  },
+  "contains":{
+    "input1": [2,7,4,8,3,2,2],
+    "input2": "Hello World!",
+    "input1_1": 2,
+    "input2_1": "Hello",
+    "input2_2": "[e-g]"
+  },
+  "daysBetween":{},
+  "distinctBy":{},
+  "endsWith":{
+    "input1": "Hello World!",
+    "input2": "!"
+  },
+  "entriesOf":{
+    "input":{
+      "testK": "testV"
+    },
+    "output": [
+      {
+        "key": "testK",
+        "value": "testV"
+      }
+    ]
+  },
+  "filter":{
+    "input": [2,7,4,8,3,2,2],
+    "output": [7,4,8,3]
+  },
+  "filterObject":{
+    "input":{
+      "testK": "testV",
+      "test2": "value2"
+    },
+    "output1":{
+      "test2": "value2"
+    },
+    "output2":{
+      "testK": "testV"
+    }
+  },
+  "find":{
+    "input1": [2,7,4,8,3,2,2],
+    "input1_1": 2,
+    "input2": "Hello World!",
+    "input2_1": "Hell",
+    "input2_2": "[o]",
+    "output1": [0,5,6],
+    "output2":[0],
+    "output3":[4,7]
+  },
+  "flatMap":{
+    "input": [[3,5],[1,2,5]],
+    "output": [3,5,1,2,5]
+  },
+  "flatten":{
+    "input":[[0,0],[1,1],[2,3],[5,8]],
+    "output": [0,0,1,1,2,3,5,8]
+  },
+  "floor":{
+    "input": 0.22,
+    "output": 0
+  },
+  "groupBy":{},
+  "isBlank":{},
+  "isDecimal":{
+    "input": 0.22
+  },
+  "isEmpty":{},
+  "isEven":{},
+  "isInteger":{},
+  "isLeapYear":{},
+  "isOdd":{
+    "input": 123
+  },
+  "joinBy":{},
+  "keysOf":{
+    "input": {
+      "testK": "testV"
+    },
+    "output": ["testK"]
+  },
+  "log":{},
+  "lower":{
+    "input": "Hello World!",
+    "output": "hello world!"
+  },
+  "map":{},
+  "mapObject":{},
+  "match":{},
+  "matches":{},
+  "max":{
+    "input1": [false,true,false],
+    "input2": ["a","d","c"],
+    "input3": [5,1,88,3,2],
+    "output1": true,
+    "output2": "d",
+    "output3": 88
+  },
+  "maxBy":{
+    "input1": [false,true,false],
+    "input2": ["a","d","c"],
+    "input3": [5,1,88,3,2],
+    "output1": true,
+    "output2": "d",
+    "output3": 88
+  },
+  "min":{
+    "input1": [false,true,false],
+    "input2": ["a","d","c"],
+    "input3": [5,1,88,3,2],
+    "output1": false,
+    "output2": "a",
+    "output3": 1
+  },
+  "minBy":{
+    "input1": [false,true,false],
+    "input2": ["a","d","c"],
+    "input3": [5,1,88,3,2],
+    "output1": false,
+    "output2": "a",
+    "output3": 1
+  },
+  "mod":{
+    "input1": 2,
+    "input2": 2,
+    "output": 0
+  },
+  "namesOf":{},
+  "native":{},
+  "now":{},
+  "orderBy":{},
+  "pluck":{},
+  "pow":{},
+  "random":{},
+  "randomInt":{},
+  "read":{},
+  "readUrl":{},
+  "reduce":{},
+  "replace":{},
+  "round":{
+    "input": 0.22,
+    "output": 0
+  },
+  "message": "Hello World!",
+  "scan":{
+    "input1": "",
+    "input2": "",
+    "output": [
+      ["anypt@mulesoft.com","anypt","mulesoft"],
+      ["max@mulesoft.com","max","mulesoft"]
+    ]
+  },
+  "sizeOf":{
+    "input1": "Hello World!",
+    "input2": [2,7,4,8,3,2,2],
+    "input3": {
+      "testK": "testV"
+    },
+    "output1": 12,
+    "output2": 7,
+    "output3": 1
+  },
+  "splitBy":{
+    "input1": "a-b-c",
+    "input1_1": "-",
+    "input1_2": "[b]",
+    "output1":["a","b","c"],
+    "output2":["a-","-c"]
+  },
+  "sqrt":{
+    "input": 4,
+    "output": 2
+  },
+  "startsWith":{
+    "input1": "Hello World!",
+    "input2": "Hell"
+  },
+  "sum":{
+    "input":[2,7,4,8,3,2,2],
+    "output":28
+  },
+  "to":{
+    "input1": 0,
+    "input2": 3,
+    "output": [0,1,2,3]
+  },
+  "trim": {
+    "input": "  Hello     World     ",
+    "output": "Hello     World"
+  },
+  "typeOf":{
+    "input1": "",
+    "input2": null,
+    "input3": true,
+    "input4": {},
+    "input5": [],
+    "output1": "string",
+    "output2": "null",
+    "output3": "boolean",
+    "output4": "object",
+    "output5": "array"
+  },
+  "unzip":{
+    "input":[[0,"a"],[1,"b"],[2,"c"],[ 3,"d"]],
+    "output":[[0,1,2,3],["a","b","c","d"]]
+  },
+  "upper":{
+    "input": "Hello World!",
+    "output": "HELLO WORLD!"
+  },
+  "uuid":{},
+  "valuesOf":{
+    "input": {
+      "val1": true,
+      "val2": 1
+    },
+    "output":[1,true]
+  },
+  "with":{},
+  "write":{},
+  "xsiType":{},
+  "zip":{
+    "input1":[0,1],
+    "input2":["a","b"],
+    "output":[ [0,"a"], [1,"b"] ]
+  }
+}
