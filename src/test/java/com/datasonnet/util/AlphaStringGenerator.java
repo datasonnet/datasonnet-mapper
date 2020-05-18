@@ -36,6 +36,7 @@ import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static com.pholser.junit.quickcheck.internal.Lists.shrinksOfOneItem;
@@ -88,7 +89,7 @@ public class AlphaStringGenerator extends Generator<String> {
                 .filter(this::codePointsInRange)
                 .collect(toList()));
 
-        return shrinks;
+        return Collections.unmodifiableList(shrinks);
     }
 
     @Override public BigDecimal magnitude(Object value) {

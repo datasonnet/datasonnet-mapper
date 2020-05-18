@@ -1,8 +1,11 @@
 package com.datasonnet;
 
+import com.datasonnet.document.Document;
+import com.datasonnet.document.StringDocument;
 import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
 import com.datasonnet.Mapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -19,12 +22,12 @@ public class CSVReaderTest {
                 "application/csv"
         );
 
-        DataFormatService.getInstance().findAndRegisterPlugins();
+        Mapper mapper = new Mapper("{ fName: payload[0][\"First Name\"] }");
 
-        Mapper mapper = new Mapper("local csvInput = DS.Formats.read(payload, \"application/csv\"); { fName: csvInput[0][\"First Name\"] }", Collections.emptyList(), true);
+
         Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
 
-        assertEquals("{\"fName\":\"Eugene\"}", mapped.contents());
+        assertEquals("{\"fName\":\"Eugene\"}", mapped.getContentsAsString());
     }
 
     @Test
@@ -35,12 +38,12 @@ public class CSVReaderTest {
         );
         String jsonnet = TestResourceReader.readFileAsString("readCSVExtTest.ds");
 
-        DataFormatService.getInstance().findAndRegisterPlugins();
+        Mapper mapper = new Mapper(jsonnet);
 
-        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+
         Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
 
-        assertEquals("{\"fName\":\"Eugene\",\"num\":\"234\"}", mapped.contents());
+        assertEquals("{\"fName\":\"Eugene\",\"num\":\"234\"}", mapped.getContentsAsString());
     }
 
 

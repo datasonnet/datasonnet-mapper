@@ -1,5 +1,6 @@
 package com.datasonnet;
 
+import com.datasonnet.document.StringDocument;
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.Test;
 
@@ -13,19 +14,17 @@ public class UtilLibraryTest {
     void testDuplicates() throws Exception {
         String jsonData = TestResourceReader.readFileAsString("utilLibDuplicatesTest.json");
 
-        Mapper mapper = new Mapper("DS.Util.duplicates(payload.primitive)", Collections.emptyList(), true);
-        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").contents();
+        Mapper mapper = new Mapper("DS.Util.duplicates(payload.primitive)");
+        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
         assertEquals(mappedJson, "[\"hello\",\"world\"]");
 
-//TODO these won't work until sjsonnet supports key functions
+        mapper = new Mapper("DS.Util.duplicates(payload.complex, function(x) x.language.name)");
+        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
+        assertEquals(mappedJson, "[{\"language\":{\"name\":\"Java8\",\"version\":\"1.8.0\"}}]");
 
-//        mapper = new Mapper("DS.Util.duplicates(payload.complex, function(x) x.language.name)", Collections.emptyList(), true);
-//        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").contents();
-//        assertEquals(mappedJson, "[{\"language\":{\"name\":\"Java8\",\"version\":\"1.8.0\"}}]");
-//
-//        mapper = new Mapper("DS.Util.duplicates(payload.moreComplex, function(x) std.substr(x.language.version, 0, 3))", Collections.emptyList(), true);
-//        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").contents();
-//        assertEquals(mappedJson, "[{\"language\":{\"name\":\"Java1.8\",\"version\":\"1.8_152\"}}]");
+        mapper = new Mapper("DS.Util.duplicates(payload.moreComplex, function(x) std.substr(x.language.version, 0, 3))");
+        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
+        assertEquals(mappedJson, "[{\"language\":{\"name\":\"Java1.8\",\"version\":\"1.8_152\"}}]");
     }
 
     @Test
@@ -37,8 +36,8 @@ public class UtilLibraryTest {
     @Test
     void testReverse() throws Exception {
         String jsonData = "[\"a\",\"b\",\"c\",\"d\"]";
-        Mapper mapper = new Mapper("DS.Util.reverse(payload)", Collections.emptyList(), true);
-        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").contents();
+        Mapper mapper = new Mapper("DS.Util.reverse(payload)");
+        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
 
         assertEquals(mappedJson, "[\"d\",\"c\",\"b\",\"a\"]");
     }
@@ -67,8 +66,8 @@ public class UtilLibraryTest {
     private void testDS(String dsFileName, String input) throws Exception {
         String ds = TestResourceReader.readFileAsString(dsFileName);
 
-        Mapper mapper = new Mapper(ds, Collections.emptyList(), true);
-        String mappedJson = mapper.transform(new StringDocument(input, "application/json"), Collections.emptyMap(), "application/json").contents();
+        Mapper mapper = new Mapper(ds);
+        String mappedJson = mapper.transform(new StringDocument(input, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
 
         assertEquals(mappedJson, "true");
     }

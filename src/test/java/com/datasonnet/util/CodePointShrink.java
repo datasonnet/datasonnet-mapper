@@ -26,10 +26,12 @@
 package com.datasonnet.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import com.pholser.junit.quickcheck.generator.Shrink;
 import com.pholser.junit.quickcheck.random.SourceOfRandomness;
@@ -65,10 +67,10 @@ class CodePointShrink implements Shrink<Integer> {
                         .thenComparing(cp -> Integer.valueOf(' ').equals(cp))
                         .thenComparing((Function<Integer, Boolean>) Character::isSpaceChar)
                         .thenComparing(naturalOrder());
-        return shrinks.stream()
+        return Collections.unmodifiableList(shrinks.stream()
                 .filter(filter)
                 .filter(cp -> comparator.compare(cp, codePoint) < 0)
                 .distinct()
-                .collect(toList());
+                .collect(Collectors.toList()));
     }
 }

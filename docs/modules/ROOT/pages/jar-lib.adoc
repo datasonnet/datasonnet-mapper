@@ -1,0 +1,60 @@
+# Using DataSonnet Programmatically
+:toc:
+:toclevels: 1
+
+DataSonnet is distributed as a JAR which contains all necessary classes and dependencies to use DataSonnet programmatically embedded in your projects. Use the following Maven snippet to add DataSonnet as a dependency to your `pom.xml`:
+
+[source,xml]
+----------
+<dependency>
+    <groupId>com.datasonnet</groupId>
+    <artifactId>datasonnet-mapper</artifactId>
+    <version>${datasonnet.version}</version>
+</dependency>
+----------
+
+where `${datasonnet.version}` is the latest released version (currently 1.0.4).
+
+The simplest scenario is mapping from JSON to JSON with no additional variables:
+
+[source,java]
+------
+String json = ...; //JSON object as string
+
+Mapper mapper = new Mapper(datasonnetScript);
+String transformedJson = mapper.transform(json)
+------
+
+More complex scenarios may involve passing additional variables as well as xref:dataformats.adoc[transforming to/from other supported data formats]:
+
+[source,java]
+------
+String jsonData = ...;
+
+String jsonVar = ...;
+String xmlVar = ...;
+String textVar = ...;
+
+Map<String, Document> variables = new HashMap<>();
+variables.put("varJson", new StringDocument(jsonVar, "application/json"));
+variables.put("varXml", new StringDocument(xmlVar, "application/xml"));
+variables.put("varTxt", new StringDocument(textVar, "text/plain"));
+
+Mapper mapper = new Mapper(datasonnetScript, variables.keySet());
+Document transformedResult = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json");
+String jsonResult = transformedResult.getContentsAsString();
+------
+
+The `Mapper` constructor accepts the following arguments:
+
+- `datasonnetScript` - the `String` which contains the mapping code;
+- `argumentNames` - the `java.util.Set` which contains the names of the additional variables
+
+The `transform` method accepts the following arguments:
+
+- payload - the instance of the `com.datasonnet.Document` which contains the data and the mime type;
+- variables - the instance of the `Map<String, com.datasonnet.Document>` which contains the additional variables.
+
+The result of the `transform` method invocation is the instance of the `com.datasonnet.Document` object which contains the result of the mapping and its mime type.
+
+There are overloaded `transform` methods which accept different sets of parameters; see the DataSonnet source code and documentation for details.

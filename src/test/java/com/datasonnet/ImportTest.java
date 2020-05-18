@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class ImportTest {
     @Test
     void simpleImport() {
-        Mapper mapper = new Mapper("import 'output.json'", Collections.emptyList(), new HashMap<String, String>() {{ put("output.json", "{\"a\": 5}"); }},true);
+        Mapper mapper = new Mapper("import 'output.json'", Collections.emptyList(), Collections.singletonMap("output.json", "{\"a\": 5}"),true, true);
         String result = mapper.transform("{}");
         assertEquals("{\"a\":5}", result);
     }
@@ -21,9 +21,8 @@ public class ImportTest {
     @Test
     void importParseErrorLineNumber() {
         try {
-            Mapper mapper = new Mapper("import 'output.json'", Collections.emptyList(), new HashMap<String, String>() {{
-                put("output.json", "a b");
-            }}, true);
+            Mapper mapper = new Mapper("import 'output.json'", Collections.emptyList(),
+                    Collections.singletonMap("output.json", "a b"), true, true);
             String result = mapper.transform("{}");
             fail("Import should fail");
         } catch(IllegalArgumentException e) {
@@ -34,9 +33,8 @@ public class ImportTest {
     @Test
     void importExecuteErrorLineNumber() {
         try {
-            Mapper mapper = new Mapper("import 'output.json'", Collections.emptyList(), new HashMap<String, String>() {{
-                put("output.json", "a.b");
-            }}, true);
+            Mapper mapper = new Mapper("import 'output.json'", Collections.emptyList(),
+                    Collections.singletonMap("output.json", "a.b"), true, true);
             String result = mapper.transform("{}");
             fail("Import should fail");
         } catch(IllegalArgumentException e) {
@@ -53,7 +51,7 @@ public class ImportTest {
             Mapper mapper = new Mapper("local testlib = import 'importTest.libsonnet'; local teststr = import 'importLibsonnetTest.json'; { greeting: testlib.sayHello('World') }", Collections.emptyList(), new HashMap<String, String>() {{
                 put("importTest.libsonnet", lib);
                 put("importLibsonnetTest.json", json);
-            }}, true);
+            }}, true, true);
         } catch (IllegalArgumentException e) {
             fail("This test should not fail, only libraries are evaluated at this point");
         }
@@ -63,9 +61,8 @@ public class ImportTest {
     void importLibsonnetFail() throws Exception {
         try {
             final String libErr = TestResourceReader.readFileAsString("importTestFail.libsonnet");
-            Mapper mapper = new Mapper("local testlib = import 'importTestFail.libsonnet'; { greeting: testlib.sayHello('World') }", Collections.emptyList(), new HashMap<String, String>() {{
-                put("importTestFail.libsonnet", libErr);
-            }}, true);
+            Mapper mapper = new Mapper("local testlib = import 'importTestFail.libsonnet'; { greeting: testlib.sayHello('World') }",
+                    Collections.emptyList(), Collections.singletonMap("importTestFail.libsonnet", libErr), true, true);
             fail("This test should fail");
         } catch (IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("Unable to parse library: importTestFail.libsonnet"), "Found message: " + e.getMessage());

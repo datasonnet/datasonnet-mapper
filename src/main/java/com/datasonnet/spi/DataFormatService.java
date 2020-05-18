@@ -1,56 +1,60 @@
 package com.datasonnet.spi;
 
+import com.datasonnet.document.Document;
+import com.datasonnet.plugins.JSONFormatPlugin;
+import ujson.Str;
+import ujson.Value;
+
 import java.util.*;
 
 public class DataFormatService {
 
-    private static DataFormatService service;
-
     private Map<String, List<DataFormatPlugin>> pluginRegistry = new HashMap<>();
 
-    DataFormatService() { }
-
-    public static synchronized DataFormatService getInstance() {
-        if (service == null) {
-            service = new DataFormatService();
-        }
-        return service;
+    public DataFormatService() {
+        registerPlugin(new JSONFormatPlugin());
     }
 
-    public void registerPlugin(String mimeType, DataFormatPlugin plugin) {
-        List<DataFormatPlugin> pluginsList = pluginRegistry.getOrDefault(mimeType, new ArrayList<>());
+    public void registerPlugin(DataFormatPlugin plugin) {
+        for(String identifier : plugin.getSupportedIdentifiers()) {
+            List<DataFormatPlugin> pluginsList = pluginRegistry.getOrDefault(identifier, new ArrayList<>());
+            if (!pluginsList.contains(plugin)) {
+                pluginsList.add(plugin);
+            }
+            pluginRegistry.put(identifier, pluginsList);
+        }
+    }
+
+    public void registerPluginFor(String identifier, DataFormatPlugin plugin) {
+        List<DataFormatPlugin> pluginsList = pluginRegistry.getOrDefault(identifier, new ArrayList<>());
         if (!pluginsList.contains(plugin)) {
             pluginsList.add(plugin);
         }
-        pluginRegistry.put(mimeType, pluginsList);
+        pluginRegistry.put(identifier, pluginsList);
     }
 
-    public DataFormatPlugin getPluginFor(String mimeType) {
-        //TODO should we return list instead?
-        return pluginRegistry.containsKey(mimeType) ? pluginRegistry.get(mimeType).get(0) : null;
+    public void registerPlugins(Iterable<DataFormatPlugin> plugins) {
+        for(DataFormatPlugin plugin : plugins) {
+            registerPlugin(plugin);
+        }
     }
 
-    public Map<String, List<DataFormatPlugin>> findPlugins() {
-        Map<String, List<DataFormatPlugin>> pluginsMap = new HashMap<>();
+    public DataFormatPlugin getPluginFor(String identifier) {
+        identifier = identifier.toLowerCase();
+        return pluginRegistry.containsKey(identifier) ? pluginRegistry.get(identifier).get(0) : null;
+    }
+
+    public List<DataFormatPlugin> findPlugins() {
 
         ServiceLoader<DataFormatPlugin> loader = ServiceLoader.load(DataFormatPlugin.class);
-
-        for (DataFormatPlugin plugin : loader) {
-            for (String mimeType: plugin.getSupportedMimeTypes()) {
-                List<DataFormatPlugin> pluginsList = pluginsMap.getOrDefault(mimeType, new ArrayList<>());
-                pluginsList.add(plugin);
-                pluginsMap.put(mimeType, pluginsList);
+        return new ArrayList() {{
+            for (DataFormatPlugin plugin : loader) {
+                add(plugin);
             }
-        }
-
-        return pluginsMap;
-    }
-
-    public List<String> getSupportedMimeTypes() {
-        return new ArrayList(pluginRegistry.keySet());
+        }};
     }
 
     public void findAndRegisterPlugins() {
-        pluginRegistry.putAll(findPlugins());
+        registerPlugins(findPlugins());
     }
 }

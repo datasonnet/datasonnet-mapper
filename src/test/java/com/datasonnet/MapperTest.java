@@ -4,6 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.datasonnet.document.Document;
+import com.datasonnet.document.StringDocument;
+import com.datasonnet.spi.DataFormatService;
+import com.datasonnet.util.TestResourceReader;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -16,7 +21,7 @@ public class MapperTest {
     @ParameterizedTest
     @MethodSource("simpleProvider")
     void simple(String jsonnet, String json, String expected) {
-        Mapper mapper = new Mapper(jsonnet, Collections.emptyList(), true);
+        Mapper mapper = new Mapper(jsonnet);
         assertEquals(expected, mapper.transform(json));
     }
 
@@ -31,10 +36,9 @@ public class MapperTest {
     @ParameterizedTest
     @MethodSource("variableProvider")
     void variables(String jsonnet, String json, String variable, String value, String expected) {
-        HashMap<String, Document> variables = new HashMap<>();
-        variables.put(variable, new StringDocument(value, "application/json"));
+        Map<String, Document> variables = Collections.singletonMap(variable, new StringDocument(value, "application/json"));
         Mapper mapper = new Mapper(jsonnet, variables.keySet(), true);
-        assertEquals(expected, mapper.transform(new StringDocument(json, "application/json"), variables).contents());
+        assertEquals(expected, mapper.transform(new StringDocument(json, "application/json"), variables).getContentsAsString());
     }
 
     static Stream<String[]> variableProvider() {
@@ -112,12 +116,15 @@ public class MapperTest {
     void nonJsonArguments() {
         Mapper mapper = new Mapper("argument", Arrays.asList("argument"), true);
 
-        Map<String, Document> map = new HashMap<>();
-        map.put("argument", new StringDocument("value", "text/plain"));
+
+        Map<String, Document> map = Collections.singletonMap("argument", new StringDocument("value", "text/plain"));
 
         Document mapped = mapper.transform(new StringDocument("{}", "application/json"), map, "text/plain");
 
-        assertEquals(new StringDocument("value", "text/plain"), mapped);
+        //assertEquals(new StringDocument("value", "text/plain"), mapped);
+        assertEquals("value", mapped.getContentsAsString());
+        assertEquals("text/plain", mapped.getMimeType());
+
     }
 
     @Test
@@ -128,5 +135,33 @@ public class MapperTest {
         } catch(IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("Top Level Function must have at least one argument"), "Found message: " + e.getMessage());
         }
+    }
+
+    @Test
+    void testFieldsOrder() throws Exception {
+        String jsonData = TestResourceReader.readFileAsString("fieldOrder.json");
+        String datasonnet = TestResourceReader.readFileAsString("fieldOrder.ds");
+
+        Map<String, Document> variables = new HashMap<>();
+        variables.put("v2", new StringDocument("v2value", "text/plain"));
+        variables.put("v1", new StringDocument("v1value", "text/plain"));
+
+        Mapper mapper = new Mapper(datasonnet, variables.keySet(), true);
+
+
+        String mapped = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json").getContentsAsString();
+
+        assertEquals("{\"z\":\"z\",\"a\":\"a\",\"v2\":\"v2value\",\"v1\":\"v1value\",\"y\":\"y\",\"t\":\"t\"}", mapped.trim());
+
+        datasonnet = "/** DataSonnet\n" +
+                     "version=1.0\n" +
+                     "output.preserveOrder=false\n*/\n" + datasonnet;
+
+        mapper = new Mapper(datasonnet, variables.keySet(), true);
+
+
+        mapped = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json").getContentsAsString();
+
+        assertEquals("{\"a\":\"a\",\"t\":\"t\",\"v1\":\"v1value\",\"v2\":\"v2value\",\"y\":\"y\",\"z\":\"z\"}", mapped.trim());
     }
 }

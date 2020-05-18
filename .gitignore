@@ -2,3 +2,5 @@
 .idea
 target
 tmp
+.DS_Store
+

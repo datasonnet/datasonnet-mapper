@@ -606,8 +606,6 @@ Parses a string which contains a double number and returns its numeric represent
 ### `duplicates(array arr, function keyF=id, boolean set=true)`
 Returns an array containing duplicate elements from input array. An optional key function returns a value which will be used as a comparison key. If `set` parameter is set to true, only the first duplicate value will be included.
 
-WARNING: The parameter `keyF` is ignored. This is a known issue and will be resolved once the new version of the `sjsonnet` library is released. The below example will not work, for now `duplicates` can only work with primitive types.
-
 *Example*
 
 .Payload
@@ -784,3 +782,191 @@ DS.Util.mapToObject(payload, function(x) x.language.name, function(v) v.language
 };
 ------------------------
 
+## Regex
+
+### `regexFullMatch(string pattern, string input)`
+Matches the entire input against the pattern (anchored start and end). If there's no match, returns `null`. If there's a match, returns a JSON object which has the following structure:
+
+- `string` - the matched string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexFullMatch(@'h(?P<mid>.*)o', 'hello');
+------------------------
+.Result
+------------------------
+{
+  "captures": [
+    "ell"
+  ],
+  "namedCaptures": {
+    "mid": "ell"
+  },
+  "string": "hello"
+}
+------------------------
+
+### `regexPartialMatch(string pattern, string input)`
+Matches the input against the pattern (unanchored). If there's no match, returns `null`. If there's a match, returns a JSON object which has the following structure:
+
+- `string` - the matched string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexPartialMatch(@'e(?P<mid>.*)o', 'hello')
+------------------------
+.Result
+------------------------
+{
+  "captures": [
+    "ll"
+  ],
+  "namedCaptures": {
+    "mid": "ll"
+  },
+  "string": "ello"
+}
+------------------------
+
+### `regexScan(string pattern, string input)`
+Finds all matches of the input against the pattern. If there are any matches, returns an array of JSON objects which have the following structure:
+
+- `string` - the matched string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexScan(@'(?P<user>[a-z]*)@(?P<domain>[a-z]*).org', 'modus@datasonnet.org,box@datasonnet.org')
+------------------------
+.Result
+------------------------
+[
+    {
+        "captures": [
+            "modus",
+            "datasonnet"
+        ],
+        "namedCaptures": {
+            "domain": "datasonnet",
+            "user": "modus"
+        },
+        "string": "modus@datasonnet.org"
+    },
+    {
+        "captures": [
+            "box",
+            "datasonnet"
+        ],
+        "namedCaptures": {
+            "domain": "datasonnet",
+            "user": "box"
+        },
+        "string": "box@datasonnet.org"
+    }
+]
+------------------------
+
+### `regexQuoteMeta(string str)`
+Returns a literal pattern string for the specified string.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexQuoteMeta(@'1.5-2.0?')
+------------------------
+.Result
+------------------------
+"1\\.5-2\\.0\\?"
+------------------------
+
+### `regexReplace(string str, string pattern, string replacement)`
+Returns the input with the first match replaced by `replacement` string.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexReplace('wishyfishyisishy', @'ish', 'and')
+------------------------
+.Result
+------------------------
+"wandyfishyisishy"
+------------------------
+
+### `regexGlobalReplace(string str, string pattern, string replacement)`
+Returns the input with all matches replaced by `replacement` string.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.Regex.regexGlobalReplace('wishyfishyisishy', @'ish', 'and')
+------------------------
+.Result
+------------------------
+"wandyfandyisandy"
+------------------------
+
+### `regexGlobalReplace(string str, string pattern, function replacement)`
+Returns the input with all matches replaced by the result of the `replacement` function. The function must return string result and take a single object as an argument in the following structure:
+
+- `string` - the matched string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
+
+*Example*
+
+.DataSonnet map:
+------------------------
+local square(obj) = std.toString(std.pow(std.parseInt(obj.string), 2));
+
+DS.Regex.regexGlobalReplace("xxx2yyy4zzz6aaa", "\\d", square)
+------------------------
+.Result
+------------------------
+"xxx4yyy16zzz36aaa"
+------------------------
+
+## URL
+
+### `encode(string data, string encoding="UTF-8")`
+
+Translates a string into `application/x-www-form-urlencoded` format using the supplied encoding scheme to obtain the bytes for unsafe characters. The default encoding is `UTF-8`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.URL.encode('Hello World')
+------------------------
+.Result
+------------------------
+"Hello+World"
+------------------------
+
+### `decode(string data, string encoding="UTF-8")`
+
+Decodes a application/x-www-form-urlencoded string using a specific encoding scheme. The supplied encoding is used to determine what characters are represented by any consecutive sequences of the form "%xy".
+
+*Example*
+
+.DataSonnet map:
+------------------------
+DS.URL.decode('Hello+World')
+------------------------
+.Result
+------------------------
+"Hello World"
+------------------------
