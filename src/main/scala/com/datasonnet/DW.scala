@@ -79,12 +79,12 @@ object DW {
               }
               Val.Arr(out.toSeq)
             case s: Val.Obj =>
-              val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
-
+              val out =scala.collection.mutable.Map[String, Val.Obj.Member]()
+              // new java.util.HashMap[String, Object]()//
               for((key,hidden) <- s.getVisibleKeys()){
 
                 var contains = false
-                val outObj =  new Val.Obj(out.toMap, _ => (), None)
+                val outObj =  new Val.Obj(out, _ => (), None)
                 for((outKey,outHidden) <- outObj.getVisibleKeys()){
                   if(funct.apply(Val.Lazy(outObj.value(outKey, -1)(fs ,ev)), Val.Lazy(Val.Str(outKey))) == funct.apply(Val.Lazy(s.value(key, -1)(fs ,ev)), Val.Lazy(Val.Str(outKey)))){
                     contains = true
@@ -94,7 +94,7 @@ object DW {
                   out. += (key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(key, -1)(fs,ev)))
                 }
               }
-              new Val.Obj(out.toMap, _ => (), None)
+              new Val.Obj(out, _ => (), None)
             case _ =>
               throw new IllegalArgumentException(
                 "Expected Array or Object, got: " + container.prettyName);
@@ -115,7 +115,7 @@ object DW {
             currentObj += ("key" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Str(key)).force))
             currentObj += ("value" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
             //add key to currentObj
-            out.append(Val.Lazy(new Val.Obj(currentObj.toMap, _ => (), None)))
+            out.append(Val.Lazy(new Val.Obj(currentObj, _ => (), None)))
           }
           Val.Arr(out.toSeq)
       },
@@ -142,7 +142,7 @@ object DW {
               out. += (key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs,ev)))
             }
           }
-          new Val.Obj(out.toMap, _ => (), None)
+          new Val.Obj(out, _ => (), None)
       },
 
       builtin("find", "container", "value"){
@@ -230,7 +230,7 @@ object DW {
               for((item,index) <- s.zipWithIndex){
 
                 val key = funct.apply(item, Val.Lazy(Val.Num(index)))
-                if(!new Val.Obj(out.toMap, _ => (), None)
+                if(!new Val.Obj(out, _ => (), None)
                       .getVisibleKeys()
                       .contains(key.cast[Val.Str].value)){
 
@@ -244,13 +244,13 @@ object DW {
                   out += (key.cast[Val.Str].value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Arr(array.toSeq)))
                 }
               }
-              new Val.Obj(out.toMap, _ => (), None)
+              new Val.Obj(out, _ => (), None)
             case s: Val.Obj =>
               val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
               for((key,hidden) <- s.getVisibleKeys()){
                 val functKey = funct.apply(Val.Lazy(s.value(key,-1)(fs, ev)), Val.Lazy(Val.Str(key)))
 
-                if(!new Val.Obj(out.toMap, _ => (), None)
+                if(!new Val.Obj(out, _ => (), None)
                   .getVisibleKeys()
                   .contains(functKey.cast[Val.Str].value)){
 
@@ -261,10 +261,10 @@ object DW {
                       currentObj += (key2 -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(key2,-1)(fs,ev)))
                     } // do nothing
                   }
-                  out += (functKey.cast[Val.Str].value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Obj(currentObj.toMap, _ => (), None)))
+                  out += (functKey.cast[Val.Str].value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Obj(currentObj, _ => (), None)))
                 }
               }
-              new Val.Obj(out.toMap, _ => (), None)
+              new Val.Obj(out, _ => (), None)
             case Val.Null => Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
             case _ => throw new IllegalArgumentException(
               "Expected Array or Object, got: " + container.prettyName);
@@ -405,7 +405,7 @@ object DW {
                 }
 
               }
-              new Val.Obj(out.toMap, _ => (), None)
+              new Val.Obj(out, _ => (), None)
             case Val.Null => Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
           }
       },

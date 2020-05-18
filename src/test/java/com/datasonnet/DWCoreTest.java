@@ -16,8 +16,6 @@ public class DWCoreTest {
     private final String lib = "DW" +".";
     private final String pack = "Core";
 
-
-
     @Test
     void testDW_abs(){
         Mapper mapper = new Mapper(lib+pack+".abs(-1)", new ArrayList<>(), true);
@@ -82,7 +80,7 @@ public class DWCoreTest {
     @Test
     void testDW_entriesOf(){
         String input="{\"test1\":\"x\",\"test2\":{\"inTest3\":\"x\",\"inTest4\":{}},\"test10\":[{},{}]}";
-        String compare="[{key:test2,value:{inTest3:x,inTest4:{}}},{key:test10,value:[{},{}]},{key:test1,value:x}]";
+        String compare="[{value:x,key:test1},{value:{inTest3:x,inTest4:{}},key:test2},{value:[{},{}],key:test10}]";
         Mapper mapper = new Mapper(lib+pack+".entriesOf(" + input + ")", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals(compare, value);
@@ -161,12 +159,7 @@ public class DWCoreTest {
                 "   { \"name\": \"Bar\", \"language\": \"Scala\" },\n" +
                 "   { \"name\": \"FooBar\", \"language\": \"Java\" }], function(item,index) item.language)\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("{" +
-                    "Java:[" +
-                        "{language:Java,name:Foo}," +
-                        "{language:Java,name:FooBar}]," +
-                    "Scala:[{language:Scala,name:Bar}]" +
-                "}", value);
+        assertEquals("{Java:[{name:Foo,language:Java},{name:FooBar,language:Java}],Scala:[{name:Bar,language:Scala}]}", value);
 
         mapper = new Mapper(lib + pack + ".groupBy({ \"a\" : \"b\", \"c\" : \"d\", \"e\": \"b\"}, function(value,key) value)\n", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
@@ -327,7 +320,7 @@ public class DWCoreTest {
 
         mapper = new Mapper(lib+pack+".mapObject({\"basic\": 9.99, \"premium\": 53, \"vip\": 398.99}, function(value,key,index) {[key]: (value + 5)} )\n", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("{basic:14.99,premium:58,vip:403.99}", value);
+        assertEquals("{premium:58,vip:403.99,basic:14.99}", value);
     }
 
 
