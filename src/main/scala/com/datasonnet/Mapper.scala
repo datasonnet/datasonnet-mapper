@@ -1,11 +1,7 @@
 package com.datasonnet
 
-<<<<<<< HEAD
-import java.io.{File, PrintWriter, StringWriter}
-=======
 import java.io.{PrintWriter, StringWriter}
 import java.util
->>>>>>> upstream/master
 import java.util.Collections
 
 import com.datasonnet.document.{AbstractBaseDocument, Document, StringDocument}
@@ -163,11 +159,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   }
 
   def this(jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) {
-<<<<<<< HEAD
-    this(jsonnet, argumentNames, Collections.emptyMap(), needsWrapper)
-=======
     this(jsonnet, argumentNames, Collections.emptyMap(), needsWrapper, true)
->>>>>>> upstream/master
   }
 
   def this(jsonnet: String, argumentNames: java.lang.Iterable[String]) {
@@ -221,14 +213,10 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
 
   private val libraries = Map(
     "DS" -> Mapper.objectify(
-<<<<<<< HEAD
-      PortX.libraries + Mapper.library(evaluator, "Util", parseCache)
+      DS.libraries(dataFormats) + Mapper.library(evaluator, "Util", parseCache)
     ),
     "DW" -> Mapper.objectify(
       DW.libraries
-=======
-      DS.libraries(dataFormats) + Mapper.library(evaluator, "Util", parseCache)
->>>>>>> upstream/master
     )
   )
 
