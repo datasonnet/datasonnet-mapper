@@ -145,6 +145,9 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   private val libraries = Map(
     "DS" -> Mapper.objectify(
       PortX.libraries + Mapper.library(evaluator, "Util", parseCache)
+    ),
+    "DW" -> Mapper.objectify(
+      DW.libraries
     )
   )
 
