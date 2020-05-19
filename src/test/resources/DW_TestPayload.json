@@ -18,7 +18,11 @@
     "input2_1": "Hello",
     "input2_2": "[e-g]"
   },
-  "daysBetween":{},
+  "daysBetween":{
+    "input1": "2020-07-04T00:00:00.000Z",
+    "input2": "2020-07-01T00:00:00.000Z",
+    "output": 3
+  },
   "distinctBy":{
     "input1": [0, 1, 2, 3, 3, 2, 1, 4],
     "input2": {"a":0, "b":1, "c":0},
@@ -104,7 +108,9 @@
   "isEmpty":{},
   "isEven":{},
   "isInteger":{},
-  "isLeapYear":{},
+  "isLeapYear":{
+    "input": "2020-07-04T21:00:00.000Z"
+  },
   "isOdd":{
     "input": 123
   },

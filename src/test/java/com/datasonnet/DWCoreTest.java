@@ -56,6 +56,17 @@ public class DWCoreTest {
     }
 
     @Test
+    void testDW_daysBetween(){
+        Mapper mapper = new Mapper(lib+pack+".daysBetween(\"2020-07-04T00:00:00.000Z\",\"2020-07-01T00:00:00.000Z\")\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("3", value);
+
+        mapper = new Mapper(lib+pack+".daysBetween(\"2020-07-04T23:59:59.000Z\",\"2020-07-04T00:00:00.000Z\")\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("0", value);
+    }
+
+    @Test
     void testDW_distinctBy(){
         Mapper mapper = new Mapper(lib+pack+".distinctBy([0, 1, 2, 3, 3, 2, 1, 4], function(item,index) item)", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
@@ -142,6 +153,14 @@ public class DWCoreTest {
         Mapper mapper = new Mapper(lib+pack+".flatten([ [0.0, 0], [1,1], [2,3], [5,8] ])\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[0,0,1,1,2,3,5,8]", value);
+
+        mapper = new Mapper(lib+pack+".flatten(null)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("null", value);
+
+        mapper = new Mapper(lib+pack+".flatten([null])\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[null]", value);
     }
 
     @Test
@@ -234,6 +253,13 @@ public class DWCoreTest {
     }
 
     @Test
+    void testDW_isLeapYear(){
+        Mapper mapper = new Mapper(lib+pack+".isLeapYear(\"2020-07-04T21:00:00.000Z\")\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+    }
+
+    @Test
     void testDW_isInteger(){
         Mapper mapper = new Mapper(lib+pack+".isInteger(1.5)\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
@@ -246,14 +272,6 @@ public class DWCoreTest {
         mapper = new Mapper(lib+pack+".isInteger(1.9)\n", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("false", value);
-    }
-
-    @Disabled
-    @Test
-    void testDW_isLeapYear(){
-        Mapper mapper = new Mapper(lib+pack+".isLeapYear()\n", new ArrayList<>(), true);
-        String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("true", value);
     }
 
 
@@ -676,6 +694,182 @@ public class DWCoreTest {
         Mapper mapper = new Mapper(lib + pack + ".zip([1,2,3,4,5], [\"a\",\"b\"])\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[[1,a],[2,b]]", value);
+    }
+
+
+
+
+
+    /********************************       ARRAYS             *************************************************************/
+    @Test
+    void testDW_countBy() {
+        Mapper mapper = new Mapper(lib + "Arrays.countBy([1,2,3,4,5], function(it) it > 2)\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("3", value);
+    }
+
+
+
+
+
+    /********************************       STRINGS             *************************************************************/
+    @Test
+    void testDW_appendIfMissing() {
+        Mapper mapper = new Mapper(lib + "Strings.appendIfMissing(\"abc\", \"xyz\")", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("abcxyz", value);
+
+        mapper = new Mapper(lib + "Strings.appendIfMissing(\"abcxyz\", \"xyz\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("abcxyz", value);
+    }
+
+    @Test
+    void testDW_camelize() {
+        Mapper mapper = new Mapper(lib + "Strings.camelize(\"customer_first_name\")", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("customerFirstName", value);
+
+        mapper = new Mapper(lib + "Strings.camelize(\"_customer_first_name\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("customerFirstName", value);
+
+        mapper = new Mapper(lib + "Strings.camelize(\"_______customer_first_name\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("customerFirstName", value);
+
+        mapper = new Mapper(lib + "Strings.camelize(null)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("null", value);
+    }
+
+    @Disabled
+    @Test
+    void testDW_capitalize() {
+        Mapper mapper = new Mapper(lib + "Strings.capitalize(\"customer\")", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("Customer", value);
+
+        mapper = new Mapper(lib + "Strings.capitalize(\"customer_first_name\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("Customer First Name", value);
+
+        mapper = new Mapper(lib + "Strings.capitalize(\"customer NAME\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("Customer Name", value);
+
+        mapper = new Mapper(lib + "Strings.capitalize(null)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("null", value);
+    }
+
+    @Test
+    void testDW_charCode() {
+        Mapper mapper = new Mapper(lib + "Strings.charCode(\"Master\")", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("77", value);
+
+        mapper = new Mapper(lib + "Strings.charCode(\"M\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("77", value);
+    }
+
+    @Test
+    void testDW_charCodeAt() {
+        Mapper mapper = new Mapper(lib + "Strings.charCodeAt(\"charCodeAt\", 4)", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("67", value);
+
+        mapper = new Mapper(lib + "Strings.charCodeAt(\"charCodeAt\", 8)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("65", value);
+    }
+
+    @Test
+    void testDW_fromCharCode() {
+        Mapper mapper = new Mapper(lib + "Strings.fromCharCode(67)", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("C", value);
+
+        mapper = new Mapper(lib + "Strings.fromCharCode(65)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("A", value);
+    }
+
+    @Test
+    void testDW_isAlpha() {
+        Mapper mapper = new Mapper(lib + "Strings.isAlpha(\"sdfvxer\")", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib + "Strings.isAlpha(\"ecvt4\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+
+        mapper = new Mapper(lib + "Strings.isAlpha(true)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib + "Strings.isAlpha(45)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+    }
+
+    @Test
+    void testDW_isAlphanumeric() {
+        Mapper mapper = new Mapper(lib + "Strings.isAlphanumeric(\"sdfvxer\")", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib + "Strings.isAlphanumeric(\"ecvt4\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib + "Strings.isAlphanumeric(true)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib + "Strings.isAlphanumeric(45)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+    }
+
+    @Test
+    void testDW_isLowerCase() {
+        Mapper mapper = new Mapper(lib + "Strings.isLowerCase(\"sdfvxer\")", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib + "Strings.isLowerCase(\"ecvt4\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+
+        mapper = new Mapper(lib + "Strings.isLowerCase(\"eCvt\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+
+        mapper = new Mapper(lib + "Strings.isLowerCase(true)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib + "Strings.isLowerCase(45)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+    }
+
+    @Test
+    void testDW_isNumeric() {
+        Mapper mapper = new Mapper(lib + "Strings.isNumeric(\"sdfvxer\")", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+
+        mapper = new Mapper(lib + "Strings.isNumeric(\"5334\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib + "Strings.isNumeric(100)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
     }
 
 }

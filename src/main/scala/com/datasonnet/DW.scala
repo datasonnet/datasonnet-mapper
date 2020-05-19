@@ -2,7 +2,10 @@ package com.datasonnet
 
 
 import java.net.URL
-import java.util.Scanner
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import java.util.{Date, Scanner}
 
 import com.datasonnet.spi.UjsonUtil
 import com.datasonnet.wrap.Library.library
@@ -60,6 +63,15 @@ object DW {
             case _ => throw new IllegalArgumentException(
               "Expected Array or String, got: " + container.prettyName);
           }
+      },
+
+      builtin("daysBetween", "datetime", "datetwo"){
+        (_,_, datetimeone: String, datetimetwo: String) =>
+          val dateone = java.time.ZonedDateTime
+            .parse(datetimeone, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+          val datetwo = java.time.ZonedDateTime
+            .parse(datetimetwo, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+          Val.Num(ChronoUnit.DAYS.between(dateone, datetwo)).value.abs;
       },
 
       builtin("distinctBy", "container", "funct"){
@@ -204,17 +216,23 @@ object DW {
       },
 
       builtin("flatten", "array"){
-        (_,_, array: Val.Arr) =>
-          val out = collection.mutable.Buffer.empty[Val.Lazy]
-          for(x <- array.value){
-            x.force match{
-              case Val.Null =>
-              case Val.Arr(v) => out.appendAll(v)
-              case _ => throw new IllegalArgumentException(
-                "Expected Array, got: " + array.prettyName);
-            }
+        (_,_, array: Val) =>
+          array match {
+            case Val.Null => Val.Lazy(Val.Null).force
+            case Val.Arr(outerArray)  =>
+              val out = collection.mutable.Buffer.empty[Val.Lazy]
+              for (innerArray <- outerArray) {
+                innerArray.force match {
+                  case Val.Null => out.append(Val.Lazy(Val.Null))
+                  case Val.Arr(v) => out.appendAll(v)
+                  case _ => throw new IllegalArgumentException (
+                    "Expected Array, got: " + innerArray.force.prettyName);
+                }
+              }
+              Val.Arr(out.toSeq)
+            case _ => throw new IllegalArgumentException (
+              "Expected Array, got: " + array.prettyName);
           }
-          Val.Arr(out.toSeq)
       },
 
       builtin("floor", "num"){
@@ -313,10 +331,11 @@ object DW {
           (Math.ceil(value) == Math.floor(value)).booleanValue()
       },
 
-      //TODO
-      builtin("isLeapYear", "value"){
-        (_,_, _: Val) =>
-          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      builtin("isLeapYear", "datetime"){
+        (_,_, datetime: String) =>
+          java.time.ZonedDateTime
+              .parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+                .toLocalDate.isLeapYear;
       },
 
       builtin("isOdd", "num"){
@@ -595,12 +614,6 @@ object DW {
           (Random.nextInt((num - 0) + 1) + 0).intValue()
       },
 
-      //TODO
-      builtin("read", "value"){
-        (_,_, _: Val) =>
-          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
-      },
-
       builtin("readUrl", "url"){
         (_,_, url: String) =>
           val out = new Scanner(new URL(url).openStream(), "UTF-8").useDelimiter("\\A").next()
@@ -617,12 +630,9 @@ object DW {
           acc
       },
 
-
       builtin("replace", "string", "regex", "replacement") {
         (_,_, str: String, reg: String, replacement: String) =>
-            val regex = reg.r
-            regex.replaceAllIn(str,replacement)
-          //Materializer.reverse(UjsonUtil.jsonObjectValueOf(com.datasonnet.DWCore.replace(string, regex, replacement)));
+          reg.r.replaceAllIn(str,replacement)
       },
 
       builtin("round", "num") {
@@ -657,7 +667,6 @@ object DW {
           }
       },
 
-      //TODO String,String String,Regex
       builtin("splitBy", "str", "value"){
         (_,_, str: String, value: String) =>
           val out = collection.mutable.Buffer.empty[Val.Lazy];
@@ -665,7 +674,6 @@ object DW {
           for(words <- regex.split(str)){
             out+=Val.Lazy(Val.Str(words))
           }
-          //Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
           Val.Arr(out.toSeq)
       },
 
@@ -781,6 +789,451 @@ object DW {
           }
           Val.Arr(out.toSeq)
       }
+    ),
+    "Crypto" -> library(
+      //TODO
+      builtin("HMACBinary", "bin1", "bin2", "str"){
+        (ev,fs, bin1: Val, bin2: Val, str: String) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("HMACWith", "bin1", "bin2", "str"){
+        (ev,fs, bin1: Val, bin2: Val, str: String) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("MD5", "str"){
+        (ev,fs, str: String) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("SHA1", "str"){
+        (ev,fs, str: String) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("hashWith", "bin", "str"){
+        (ev,fs, bin: Val, str: String) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+    ),
+    "Arrays" -> library(
+      builtin("countBy", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          var total = 0
+          for(x <- arr.value){
+            if(funct.apply(x) == Val.True){
+              total+=1
+            }
+          }
+          total
+      },
+      //TODO
+      builtin("divideBy", "arr", "num"){
+        (ev,fs, arr: Val.Arr, num: Double) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("drop", "arr", "num"){
+        (ev,fs, arr: Val.Arr, num: Double) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("dropWhile", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("every", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("firstWith", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("indexOf", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("indexWhere", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("join", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("leftJoin", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("outerJoin", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("partition", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("slice", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("some", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("splitAt", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("splitWhere", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("sumBy", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("take", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("takeWhile", "arr", "funct"){
+        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      }
+    ),
+    "Binaries" -> library(
+      //TODO
+      builtin("fromBase64", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("fromHex", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("readLinesWith", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("toBase64", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("toHex", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("writeLinesWith", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+    ),
+    "Numbers" -> library(
+      //TODO
+      builtin("fromBinary", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("fromHex", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("fromRadixNumber", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("toBinary", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("toHex", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("toRadixNumber", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+    ),
+    "Objects" -> library(
+      //TODO
+      builtin("divideBy", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("entrySet", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("everyEntry", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("keySet", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("mergeWith", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("nameSet", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("someEntry", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("someEntry", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("takeWhile", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("valueSet", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+    ),
+    "Strings" -> library(
+      builtin("appendIfMissing", "str1", "str2"){
+        (ev,fs, str: String, append: String) =>
+          var ret = str;
+          if(!str.contains(append)){
+            ret=(str + append)
+          }
+          Val.Lazy(Val.Str(ret)).force
+      },
+      builtin("camelize", "str"){
+        (ev,fs, str: Val) =>
+          str match{
+            case Val.Str(value) =>
+              //regex fo _CHAR
+              var regex = "(_+)([0-9A-Za-z])".r("underscore", "letter")
+
+              //Start string at first non underscore, lower case it
+              var temp = value.substring("[^_]".r.findFirstMatchIn(value).map(_.start).toList.head )
+              temp = temp.replaceFirst(temp.charAt(0).toString, temp.charAt(0).toLower.toString)
+
+              //replace and uppercase
+              temp = regex.replaceAllIn(temp, m => s"${(m group "letter").toUpperCase()}");
+              Val.Lazy(Val.Str(temp)).force;
+
+            case Val.Null =>
+              Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String got: " + str.prettyName);
+          }
+      },
+      //TODO
+      builtin("capitalize", "str"){
+        (ev,fs, str: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      builtin("charCode", "str"){
+        (ev,fs, str: String) =>
+          str.codePointAt(0)
+      },
+      builtin("charCodeAt", "str", "num"){
+        (ev,fs, str: String, num: Int) =>
+          str.codePointAt(num)
+
+      },
+      //TODO
+      builtin("dasherize", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      builtin("fromCharCode", "num"){
+        (ev,fs, num: Int) =>
+          String.valueOf(num.asInstanceOf[Char])
+      },
+
+      builtin("isAlpha", "str"){
+        (_,_, str: Val) =>
+          str match {
+            case Val.Str(value) =>
+              if("^[A-Za-z]+$".r.matches(value)) {true}
+              else {false}
+            case Val.Null => false
+            case Val.Num(x) => false
+            case Val.True | Val.False => true
+            case _ => throw new IllegalArgumentException(
+              "Expected String, got: " + str.prettyName);
+          }
+      },
+
+      builtin("isAlphanumeric", "str"){
+        (ev,fs, str: Val) =>
+          str match {
+            case Val.Str(value) =>
+              if("^[A-Za-z0-9]+$".r.matches(value)) {true}
+              else {false}
+            case Val.Null => false
+            case Val.Num(x) => true
+            case Val.True | Val.False => true
+            case _ => throw new IllegalArgumentException(
+              "Expected String, got: " + str.prettyName);
+          }
+      },
+
+      builtin("isLowerCase", "str"){
+        (ev,fs, str: Val) =>
+          str match {
+            case Val.Str(value) =>
+              if("^[a-z]+$".r.matches(value)) {true}
+              else {false}
+            case Val.Null => false
+            case Val.Num(x) => false
+            case Val.True | Val.False => true
+            case _ => throw new IllegalArgumentException(
+              "Expected String, got: " + str.prettyName);
+          }
+      },
+      //TODO
+      builtin("isNumeric", "str"){
+        (ev,fs, str: Val) =>
+          str match {
+            case Val.Str(value) =>
+              if("^[0-9]+$".r.matches(value)) {true}
+              else {false}
+            case Val.Null => false
+            case Val.Num(x) => true
+            case Val.True | Val.False => false
+            case _ => throw new IllegalArgumentException(
+              "Expected String, got: " + str.prettyName);
+          }
+      },
+      //TODO
+      builtin("isUpperCase", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("isWhitespace", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("leftPad", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("ordinalize", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("pluralize", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("prependifMissing", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("repeat", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("rightPad", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("singularize", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("substringAfter", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("substringAfterLast", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("substringBefore", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("substringBeforeLast", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("underscore", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("unwrap", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("withMaxSize", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("wrapifMissing", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
+      //TODO
+      builtin("wrapWith", "value"){
+        (ev,fs, value: Val) =>
+          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+      },
     )
   )
 }
