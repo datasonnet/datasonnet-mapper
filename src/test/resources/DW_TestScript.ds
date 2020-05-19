@@ -7,7 +7,7 @@
         DW.Core.contains(payload.contains.input2,payload.contains.input2_1) &&
         DW.Core.contains(payload.contains.input2,payload.contains.input2_2)
     ),
-    daysBetween:null,
+    daysBetween:(DW.Core.daysBetween(payload.daysBetween.input1, payload.daysBetween.input2)==payload.daysBetween.output),
     distinctBy:(
         (DW.Core.distinctBy(payload.distinctBy.input1, function(v,i) v)==payload.distinctBy.output1) &&
         (DW.Core.distinctBy(payload.distinctBy.input1, function(v,i) i)==payload.distinctBy.output2) &&
@@ -17,7 +17,7 @@
     entriesOf:(DW.Core.entriesOf(payload.entriesOf.input)==payload.entriesOf.output),
     filter:(DW.Core.filter(payload.filter.input, function(value,index) value >= 3)==payload.filter.output),
     filterObject:(
-        (DW.Core.filterObject(payload.filterObject.input, function(value,key,index) index == 0) == payload.filterObject.output1) &&
+        (DW.Core.filterObject(payload.filterObject.input, function(value,key,index) index == 0) == payload.filterObject.output2) &&
         (DW.Core.filterObject(payload.filterObject.input, function(value,key,index) key == "testK") == payload.filterObject.output2)
     ),
     find:(
@@ -48,7 +48,7 @@
     ),
     isEven:DW.Core.isEven(10),
     isInteger:DW.Core.isInteger(1),
-    isLeapYear:null,
+    isLeapYear:DW.Core.isLeapYear(payload.isLeapYear.input),
     isOdd:(DW.Core.isOdd(payload.isOdd.input)),
     joinBy:(DW.Core.joinBy([1,2,3],"-")=="1-2-3"),
     keysOf:(DW.Core.keysOf(payload.keysOf.input)==payload.keysOf.output),
