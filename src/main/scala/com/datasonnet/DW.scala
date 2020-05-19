@@ -373,14 +373,14 @@ object DW {
       },
 
       builtin("map", "array", "funct"){
-        (_,_, array: Val, funct: Applyer) =>
+        (_, _, array: Val, funct: Applyer) =>
           array match {
             case Val.Null => Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
-            case Val.Arr(s) =>
+            case Val.Arr(seq) =>
               Val.Arr(
-                for(
-                  (v,i) <- s.zipWithIndex
-                )yield Val.Lazy(funct.apply(v,Val.Lazy(Val.Num(i))))
+                seq.zipWithIndex.map{
+                  case(item, index) => Val.Lazy(funct.apply(item, Val.Lazy(Val.Num(index))))
+                }
               )
             case _ => throw new IllegalArgumentException(
               "Expected Array, got: " + array.prettyName);
