@@ -124,14 +124,13 @@ object DW {
       },
 
       builtin("filter", "array", "funct"){
-        (_,_, array: Val.Arr, funct: Applyer) =>
-          Val.Arr(
-            for(
-              (v,i) <- array.value.zipWithIndex
-              if funct.apply(v,Val.Lazy(Val.Num(i))) == Val.True
-            ) yield Val.Lazy(v.force)
-          )
-
+        (_, _, array: Val.Arr, funct: Applyer) =>
+          Val.Arr(array.value
+            .zipWithIndex
+            .filter({
+              case (lazyItem, index) => funct.apply(lazyItem, Val.Lazy(Val.Num(index))) == Val.True
+            })
+            .map(_._1))
       },
 
       builtin("filterObject", "obj", "func"){
