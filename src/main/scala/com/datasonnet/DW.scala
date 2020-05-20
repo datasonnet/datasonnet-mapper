@@ -148,13 +148,23 @@ object DW {
       },
 
       builtin("filter", "array", "funct"){
-        (_, _, array: Val.Arr, funct: Applyer) =>
-          Val.Arr(array.value
-            .zipWithIndex
-            .filter({
-              case (lazyItem, index) => funct.apply(lazyItem, Val.Lazy(Val.Num(index))) == Val.True
-            })
-            .map(_._1))
+        (_, _, value: Val, funct: Applyer) =>
+          val args = funct.f.params.allIndices.size>1
+          value match {
+            case Val.Arr(array) =>
+              Val.Arr(array
+                .zipWithIndex
+                .filter({
+                  case (lazyItem, index) => (
+                    (if (args) funct.apply(lazyItem, Val.Lazy(Val.Num(index))) else funct.apply(lazyItem))
+                      == Val.True
+                    )
+                })
+                .map(_._1))
+            case Val.Null => Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected Array , got: " + value.prettyName);
+          }
       },
 
       builtin("filterObject", "obj", "func"){
