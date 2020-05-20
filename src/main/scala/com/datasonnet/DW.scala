@@ -45,19 +45,21 @@ object DW {
 
       builtin("contains", "container", "value"){
         (ev,_, container: Val, value: Val) =>
-          container match{
-            case Val.Arr(s) =>
-              val size = (
-                for(
-                  v <- s
-                  if Materializer(v.force)(ev) == Materializer(value)(ev)
-                ) yield Val.Lazy(Val.True)
-                ).size
-              if(size > 0) true else false
+        container match{
+          // See: scala.collection.IterableOnceOps.exists
+          case Val.Arr(array) =>
+              val evald = Materializer(value)(ev)
+              var res = false
+              val it = array.iterator
+              while (!res && it.hasNext) {
+                res = Materializer(it.next().force)(ev) == evald
+              }
+              res
 
             case Val.Str(s) =>
               val regex = value.cast[Val.Str].value.r
               regex.findAllMatchIn(s).toSeq.nonEmpty;
+
             case _ => throw new IllegalArgumentException(
               "Expected Array or String, got: " + container.prettyName);
           }
