@@ -29,15 +29,16 @@ object DW {
           Math.abs(num);
       },
 
-      builtin("avg", "array"){
-        (_,_, array: Val.Arr) =>
-          var value = 0.0
-          val size = array.value.size
-          for (
-            i <- array.value
-          ) yield value += i.force.asInstanceOf[Val.Num].value
-
-          value.doubleValue() / size;
+      // See: https://damieng.com/blog/2014/12/11/sequence-averages-in-scala
+      // See: https://gist.github.com/gclaramunt/5710280
+      builtin("avg", "array") {
+        (_, _, array: Val.Arr) =>
+          val (sum, length) = array.value.foldLeft((0.0, 0)) (
+            {
+              case ((sum, length), num) => (sum + num.force.asInstanceOf[Val.Num].value, 1 + length)
+            }
+          )
+          sum / length
       },
 
       builtin("ceil", "num"){
@@ -47,14 +48,21 @@ object DW {
 
       builtin("contains", "container", "value"){
         (ev,_, container: Val, value: Val) =>
-          container match{
-            case Val.Arr(array) =>
-              array.toList.map{
-                case(item) => item.force
-              }.contains(value)
+        container match{
+          // See: scala.collection.IterableOnceOps.exists
+          case Val.Arr(array) =>
+              val evald = Materializer(value)(ev)
+              var res = false
+              val it = array.iterator
+              while (!res && it.hasNext) {
+                res = Materializer(it.next().force)(ev) == evald
+              }
+              res
+
             case Val.Str(s) =>
               val regex = value.cast[Val.Str].value.r
               regex.findAllMatchIn(s).toSeq.nonEmpty;
+
             case _ => throw new IllegalArgumentException(
               "Expected Array or String, got: " + container.prettyName);
           }
@@ -140,30 +148,13 @@ object DW {
       },
 
       builtin("filter", "array", "funct"){
-        (_,_, value: Val, funct: Applyer) =>
-         value match {
-           case Val.Arr(array) =>
-             val args = funct.f.params.allIndices.size > 1
-             args match {
-               case true =>
-                 Val.Arr(
-                   for (
-                     (v, i) <- array.zipWithIndex
-                     if funct.apply(v, Val.Lazy(Val.Num(i))) == Val.True
-                   ) yield Val.Lazy(v.force)
-                 )
-               case false =>
-                 Val.Arr(
-                   for (
-                     (v, i) <- array.zipWithIndex
-                     if funct.apply(v) == Val.True
-                   ) yield Val.Lazy(v.force)
-                 )
-             }
-           case Val.Null => Val.Lazy(Val.Null).force
-         }
-         /* */
-
+        (_, _, array: Val.Arr, funct: Applyer) =>
+          Val.Arr(array.value
+            .zipWithIndex
+            .filter({
+              case (lazyItem, index) => funct.apply(lazyItem, Val.Lazy(Val.Num(index))) == Val.True
+            })
+            .map(_._1))
       },
 
       builtin("filterObject", "obj", "func"){
@@ -350,8 +341,8 @@ object DW {
       },
 
       builtin("isEven", "num"){
-        (_,_, num: Double) =>
-          ((num%2)==0).booleanValue()
+        (_, _, num: Double) =>
+          (num % 2) == 0
       },
 
       builtin("isInteger", "value") {
@@ -367,8 +358,8 @@ object DW {
       },
 
       builtin("isOdd", "num"){
-        (_,_, num: Double) =>
-          ((num%2)!=0).booleanValue()
+        (_, _, num: Double) =>
+          (num % 2) != 0
       },
 
       builtin("joinBy", "array", "sep"){

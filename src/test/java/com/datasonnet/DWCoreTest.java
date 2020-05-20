@@ -372,9 +372,9 @@ public class DWCoreTest {
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("{premium:58,vip:403.99,basic:14.99}", value);
 
-        mapper = new Mapper(lib+pack+".mapObject({\"basic\": 9.99, \"premium\": 53, \"vip\": 398.99}, function(value,key) {} )\n", new ArrayList<>(), true);
+        mapper = new Mapper(lib+pack+".mapObject({\"basic\": 9.99, \"premium\": 53, \"vip\": 398.99}, function(value) {\"value\": value} )\n", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("{premium:58,vip:403.99,basic:14.99}", value);
+        assertEquals("{value:398.99}", value);
     }
 
 
