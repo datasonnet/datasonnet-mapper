@@ -26,15 +26,16 @@ object DW {
           Math.abs(num);
       },
 
-      builtin("avg", "array"){
-        (_,_, array: Val.Arr) =>
-          var value = 0.0
-          val size = array.value.size
-          for (
-            i <- array.value
-          ) yield value += i.force.asInstanceOf[Val.Num].value
-
-          value.doubleValue() / size;
+      // See: https://damieng.com/blog/2014/12/11/sequence-averages-in-scala
+      // See: https://gist.github.com/gclaramunt/5710280
+      builtin("avg", "array") {
+        (_, _, array: Val.Arr) =>
+          val (sum, length) = array.value.foldLeft((0.0, 0)) (
+            {
+              case ((sum, length), num) => (sum + num.force.asInstanceOf[Val.Num].value, 1 + length)
+            }
+          )
+          sum / length
       },
 
       builtin("ceil", "num"){
