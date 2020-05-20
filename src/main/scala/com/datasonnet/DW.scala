@@ -301,13 +301,8 @@ object DW {
       },
 
       builtin("isEven", "num"){
-        (_,_, num: Double) =>
-          if((num%2)==0){
-            true
-          }
-          else{
-            false
-          }
+        (_, _, num: Double) =>
+          (num % 2) == 0
       },
 
       builtin("isInteger", "value") {
@@ -322,13 +317,8 @@ object DW {
       },
 
       builtin("isOdd", "num"){
-        (_,_, num: Double) =>
-          if((num%2)==0){
-            false
-          }
-          else{
-            true
-          }
+        (_, _, num: Double) =>
+          (num % 2) != 0
       },
 
       builtin("joinBy", "array", "sep"){
