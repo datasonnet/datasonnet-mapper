@@ -5,3 +5,5 @@ tmp
 .DS_Store
 .settings
 .classpath
+.factorypath
+.project
