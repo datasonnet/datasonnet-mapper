@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.{Date, Scanner}
 
+import com.datasonnet
 import com.datasonnet.spi.UjsonUtil
 import com.datasonnet.wrap.Library.library
 import fastparse.internal.Logger
@@ -801,10 +802,10 @@ object DW {
         (ev,fs, bin1: Val, bin2: Val, str: String) =>
           Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
       },
-      //TODO
+      //TODO - EWN Test 
       builtin("MD5", "str"){
         (ev,fs, str: String) =>
-          Materializer.reverse(UjsonUtil.jsonObjectValueOf("null"));
+          datasonnet.Crypto.hash(str,"MD5");
       },
       //TODO
       builtin("SHA1", "str"){
