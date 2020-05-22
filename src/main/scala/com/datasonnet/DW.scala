@@ -416,7 +416,6 @@ object DW {
             case Val.Str(s) =>
               val regex = value.cast[Val.Str].value.r
               regex.findAllMatchIn(s).toSeq.nonEmpty;
-
             case _ => throw new IllegalArgumentException(
               "Expected Array or String, got: " + container.prettyName);
           }
@@ -1013,10 +1012,10 @@ object DW {
         (ev,fs, bin1: Val, bin2: Val, str: String) =>
           Val.Lazy(Val.Null).force
       },
-      //TODO
+      //TODO - EWN Test 
       builtin("MD5", "str"){
         (ev,fs, str: String) =>
-          Val.Lazy(Val.Null).force
+          datasonnet.Crypto.hash(str,"MD5");
       },
       //TODO
       builtin("SHA1", "str"){
