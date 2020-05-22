@@ -485,6 +485,10 @@ public class DWCoreTest {
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[0,1,1,2,3,5]", value);
 
+        mapper = new Mapper(lib + pack + ".orderBy([0,5,1,3,2,1], function(item,ind) ind)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[0,5,1,3,2,1]", value);
+
         mapper = new Mapper(lib + pack + ".orderBy([\"b\",\"a\"], function(item) item)\n", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[a,b]", value);
@@ -492,6 +496,11 @@ public class DWCoreTest {
         mapper = new Mapper(lib + pack + ".orderBy([{ letter: \"e\" }, { letter: \"d\" }], function(item) item.letter)\n", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[{letter:d},{letter:e}]", value);
+
+        mapper = new Mapper(lib + pack + ".orderBy([{ letter: \"e\" }, { letter: \"d\" }], function(item,ind) ind)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[{letter:e},{letter:d}]", value);
+
     }
 
     @Test
