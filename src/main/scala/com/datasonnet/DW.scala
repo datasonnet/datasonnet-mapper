@@ -326,35 +326,32 @@ object DW {
 
   def orderBy(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val ={
     val args = funct.f.params.allIndices.size>1
-    var out = scala.collection.mutable.Map.empty[String, Val]
+    var out = scala.collection.mutable.Map.empty[String, Val.Obj.Member]
     for((item, h) <- obj.getVisibleKeys()){
-      out += (item -> obj.value(item, -1)(fs,ev))
+      out += (item -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(item, -1)(fs, ev)))
     }
-
-    obj.getVisibleKeys().toSeq.sortWith{
-      case((it1,h1),(it2,h2)) => (
-        funct.apply(Val.Lazy(Val.Str(it1)), Val.Lazy(obj.value(it1, -1)(fs, ev))).toString >
-          funct.apply(Val.Lazy(Val.Str(it2)), Val.Lazy(obj.value(it2, -1)(fs, ev))).toString
-        )
+    if(args) {
+      new Val.Obj(
+        scala.collection.mutable.Map(
+          out.toSeq.sortWith {
+            case ((it1, h1), (it2, h2)) => (
+              funct.apply(Val.Lazy(Val.Str(it1)), Val.Lazy(obj.value(it1, -1)(fs, ev))).toString >
+                funct.apply(Val.Lazy(Val.Str(it2)), Val.Lazy(obj.value(it2, -1)(fs, ev))).toString
+              )
+          }: _*),
+        _ => (), None)
     }
-
-    /*
-    val arr = out.toSeq.sortWith{
-      case ((it1,ind1), (it2,ind2)) => funct.apply(it1)
+    else{
+      new Val.Obj(
+        scala.collection.mutable.Map(
+          out.toSeq.sortWith {
+            case ((it1, h1), (it2, h2)) => (
+              funct.apply(Val.Lazy(Val.Str(it1))).toString >
+                funct.apply(Val.Lazy(Val.Str(it2))).toString
+              )
+          }: _*),
+        _ => (), None)
     }
-
-    for(i <- arr.indices){
-      for(j <- i until(0,-1)){
-        if (funct.apply(Val.Lazy(Val.Str(arr(j)._1))).toString < funct.apply(Val.Lazy(Val.Str(arr(j-1)._1))).toString ) {
-          val temp = arr(j)
-          arr(j) = arr(j - 1)
-          arr(j - 1) = temp
-        }
-      }
-    }
-*/
-    //val out = collection.mutable.Buffer.empty[Val.Lazy]
-    Val.Lazy(Val.Null).force //TODO
   }
 
   def pluck(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val ={

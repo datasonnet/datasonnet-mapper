@@ -501,6 +501,14 @@ public class DWCoreTest {
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[{letter:e},{letter:d}]", value);
 
+        mapper = new Mapper(lib + pack + ".orderBy({d: \"d\", a: \"a\", e: \"e\", z: \"z\", c: \"c\"}, function(value,key) key)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{a:a,c:c,d:d,e:e,z:z}", value);
+
+        mapper = new Mapper(lib + pack + ".orderBy({d: \"d\", a: \"a\", e: \"e\", z: \"z\", c: \"c\"}, function(value) value)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{a:a,c:c,d:d,e:e,z:z}", value);
+
     }
 
     @Test
