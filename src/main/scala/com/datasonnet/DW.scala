@@ -29,24 +29,22 @@ object DW {
     val out = collection.mutable.Buffer.empty[Val.Lazy]
     if(args) { // 2 args
       for ((item, index) <- array.zipWithIndex) {
-        val current = funct.apply(item, Val.Lazy(Val.Num(index)))
 
-        if (!out.zipWithIndex.map {
+        if (!out.zipWithIndex.map { // out array does not contain item
           case (outItem, outIndex) => funct.apply(outItem, Val.Lazy(Val.Num(outIndex)))
-        }.contains(current)
-        )
+        }.contains(funct.apply(item, Val.Lazy(Val.Num(index))))) {
           out.append(item)
+        }
       }
     }
     else{ // 1 arg
       for (item <- array) {
-        val current =funct.apply(item)
 
-        if (!out.map {
+        if (!out.map { // out array does not contain item
             case (outItem) => funct.apply(outItem)
-          }.contains(current)
-        )
+          }.contains(funct.apply(item))) {
           out.append(item)
+        }
       }
     }
     Val.Arr(out.toSeq)
@@ -59,30 +57,24 @@ object DW {
 
     if(args) { // 2 args
       for ((key, hidden) <- obj.getVisibleKeys()) {
-        var contains = false
         val outObj = new Val.Obj(out, _ => (), None)
-        for ((outKey, outHidden) <- outObj.getVisibleKeys()) {
-          if (funct.apply(Val.Lazy(outObj.value(outKey, -1)(fs, ev)), Val.Lazy(Val.Str(outKey))) ==
-                  funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(outKey)))) {
-            contains = true
-          }
-        }
-        if (!contains) {
+
+        if(! outObj.getVisibleKeys().toSeq.map{
+          case (outKey, outH) =>
+            funct.apply(Val.Lazy(outObj.value(outKey, -1)(fs, ev)), Val.Lazy(Val.Str(outKey)))
+        }.contains(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))))){
           out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
         }
       }
     }
     else{ //1 arg
       for ((key, hidden) <- obj.getVisibleKeys()) {
-        var contains = false
         val outObj = new Val.Obj(out, _ => (), None)
-        for ((outKey, outHidden) <- outObj.getVisibleKeys()) {
-          if (funct.apply(Val.Lazy(outObj.value(outKey, -1)(fs, ev))) ==
-                funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)))) {
-            contains = true
-          }
-        }
-        if (!contains) {
+
+        if(! outObj.getVisibleKeys().toSeq.map{
+          case (outKey, outH) =>
+            funct.apply(Val.Lazy(outObj.value(outKey, -1)(fs, ev)))
+        }.contains(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))))){
           out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
         }
       }
@@ -109,28 +101,34 @@ object DW {
     val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
     args match {
       case 3 =>
-        for (((key, hidden), index) <- obj.getVisibleKeys().zipWithIndex) {
-          val functBool = func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index)))
-          if (functBool == Val.True) {
-            out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
-          }
-        }
+
+        new Val.Obj(
+          scala.collection.mutable.Map(
+            obj.getVisibleKeys().zipWithIndex.toSeq.collect({
+              case ((key,h),index)
+                if (func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))) == Val.True) =>
+                  (key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+            }): _*),
+          _ => (), None)
       case 2 =>
-        for ((key, hidden) <- obj.getVisibleKeys()) {
-          val functBool = func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)))
-          if (functBool == Val.True) {
-            out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
-          }
-        }
+        new Val.Obj(
+          scala.collection.mutable.Map(
+            obj.getVisibleKeys().zipWithIndex.toSeq.collect({
+              case ((key,h),index)
+                if (func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))) == Val.True) =>
+                (key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+            }): _*),
+          _ => (), None)
       case 1 =>
-        for ((key, hidden)<- obj.getVisibleKeys()) {
-          val functBool = func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)))
-          if (functBool == Val.True) {
-            out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
-          }
-        }
+        new Val.Obj(
+          scala.collection.mutable.Map(
+            obj.getVisibleKeys().zipWithIndex.toSeq.collect({
+              case ((key,h),index)
+                if (func.apply(Val.Lazy(obj.value(key, -1)(fs, ev))) == Val.True) =>
+                (key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+            }): _*),
+          _ => (), None)
     }
-    new Val.Obj(out, _ => (), None)
   }
 
   def flatMap(array: Seq[Val.Lazy], funct: Applyer): Val ={
@@ -140,9 +138,9 @@ object DW {
       for (v <- array) {
         v.force match {
           case Val.Arr(inner) =>
-            for ((inV, inI) <- inner.zipWithIndex) {
-              out.append(Val.Lazy(funct.apply(inV, Val.Lazy(Val.Num(inI)))))
-            }
+            out.appendAll(inner.zipWithIndex.map({
+              case (it, ind) => Val.Lazy(funct.apply(it, Val.Lazy(Val.Num(ind))))
+            }))
           case _ => throw new IllegalArgumentException(
             "Expected Array of Arrays, got: Array of " + v.force.prettyName);
         }
@@ -152,9 +150,9 @@ object DW {
       for(v <- array){
         v.force match {
           case Val.Arr(inner) =>
-            for(inV <- inner){
-              out.append(Val.Lazy(funct.apply(inV)))
-            }
+            out.appendAll(inner.map({
+              case (it) => Val.Lazy(funct.apply(it))
+            }))
           case _ =>  throw new IllegalArgumentException(
             "Expected Array of Arrays, got: Array of " + v.force.prettyName);
         }
@@ -175,12 +173,10 @@ object DW {
           .contains(key.cast[Val.Str].value)) {
 
           val array = collection.mutable.Buffer.empty[Val.Lazy]
-          for ((item2, index2) <- s.zipWithIndex) {
-            val compare =funct.apply(item2, Val.Lazy(Val.Num(index2)))
-            if (key == compare) {
-              array.append(item2)
-            }
-          }
+          array.appendAll(s.zipWithIndex.collect({
+            case (item2,index2) if key == funct.apply(item2, Val.Lazy(Val.Num(index2))) =>
+              item2
+          }))
           out += (key.cast[Val.Str].value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Arr(array.toSeq)))
         }
       }
@@ -193,12 +189,10 @@ object DW {
           .contains(key.cast[Val.Str].value)){
 
           val array = collection.mutable.Buffer.empty[Val.Lazy]
-          for((item2) <- s){
-            val compare =funct.apply(item2)
-            if(key == compare){
-              array.append(item2)
-            }
-          }
+          array.appendAll(s.collect({
+            case (item2) if key == funct.apply(item2) =>
+              item2
+          }))
           out += (key.cast[Val.Str].value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Arr(array.toSeq)))
         }
       }
@@ -218,12 +212,10 @@ object DW {
           .contains(functKey.cast[Val.Str].value)) {
 
           val currentObj = scala.collection.mutable.Map[String, Val.Obj.Member]()
-          for ((key2, hidden2) <- obj.getVisibleKeys()) {
-            val compare = funct.apply(Val.Lazy(obj.value(key2, -1)(fs, ev)), Val.Lazy(Val.Str(key2)))
-            if (functKey == compare) {
-              currentObj += (key2 -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key2, -1)(fs, ev)))
-            } // do nothing
-          }
+          currentObj.addAll(obj.getVisibleKeys().collect({
+            case (key2,hidden2) if functKey == funct.apply(Val.Lazy(obj.value(key2, -1)(fs, ev)), Val.Lazy(Val.Str(key2))) =>
+              (key2 -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key2, -1)(fs, ev)))
+          }))
           out += (functKey.cast[Val.Str].value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Obj(currentObj, _ => (), None)))
         }
       }
@@ -237,12 +229,10 @@ object DW {
           .contains(functKey.cast[Val.Str].value)){
 
           val currentObj = scala.collection.mutable.Map[String, Val.Obj.Member]()
-          for((key2,hidden2) <- obj.getVisibleKeys()) {
-            val compare = funct.apply(Val.Lazy(obj.value(key2,-1)(fs, ev)))
-            if (functKey == compare){
-              currentObj += (key2 -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key2,-1)(fs,ev)))
-            } // do nothing
-          }
+          currentObj.addAll(obj.getVisibleKeys().collect({
+            case (key2,hidden2) if functKey == funct.apply(Val.Lazy(obj.value(key2, -1)(fs, ev))) =>
+              (key2 -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key2, -1)(fs, ev)))
+          }))
           out += (functKey.cast[Val.Str].value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Obj(currentObj, _ => (), None)))
         }
       }
@@ -273,37 +263,39 @@ object DW {
         for (((key, hidden), index) <- obj.getVisibleKeys().zipWithIndex) {
           funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))) match {
             case s: Val.Obj =>
-              for ((sKey, sHidden) <- s.getVisibleKeys()) {
-                out += (sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev)))
-              }
+                out.addAll(s.getVisibleKeys().map{
+                  case (sKey, sHidden) =>  (sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev)))
+                })
             case i => throw new IllegalArgumentException(
               "Function must return an object, got: " + i.prettyName);
           }
         }
+        new Val.Obj(out, _ => (), None)
       case 2 =>
         for ((key, hidden) <- obj.getVisibleKeys()) {
           funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))) match {
             case s: Val.Obj =>
-              for ((sKey, sHidden) <- s.getVisibleKeys()) {
-                out += (sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev)))
-              }
+              out.addAll(s.getVisibleKeys().map{
+                case (sKey, sHidden) =>  (sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev)))
+              })
             case i => throw new IllegalArgumentException(
               "Function must return an object, got: " + i.prettyName);
           }
         }
+        new Val.Obj(out, _ => (), None)
       case 1 =>
         for ((key, hidden) <- obj.getVisibleKeys()) {
           funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))) match {
             case s: Val.Obj =>
-              for ((sKey, sHidden) <- s.getVisibleKeys()) {
-                out += (sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev)))
-              }
+              out.addAll(s.getVisibleKeys().map{
+                case (sKey, sHidden) =>  (sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev)))
+              })
             case i => throw new IllegalArgumentException(
               "Function must return an object, got: " + i.prettyName);
           }
         }
+        new Val.Obj(out, _ => (), None)
     }
-    new Val.Obj(out, _ => (), None)
   }
 
   def orderBy(array: Seq[Val.Lazy], funct: Applyer): Val ={
@@ -354,17 +346,20 @@ object DW {
     val out = collection.mutable.Buffer.empty[Val.Lazy]
     args match {
       case 3 =>
-        for (((key, hidden), index) <- obj.getVisibleKeys().zipWithIndex) {
-          out.append(Val.Lazy(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index)))))
-        }
+        out.appendAll(obj.getVisibleKeys().zipWithIndex.map{
+          case ((key, hidden), index) =>
+            Val.Lazy(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))))
+        })
       case 2 =>
-        for ((key, hidden) <- obj.getVisibleKeys()) {
-          out.append(Val.Lazy(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)))))
-        }
+        out.appendAll(obj.getVisibleKeys().map{
+          case (key, hidden) =>
+            Val.Lazy(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))))
+        })
       case 1 =>
-        for ((key, hidden) <- obj.getVisibleKeys()) {
-          out.append(Val.Lazy(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)))))
-        }
+        out.appendAll(obj.getVisibleKeys().map{
+          case (key, hidden) =>
+            Val.Lazy(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))))
+        })
     }
     Val.Arr(out.toSeq)
   }
@@ -446,15 +441,14 @@ object DW {
       builtin("entriesOf", "obj"){
         (ev,fs, obj: Val.Obj) =>
 
-          val out = collection.mutable.Buffer.empty[Val.Lazy]
-          for((key,hidden) <- obj.getVisibleKeys()){
-            val currentObj = scala.collection.mutable.Map[String, Val.Obj.Member]()
-            currentObj += ("key" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Str(key)).force))
-            currentObj += ("value" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
-            //add key to currentObj
-            out.append(Val.Lazy(new Val.Obj(currentObj, _ => (), None)))
-          }
-          Val.Arr(out.toSeq)
+          Val.Arr(obj.getVisibleKeys().toSeq.collect({
+            case(key,hidden) =>
+              val currentObj = scala.collection.mutable.Map[String, Val.Obj.Member]()
+              currentObj += ("key" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Str(key)).force))
+              currentObj += ("value" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+
+              (Val.Lazy(new Val.Obj(currentObj, _ => (), None)))
+          }))
       },
 
       builtin("filter", "array", "funct"){
@@ -490,12 +484,9 @@ object DW {
               }
               Val.Arr(out.toSeq)
             case Val.Arr(s) =>
-              Val.Arr(
-                for(
-                  (v,i) <- s.zipWithIndex
-                  if v.force == value
-                ) yield Val.Lazy(Val.Num(i))
-              )
+              Val.Arr(s.zipWithIndex.collect({
+                case (v,i) if v.force == value => Val.Lazy(Val.Num(i))
+              }))
             case _ => throw new IllegalArgumentException(
               "Expected Array or String, got: " + container.prettyName);
           }
