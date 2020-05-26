@@ -564,6 +564,8 @@ public class DWCoreTest {
     //@Disabled
     @Test
     void testDW_reduce() {
+
+
         Mapper mapper = new Mapper(lib + pack + ".reduce([2,3], function(it,acc) it+acc, 0)\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("5", value);
