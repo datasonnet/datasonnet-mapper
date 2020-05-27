@@ -46,7 +46,6 @@ public class DWStringsTest {
         assertEquals("null", value);
     }
 
-    @Disabled
     @Test
     void testDW_capitalize() {
         Mapper mapper = new Mapper(lib + pack + ".capitalize(\"customer\")", new ArrayList<>(), true);
@@ -58,6 +57,10 @@ public class DWStringsTest {
         assertEquals("Customer First Name", value);
 
         mapper = new Mapper(lib + pack + ".capitalize(\"customer NAME\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("Customer Name", value);
+
+        mapper = new Mapper(lib + pack + ".capitalize(\"customerName\")", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("Customer Name", value);
 
@@ -86,6 +89,29 @@ public class DWStringsTest {
         mapper = new Mapper(lib + pack + ".charCodeAt(\"charCodeAt\", 8)", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("65", value);
+    }
+
+    @Test
+    void testDW_dasherize() {
+        Mapper mapper = new Mapper(lib + pack + ".dasherize(\"customer\")", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("customer", value);
+
+        mapper = new Mapper(lib + pack + ".dasherize(\"customer_first_name\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("customer-first-name", value);
+
+        mapper = new Mapper(lib + pack + ".dasherize(\"customer NAME\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("customer-name", value);
+
+        mapper = new Mapper(lib + pack + ".dasherize(\"customerName\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("customer-name", value);
+
+        mapper = new Mapper(lib + pack + ".dasherize(null)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("null", value);
     }
 
     @Test
@@ -173,6 +199,87 @@ public class DWStringsTest {
         mapper = new Mapper(lib + pack + ".isNumeric(100)", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("true", value);
+    }
+
+    @Test
+    void testDW_isUpperCase() {
+        Mapper mapper = new Mapper(lib + pack + ".isUpperCase(\"SDFVXER\")", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib + pack + ".isUpperCase(\"ECVT4\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+
+        mapper = new Mapper(lib + pack + ".isUpperCase(\"EcVT\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+
+        mapper = new Mapper(lib + pack + ".isUpperCase(true)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+
+        mapper = new Mapper(lib + pack + ".isUpperCase(45)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+    }
+
+    @Test
+    void testDW_isWhitespace() {
+        Mapper mapper = new Mapper(lib + pack + ".isWhitespace(null)", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+
+        mapper = new Mapper(lib + pack + ".isWhitespace(\"\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib + pack + ".isWhitespace(\"       \")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib + pack + ".isWhitespace(\"   abc    \")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+
+        mapper = new Mapper(lib + pack + ".isWhitespace(true)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+
+        mapper = new Mapper(lib + pack + ".isWhitespace(45)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+    }
+
+    @Test
+    void testDW_leftPad() {
+        Mapper mapper = new Mapper(lib + pack + ".leftPad(null,3)", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("null", value);
+
+        mapper = new Mapper(lib + pack + ".leftPad(\"\",3)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("   ", value);
+
+        mapper = new Mapper(lib + pack + ".leftPad(\"bat\",5)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("  bat", value);
+
+        mapper = new Mapper(lib + pack + ".leftPad(\"bat\",3)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("bat", value);
+
+        mapper = new Mapper(lib + pack + ".leftPad(\"bat\",-1)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("bat", value);
+
+        mapper = new Mapper(lib + pack + ".leftPad(45,3)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals(" 45", value);
+
+        mapper = new Mapper(lib + pack + ".leftPad(true,10)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("      true", value);
     }
 
 }

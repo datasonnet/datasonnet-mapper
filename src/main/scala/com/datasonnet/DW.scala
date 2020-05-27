@@ -2,6 +2,7 @@ package com.datasonnet
 
 
 import java.net.URL
+import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Scanner
@@ -12,7 +13,7 @@ import com.datasonnet.wrap.Library.library
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet.ReadWriter.StringRead
 import sjsonnet.Std._
-import sjsonnet.{Applyer, EvalScope, FileScope, Materializer, Val}
+import sjsonnet.{Applyer, EvalScope, FileScope, Format, Materializer, Val}
 
 import scala.util.Random
 
@@ -1243,7 +1244,7 @@ object DW {
           Val.Lazy(Val.Str(ret)).force
       },
       builtin("camelize", "str"){
-        (ev,fs, str: Val) =>
+        (_,_, str: Val) =>
           str match{
             case Val.Str(value) =>
               //regex fo _CHAR
@@ -1263,31 +1264,70 @@ object DW {
               "Expected String got: " + str.prettyName);
           }
       },
-      /*
-      //TODO
+
       builtin("capitalize", "str"){
-        (ev,fs, str: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, str: Val) =>
+          str match{
+            case Val.Str(value) =>
+              //regex fo _CHAR
+              val regex = "([_\\s-]+)([0-9A-Za-z])([A-Z]+|)".r("one", "two", "three")
+              val middleRegex = "([a-z])([A-Z])".r("end", "start")
+
+              //Start string at first non underscore, lower case it
+              var temp = value.substring("[0-9A-Za-z]".r.findFirstMatchIn(value).map(_.start).toList.head )
+              temp = temp.replaceFirst(temp.charAt(0).toString, temp.charAt(0).toUpper.toString)
+
+              //replace and uppercase
+              temp = regex.replaceAllIn(temp, m => s" ${(m group "two").toUpperCase()+(m group "three").toLowerCase()}")
+              temp = middleRegex.replaceAllIn(temp, m => s"${m group "end"} ${(m group "start").toUpperCase()}")
+
+              Val.Lazy(Val.Str(temp)).force;
+
+            case Val.Null =>
+              Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String got: " + str.prettyName);
+          }
       },
-       */
       builtin("charCode", "str"){
         (ev,fs, str: String) =>
           str.codePointAt(0)
       },
+
       builtin("charCodeAt", "str", "num"){
         (ev,fs, str: String, num: Int) =>
           str.codePointAt(num)
 
       },
-      /*
-      //TODO
-      builtin("dasherize", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("dasherize", "str"){
+        (_,_, str: Val) =>
+          str match{
+            case Val.Str(value) =>
+              //regex fo _CHAR
+              val regex = "([_\\s-]+)([0-9A-Za-z])([A-Z]+|)".r("one", "two", "three")
+              val middleRegex = "([a-z])([A-Z])".r("end", "start")
+
+              //Start string at first non underscore, lower case it
+              var temp = value
+
+              //replace and uppercase
+              temp = regex.replaceAllIn(temp, m => s"-${(m group "two")+(m group "three").toLowerCase()}")
+              temp = middleRegex.replaceAllIn(temp, m => s"${m group "end"}-${(m group "start")}")
+
+              temp = temp.toLowerCase()
+
+              Val.Lazy(Val.Str(temp)).force;
+
+            case Val.Null =>
+              Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String got: " + str.prettyName);
+          }
       },
-       */
+
       builtin("fromCharCode", "num"){
-        (ev,fs, num: Int) =>
+        (_,_, num: Int) =>
           String.valueOf(num.asInstanceOf[Char])
       },
 
@@ -1306,7 +1346,7 @@ object DW {
       },
 
       builtin("isAlphanumeric", "str"){
-        (ev,fs, str: Val) =>
+        (_,_, str: Val) =>
           str match {
             case Val.Str(value) =>
               if("^[A-Za-z0-9]+$".r.matches(value)) {true}
@@ -1320,7 +1360,7 @@ object DW {
       },
 
       builtin("isLowerCase", "str"){
-        (ev,fs, str: Val) =>
+        (_,_, str: Val) =>
           str match {
             case Val.Str(value) =>
               if("^[a-z]+$".r.matches(value)) {true}
@@ -1332,35 +1372,62 @@ object DW {
               "Expected String, got: " + str.prettyName);
           }
       },
+
       builtin("isNumeric", "str"){
         (_,_, str: Val) =>
           str match {
             case Val.Str(value) =>
               if("^[0-9]+$".r.matches(value)) {true}
               else {false}
-            case Val.Null => false
             case Val.Num(x) => true
-            case Val.True | Val.False => false
+            case Val.True | Val.False | Val.Null => false
             case _ => throw new IllegalArgumentException(
               "Expected String, got: " + str.prettyName);
           }
       },
+
+      builtin("isUpperCase", "str"){
+        (_,_, str: Val) =>
+          str match {
+            case Val.Str(value) =>
+              if("^[A-Z]+$".r.matches(value)) {true}
+              else {false}
+            case Val.Num(x) => false
+            case Val.True | Val.False | Val.Null => false
+            case _ => throw new IllegalArgumentException(
+              "Expected String, got: " + str.prettyName);
+          }
+      },
+
+      builtin("isWhitespace", "str"){
+        (_,_, str: Val) =>
+          str match {
+            case Val.Str(value) => value.trim().isEmpty
+            case Val.Num(x) => false
+            case Val.True | Val.False | Val.Null => false
+            case _ => throw new IllegalArgumentException(
+              "Expected String, got: " + str.prettyName);
+          }
+      },
+
+      builtin("leftPad", "str", "offset"){
+        (_,_, str: Val, offset: Int) =>
+          str match {
+            case Val.Str(value) =>
+              Val.Lazy(Val.Str(("%" + offset + "s").format(value))).force
+            case Val.True =>
+              Val.Lazy(Val.Str(("%" + offset + "s").format("true"))).force
+            case Val.False =>
+              Val.Lazy(Val.Str(("%" + offset + "s").format("false"))).force
+            case Val.Num(x) =>
+              //TODO change to use sjsonnet's Format and DecimalFormat
+              Val.Lazy(Val.Str(("%" + offset + "s").format(new DecimalFormat("0.#").format(x)))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String, got: " + str.prettyName)
+          }
+      },
       /*
-      //TODO
-      builtin("isUpperCase", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
-      builtin("isWhitespace", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
-      builtin("leftPad", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
-      },
       //TODO
       builtin("ordinalize", "value"){
         (ev,fs, value: Val) =>

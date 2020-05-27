@@ -1,4 +1,4 @@
-package com.datasonnet.util;
+package com.datasonnet;
 
 import com.datasonnet.Mapper;
 import org.junit.jupiter.api.Test;
