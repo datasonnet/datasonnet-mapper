@@ -25,6 +25,18 @@ public class DWStringsTest {
         mapper = new Mapper(lib +  pack + ".appendIfMissing(\"abcxyz\", \"xyz\")", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("abcxyz", value);
+
+        mapper = new Mapper(lib +  pack + ".appendIfMissing(null, \"\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("null", value);
+
+        mapper = new Mapper(lib +  pack + ".appendIfMissing(\"xyza\", \"xyz\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("xyzaxyz", value);
+
+        mapper = new Mapper(lib +  pack + ".appendIfMissing(\"\", \"xyz\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("xyz", value);
     }
 
     @Test
@@ -281,5 +293,127 @@ public class DWStringsTest {
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("      true", value);
     }
+
+    @Test
+    void testDW_ordinalize() {
+        Mapper mapper = new Mapper(lib + pack + ".ordinalize(1)", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("1st", value);
+
+        mapper = new Mapper(lib + pack + ".ordinalize(2)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2nd", value);
+
+        mapper = new Mapper(lib + pack + ".ordinalize(3)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("3rd", value);
+
+        mapper = new Mapper(lib + pack + ".ordinalize(111)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("111th", value);
+
+        mapper = new Mapper(lib + pack + ".ordinalize(22)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("22nd", value);
+
+        mapper = new Mapper(lib + pack + ".ordinalize(null)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("null", value);
+    }
+
+    @Test
+    void testDW_pluralize() {
+        Mapper mapper = new Mapper(lib + pack + ".pluralize(null)", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("null", value);
+
+        mapper = new Mapper(lib + pack + ".pluralize(\"help\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("helps", value);
+
+        mapper = new Mapper(lib + pack + ".pluralize(\"box\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("boxes", value);
+
+        mapper = new Mapper(lib + pack + ".pluralize(\"monday\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("mondays", value);
+
+        mapper = new Mapper(lib + pack + ".pluralize(\"mondy\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("mondies", value);
+    }
+
+
+    @Test
+    void testDW_prependIfMissing() {
+        Mapper mapper = new Mapper(lib + pack + ".prependIfMissing(\"abc\", \"xyz\")", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("xyzabc", value);
+
+        mapper = new Mapper(lib +  pack + ".prependIfMissing(\"xyzabc\", \"xyz\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("xyzabc", value);
+
+        mapper = new Mapper(lib +  pack + ".prependIfMissing(null, \"\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("null", value);
+
+        mapper = new Mapper(lib +  pack + ".prependIfMissing(\"axyz\", \"xyz\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("xyzaxyz", value);
+
+        mapper = new Mapper(lib +  pack + ".prependIfMissing(\"\", \"xyz\")", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("xyz", value);
+    }
+
+    @Test
+    void testDW_repeat() {
+        Mapper mapper = new Mapper(lib + pack + ".repeat(\"e\", 0)", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("", value);
+
+        mapper = new Mapper(lib + pack + ".repeat(\"e\", 3)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("eee", value);
+
+        mapper = new Mapper(lib + pack + ".repeat(\"e\", -2)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("", value);
+    }
+
+
+    @Test
+    void testDW_rightPad() {
+        Mapper mapper = new Mapper(lib + pack + ".rightPad(null,3)", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("null", value);
+
+        mapper = new Mapper(lib + pack + ".rightPad(\"\",3)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("   ", value);
+
+        mapper = new Mapper(lib + pack + ".rightPad(\"bat\",5)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("bat  ", value);
+
+        mapper = new Mapper(lib + pack + ".rightPad(\"bat\",3)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("bat", value);
+
+        mapper = new Mapper(lib + pack + ".rightPad(\"bat\",-1)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("bat", value);
+
+        mapper = new Mapper(lib + pack + ".rightPad(45,3)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("45 ", value);
+
+        mapper = new Mapper(lib + pack + ".rightPad(true,10)", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true      ", value);
+    }
+
 
 }

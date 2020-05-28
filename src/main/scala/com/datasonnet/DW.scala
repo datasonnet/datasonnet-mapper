@@ -13,7 +13,7 @@ import com.datasonnet.wrap.Library.library
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet.ReadWriter.StringRead
 import sjsonnet.Std._
-import sjsonnet.{Applyer, EvalScope, FileScope, Format, Materializer, Val}
+import sjsonnet.{Applyer, EvalScope, FileScope, Materializer, Val}
 
 import scala.util.Random
 
@@ -1010,7 +1010,7 @@ object DW {
     ),
     "Arrays" -> library(
       builtin("countBy", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+        (_,_, arr: Val.Arr, funct: Applyer) =>
           var total = 0
           for(x <- arr.value){
             if(funct.apply(x) == Val.True){
@@ -1236,26 +1236,33 @@ object DW {
     ),
     "Strings" -> library(
       builtin("appendIfMissing", "str1", "str2"){
-        (ev,fs, str: String, append: String) =>
-          var ret = str;
-          if(!str.contains(append)){
-            ret=(str + append)
+        (_,_, value: Val, append: String) =>
+          value match {
+            case Val.Str(str) =>
+              var ret = str
+              if(!str.endsWith(append)){
+                ret = str + append
+              }
+              Val.Lazy(Val.Str(ret)).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String got: " + value.prettyName);
           }
-          Val.Lazy(Val.Str(ret)).force
       },
+
       builtin("camelize", "str"){
         (_,_, str: Val) =>
           str match{
             case Val.Str(value) =>
               //regex fo _CHAR
-              var regex = "(_+)([0-9A-Za-z])".r("underscore", "letter")
+              val regex = "(_+)([0-9A-Za-z])".r("underscore", "letter")
 
               //Start string at first non underscore, lower case it
               var temp = value.substring("[^_]".r.findFirstMatchIn(value).map(_.start).toList.head )
               temp = temp.replaceFirst(temp.charAt(0).toString, temp.charAt(0).toLower.toString)
 
               //replace and uppercase
-              temp = regex.replaceAllIn(temp, m => s"${(m group "letter").toUpperCase()}");
+              temp = regex.replaceAllIn(temp, m => s"${(m group "letter").toUpperCase()}")
               Val.Lazy(Val.Str(temp)).force;
 
             case Val.Null =>
@@ -1289,15 +1296,15 @@ object DW {
               "Expected String got: " + str.prettyName);
           }
       },
+
       builtin("charCode", "str"){
-        (ev,fs, str: String) =>
+        (_,_, str: String) =>
           str.codePointAt(0)
       },
 
       builtin("charCodeAt", "str", "num"){
-        (ev,fs, str: String, num: Int) =>
+        (_,_, str: String, num: Int) =>
           str.codePointAt(num)
-
       },
 
       builtin("dasherize", "str"){
@@ -1313,7 +1320,7 @@ object DW {
 
               //replace and uppercase
               temp = regex.replaceAllIn(temp, m => s"-${(m group "two")+(m group "three").toLowerCase()}")
-              temp = middleRegex.replaceAllIn(temp, m => s"${m group "end"}-${(m group "start")}")
+              temp = middleRegex.replaceAllIn(temp, m => s"${m group "end"}-${m group "start"}")
 
               temp = temp.toLowerCase()
 
@@ -1338,7 +1345,7 @@ object DW {
               if("^[A-Za-z]+$".r.matches(value)) {true}
               else {false}
             case Val.Null => false
-            case Val.Num(x) => false
+            case Val.Num(_) => false
             case Val.True | Val.False => true
             case _ => throw new IllegalArgumentException(
               "Expected String, got: " + str.prettyName);
@@ -1352,7 +1359,7 @@ object DW {
               if("^[A-Za-z0-9]+$".r.matches(value)) {true}
               else {false}
             case Val.Null => false
-            case Val.Num(x) => true
+            case Val.Num(_) => true
             case Val.True | Val.False => true
             case _ => throw new IllegalArgumentException(
               "Expected String, got: " + str.prettyName);
@@ -1366,7 +1373,7 @@ object DW {
               if("^[a-z]+$".r.matches(value)) {true}
               else {false}
             case Val.Null => false
-            case Val.Num(x) => false
+            case Val.Num(_) => false
             case Val.True | Val.False => true
             case _ => throw new IllegalArgumentException(
               "Expected String, got: " + str.prettyName);
@@ -1379,7 +1386,7 @@ object DW {
             case Val.Str(value) =>
               if("^[0-9]+$".r.matches(value)) {true}
               else {false}
-            case Val.Num(x) => true
+            case Val.Num(_) => true
             case Val.True | Val.False | Val.Null => false
             case _ => throw new IllegalArgumentException(
               "Expected String, got: " + str.prettyName);
@@ -1392,7 +1399,7 @@ object DW {
             case Val.Str(value) =>
               if("^[A-Z]+$".r.matches(value)) {true}
               else {false}
-            case Val.Num(x) => false
+            case Val.Num(_) => false
             case Val.True | Val.False | Val.Null => false
             case _ => throw new IllegalArgumentException(
               "Expected String, got: " + str.prettyName);
@@ -1403,7 +1410,7 @@ object DW {
         (_,_, str: Val) =>
           str match {
             case Val.Str(value) => value.trim().isEmpty
-            case Val.Num(x) => false
+            case Val.Num(_) => false
             case Val.True | Val.False | Val.Null => false
             case _ => throw new IllegalArgumentException(
               "Expected String, got: " + str.prettyName);
@@ -1427,32 +1434,95 @@ object DW {
               "Expected String, got: " + str.prettyName)
           }
       },
-      /*
-      //TODO
-      builtin("ordinalize", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("ordinalize", "num"){
+        (_,_, num: Val) =>
+          (num match { //convert number value to string
+            case Val.Null => "null"
+            case Val.Str(value) =>
+              if("^[0-9]+$".r.matches(value)) {value}
+              else {"X"}
+            case Val.Num(value) => value.toInt.toString
+            case _ => throw new IllegalArgumentException(
+              "Expected Number, got: " + num.prettyName)
+          }) match { //convert string number to ordinalized string number
+            case "null" => Val.Lazy(Val.Null).force
+            case "X" => throw new IllegalArgumentException(
+              "Expected Number, got: " + num.prettyName)
+            case str =>
+              if(str.endsWith("11") || str.endsWith("12") || str.endsWith("13")){
+                Val.Lazy(Val.Str(str + "th")).force
+              }
+              else{
+                if(str.endsWith("1")){ Val.Lazy(Val.Str(str + "st")).force }
+                else if(str.endsWith("2")){ Val.Lazy(Val.Str(str + "nd")).force }
+                else if(str.endsWith("3")){ Val.Lazy(Val.Str(str + "rd")).force }
+                else { Val.Lazy(Val.Str(str + "th")).force }
+              }
+          }
       },
-      //TODO
+
       builtin("pluralize", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Str(str) =>
+              val comparator = str.toLowerCase()
+              val specialSList = List("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
+              if(specialSList.contains(comparator)) { Val.Lazy(Val.Str(str + "s")).force }
+              else if (comparator.isEmpty) Val.Lazy(Val.Str("")).force
+              else {
+                if(comparator.endsWith("y")) { Val.Lazy(Val.Str(str.substring(0,str.length-1) + "ies")).force }
+                else if(comparator.endsWith("x")) { Val.Lazy(Val.Str(str + "es")).force }
+                else { Val.Lazy(Val.Str(str + "s")).force }
+              }
+            case Val.Null => Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected Number, got: " + value.prettyName)
+          }
       },
-      //TODO
-      builtin("prependifMissing", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("prependIfMissing", "str1", "str2"){
+        (_,_, value: Val, append: String) =>
+          value match {
+            case Val.Str(str) =>
+              var ret = str
+              if(!str.startsWith(append)){
+                ret = append + str
+              }
+              Val.Lazy(Val.Str(ret)).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String got: " + value.prettyName);
+          }
       },
-      //TODO
-      builtin("repeat", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("repeat", "str", "num"){
+        (_,_, str: String, num: Int) =>
+          var ret = ""
+          for(_ <- 0 until num){
+            ret += str
+          }
+          Val.Lazy(Val.Str(ret)).force
       },
-      //TODO
-      builtin("rightPad", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("rightPad", "str", "offset"){
+        (_,_, value: Val, offset: Int) =>
+          value match {
+            case Val.Str(str) =>
+              Val.Lazy(Val.Str(str.padTo(offset, ' '))).force
+            case Val.Num(x) =>
+              //TODO change to use sjsonnet's Format and DecimalFormat
+              Val.Lazy(Val.Str(new DecimalFormat("0.#").format(x).padTo(offset, ' '))).force
+            case Val.True =>
+              Val.Lazy(Val.Str("true".padTo(offset, ' '))).force
+            case Val.False =>
+              Val.Lazy(Val.Str("false".padTo(offset, ' '))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String, got: " + value.prettyName)
+          }
       },
+      /*
       //TODO
       builtin("singularize", "value"){
         (ev,fs, value: Val) =>
