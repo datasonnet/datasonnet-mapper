@@ -735,6 +735,8 @@ public class DWCoreTest {
         Mapper mapper = new Mapper(lib + pack + ".uuid()\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals(5, value.split("-").length);
+
+        logger.info("UUID: " + value);
     }
 
     @Test

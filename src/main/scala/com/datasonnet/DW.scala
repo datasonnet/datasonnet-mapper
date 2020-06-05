@@ -2,10 +2,11 @@ package com.datasonnet
 
 
 import java.net.URL
+import java.nio.charset.StandardCharsets
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.Scanner
+import java.util.{Base64, Scanner}
 
 import com.datasonnet
 import com.datasonnet.spi.UjsonUtil
@@ -944,7 +945,20 @@ object DW {
 
       builtin0("uuid") {
         (_, _, _) =>
-          Materializer.reverse(UjsonUtil.jsonObjectValueOf(com.datasonnet.DWCore.uuid()));
+            val n = 36
+            val AlphaNumericString = "0123456789" +
+                        "abcdefghijklmnopqrstuvxyz"
+            val sb = new StringBuilder(n)
+            for( i <- 0 until n){
+              if(i.equals(8) || i.equals(13) || i.equals(18) || i.equals(23)){
+                sb.append('-')
+              }
+              else{
+                val index = (AlphaNumericString.length * math.random()).toInt
+                sb.append(AlphaNumericString.charAt(index))
+              }
+            }
+            Val.Lazy(Val.Str(sb.toString())).force
       },
 
       builtin("valuesOf", "obj"){
@@ -1113,38 +1127,63 @@ object DW {
        */
     ),
     "Binaries" -> library(
-      /*
-      //TODO
       builtin("fromBase64", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Num(x) => Val.Lazy(Val.Str(new String(Base64.getDecoder.decode(x.toString)))).force
+            case Val.Str(x) => Val.Lazy(Val.Str(new String(Base64.getDecoder.decode(x)))).force
+            case x => throw new IllegalArgumentException(
+              "Expected String, got: " + x.prettyName);
+          }
       },
-      //TODO
+
       builtin("fromHex", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+            value match {
+              case Val.Str(x) => Val.Lazy(Val.Str(
+                x.sliding(2, 2).toArray.map(Integer.parseInt(_, 16).toChar).mkString
+              )).force
+              case x => throw new IllegalArgumentException(
+                "Expected String, got: " + x.prettyName);
+            }
       },
-      //TODO
-      builtin("readLinesWith", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("readLinesWith", "value", "encoding"){
+        (_,_, value: String, enc: String) =>
+          Val.Arr(
+            new String(value.getBytes(), enc).split('\n').collect({
+              case str => Val.Lazy(Val.Str(str))
+            })
+          )
       },
-      //TODO
+
       builtin("toBase64", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Num(x) =>
+              if(x % 1 == 0) Val.Lazy(Val.Str(new String(Base64.getEncoder.encode(x.toInt.toString.getBytes())))).force
+              else Val.Lazy(Val.Str(new String(Base64.getEncoder.encode(x.toString.getBytes())))).force
+            case Val.Str(x) => Val.Lazy(Val.Str(new String(Base64.getEncoder.encode(x.getBytes())))).force
+            case x => throw new IllegalArgumentException(
+              "Expected String, got: " + x.prettyName);
+          }
       },
-      //TODO
+
       builtin("toHex", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Num(x) => Val.Lazy(Val.Str(Integer.toString(x.toInt, 16).toUpperCase())).force
+            case Val.Str(x) => Val.Lazy(Val.Str(x.getBytes().map(_.toHexString).mkString.toUpperCase())).force
+            case x => throw new IllegalArgumentException(
+              "Expected String, got: " + x.prettyName);
+          }
       },
-      //TODO
-      builtin("writeLinesWith", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("writeLinesWith", "value", "encoding"){
+        (_,_, value: Val.Arr, enc: String) =>
+          val str = value.value.map(item => item.force.asInstanceOf[Val.Str].value).mkString("\n") + "\n"
+          Val.Lazy(Val.Str(new String(str.getBytes, enc))).force
       },
-       */
     ),
     // TODO currently limited to 32 bit value
     "Numbers" -> library(
@@ -1222,7 +1261,7 @@ object DW {
       },
 
       builtin("toRadixNumber", "value", "num"){
-        (ev,fs, value: Val, num: Int) =>
+        (_,_, value: Val, num: Int) =>
           value match {
             case Val.Num(x) =>
               if(x < 0)  Val.Lazy(Val.Str("-" + Integer.toString(x.toInt.abs, num))).force
