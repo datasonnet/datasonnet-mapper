@@ -1059,24 +1059,26 @@ object DW {
         (ev,fs, arr: Val.Arr, funct: Applyer) =>
           Val.Lazy(Val.Null).force
       },
-      //TODO
-      builtin("indexOf", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+      */
+      builtin("indexOf", "array", "value"){
+        (_,_, array: Val.Arr, value: Val) =>
+          array.value.indexWhere(_.force == value)
       },
-      //TODO
+
       builtin("indexWhere", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+        (_,_, array: Val.Arr, funct: Applyer) =>
+          array.value.indexWhere(funct.apply(_) == Val.Lazy(Val.True).force)
       },
+      /* TODO: No builtin functions that allow 4 parameters
       //TODO
       builtin("join", "arr", "funct"){
         (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          //arr.value.
           Val.Lazy(Val.Null).force
       },
       //TODO
-      builtin("leftJoin", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+      builtin("leftJoin", "arrayL", "arrayR", "funct"){
+        (ev,fs, arrayL: Val.Arr, arrayR: Val.Arr, funct: Applyer) =>
           Val.Lazy(Val.Null).force
       },
       //TODO
@@ -1084,6 +1086,7 @@ object DW {
         (ev,fs, arr: Val.Arr, funct: Applyer) =>
           Val.Lazy(Val.Null).force
       },
+       */
       //TODO
       builtin("partition", "arr", "funct"){
         (ev,fs, arr: Val.Arr, funct: Applyer) =>
@@ -1124,7 +1127,6 @@ object DW {
         (ev,fs, arr: Val.Arr, funct: Applyer) =>
           Val.Lazy(Val.Null).force
       }
-       */
     ),
     "Binaries" -> library(
       builtin("fromBase64", "value"){
