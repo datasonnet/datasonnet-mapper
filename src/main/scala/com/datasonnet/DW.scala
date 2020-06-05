@@ -1146,39 +1146,95 @@ object DW {
       },
        */
     ),
+    // TODO currently limited to 32 bit value
     "Numbers" -> library(
-      /*
-      //TODO
       builtin("fromBinary", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Num(x) =>
+              if("[^2-9]".r.matches(x.toString)){
+                throw new IllegalArgumentException(
+                  "Expected Binary, got: Number");
+              }
+              else Val.Lazy(Val.Num(Integer.parseInt(x.toInt.toString, 2))).force;
+            case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x,2))).force;
+            case Val.Null => Val.Lazy(Val.Null).force
+            case x => throw new IllegalArgumentException(
+              "Expected Binary, got: " + x.prettyName);
+          }
       },
-      //TODO
+
       builtin("fromHex", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Num(x) =>
+              if("[^0-9a-f]".r.matches(x.toString.toLowerCase())){
+                throw new IllegalArgumentException(
+                  "Expected Binary, got: Number");
+              }
+              else Val.Lazy(Val.Num(Integer.parseInt(x.toInt.toString.toLowerCase(), 16))).force;
+            case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x.toLowerCase(),16))).force;
+            case Val.Null => Val.Lazy(Val.Null).force
+            case x => throw new IllegalArgumentException(
+              "Expected Binary, got: " + x.prettyName);
+          }
       },
-      //TODO
-      builtin("fromRadixNumber", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("fromRadixNumber", "value", "num"){
+        (_,_, value: Val, num: Int) =>
+          value match {
+            case Val.Num(x) => Val.Lazy(Val.Num(Integer.parseInt(x.toInt.toString.toLowerCase(), num))).force;
+            case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x.toLowerCase(), num))).force;
+            case x => throw new IllegalArgumentException(
+              "Expected Binary, got: " + x.prettyName);
+              //null not supported in DW function
+          }
       },
-      //TODO
+
       builtin("toBinary", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Num(x) =>
+              if(x < 0)  Val.Lazy(Val.Str("-" + x.toInt.abs.toBinaryString)).force
+              else Val.Lazy(Val.Str(x.toInt.toBinaryString)).force
+            case Val.Str(x) =>
+              if(x.startsWith("-")) Val.Lazy(Val.Str(x.toInt.abs.toBinaryString)).force
+              else Val.Lazy(Val.Str(x.toInt.toBinaryString)).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case x => throw new IllegalArgumentException(
+              "Expected Binary, got: " + x.prettyName);
+          }
       },
-      //TODO
+
       builtin("toHex", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Num(x) =>
+              if(x < 0)  Val.Lazy(Val.Str("-" + x.toInt.abs.toHexString)).force
+              else Val.Lazy(Val.Str(x.toInt.toHexString)).force
+            case Val.Str(x) =>
+              if(x.startsWith("-")) Val.Lazy(Val.Str(x.toInt.abs.toHexString)).force
+              else Val.Lazy(Val.Str(x.toInt.toHexString)).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case x => throw new IllegalArgumentException(
+              "Expected Binary, got: " + x.prettyName);
+          }
       },
-      //TODO
-      builtin("toRadixNumber", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("toRadixNumber", "value", "num"){
+        (ev,fs, value: Val, num: Int) =>
+          value match {
+            case Val.Num(x) =>
+              if(x < 0)  Val.Lazy(Val.Str("-" + Integer.toString(x.toInt.abs, num))).force
+              else Val.Lazy(Val.Str(Integer.toString(x.toInt, num))).force
+            case Val.Str(x) =>
+              if(x.startsWith("-"))  Val.Lazy(Val.Str("-" + Integer.toString(x.toInt.abs, num))).force
+              else Val.Lazy(Val.Str(Integer.toString(x.toInt, num))).force
+            case x => throw new IllegalArgumentException(
+              "Expected Binary, got: " + x.prettyName);
+              //DW functions does not support null
+          }
       }
-       */
     ),
     "Objects" -> library(
       /*
