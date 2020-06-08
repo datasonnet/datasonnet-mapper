@@ -810,10 +810,8 @@ object DW {
       //TODO needs work to get default from function
       builtin("reduce", "array", "funct", "init"){
         (_,_, array: Val.Arr, funct: Applyer, init: Val) =>
-        var acc: Val = init
-          for(item <- array.value){
-            acc=funct.apply(item,Val.Lazy(acc))
-          }
+          var acc: Val = init
+          array.value.foreach(item => acc=funct.apply(item,Val.Lazy(acc)))
           acc
       },
 
@@ -1087,45 +1085,71 @@ object DW {
           Val.Lazy(Val.Null).force
       },
        */
-      //TODO
+
       builtin("partition", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+        (_,_, array: Val.Arr, funct: Applyer) =>
+          val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
+          val part =array.value.partition(funct.apply(_) == Val.True)
+          out+=( "success" -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => Val.Arr(part._1)))
+          out+=( "failure" -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => Val.Arr(part._2)))
+          new Val.Obj(out, _ => (), None)
       },
-      //TODO
-      builtin("slice", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("slice", "arr", "start", "end"){
+        (_,_, array: Val.Arr, start: Int, end: Int) =>
+          //version commented below is slightly slower
+          //Val.Arr(array.value.splitAt(start)._2.splitAt(end-1)._1)
+          Val.Arr(
+            array.value.zipWithIndex.filter({
+              case (_, index) => (index >= start) && (index < end)
+            }).map(_._1)
+          )
       },
-      //TODO
-      builtin("some", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("some", "value", "funct"){
+        (_,_, value: Val, funct: Applyer) =>
+          value match {
+            case Val.Arr(array) =>
+              Val.bool(array.exists(item => funct.apply(item) == Val.True))
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected Array, got: " + i.prettyName);
+          }
       },
-      //TODO
-      builtin("splitAt", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("splitAt", "array", "index"){
+        (_,_, array: Val.Arr, index: Int) =>
+          val split = array.value.splitAt(index)
+          val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
+
+          out+=( "l" -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => Val.Arr(split._1)))
+          out+=( "r" -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => Val.Arr(split._2)))
+          new Val.Obj(out, _ => (), None)
       },
-      //TODO
+
       builtin("splitWhere", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+        (_,_, arr: Val.Arr, funct: Applyer) =>
+          val split =arr.value.splitAt(arr.value.indexWhere(funct.apply(_) == Val.True))
+          val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
+
+          out+=( "l" -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => Val.Arr(split._1)))
+          out+=( "r" -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => Val.Arr(split._2)))
+          new Val.Obj(out, _ => (), None)
       },
-      //TODO
-      builtin("sumBy", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("sumBy", "array", "funct"){
+        (_,_, array: Val.Arr, funct: Applyer) =>
+          array.value.foldLeft(0.0) ((sum, num) => sum + funct.apply(num).asInstanceOf[Val.Num].value)
       },
-      //TODO
-      builtin("take", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("take", "array", "index"){
+        (_,_, array: Val.Arr, index: Int) =>
+          Val.Arr(array.value.splitAt(index)._1)
       },
-      //TODO
-      builtin("takeWhile", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("takeWhile", "array", "funct"){
+        (_,_, array: Val.Arr, funct: Applyer) =>
+          Val.Arr(array.value.splitAt(array.value.indexWhere(item => funct.apply(item) == Val.False))._1)
       }
     ),
     "Binaries" -> library(
