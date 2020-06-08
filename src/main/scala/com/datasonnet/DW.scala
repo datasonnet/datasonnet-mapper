@@ -1149,7 +1149,7 @@ object DW {
 
       builtin("takeWhile", "array", "funct"){
         (_,_, array: Val.Arr, funct: Applyer) =>
-          Val.Arr(array.value.splitAt(array.value.indexWhere(item => funct.apply(item) == Val.False))._1)
+          Val.Arr(array.value.takeWhile(item => funct.apply(item) == Val.True))
       }
     ),
     "Binaries" -> library(
@@ -1379,33 +1379,46 @@ object DW {
               "Expected Object, got: " + i.prettyName);
           }
       },
-      /*
-      //TODO
-      builtin("nameSet", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("nameSet", "obj"){
+        (_,_, obj: Val.Obj) =>
+          Val.Arr(
+            obj.getVisibleKeys()
+              .collect{case (k, _) => Val.Lazy(Val.Str(k))}.toSeq
+          )
       },
-      //TODO
-      builtin("someEntry", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("someEntry", "value", "funct"){
+        (ev,fs, value: Val, funct: Applyer) =>
+          value match {
+            case obj: Val.Obj =>
+              Val.bool(obj.getVisibleKeys().exists(
+                item => funct.apply(Val.Lazy(obj.value(item._1, -1)(fs, ev)), Val.Lazy(Val.Str(item._1))) == Val.True
+              ))
+            case Val.Null => Val.Lazy(Val.False).force
+            case i => throw new IllegalArgumentException(
+              "Expected Object, got: " + i.prettyName);
+          }
       },
-      //TODO
-      builtin("someEntry", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("takeWhile", "obj", "funct"){
+        (ev,fs, obj: Val.Obj, funct: Applyer) =>
+          val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
+          obj.getVisibleKeys().takeWhile(
+            item => funct.apply(Val.Lazy(obj.value(item._1, -1)(fs, ev)), Val.Lazy(Val.Str(item._1))) == Val.True
+          ).foreachEntry((key,_) => out+=(key -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => obj.value(key, -1)(fs,ev))))
+
+          new Val.Obj(out, _ => (), None)
       },
-      //TODO
-      builtin("takeWhile", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
+
       builtin("valueSet", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
-      },
-       */
+        (ev,fs, obj: Val.Obj) =>
+          val out = collection.mutable.Buffer.empty[Val.Lazy]
+          for((key,_) <- obj.getVisibleKeys()){
+            out.append(Val.Lazy(obj.value(key, -1)(fs, ev)))
+          }
+          Val.Arr(out.toSeq)
+      }
     ),
     "Strings" -> library(
       builtin("appendIfMissing", "str1", "str2"){

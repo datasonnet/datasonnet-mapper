@@ -89,4 +89,50 @@ public class DWObjectsTest {
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("{a:false,c:Test}", value);
     }
+
+    @Test
+    void testDWObjects_nameSet(){
+        Mapper mapper = new Mapper(lib+pack+".nameSet({ \"a\" : true, \"b\" : 1})\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[a,b]", value);
+    }
+
+    @Test
+    void testDWObjects_someEntry(){
+        Mapper mapper = new Mapper(lib+pack+".someEntry({ \"a\" : true, \"b\" : 1}, function(value,key) value == true)\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib+pack+".someEntry({ \"a\" : true, \"b\" : 1}, function(value,key) value == false)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+
+        mapper = new Mapper(lib+pack+".someEntry({ \"a\" : true, \"b\" : 1}, function(value,key) key == \"a\")\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+
+        mapper = new Mapper(lib+pack+".someEntry(null, function(value,key) key == \"a\")\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+    }
+
+
+    @Test
+    void testDWObjects_takeWhile() {
+        Mapper mapper = new Mapper(lib + pack + ".takeWhile({\"a\":1,\"b\":1,\"c\":5,\"d\":1}, function(value,key) value == 1)\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{a:1,b:1}", value);
+
+        mapper = new Mapper(lib + pack + ".takeWhile({\"a\":1,\"b\":1,\"c\":5,\"d\":1}, function(value,key) key == \"a\")\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{a:1}", value);
+    }
+
+    @Test
+    void testDWObjects_valueSet(){
+        Mapper mapper = new Mapper(lib+pack+".valueSet({ \"a\" : true, \"b\" : 1, \"c\":[], \"d\":\"d\"})\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[true,1,[],d]", value);
+    }
 }
