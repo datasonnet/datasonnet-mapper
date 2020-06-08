@@ -2,7 +2,6 @@ package com.datasonnet
 
 
 import java.net.URL
-import java.nio.charset.StandardCharsets
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -1004,7 +1003,7 @@ object DW {
        */
       //TODO - EWN Test
       builtin("MD5", "str"){
-        (ev,fs, str: String) =>
+        (_,_, str: String) =>
           datasonnet.Crypto.hash(str,"MD5");
       },
       /*
@@ -1165,13 +1164,13 @@ object DW {
 
       builtin("fromHex", "value"){
         (_,_, value: Val) =>
-            value match {
-              case Val.Str(x) => Val.Lazy(Val.Str(
-                x.sliding(2, 2).toArray.map(Integer.parseInt(_, 16).toChar).mkString
-              )).force
-              case x => throw new IllegalArgumentException(
-                "Expected String, got: " + x.prettyName);
-            }
+          value match {
+            case Val.Str(x) => Val.Lazy(Val.Str(
+              x.toSeq.sliding(2, 2).map(byte => Integer.parseInt(byte.unwrap, 16).toChar).mkString
+            )).force
+            case x => throw new IllegalArgumentException(
+              "Expected String, got: " + x.prettyName);
+          }
       },
 
       builtin("readLinesWith", "value", "encoding"){
@@ -1219,7 +1218,7 @@ object DW {
             case Val.Num(x) =>
               if("[^2-9]".r.matches(x.toString)){
                 throw new IllegalArgumentException(
-                  "Expected Binary, got: Number");
+                  "Expected Binary, got: Number")
               }
               else Val.Lazy(Val.Num(Integer.parseInt(x.toInt.toString, 2))).force;
             case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x,2))).force;
@@ -1235,7 +1234,7 @@ object DW {
             case Val.Num(x) =>
               if("[^0-9a-f]".r.matches(x.toString.toLowerCase())){
                 throw new IllegalArgumentException(
-                  "Expected Binary, got: Number");
+                  "Expected Binary, got: Number")
               }
               else Val.Lazy(Val.Num(Integer.parseInt(x.toInt.toString.toLowerCase(), 16))).force;
             case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x.toLowerCase(),16))).force;
@@ -1708,58 +1707,161 @@ object DW {
               "Expected String, got: " + value.prettyName)
           }
       },
-      /*
-      //TODO
+
       builtin("singularize", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Str(s) =>
+              if(s.endsWith("ies"))
+                Val.Lazy(Val.Str(s.substring(0,s.length-3) +"y")).force
+              else if(s.endsWith("es"))
+                Val.Lazy(Val.Str(s.substring(0,s.length-2))).force
+              else
+                Val.Lazy(Val.Str(s.substring(0,s.length-1))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("substringAfter", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("substringAfter", "value", "sep"){
+        (_,_, value: Val, sep: String) =>
+          value match {
+            case Val.Str(s) =>
+              Val.Lazy(Val.Str(s.substring(
+                s.indexOf(sep) match {
+                  case -1 => s.length
+                  case i => if(sep.equals("")) i else i+1
+                }
+              ))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("substringAfterLast", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("substringAfterLast", "value", "sep"){
+        (_,_, value: Val, sep: String) =>
+          value match {
+            case Val.Str(s) =>
+              val split = s.split(sep)
+              if(sep.equals("")) Val.Lazy(Val.Str("")).force
+              else if(split.length==1) Val.Lazy(Val.Str("")).force
+              else Val.Lazy(Val.Str(split(split.length-1))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("substringBefore", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("substringBefore", "value", "sep"){
+        (_,_, value: Val, sep: String) =>
+          value match {
+            case Val.Str(s) =>
+              Val.Lazy(Val.Str(s.substring(0,
+                s.indexOf(sep) match {
+                  case -1 => 0
+                  case i => i
+                }
+              ))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("substringBeforeLast", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("substringBeforeLast", "value", "sep"){
+        (_,_, value: Val, sep: String) =>
+          value match {
+            case Val.Str(s) =>
+              Val.Lazy(Val.Str(s.substring(0,
+                s.lastIndexOf(sep) match {
+                  case -1 => 0
+                  case i => i
+                }
+              ))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("underscore", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("underscore", "str"){
+        (_,_, str: Val) =>
+          str match{
+            case Val.Str(value) =>
+              //regex fo _CHAR
+              val regex = "([_\\s-]+)([0-9A-Za-z])([A-Z]+|)".r("one", "two", "three")
+              val middleRegex = "([a-z])([A-Z])".r("end", "start")
+
+              //Start string at first non underscore, lower case it
+              var temp = value.substring("[0-9A-Za-z]".r.findFirstMatchIn(value).map(_.start).toList.head )
+              temp = temp.replaceFirst(temp.charAt(0).toString, temp.charAt(0).toLower.toString)
+
+              //replace and uppercase
+              temp = regex.replaceAllIn(temp, m => s"_${(m group "two")+(m group "three")}")
+              temp = middleRegex.replaceAllIn(temp, m => s"${m group "end"}_${m group "start"}")
+
+              Val.Lazy(Val.Str(temp.toLowerCase)).force;
+
+            case Val.Null =>
+              Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String got: " + str.prettyName);
+          }
       },
-      //TODO
-      builtin("unwrap", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("unwrap", "value", "wrapper"){
+        (_,_, value: Val, wrapper: String) =>
+          value match {
+            case Val.Str(str) =>
+              val starts = str.startsWith(wrapper)
+              val ends = str.endsWith(wrapper)
+              if(starts && ends) Val.Lazy(Val.Str(str.substring(0+wrapper.length, str.length-wrapper.length))).force
+              else if(starts) Val.Lazy(Val.Str(str.substring(0+wrapper.length, str.length) + wrapper)).force
+              else if(ends) Val.Lazy(Val.Str(wrapper + str.substring(0, str.length-wrapper.length))).force
+              else  Val.Lazy(Val.Str(str)).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("withMaxSize", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("withMaxSize", "value", "num"){
+        (_,_, value: Val, num: Int) =>
+          value match {
+            case Val.Str(str) =>
+              if(str.length<=num) Val.Lazy(Val.Str(str)).force
+              else Val.Lazy(Val.Str(str.substring(0,num))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("wrapifMissing", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("wrapIfMissing", "value", "wrapper"){
+        (_,_, value: Val, wrapper: String) =>
+          value match {
+            case Val.Str(str) =>
+              val ret = new StringBuilder(str)
+              if(!str.startsWith(wrapper)) ret.insert(0, wrapper)
+              if(!str.endsWith(wrapper)) ret.append(wrapper)
+              Val.Lazy(Val.Str(ret.toString())).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("wrapWith", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
-      },
-       */
+
+      builtin("wrapWith", "value", "wrapper"){
+        (_,_, value: Val, wrapper: String) =>
+          value match {
+            case Val.Str(str) => Val.Lazy(Val.Str( wrapper + str + wrapper)).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
+      }
     )
   )
 }
