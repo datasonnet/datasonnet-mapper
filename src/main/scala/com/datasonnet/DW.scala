@@ -1302,32 +1302,84 @@ object DW {
       }
     ),
     "Objects" -> library(
+      builtin("divideBy", "obj", "num"){
+        (ev,fs, obj: Val.Obj, num: Int) =>
+          val out = collection.mutable.Buffer.empty[Val.Lazy]
+
+          obj.getVisibleKeys().sliding(num,num).foreach({
+            map =>
+              val currentObject = collection.mutable.Map[String, Val.Obj.Member]()
+              map.foreachEntry((key, _) => currentObject += (key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))))
+              out.append(Val.Lazy(new Val.Obj(currentObject, _ => (), None)))
+          })
+          Val.Arr(out.toSeq)
+      },
+
+      builtin("entrySet", "obj"){
+        (ev,fs, obj: Val.Obj) =>
+          Val.Arr(obj.getVisibleKeys().toSeq.collect({
+            case(key,_) =>
+              val currentObj = scala.collection.mutable.Map[String, Val.Obj.Member]()
+              currentObj += ("key" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Str(key)).force))
+              currentObj += ("value" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+
+              Val.Lazy(new Val.Obj(currentObj, _ => (), None))
+          }))
+      },
+
+      builtin("everyEntry", "value", "funct"){
+        (ev,fs, value: Val, funct: Applyer) =>
+          value match {
+            case obj: Val.Obj =>
+              val args = funct.f.params.allIndices.size>1
+              if(args)
+                Val.bool(obj.getVisibleKeys().toSeq.forall(key => funct.apply(Val.Lazy(obj.value(key._1, -1)(fs, ev)), Val.Lazy(Val.Str(key._1))) == Val.True))
+              else
+                Val.bool(obj.getVisibleKeys().toSeq.forall(key => funct.apply(Val.Lazy(obj.value(key._1, -1)(fs, ev))) == Val.True))
+            case Val.Null => Val.Lazy(Val.True).force
+            case i => throw new IllegalArgumentException(
+              "Expected Array, got: " + i.prettyName);
+          }
+      },
+
+      builtin("keySet", "obj"){
+        (_,_, obj: Val.Obj) =>
+          Val.Arr(
+            obj.getVisibleKeys()
+              .collect{case (k, _) => Val.Lazy(Val.Str(k))}.toSeq
+          )
+      },
+
+      builtin("mergeWith", "valueOne", "valueTwo"){
+        (ev,fs, valueOne: Val, valueTwo: Val) =>
+          val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
+          valueOne match {
+            case obj: Val.Obj =>
+              valueTwo match {
+                case obj2: Val.Obj =>
+                  obj2.getVisibleKeys().foreachEntry(
+                    (key, _) => out+=(key -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => obj2.value(key, -1)(fs,ev)))
+                  )
+                  val keySet = obj2.getVisibleKeys().keySet
+                  obj.getVisibleKeys().foreachEntry(
+                    (key, _) => if(!keySet.contains(key)) out+=(key -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => obj.value(key, -1)(fs,ev)))
+                  )
+                  new Val.Obj(out, _ => (), None)
+                case Val.Null => valueOne
+                case i => throw new IllegalArgumentException(
+                  "Expected Object, got: " + i.prettyName);
+              }
+            case Val.Null =>
+              valueTwo match {
+                case _: Val.Obj => valueTwo
+                case i => throw new IllegalArgumentException(
+                  "Expected Object, got: " + i.prettyName);
+              }
+            case i => throw new IllegalArgumentException(
+              "Expected Object, got: " + i.prettyName);
+          }
+      },
       /*
-      //TODO
-      builtin("divideBy", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
-      builtin("entrySet", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
-      builtin("everyEntry", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
-      builtin("keySet", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
-      builtin("mergeWith", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
-      },
       //TODO
       builtin("nameSet", "value"){
         (ev,fs, value: Val) =>
