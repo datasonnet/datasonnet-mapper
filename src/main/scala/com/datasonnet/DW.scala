@@ -2,6 +2,7 @@ package com.datasonnet
 
 
 import java.net.URL
+import java.nio.charset.StandardCharsets
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -645,7 +646,7 @@ object DW {
 
       builtin("matches", "string", "regex") {
         (_,_, string: String, regex: String) =>
-            regex.r.matches(string);
+          regex.r.matches(string);
       },
 
       builtin("max", "array"){
@@ -989,36 +990,33 @@ object DW {
       }
     ),
     "Crypto" -> library(
-      /*
-      //TODO
-      builtin("HMACBinary", "bin1", "bin2", "str"){
-        (ev,fs, bin1: Val, bin2: Val, str: String) =>
-          Val.Lazy(Val.Null).force
+      //TODO converts to UTF-16?
+      builtin("HMACBinary", "key", "str", "alg"){
+        (_,_, key: String, str: String, alg: String) =>
+         datasonnet.Crypto.hmac(str, key,alg)
       },
-      //TODO
-      builtin("HMACWith", "bin1", "bin2", "str"){
-        (ev,fs, bin1: Val, bin2: Val, str: String) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("HMACWith", "key", "str", "alg"){
+        (_,_, key: String, str: String, alg: String) =>
+          datasonnet.Crypto.hmac(str, key,alg)
       },
-       */
-      //TODO - EWN Test
+
       builtin("MD5", "str"){
         (_,_, str: String) =>
           datasonnet.Crypto.hash(str,"MD5");
       },
-      /*
-      //TODO
+
       builtin("SHA1", "str"){
-        (ev,fs, str: String) =>
-          Val.Lazy(Val.Null).force
+        (_,_, str: String) =>
+          datasonnet.Crypto.hash(str,"SHA-1");
       },
-      //TODO
-      builtin("hashWith", "bin", "str"){
-        (ev,fs, bin: Val, str: String) =>
-          Val.Lazy(Val.Null).force
+      //TODO converts with utf 16 ?
+      builtin("hashWith", "str", "alg"){
+        (_,_, str: String, alg: String) =>
+          datasonnet.Crypto.hash(str,alg);
       },
-      */
     ),
+
     "Arrays" -> library(
       builtin("countBy", "arr", "funct"){
         (_,_, arr: Val.Arr, funct: Applyer) =>
@@ -1030,33 +1028,40 @@ object DW {
           }
           total
       },
-      /*
-      //TODO
-      builtin("divideBy", "arr", "num"){
-        (ev,fs, arr: Val.Arr, num: Double) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("divideBy", "array", "size"){
+        (_,_, array: Val.Arr, size: Int) =>
+          Val.Arr(array.value.sliding(size, size).map(item => Val.Lazy(Val.Arr(item))).toSeq)
       },
-      //TODO
+
       builtin("drop", "arr", "num"){
-        (ev,fs, arr: Val.Arr, num: Double) =>
-          Val.Lazy(Val.Null).force
+        (_,_, arr: Val.Arr, num: Int) =>
+          Val.Arr(arr.value.drop(num))
       },
-      //TODO
+
       builtin("dropWhile", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+        (_,_, arr: Val.Arr, funct: Applyer) =>
+          Val.Arr(arr.value.dropWhile(funct.apply(_) == Val.True))
       },
-      //TODO
-      builtin("every", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("every", "value", "funct"){
+        (_,_, value: Val, funct: Applyer) =>
+          value match {
+            case Val.Arr(arr) => Val.bool(arr.forall(funct.apply(_) == Val.True))
+            case Val.Null => Val.Lazy(Val.True).force
+            case i => throw new IllegalArgumentException(
+              "Expected Array, got: " + i.prettyName)
+          }
       },
-      //TODO
+
       builtin("firstWith", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+        (_,_, arr: Val.Arr, funct: Applyer) =>
+          if(funct.f.params.allIndices.size > 1)
+            arr.value.zipWithIndex.find(item => funct.apply(item._1, Val.Lazy(Val.Num(item._2))) == Val.True).map(_._1).getOrElse(Val.Lazy(Val.Null)).force
+          else
+            arr.value.find(funct.apply(_) == Val.True).getOrElse(Val.Lazy(Val.Null)).force
       },
-      */
+
       builtin("indexOf", "array", "value"){
         (_,_, array: Val.Arr, value: Val) =>
           array.value.indexWhere(_.force == value)

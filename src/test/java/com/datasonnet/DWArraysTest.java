@@ -23,6 +23,65 @@ public class DWArraysTest {
     }
 
     @Test
+    void testDWArrays_divideBy() {
+        Mapper mapper = new Mapper(lib + pack + ".divideBy([1,2,3,4,5], 2)\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[[1,2],[3,4],[5]]", value);
+
+        mapper = new Mapper(lib + pack + ".divideBy([1,2,3,4,5], 3)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[[1,2,3],[4,5]]", value);
+    }
+
+    @Test
+    void testDWArrays_drop() {
+        Mapper mapper = new Mapper(lib + pack + ".drop([1,2,3,4,5], 2)\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[3,4,5]", value);
+
+        mapper = new Mapper(lib + pack + ".drop([1,2,3,4,5], 1)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[2,3,4,5]", value);
+
+        mapper = new Mapper(lib + pack + ".drop([1,2,3,4,5], 10)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[]", value);
+    }
+
+    @Test
+    void testDWArrays_dropWhile() {
+        Mapper mapper = new Mapper(lib + pack + ".dropWhile([1,2,3,4,5], function(item) item < 3)\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[3,4,5]", value);
+    }
+
+    @Test
+    void testDWArrays_every() {
+        Mapper mapper = new Mapper(lib + pack + ".every([1,1,1], function(item) item == 1)\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib + pack + ".every(null, function(item) item == 1)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib + pack + ".every([1,2,1], function(item) item == 1)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("false", value);
+    }
+
+    @Test
+    void testDWArrays_firstWith() {
+        Mapper mapper = new Mapper(lib + pack + ".firstWith([1,2,3], function(item) (item % 2) == 0)\n", new ArrayList<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2", value);
+
+        mapper = new Mapper(lib + pack + ".firstWith([1,2,3], function(item) (item % 10) == 0)\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("null", value);
+    }
+
+    @Test
     void testDWArrays_indexOf() {
         Mapper mapper = new Mapper(lib + pack + ".indexOf([1,2,3,4,5,3], 3)\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
