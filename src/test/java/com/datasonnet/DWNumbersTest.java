@@ -35,11 +35,12 @@ public class DWNumbersTest {
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("4", value);
 
-        /* Needs higher than 32 bit support
-        mapper = new Mapper(lib + pack + ".fromBinary(\"11111111111111111111111111111111111111111111111111111111111111\")");
+        /*//Needs higher than 32 bit support
+        mapper = new Mapper(lib + pack + ".fromBinary(\"1111111111111111111111111111111111111111111111111111111111111\")");
         value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("2147483647", value);
+        assertEquals("4611686018427387903", value);
         */
+
     }
 
     @Test

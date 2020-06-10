@@ -2,7 +2,6 @@ package com.datasonnet
 
 
 import java.net.URL
-import java.nio.charset.StandardCharsets
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -18,67 +17,62 @@ import sjsonnet.{Applyer, EvalScope, FileScope, Materializer, Val}
 
 import scala.util.Random
 
-/*
- * considerations:
- *    Math: which one is faster Java.lang.Math, or scala.math ?
- */
-
-
 object DW {
 
   def distinctBy(array: Seq[Val.Lazy], funct: Applyer): Val ={
     val args=funct.f.params.argIndices.size>1
     val out = collection.mutable.Buffer.empty[Val.Lazy]
     if(args) { // 2 args
-      for ((item, index) <- array.zipWithIndex) {
-
-        if (!out.zipWithIndex.map { // out array does not contain item
-          case (outItem, outIndex) => funct.apply(outItem, Val.Lazy(Val.Num(outIndex)))
-        }.contains(funct.apply(item, Val.Lazy(Val.Num(index))))) {
-          out.append(item)
-        }
-      }
+      array.zipWithIndex.foreach(
+        item =>
+          if (!out.zipWithIndex.map { // out array does not contain item
+            case (outItem, outIndex) => funct.apply(outItem, Val.Lazy(Val.Num(outIndex)))
+          }.contains(funct.apply(item._1, Val.Lazy(Val.Num(item._2))))) {
+            out.append(item._1)
+          }
+      )
     }
     else{ // 1 arg
-      for (item <- array) {
-
-        if (!out.map(// out array does not contain item
-          outItem => funct.apply(outItem)).contains(funct.apply(item))) {
-          out.append(item)
-        }
-      }
+      array.foreach(
+        item =>
+          if (!out.map(funct.apply(_)).contains(funct.apply(item))) {
+            out.append(item)
+          }
+      )
     }
     Val.Arr(out.toSeq)
   }
 
-  //Needs to be cleaned up
   def distinctBy(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val ={
     val args=funct.f.params.argIndices.size>1
     val out =scala.collection.mutable.Map[String, Val.Obj.Member]()
 
     if(args) { // 2 args
-      for ((key, _) <- obj.getVisibleKeys()) {
-        val outObj = new Val.Obj(out, _ => (), None)
-
-        if(! outObj.getVisibleKeys().toSeq.map{
-          case (outKey, _) =>
-            funct.apply(Val.Lazy(outObj.value(outKey, -1)(fs, ev)), Val.Lazy(Val.Str(outKey)))
-        }.contains(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))))){
-          out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+      obj.getVisibleKeys().keySet.foreach(
+        key => {
+          val outObj = new Val.Obj(out, _ => (), None)
+          if (!outObj.getVisibleKeys().keySet.map(outKey =>
+            funct.apply(
+              Val.Lazy(outObj.value(outKey, -1)(fs, ev)),
+              Val.Lazy(Val.Str(outKey))
+            )
+          ).contains(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))))) {
+            out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+          }
         }
-      }
+      )
     }
     else{ //1 arg
-      for ((key, _) <- obj.getVisibleKeys()) {
-        val outObj = new Val.Obj(out, _ => (), None)
-
-        if(! outObj.getVisibleKeys().toSeq.map{
-          case (outKey, _) =>
-            funct.apply(Val.Lazy(outObj.value(outKey, -1)(fs, ev)))
-        }.contains(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))))){
-          out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+      obj.getVisibleKeys().keySet.foreach(
+        key => {
+          val outObj = new Val.Obj(out, _ => (), None)
+          if (!outObj.getVisibleKeys().keySet.map(outKey =>
+              funct.apply(Val.Lazy(outObj.value(outKey, -1)(fs, ev)))
+          ).contains(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))))) {
+              out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+          }
         }
-      }
+      )
     }
     new Val.Obj(out, _ => (), None)
   }
@@ -90,42 +84,35 @@ object DW {
         array.zipWithIndex.filter({
           case (lazyItem, index) => funct.apply(lazyItem, Val.Lazy(Val.Num(index))) == Val.True
         }).map(_._1)
-    else
-      array.filter(lazyItem => funct.apply(lazyItem) == Val.True)
+      else
+        array.filter(lazyItem => funct.apply(lazyItem) == Val.True)
     )
   }
 
   def filterObject(obj: Val.Obj, func: Applyer, ev: EvalScope, fs: FileScope): Val ={
     val args=func.f.params.allIndices.size
-    args match {
-      case 3 =>
-        new Val.Obj(
-          scala.collection.mutable.Map(
-            obj.getVisibleKeys().zipWithIndex.toSeq.collect({
-              case ((key,_),index)
-                if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))) == Val.True =>
-                  key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
-            }): _*),
-          _ => (), None)
-      case 2 =>
-        new Val.Obj(
-          scala.collection.mutable.Map(
-            obj.getVisibleKeys().toSeq.collect({
-              case (key,_)
-                if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))) == Val.True =>
+    new Val.Obj(
+      if(args==3) {
+        scala.collection.mutable.Map(
+          obj.getVisibleKeys().keySet.zipWithIndex.toSeq.collect({
+            case (key, index) if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))) == Val.True =>
                 key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
-            }): _*),
-          _ => (), None)
-      case 1 =>
-        new Val.Obj(
-          scala.collection.mutable.Map(
-            obj.getVisibleKeys().toSeq.collect({
-              case (key,_)
-                if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev))) == Val.True =>
+          }): _*)
+      }
+      else if(args==2) {
+        scala.collection.mutable.Map(
+          obj.getVisibleKeys().keySet.toSeq.collect({
+            case key if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))) == Val.True =>
                 key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
-            }): _*),
-          _ => (), None)
-    }
+          }): _*)
+      }
+      else {
+        scala.collection.mutable.Map(
+          obj.getVisibleKeys().keySet.toSeq.collect({
+            case key if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev))) == Val.True =>
+                key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
+          }): _*)
+      }, _ => (), None) // end of new object to return
   }
 
   def flatMap(array: Seq[Val.Lazy], funct: Applyer): Val ={
@@ -363,16 +350,18 @@ object DW {
           Math.abs(num);
       },
 
-      // TODO may have to change this since we need to validate that is an array of numbers
       // See: https://damieng.com/blog/2014/12/11/sequence-averages-in-scala
       // See: https://gist.github.com/gclaramunt/5710280
       builtin("avg", "array") {
         (_, _, array: Val.Arr) =>
-          val (sum, length) = array.value.foldLeft((0.0, 0)) (
-            {
-              case ((sum, length), num) => (sum + num.force.asInstanceOf[Val.Num].value, 1 + length)
-            }
-          )
+          val (sum, length) = array.value.foldLeft((0.0, 0)) ({
+              case ((sum, length), num) =>
+                (num.force match {
+                    case Val.Num(x) => sum + x
+                    case i => throw new IllegalArgumentException(
+                      "Expected Array of Numbers got: Array of " + i.prettyName)
+                },1 + length)
+          })
           sum / length
       },
 
@@ -383,20 +372,12 @@ object DW {
 
       builtin("contains", "container", "value"){
         (_,_, container: Val, value: Val) =>
-        container match{
-          // See: scala.collection.IterableOnceOps.exists
-          case Val.Arr(array) =>
-              val evald = value
-              var res = false
-              val it = array.iterator
-              while (!res && it.hasNext) {
-                res = it.next().force == evald
-              }
-              res
-
+          container match{
+            // See: scala.collection.IterableOnceOps.exists
+            case Val.Arr(array) =>
+              array.exists( _.force == value)
             case Val.Str(s) =>
-              val regex = value.cast[Val.Str].value.r
-              regex.findAllMatchIn(s).toSeq.nonEmpty;
+              value.cast[Val.Str].value.r.findAllMatchIn(s).nonEmpty;
             case _ => throw new IllegalArgumentException(
               "Expected Array or String, got: " + container.prettyName);
           }
@@ -418,9 +399,8 @@ object DW {
               distinctBy(arr,funct)
             case obj: Val.Obj =>
               distinctBy(obj,funct,ev,fs)
-            case _ =>
-              throw new IllegalArgumentException(
-                "Expected Array or Object, got: " + container.prettyName);
+            case i => throw new IllegalArgumentException(
+                "Expected Array or Object, got: " + i.prettyName);
           }
       },
 
@@ -431,15 +411,14 @@ object DW {
 
       builtin("entriesOf", "obj"){
         (ev,fs, obj: Val.Obj) =>
-
-          Val.Arr(obj.getVisibleKeys().toSeq.collect({
-            case(key,_) =>
+          Val.Arr(obj.getVisibleKeys().keySet.collect({
+            case key =>
               val currentObj = scala.collection.mutable.Map[String, Val.Obj.Member]()
               currentObj += ("key" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Str(key)).force))
               currentObj += ("value" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
 
               Val.Lazy(new Val.Obj(currentObj, _ => (), None))
-          }))
+          }).toSeq)
       },
 
       builtin("filter", "array", "funct"){
@@ -448,8 +427,8 @@ object DW {
             case Val.Arr(array) =>
               filter(array, funct)
             case Val.Null => Val.Lazy(Val.Null).force
-            case _ => throw new IllegalArgumentException(
-              "Expected Array , got: " + value.prettyName);
+            case i => throw new IllegalArgumentException(
+              "Expected Array , got: " + i.prettyName);
           }
       },
 
@@ -459,8 +438,8 @@ object DW {
             case obj: Val.Obj =>
               filterObject(obj, func, ev, fs)
             case Val.Null => Val.Lazy(Val.Null).force
-            case _ => throw new IllegalArgumentException(
-              "Expected Object, got: " + value.prettyName);
+            case i => throw new IllegalArgumentException(
+              "Expected Object, got: " + i.prettyName);
           }
       },
 
@@ -468,12 +447,8 @@ object DW {
         (_,_, container: Val, value: Val) =>
           container match {
             case Val.Str(str) =>
-              val out = collection.mutable.Buffer.empty[Val.Lazy]
               val sub = value.cast[Val.Str].value
-              for(loc <- sub.r.findAllMatchIn(str).map(_.start)){
-                  out.append(Val.Lazy(Val.Num(loc)))
-              }
-              Val.Arr(out.toSeq)
+              Val.Arr(sub.r.findAllMatchIn(str).map(_.start).map( item => Val.Lazy(Val.Num(item))).toSeq)
             case Val.Arr(s) =>
               Val.Arr(s.zipWithIndex.collect({
                 case (v,i) if v.force == value => Val.Lazy(Val.Num(i))
@@ -583,27 +558,22 @@ object DW {
 
       builtin("joinBy", "array", "sep"){
         (_,_, array: Val.Arr, sep: String) =>
-          var acc = ""
-          for(x <- array.value){
-            val value = x.force match{
+          array.value.map({
+            _.force match{
               case Val.Str(x) => x
               case Val.True => "true"
               case Val.False => "false"
-              case Val.Num(x) => if(Math.ceil(x) != Math.floor(x)) x.toString else x.intValue().toString
-              case _ => throw new IllegalArgumentException(
-                "Expected String, Number, Boolean, got: " + x.force.prettyName);
+              case Val.Num(x) => if(!x.isWhole) x.toString else x.intValue().toString
+              case i => throw new IllegalArgumentException(
+                "Expected String, Number, Boolean, got: " + i.prettyName);
             }
-            if(acc.isEmpty) acc += value else acc += (sep + value)
-          }
-          acc
+          }).mkString(sep)
       },
 
       builtin("keysOf", "obj"){
         (_,_, obj: Val.Obj) =>
-          Val.Arr(
-            obj.getVisibleKeys()
-              .collect{case (k, _) => Val.Lazy(Val.Str(k))}.toSeq
-          )
+          Val.Arr(obj.getVisibleKeys().keySet
+            .map( item => Val.Lazy(Val.Str(item))).toSeq)
       },
 
       builtin("lower", "str"){
@@ -635,12 +605,10 @@ object DW {
 
       builtin("match", "string", "regex") {
         (_, _, string: String, regex: String) =>
-            val out=collection.mutable.Buffer.empty[Val.Lazy]
-            for( word <- regex.r.findAllMatchIn(string)){
-              for(index <- 0 to word.groupCount){
-                out+=Val.Lazy(Val.Str(word.group(index)))
-              }
-            }
+          val out=collection.mutable.Buffer.empty[Val.Lazy]
+          regex.r.findAllMatchIn(string).foreach(
+            word => (0 to word.groupCount).foreach(index => out+=Val.Lazy(Val.Str(word.group(index))))
+          )
           Val.Arr(out.toSeq)
       },
 
@@ -754,10 +722,7 @@ object DW {
 
       builtin("namesOf", "obj"){
         (_,_, obj: Val.Obj) =>
-          Val.Arr(
-            obj.getVisibleKeys()
-              .collect{case (k, _) => Val.Lazy(Val.Str(k))}.toSeq
-          )
+          Val.Arr(obj.getVisibleKeys().keySet.map(item => Val.Lazy(Val.Str(item))).toSeq)
       },
 
       builtin("orderBy", "value", "funct"){
@@ -802,7 +767,6 @@ object DW {
       //TODO add read mediatype
       builtin("readUrl", "url"){
         (_,_, url: String) =>
-
           val out = new Scanner(new URL(url).openStream(), "UTF-8").useDelimiter("\\A").next()
           Materializer.reverse(UjsonUtil.jsonObjectValueOf(out));
       },
@@ -827,16 +791,13 @@ object DW {
 
       builtin("scan", "str", "regex"){
         (_,_, str: String, regex: String) =>
-          val out = collection.mutable.Buffer.empty[Val.Lazy]
-
-          for(item <- regex.r.findAllMatchIn(str)){
-            val subOut = collection.mutable.Buffer.empty[Val.Lazy]
-            for(index <- 0 to item.groupCount){
-              subOut+=Val.Lazy(Val.Str(item.group(index)))
-            }
-            out.append(Val.Lazy(Val.Arr(subOut.toSeq)))
-          }
-          Val.Arr(out.toSeq);
+          Val.Arr(
+            regex.r.findAllMatchIn(str).map( item => {
+              Val.Lazy(Val.Arr(
+                (0 to item.groupCount).map( i => Val.Lazy(Val.Str(item.group(i))) )
+              ))
+            }).toSeq
+          )
       },
 
       builtin("sizeOf", "value"){
@@ -854,11 +815,7 @@ object DW {
 
       builtin("splitBy", "str", "regex"){
         (_,_, str: String, regex: String) =>
-          val out = collection.mutable.Buffer.empty[Val.Lazy]
-          for(words <- regex.r.split(str)){
-            out+=Val.Lazy(Val.Str(words))
-          }
-          Val.Arr(out.toSeq)
+          Val.Arr(regex.r.split(str).map(item => Val.Lazy(Val.Str(item))))
       },
 
       builtin("sqrt", "num"){
@@ -873,24 +830,18 @@ object DW {
 
       builtin("sum", "array"){
         (_,_, array: Val.Arr) =>
-          var total = 0.0
-          for(x <- array.value){
-            x.force match {
-              case Val.Num(s) => total += s
-              case _ => throw new IllegalArgumentException(
-                "Expected Array of numbers got: " + x.force.prettyName);
+          array.value.foldLeft(0.0)((sum, value) =>
+            value.force match {
+              case Val.Num(x) => sum + x
+              case i => throw new IllegalArgumentException(
+                "Expected Array of Numbers, got: " + i)
             }
-          }
-          total
+          )
       },
 
       builtin("to", "begin", "end"){
         (_,_, begin: Int, end: Int) =>
-          Val.Arr(
-            (begin to end).map( i =>
-              Val.Lazy(Val.Num(i))
-            )
-          )
+          Val.Arr((begin to end).map( i => Val.Lazy(Val.Num(i))))
       },
 
       builtin("trim", "str"){
@@ -913,23 +864,18 @@ object DW {
 
       builtin("unzip", "array"){
         (_, _, array: Val.Arr) =>
-          var size = Int.MaxValue
-          for(v <- array.value){
-            v.force match{
-              case Val.Arr(s) => if(s.size < size) size = s.size
-              case _ =>   throw new IllegalArgumentException(
-                "Expected Array, got: " + v.force.prettyName);
+          var size = array.value.map(
+            _.force match {
+              case Val.Arr(arr) => arr.size
+              case i => throw new IllegalArgumentException(
+                "Expected Array, got: " + i.prettyName);
             }
-          }
+          ).max
           val out = collection.mutable.Buffer.empty[Val.Lazy]
           for(i <-0 until size) {
             val current = collection.mutable.Buffer.empty[Val.Lazy]
             for (x <- array.value) {
-              x.force match{
-                case Val.Arr(s) => current.append(s(i))
-                case _ => throw new IllegalArgumentException(
-                  "Expected Array, got: " + x.force.prettyName);
-              }
+              current.append(x.force.asInstanceOf[Val.Arr].value(i))
             }
             out.append(Val.Lazy(Val.Arr(current.toSeq)))
           }
@@ -961,11 +907,7 @@ object DW {
 
       builtin("valuesOf", "obj"){
         (ev,fs, obj: Val.Obj) =>
-          val out = collection.mutable.Buffer.empty[Val.Lazy]
-          for((key,_) <- obj.getVisibleKeys()){
-            out.append(Val.Lazy(obj.value(key, -1)(fs, ev)))
-          }
-          Val.Arr(out.toSeq)
+          Val.Arr(obj.getVisibleKeys().keySet.map( key => Val.Lazy(obj.value(key, -1)(fs, ev))).toSeq)
       },
 
       builtin("zip", "array1", "array2") {
@@ -1225,8 +1167,10 @@ object DW {
                 throw new IllegalArgumentException(
                   "Expected Binary, got: Number")
               }
-              else Val.Lazy(Val.Num(Integer.parseInt(x.toInt.toString, 2))).force;
+              else Val.Lazy(Val.Num( Integer.parseInt(x.toInt.toString, 2))).force
+                //Val.Lazy(Val.Num( java.lang.Long.parseLong(x.toLong.toString,2))).force
             case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x,2))).force;
+              //Val.Lazy(Val.Num( java.lang.Long.parseLong(x,2))).force
             case Val.Null => Val.Lazy(Val.Null).force
             case x => throw new IllegalArgumentException(
               "Expected Binary, got: " + x.prettyName);

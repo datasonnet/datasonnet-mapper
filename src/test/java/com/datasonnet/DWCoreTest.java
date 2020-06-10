@@ -316,9 +316,9 @@ public class DWCoreTest {
 
     @Test
     void testDW_joinBy(){
-        Mapper mapper = new Mapper(lib+pack+".joinBy([1,2,3], \"-\")\n", new ArrayList<>(), true);
+        Mapper mapper = new Mapper(lib+pack+".joinBy([1.0,2,3.5], \"-\")\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("1-2-3", value);
+        assertEquals("1-2-3.5", value);
 
         mapper = new Mapper(lib+pack+".joinBy([\"a\",\"b\",\"c\"], \"-\")\n", new ArrayList<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
