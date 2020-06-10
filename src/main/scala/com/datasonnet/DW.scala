@@ -238,43 +238,44 @@ object DW {
   def mapObject(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val ={
     val args=funct.f.params.allIndices.size
     val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
-    args match {
-      case 3 =>
-        for (((key, _), index) <- obj.getVisibleKeys().zipWithIndex) {
-          funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))) match {
-            case s: Val.Obj =>
-                out.addAll(s.getVisibleKeys().map{
-                  case (sKey, _) =>  sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
-                })
-            case i => throw new IllegalArgumentException(
-              "Function must return an object, got: " + i.prettyName);
-          }
+    if(args.equals(3)) {
+      for (((key, _), index) <- obj.getVisibleKeys().zipWithIndex) {
+        funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))) match {
+          case s: Val.Obj =>
+            out.addAll(s.getVisibleKeys().map {
+              case (sKey, _) => sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
+            })
+          case i => throw new IllegalArgumentException(
+            "Function must return an object, got: " + i.prettyName);
         }
-        new Val.Obj(out, _ => (), None)
-      case 2 =>
-        for ((key, _) <- obj.getVisibleKeys()) {
-          funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))) match {
-            case s: Val.Obj =>
-              out.addAll(s.getVisibleKeys().map{
-                case (sKey, _) =>  sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
-              })
-            case i => throw new IllegalArgumentException(
-              "Function must return an object, got: " + i.prettyName);
-          }
+      }
+      new Val.Obj(out, _ => (), None)
+    }
+    else if(args.equals(2)) {
+      for ((key, _) <- obj.getVisibleKeys()) {
+        funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))) match {
+          case s: Val.Obj =>
+            out.addAll(s.getVisibleKeys().map {
+              case (sKey, _) => sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
+            })
+          case i => throw new IllegalArgumentException(
+            "Function must return an object, got: " + i.prettyName);
         }
-        new Val.Obj(out, _ => (), None)
-      case 1 =>
-        for ((key, _) <- obj.getVisibleKeys()) {
-          funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))) match {
-            case s: Val.Obj =>
-              out.addAll(s.getVisibleKeys().map{
-                case (sKey, _) =>  sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
-              })
-            case i => throw new IllegalArgumentException(
-              "Function must return an object, got: " + i.prettyName);
-          }
+      }
+      new Val.Obj(out, _ => (), None)
+    }
+    else {
+      for ((key, _) <- obj.getVisibleKeys()) {
+        funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))) match {
+          case s: Val.Obj =>
+            out.addAll(s.getVisibleKeys().map {
+              case (sKey, _) => sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
+            })
+          case i => throw new IllegalArgumentException(
+            "Function must return an object, got: " + i.prettyName);
         }
-        new Val.Obj(out, _ => (), None)
+      }
+      new Val.Obj(out, _ => (), None)
     }
   }
 
@@ -322,22 +323,20 @@ object DW {
   def pluck(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val ={
     val args= funct.f.params.allIndices.size
     val out = collection.mutable.Buffer.empty[Val.Lazy]
-    args match {
-      case 3 =>
-        out.appendAll(obj.getVisibleKeys().zipWithIndex.map{
-          case ((key, _), index) =>
-            Val.Lazy(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))))
-        })
-      case 2 =>
-        out.appendAll(obj.getVisibleKeys().map{
-          case (key, _) =>
-            Val.Lazy(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))))
-        })
-      case 1 =>
-        out.appendAll(obj.getVisibleKeys().map{
-          case (key, _) =>
-            Val.Lazy(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))))
-        })
+    if(args.equals(3)) {
+      out.appendAll(obj.getVisibleKeys().keySet.zipWithIndex.map(
+        item => Val.Lazy(funct.apply(Val.Lazy(obj.value(item._1, -1)(fs, ev)), Val.Lazy(Val.Str(item._1)), Val.Lazy(Val.Num(item._2))))
+      ))
+    }
+    else if(args.equals(2)) {
+      out.appendAll(obj.getVisibleKeys().keySet.map(
+        item => Val.Lazy(funct.apply(Val.Lazy(obj.value(item, -1)(fs, ev)), Val.Lazy(Val.Str(item))))
+      ))
+    }
+    else {
+      out.appendAll(obj.getVisibleKeys().keySet.map(
+        item => Val.Lazy(funct.apply(Val.Lazy(obj.value(item, -1)(fs, ev))))
+      ))
     }
     Val.Arr(out.toSeq)
   }
