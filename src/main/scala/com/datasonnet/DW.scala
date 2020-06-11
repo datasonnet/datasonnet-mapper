@@ -2,9 +2,10 @@ package com.datasonnet
 
 
 import java.net.URL
+import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.Scanner
+import java.util.{Base64, Scanner}
 
 import com.datasonnet
 import com.datasonnet.spi.UjsonUtil
@@ -16,67 +17,62 @@ import sjsonnet.{Applyer, EvalScope, FileScope, Materializer, Val}
 
 import scala.util.Random
 
-/*
- * considerations:
- *    Math: which one is faster Java.lang.Math, or scala.math ?
- */
-
-
 object DW {
 
   def distinctBy(array: Seq[Val.Lazy], funct: Applyer): Val ={
     val args=funct.f.params.argIndices.size>1
     val out = collection.mutable.Buffer.empty[Val.Lazy]
     if(args) { // 2 args
-      for ((item, index) <- array.zipWithIndex) {
-
-        if (!out.zipWithIndex.map { // out array does not contain item
-          case (outItem, outIndex) => funct.apply(outItem, Val.Lazy(Val.Num(outIndex)))
-        }.contains(funct.apply(item, Val.Lazy(Val.Num(index))))) {
-          out.append(item)
-        }
-      }
+      array.zipWithIndex.foreach(
+        item =>
+          if (!out.zipWithIndex.map { // out array does not contain item
+            case (outItem, outIndex) => funct.apply(outItem, Val.Lazy(Val.Num(outIndex)))
+          }.contains(funct.apply(item._1, Val.Lazy(Val.Num(item._2))))) {
+            out.append(item._1)
+          }
+      )
     }
     else{ // 1 arg
-      for (item <- array) {
-
-        if (!out.map(// out array does not contain item
-          outItem => funct.apply(outItem)).contains(funct.apply(item))) {
-          out.append(item)
-        }
-      }
+      array.foreach(
+        item =>
+          if (!out.map(funct.apply(_)).contains(funct.apply(item))) {
+            out.append(item)
+          }
+      )
     }
     Val.Arr(out.toSeq)
   }
 
-  //Needs to be cleaned up
   def distinctBy(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val ={
     val args=funct.f.params.argIndices.size>1
     val out =scala.collection.mutable.Map[String, Val.Obj.Member]()
 
     if(args) { // 2 args
-      for ((key, _) <- obj.getVisibleKeys()) {
-        val outObj = new Val.Obj(out, _ => (), None)
-
-        if(! outObj.getVisibleKeys().toSeq.map{
-          case (outKey, _) =>
-            funct.apply(Val.Lazy(outObj.value(outKey, -1)(fs, ev)), Val.Lazy(Val.Str(outKey)))
-        }.contains(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))))){
-          out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+      obj.getVisibleKeys().keySet.foreach(
+        key => {
+          val outObj = new Val.Obj(out, _ => (), None)
+          if (!outObj.getVisibleKeys().keySet.map(outKey =>
+            funct.apply(
+              Val.Lazy(outObj.value(outKey, -1)(fs, ev)),
+              Val.Lazy(Val.Str(outKey))
+            )
+          ).contains(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))))) {
+            out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+          }
         }
-      }
+      )
     }
     else{ //1 arg
-      for ((key, _) <- obj.getVisibleKeys()) {
-        val outObj = new Val.Obj(out, _ => (), None)
-
-        if(! outObj.getVisibleKeys().toSeq.map{
-          case (outKey, _) =>
-            funct.apply(Val.Lazy(outObj.value(outKey, -1)(fs, ev)))
-        }.contains(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))))){
-          out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+      obj.getVisibleKeys().keySet.foreach(
+        key => {
+          val outObj = new Val.Obj(out, _ => (), None)
+          if (!outObj.getVisibleKeys().keySet.map(outKey =>
+              funct.apply(Val.Lazy(outObj.value(outKey, -1)(fs, ev)))
+          ).contains(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))))) {
+              out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+          }
         }
-      }
+      )
     }
     new Val.Obj(out, _ => (), None)
   }
@@ -88,42 +84,35 @@ object DW {
         array.zipWithIndex.filter({
           case (lazyItem, index) => funct.apply(lazyItem, Val.Lazy(Val.Num(index))) == Val.True
         }).map(_._1)
-    else
-      array.filter(lazyItem => funct.apply(lazyItem) == Val.True)
+      else
+        array.filter(lazyItem => funct.apply(lazyItem) == Val.True)
     )
   }
 
   def filterObject(obj: Val.Obj, func: Applyer, ev: EvalScope, fs: FileScope): Val ={
     val args=func.f.params.allIndices.size
-    args match {
-      case 3 =>
-        new Val.Obj(
-          scala.collection.mutable.Map(
-            obj.getVisibleKeys().zipWithIndex.toSeq.collect({
-              case ((key,_),index)
-                if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))) == Val.True =>
-                  key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
-            }): _*),
-          _ => (), None)
-      case 2 =>
-        new Val.Obj(
-          scala.collection.mutable.Map(
-            obj.getVisibleKeys().toSeq.collect({
-              case (key,_)
-                if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))) == Val.True =>
+    new Val.Obj(
+      if(args==3) {
+        scala.collection.mutable.Map(
+          obj.getVisibleKeys().keySet.zipWithIndex.toSeq.collect({
+            case (key, index) if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))) == Val.True =>
                 key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
-            }): _*),
-          _ => (), None)
-      case 1 =>
-        new Val.Obj(
-          scala.collection.mutable.Map(
-            obj.getVisibleKeys().toSeq.collect({
-              case (key,_)
-                if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev))) == Val.True =>
+          }): _*)
+      }
+      else if(args==2) {
+        scala.collection.mutable.Map(
+          obj.getVisibleKeys().keySet.toSeq.collect({
+            case key if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))) == Val.True =>
                 key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
-            }): _*),
-          _ => (), None)
-    }
+          }): _*)
+      }
+      else {
+        scala.collection.mutable.Map(
+          obj.getVisibleKeys().keySet.toSeq.collect({
+            case key if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev))) == Val.True =>
+                key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
+          }): _*)
+      }, _ => (), None) // end of new object to return
   }
 
   def flatMap(array: Seq[Val.Lazy], funct: Applyer): Val ={
@@ -249,43 +238,44 @@ object DW {
   def mapObject(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val ={
     val args=funct.f.params.allIndices.size
     val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
-    args match {
-      case 3 =>
-        for (((key, _), index) <- obj.getVisibleKeys().zipWithIndex) {
-          funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))) match {
-            case s: Val.Obj =>
-                out.addAll(s.getVisibleKeys().map{
-                  case (sKey, _) =>  sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
-                })
-            case i => throw new IllegalArgumentException(
-              "Function must return an object, got: " + i.prettyName);
-          }
+    if(args.equals(3)) {
+      for (((key, _), index) <- obj.getVisibleKeys().zipWithIndex) {
+        funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))) match {
+          case s: Val.Obj =>
+            out.addAll(s.getVisibleKeys().map {
+              case (sKey, _) => sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
+            })
+          case i => throw new IllegalArgumentException(
+            "Function must return an object, got: " + i.prettyName);
         }
-        new Val.Obj(out, _ => (), None)
-      case 2 =>
-        for ((key, _) <- obj.getVisibleKeys()) {
-          funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))) match {
-            case s: Val.Obj =>
-              out.addAll(s.getVisibleKeys().map{
-                case (sKey, _) =>  sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
-              })
-            case i => throw new IllegalArgumentException(
-              "Function must return an object, got: " + i.prettyName);
-          }
+      }
+      new Val.Obj(out, _ => (), None)
+    }
+    else if(args.equals(2)) {
+      for ((key, _) <- obj.getVisibleKeys()) {
+        funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))) match {
+          case s: Val.Obj =>
+            out.addAll(s.getVisibleKeys().map {
+              case (sKey, _) => sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
+            })
+          case i => throw new IllegalArgumentException(
+            "Function must return an object, got: " + i.prettyName);
         }
-        new Val.Obj(out, _ => (), None)
-      case 1 =>
-        for ((key, _) <- obj.getVisibleKeys()) {
-          funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))) match {
-            case s: Val.Obj =>
-              out.addAll(s.getVisibleKeys().map{
-                case (sKey, _) =>  sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
-              })
-            case i => throw new IllegalArgumentException(
-              "Function must return an object, got: " + i.prettyName);
-          }
+      }
+      new Val.Obj(out, _ => (), None)
+    }
+    else {
+      for ((key, _) <- obj.getVisibleKeys()) {
+        funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))) match {
+          case s: Val.Obj =>
+            out.addAll(s.getVisibleKeys().map {
+              case (sKey, _) => sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
+            })
+          case i => throw new IllegalArgumentException(
+            "Function must return an object, got: " + i.prettyName);
         }
-        new Val.Obj(out, _ => (), None)
+      }
+      new Val.Obj(out, _ => (), None)
     }
   }
 
@@ -333,22 +323,20 @@ object DW {
   def pluck(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val ={
     val args= funct.f.params.allIndices.size
     val out = collection.mutable.Buffer.empty[Val.Lazy]
-    args match {
-      case 3 =>
-        out.appendAll(obj.getVisibleKeys().zipWithIndex.map{
-          case ((key, _), index) =>
-            Val.Lazy(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))))
-        })
-      case 2 =>
-        out.appendAll(obj.getVisibleKeys().map{
-          case (key, _) =>
-            Val.Lazy(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))))
-        })
-      case 1 =>
-        out.appendAll(obj.getVisibleKeys().map{
-          case (key, _) =>
-            Val.Lazy(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))))
-        })
+    if(args.equals(3)) {
+      out.appendAll(obj.getVisibleKeys().keySet.zipWithIndex.map(
+        item => Val.Lazy(funct.apply(Val.Lazy(obj.value(item._1, -1)(fs, ev)), Val.Lazy(Val.Str(item._1)), Val.Lazy(Val.Num(item._2))))
+      ))
+    }
+    else if(args.equals(2)) {
+      out.appendAll(obj.getVisibleKeys().keySet.map(
+        item => Val.Lazy(funct.apply(Val.Lazy(obj.value(item, -1)(fs, ev)), Val.Lazy(Val.Str(item))))
+      ))
+    }
+    else {
+      out.appendAll(obj.getVisibleKeys().keySet.map(
+        item => Val.Lazy(funct.apply(Val.Lazy(obj.value(item, -1)(fs, ev))))
+      ))
     }
     Val.Arr(out.toSeq)
   }
@@ -361,16 +349,18 @@ object DW {
           Math.abs(num);
       },
 
-      // TODO may have to change this since we need to validate that is an array of numbers
       // See: https://damieng.com/blog/2014/12/11/sequence-averages-in-scala
       // See: https://gist.github.com/gclaramunt/5710280
       builtin("avg", "array") {
         (_, _, array: Val.Arr) =>
-          val (sum, length) = array.value.foldLeft((0.0, 0)) (
-            {
-              case ((sum, length), num) => (sum + num.force.asInstanceOf[Val.Num].value, 1 + length)
-            }
-          )
+          val (sum, length) = array.value.foldLeft((0.0, 0)) ({
+              case ((sum, length), num) =>
+                (num.force match {
+                    case Val.Num(x) => sum + x
+                    case i => throw new IllegalArgumentException(
+                      "Expected Array of Numbers got: Array of " + i.prettyName)
+                },1 + length)
+          })
           sum / length
       },
 
@@ -381,20 +371,12 @@ object DW {
 
       builtin("contains", "container", "value"){
         (_,_, container: Val, value: Val) =>
-        container match{
-          // See: scala.collection.IterableOnceOps.exists
-          case Val.Arr(array) =>
-              val evald = value
-              var res = false
-              val it = array.iterator
-              while (!res && it.hasNext) {
-                res = it.next().force == evald
-              }
-              res
-
+          container match{
+            // See: scala.collection.IterableOnceOps.exists
+            case Val.Arr(array) =>
+              array.exists( _.force == value)
             case Val.Str(s) =>
-              val regex = value.cast[Val.Str].value.r
-              regex.findAllMatchIn(s).toSeq.nonEmpty;
+              value.cast[Val.Str].value.r.findAllMatchIn(s).nonEmpty;
             case _ => throw new IllegalArgumentException(
               "Expected Array or String, got: " + container.prettyName);
           }
@@ -416,9 +398,8 @@ object DW {
               distinctBy(arr,funct)
             case obj: Val.Obj =>
               distinctBy(obj,funct,ev,fs)
-            case _ =>
-              throw new IllegalArgumentException(
-                "Expected Array or Object, got: " + container.prettyName);
+            case i => throw new IllegalArgumentException(
+                "Expected Array or Object, got: " + i.prettyName);
           }
       },
 
@@ -429,15 +410,14 @@ object DW {
 
       builtin("entriesOf", "obj"){
         (ev,fs, obj: Val.Obj) =>
-
-          Val.Arr(obj.getVisibleKeys().toSeq.collect({
-            case(key,_) =>
+          Val.Arr(obj.getVisibleKeys().keySet.collect({
+            case key =>
               val currentObj = scala.collection.mutable.Map[String, Val.Obj.Member]()
               currentObj += ("key" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Str(key)).force))
               currentObj += ("value" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
 
               Val.Lazy(new Val.Obj(currentObj, _ => (), None))
-          }))
+          }).toSeq)
       },
 
       builtin("filter", "array", "funct"){
@@ -446,8 +426,8 @@ object DW {
             case Val.Arr(array) =>
               filter(array, funct)
             case Val.Null => Val.Lazy(Val.Null).force
-            case _ => throw new IllegalArgumentException(
-              "Expected Array , got: " + value.prettyName);
+            case i => throw new IllegalArgumentException(
+              "Expected Array , got: " + i.prettyName);
           }
       },
 
@@ -457,8 +437,8 @@ object DW {
             case obj: Val.Obj =>
               filterObject(obj, func, ev, fs)
             case Val.Null => Val.Lazy(Val.Null).force
-            case _ => throw new IllegalArgumentException(
-              "Expected Object, got: " + value.prettyName);
+            case i => throw new IllegalArgumentException(
+              "Expected Object, got: " + i.prettyName);
           }
       },
 
@@ -466,12 +446,8 @@ object DW {
         (_,_, container: Val, value: Val) =>
           container match {
             case Val.Str(str) =>
-              val out = collection.mutable.Buffer.empty[Val.Lazy]
               val sub = value.cast[Val.Str].value
-              for(loc <- sub.r.findAllMatchIn(str).map(_.start)){
-                  out.append(Val.Lazy(Val.Num(loc)))
-              }
-              Val.Arr(out.toSeq)
+              Val.Arr(sub.r.findAllMatchIn(str).map(_.start).map( item => Val.Lazy(Val.Num(item))).toSeq)
             case Val.Arr(s) =>
               Val.Arr(s.zipWithIndex.collect({
                 case (v,i) if v.force == value => Val.Lazy(Val.Num(i))
@@ -581,27 +557,22 @@ object DW {
 
       builtin("joinBy", "array", "sep"){
         (_,_, array: Val.Arr, sep: String) =>
-          var acc = ""
-          for(x <- array.value){
-            val value = x.force match{
+          array.value.map({
+            _.force match{
               case Val.Str(x) => x
               case Val.True => "true"
               case Val.False => "false"
-              case Val.Num(x) => if(Math.ceil(x) != Math.floor(x)) x.toString else x.intValue().toString
-              case _ => throw new IllegalArgumentException(
-                "Expected String, Number, Boolean, got: " + x.force.prettyName);
+              case Val.Num(x) => if(!x.isWhole) x.toString else x.intValue().toString
+              case i => throw new IllegalArgumentException(
+                "Expected String, Number, Boolean, got: " + i.prettyName);
             }
-            if(acc.isEmpty) acc += value else acc += (sep + value)
-          }
-          acc
+          }).mkString(sep)
       },
 
       builtin("keysOf", "obj"){
         (_,_, obj: Val.Obj) =>
-          Val.Arr(
-            obj.getVisibleKeys()
-              .collect{case (k, _) => Val.Lazy(Val.Str(k))}.toSeq
-          )
+          Val.Arr(obj.getVisibleKeys().keySet
+            .map( item => Val.Lazy(Val.Str(item))).toSeq)
       },
 
       builtin("lower", "str"){
@@ -633,18 +604,16 @@ object DW {
 
       builtin("match", "string", "regex") {
         (_, _, string: String, regex: String) =>
-            val out=collection.mutable.Buffer.empty[Val.Lazy]
-            for( word <- regex.r.findAllMatchIn(string)){
-              for(index <- 0 to word.groupCount){
-                out+=Val.Lazy(Val.Str(word.group(index)))
-              }
-            }
+          val out=collection.mutable.Buffer.empty[Val.Lazy]
+          regex.r.findAllMatchIn(string).foreach(
+            word => (0 to word.groupCount).foreach(index => out+=Val.Lazy(Val.Str(word.group(index))))
+          )
           Val.Arr(out.toSeq)
       },
 
       builtin("matches", "string", "regex") {
         (_,_, string: String, regex: String) =>
-            regex.r.matches(string);
+          regex.r.matches(string);
       },
 
       builtin("max", "array"){
@@ -752,10 +721,7 @@ object DW {
 
       builtin("namesOf", "obj"){
         (_,_, obj: Val.Obj) =>
-          Val.Arr(
-            obj.getVisibleKeys()
-              .collect{case (k, _) => Val.Lazy(Val.Str(k))}.toSeq
-          )
+          Val.Arr(obj.getVisibleKeys().keySet.map(item => Val.Lazy(Val.Str(item))).toSeq)
       },
 
       builtin("orderBy", "value", "funct"){
@@ -800,7 +766,6 @@ object DW {
       //TODO add read mediatype
       builtin("readUrl", "url"){
         (_,_, url: String) =>
-
           val out = new Scanner(new URL(url).openStream(), "UTF-8").useDelimiter("\\A").next()
           Materializer.reverse(UjsonUtil.jsonObjectValueOf(out));
       },
@@ -808,10 +773,8 @@ object DW {
       //TODO needs work to get default from function
       builtin("reduce", "array", "funct", "init"){
         (_,_, array: Val.Arr, funct: Applyer, init: Val) =>
-        var acc: Val = init
-          for(item <- array.value){
-            acc=funct.apply(item,Val.Lazy(acc))
-          }
+          var acc: Val = init
+          array.value.foreach(item => acc=funct.apply(item,Val.Lazy(acc)))
           acc
       },
 
@@ -827,16 +790,13 @@ object DW {
 
       builtin("scan", "str", "regex"){
         (_,_, str: String, regex: String) =>
-          val out = collection.mutable.Buffer.empty[Val.Lazy]
-
-          for(item <- regex.r.findAllMatchIn(str)){
-            val subOut = collection.mutable.Buffer.empty[Val.Lazy]
-            for(index <- 0 to item.groupCount){
-              subOut+=Val.Lazy(Val.Str(item.group(index)))
-            }
-            out.append(Val.Lazy(Val.Arr(subOut.toSeq)))
-          }
-          Val.Arr(out.toSeq);
+          Val.Arr(
+            regex.r.findAllMatchIn(str).map( item => {
+              Val.Lazy(Val.Arr(
+                (0 to item.groupCount).map( i => Val.Lazy(Val.Str(item.group(i))) )
+              ))
+            }).toSeq
+          )
       },
 
       builtin("sizeOf", "value"){
@@ -854,11 +814,7 @@ object DW {
 
       builtin("splitBy", "str", "regex"){
         (_,_, str: String, regex: String) =>
-          val out = collection.mutable.Buffer.empty[Val.Lazy]
-          for(words <- regex.r.split(str)){
-            out+=Val.Lazy(Val.Str(words))
-          }
-          Val.Arr(out.toSeq)
+          Val.Arr(regex.r.split(str).map(item => Val.Lazy(Val.Str(item))))
       },
 
       builtin("sqrt", "num"){
@@ -873,24 +829,18 @@ object DW {
 
       builtin("sum", "array"){
         (_,_, array: Val.Arr) =>
-          var total = 0.0
-          for(x <- array.value){
-            x.force match {
-              case Val.Num(s) => total += s
-              case _ => throw new IllegalArgumentException(
-                "Expected Array of numbers got: " + x.force.prettyName);
+          array.value.foldLeft(0.0)((sum, value) =>
+            value.force match {
+              case Val.Num(x) => sum + x
+              case i => throw new IllegalArgumentException(
+                "Expected Array of Numbers, got: " + i)
             }
-          }
-          total
+          )
       },
 
       builtin("to", "begin", "end"){
         (_,_, begin: Int, end: Int) =>
-          Val.Arr(
-            (begin to end).map( i =>
-              Val.Lazy(Val.Num(i))
-            )
-          )
+          Val.Arr((begin to end).map( i => Val.Lazy(Val.Num(i))))
       },
 
       builtin("trim", "str"){
@@ -913,23 +863,18 @@ object DW {
 
       builtin("unzip", "array"){
         (_, _, array: Val.Arr) =>
-          var size = Int.MaxValue
-          for(v <- array.value){
-            v.force match{
-              case Val.Arr(s) => if(s.size < size) size = s.size
-              case _ =>   throw new IllegalArgumentException(
-                "Expected Array, got: " + v.force.prettyName);
+          var size = array.value.map(
+            _.force match {
+              case Val.Arr(arr) => arr.size
+              case i => throw new IllegalArgumentException(
+                "Expected Array, got: " + i.prettyName);
             }
-          }
+          ).max
           val out = collection.mutable.Buffer.empty[Val.Lazy]
           for(i <-0 until size) {
             val current = collection.mutable.Buffer.empty[Val.Lazy]
             for (x <- array.value) {
-              x.force match{
-                case Val.Arr(s) => current.append(s(i))
-                case _ => throw new IllegalArgumentException(
-                  "Expected Array, got: " + x.force.prettyName);
-              }
+              current.append(x.force.asInstanceOf[Val.Arr].value(i))
             }
             out.append(Val.Lazy(Val.Arr(current.toSeq)))
           }
@@ -943,16 +888,25 @@ object DW {
 
       builtin0("uuid") {
         (_, _, _) =>
-          Materializer.reverse(UjsonUtil.jsonObjectValueOf(com.datasonnet.DWCore.uuid()));
+            val n = 36
+            val AlphaNumericString = "0123456789" +
+                        "abcdefghijklmnopqrstuvxyz"
+            val sb = new StringBuilder(n)
+            for( i <- 0 until n){
+              if(i.equals(8) || i.equals(13) || i.equals(18) || i.equals(23)){
+                sb.append('-')
+              }
+              else{
+                val index = (AlphaNumericString.length * math.random()).toInt
+                sb.append(AlphaNumericString.charAt(index))
+              }
+            }
+            Val.Lazy(Val.Str(sb.toString())).force
       },
 
       builtin("valuesOf", "obj"){
         (ev,fs, obj: Val.Obj) =>
-          val out = collection.mutable.Buffer.empty[Val.Lazy]
-          for((key,_) <- obj.getVisibleKeys()){
-            out.append(Val.Lazy(obj.value(key, -1)(fs, ev)))
-          }
-          Val.Arr(out.toSeq)
+          Val.Arr(obj.getVisibleKeys().keySet.map( key => Val.Lazy(obj.value(key, -1)(fs, ev))).toSeq)
       },
 
       builtin("zip", "array1", "array2") {
@@ -977,39 +931,36 @@ object DW {
       }
     ),
     "Crypto" -> library(
-      /*
-      //TODO
-      builtin("HMACBinary", "bin1", "bin2", "str"){
-        (ev,fs, bin1: Val, bin2: Val, str: String) =>
-          Val.Lazy(Val.Null).force
+      //TODO converts to UTF-16?
+      builtin("HMACBinary", "key", "str", "alg"){
+        (_,_, key: String, str: String, alg: String) =>
+         datasonnet.Crypto.hmac(str, key,alg)
       },
-      //TODO
-      builtin("HMACWith", "bin1", "bin2", "str"){
-        (ev,fs, bin1: Val, bin2: Val, str: String) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("HMACWith", "key", "str", "alg"){
+        (_,_, key: String, str: String, alg: String) =>
+          datasonnet.Crypto.hmac(str, key,alg)
       },
-       */
-      //TODO - EWN Test
+
       builtin("MD5", "str"){
-        (ev,fs, str: String) =>
+        (_,_, str: String) =>
           datasonnet.Crypto.hash(str,"MD5");
       },
-      /*
-      //TODO
+
       builtin("SHA1", "str"){
-        (ev,fs, str: String) =>
-          Val.Lazy(Val.Null).force
+        (_,_, str: String) =>
+          datasonnet.Crypto.hash(str,"SHA-1");
       },
-      //TODO
-      builtin("hashWith", "bin", "str"){
-        (ev,fs, bin: Val, str: String) =>
-          Val.Lazy(Val.Null).force
+      //TODO converts with utf 16 ?
+      builtin("hashWith", "str", "alg"){
+        (_,_, str: String, alg: String) =>
+          datasonnet.Crypto.hash(str,alg);
       },
-      */
     ),
+
     "Arrays" -> library(
       builtin("countBy", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+        (_,_, arr: Val.Arr, funct: Applyer) =>
           var total = 0
           for(x <- arr.value){
             if(funct.apply(x) == Val.True){
@@ -1018,50 +969,59 @@ object DW {
           }
           total
       },
-      /*
-      //TODO
-      builtin("divideBy", "arr", "num"){
-        (ev,fs, arr: Val.Arr, num: Double) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("divideBy", "array", "size"){
+        (_,_, array: Val.Arr, size: Int) =>
+          Val.Arr(array.value.sliding(size, size).map(item => Val.Lazy(Val.Arr(item))).toSeq)
       },
-      //TODO
+
       builtin("drop", "arr", "num"){
-        (ev,fs, arr: Val.Arr, num: Double) =>
-          Val.Lazy(Val.Null).force
+        (_,_, arr: Val.Arr, num: Int) =>
+          Val.Arr(arr.value.drop(num))
       },
-      //TODO
+
       builtin("dropWhile", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+        (_,_, arr: Val.Arr, funct: Applyer) =>
+          Val.Arr(arr.value.dropWhile(funct.apply(_) == Val.True))
       },
-      //TODO
-      builtin("every", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("every", "value", "funct"){
+        (_,_, value: Val, funct: Applyer) =>
+          value match {
+            case Val.Arr(arr) => Val.bool(arr.forall(funct.apply(_) == Val.True))
+            case Val.Null => Val.Lazy(Val.True).force
+            case i => throw new IllegalArgumentException(
+              "Expected Array, got: " + i.prettyName)
+          }
       },
-      //TODO
+
       builtin("firstWith", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+        (_,_, arr: Val.Arr, funct: Applyer) =>
+          if(funct.f.params.allIndices.size > 1)
+            arr.value.zipWithIndex.find(item => funct.apply(item._1, Val.Lazy(Val.Num(item._2))) == Val.True).map(_._1).getOrElse(Val.Lazy(Val.Null)).force
+          else
+            arr.value.find(funct.apply(_) == Val.True).getOrElse(Val.Lazy(Val.Null)).force
       },
-      //TODO
-      builtin("indexOf", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("indexOf", "array", "value"){
+        (_,_, array: Val.Arr, value: Val) =>
+          array.value.indexWhere(_.force == value)
       },
-      //TODO
+
       builtin("indexWhere", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+        (_,_, array: Val.Arr, funct: Applyer) =>
+          array.value.indexWhere(funct.apply(_) == Val.Lazy(Val.True).force)
       },
+      /* TODO: No builtin functions that allow 4 parameters
       //TODO
       builtin("join", "arr", "funct"){
         (ev,fs, arr: Val.Arr, funct: Applyer) =>
+          //arr.value.
           Val.Lazy(Val.Null).force
       },
       //TODO
-      builtin("leftJoin", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
+      builtin("leftJoin", "arrayL", "arrayR", "funct"){
+        (ev,fs, arrayL: Val.Arr, arrayR: Val.Arr, funct: Applyer) =>
           Val.Lazy(Val.Null).force
       },
       //TODO
@@ -1069,192 +1029,373 @@ object DW {
         (ev,fs, arr: Val.Arr, funct: Applyer) =>
           Val.Lazy(Val.Null).force
       },
-      //TODO
-      builtin("partition", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
-      builtin("slice", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
-      builtin("some", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
-      builtin("splitAt", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
-      builtin("splitWhere", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
-      builtin("sumBy", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
-      builtin("take", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
-      builtin("takeWhile", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
-      }
        */
+
+      builtin("partition", "arr", "funct"){
+        (_,_, array: Val.Arr, funct: Applyer) =>
+          val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
+          val part =array.value.partition(funct.apply(_) == Val.True)
+          out+=( "success" -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => Val.Arr(part._1)))
+          out+=( "failure" -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => Val.Arr(part._2)))
+          new Val.Obj(out, _ => (), None)
+      },
+
+      builtin("slice", "arr", "start", "end"){
+        (_,_, array: Val.Arr, start: Int, end: Int) =>
+          //version commented below is slightly slower
+          //Val.Arr(array.value.splitAt(start)._2.splitAt(end-1)._1)
+          Val.Arr(
+            array.value.zipWithIndex.filter({
+              case (_, index) => (index >= start) && (index < end)
+            }).map(_._1)
+          )
+      },
+
+      builtin("some", "value", "funct"){
+        (_,_, value: Val, funct: Applyer) =>
+          value match {
+            case Val.Arr(array) =>
+              Val.bool(array.exists(item => funct.apply(item) == Val.True))
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected Array, got: " + i.prettyName);
+          }
+      },
+
+      builtin("splitAt", "array", "index"){
+        (_,_, array: Val.Arr, index: Int) =>
+          val split = array.value.splitAt(index)
+          val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
+
+          out+=( "l" -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => Val.Arr(split._1)))
+          out+=( "r" -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => Val.Arr(split._2)))
+          new Val.Obj(out, _ => (), None)
+      },
+
+      builtin("splitWhere", "arr", "funct"){
+        (_,_, arr: Val.Arr, funct: Applyer) =>
+          val split =arr.value.splitAt(arr.value.indexWhere(funct.apply(_) == Val.True))
+          val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
+
+          out+=( "l" -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => Val.Arr(split._1)))
+          out+=( "r" -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => Val.Arr(split._2)))
+          new Val.Obj(out, _ => (), None)
+      },
+
+      builtin("sumBy", "array", "funct"){
+        (_,_, array: Val.Arr, funct: Applyer) =>
+          array.value.foldLeft(0.0) ((sum, num) => sum + funct.apply(num).asInstanceOf[Val.Num].value)
+      },
+
+      builtin("take", "array", "index"){
+        (_,_, array: Val.Arr, index: Int) =>
+          Val.Arr(array.value.splitAt(index)._1)
+      },
+
+      builtin("takeWhile", "array", "funct"){
+        (_,_, array: Val.Arr, funct: Applyer) =>
+          Val.Arr(array.value.takeWhile(item => funct.apply(item) == Val.True))
+      }
     ),
     "Binaries" -> library(
-      /*
-      //TODO
       builtin("fromBase64", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Num(x) => Val.Lazy(Val.Str(new String(Base64.getDecoder.decode(x.toString)))).force
+            case Val.Str(x) => Val.Lazy(Val.Str(new String(Base64.getDecoder.decode(x)))).force
+            case x => throw new IllegalArgumentException(
+              "Expected String, got: " + x.prettyName);
+          }
       },
-      //TODO
+
       builtin("fromHex", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Str(x) => Val.Lazy(Val.Str(
+              x.toSeq.sliding(2, 2).map(byte => Integer.parseInt(byte.unwrap, 16).toChar).mkString
+            )).force
+            case x => throw new IllegalArgumentException(
+              "Expected String, got: " + x.prettyName);
+          }
       },
-      //TODO
-      builtin("readLinesWith", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("readLinesWith", "value", "encoding"){
+        (_,_, value: String, enc: String) =>
+          Val.Arr(
+            new String(value.getBytes(), enc).split('\n').collect({
+              case str => Val.Lazy(Val.Str(str))
+            })
+          )
       },
-      //TODO
+
       builtin("toBase64", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Num(x) =>
+              if(x % 1 == 0) Val.Lazy(Val.Str(new String(Base64.getEncoder.encode(x.toInt.toString.getBytes())))).force
+              else Val.Lazy(Val.Str(new String(Base64.getEncoder.encode(x.toString.getBytes())))).force
+            case Val.Str(x) => Val.Lazy(Val.Str(new String(Base64.getEncoder.encode(x.getBytes())))).force
+            case x => throw new IllegalArgumentException(
+              "Expected String, got: " + x.prettyName);
+          }
       },
-      //TODO
+
       builtin("toHex", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Num(x) => Val.Lazy(Val.Str(Integer.toString(x.toInt, 16).toUpperCase())).force
+            case Val.Str(x) => Val.Lazy(Val.Str(x.getBytes().map(_.toHexString).mkString.toUpperCase())).force
+            case x => throw new IllegalArgumentException(
+              "Expected String, got: " + x.prettyName);
+          }
       },
-      //TODO
-      builtin("writeLinesWith", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("writeLinesWith", "value", "encoding"){
+        (_,_, value: Val.Arr, enc: String) =>
+          val str = value.value.map(item => item.force.asInstanceOf[Val.Str].value).mkString("\n") + "\n"
+          Val.Lazy(Val.Str(new String(str.getBytes, enc))).force
       },
-       */
     ),
+    // TODO currently limited to 32 bit value
     "Numbers" -> library(
-      /*
-      //TODO
       builtin("fromBinary", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Num(x) =>
+              if("[^2-9]".r.matches(x.toString)){
+                throw new IllegalArgumentException(
+                  "Expected Binary, got: Number")
+              }
+              else Val.Lazy(Val.Num( Integer.parseInt(x.toInt.toString, 2))).force
+                //Val.Lazy(Val.Num( java.lang.Long.parseLong(x.toLong.toString,2))).force
+            case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x,2))).force;
+              //Val.Lazy(Val.Num( java.lang.Long.parseLong(x,2))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case x => throw new IllegalArgumentException(
+              "Expected Binary, got: " + x.prettyName);
+          }
       },
-      //TODO
+
       builtin("fromHex", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Num(x) =>
+              if("[^0-9a-f]".r.matches(x.toString.toLowerCase())){
+                throw new IllegalArgumentException(
+                  "Expected Binary, got: Number")
+              }
+              else Val.Lazy(Val.Num(Integer.parseInt(x.toInt.toString.toLowerCase(), 16))).force;
+            case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x.toLowerCase(),16))).force;
+            case Val.Null => Val.Lazy(Val.Null).force
+            case x => throw new IllegalArgumentException(
+              "Expected Binary, got: " + x.prettyName);
+          }
       },
-      //TODO
-      builtin("fromRadixNumber", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("fromRadixNumber", "value", "num"){
+        (_,_, value: Val, num: Int) =>
+          value match {
+            case Val.Num(x) => Val.Lazy(Val.Num(Integer.parseInt(x.toInt.toString.toLowerCase(), num))).force;
+            case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x.toLowerCase(), num))).force;
+            case x => throw new IllegalArgumentException(
+              "Expected Binary, got: " + x.prettyName);
+              //null not supported in DW function
+          }
       },
-      //TODO
+
       builtin("toBinary", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Num(x) =>
+              if(x < 0)  Val.Lazy(Val.Str("-" + x.toInt.abs.toBinaryString)).force
+              else Val.Lazy(Val.Str(x.toInt.toBinaryString)).force
+            case Val.Str(x) =>
+              if(x.startsWith("-")) Val.Lazy(Val.Str(x.toInt.abs.toBinaryString)).force
+              else Val.Lazy(Val.Str(x.toInt.toBinaryString)).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case x => throw new IllegalArgumentException(
+              "Expected Binary, got: " + x.prettyName);
+          }
       },
-      //TODO
+
       builtin("toHex", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Num(x) =>
+              if(x < 0)  Val.Lazy(Val.Str("-" + x.toInt.abs.toHexString)).force
+              else Val.Lazy(Val.Str(x.toInt.toHexString)).force
+            case Val.Str(x) =>
+              if(x.startsWith("-")) Val.Lazy(Val.Str(x.toInt.abs.toHexString)).force
+              else Val.Lazy(Val.Str(x.toInt.toHexString)).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case x => throw new IllegalArgumentException(
+              "Expected Binary, got: " + x.prettyName);
+          }
       },
-      //TODO
-      builtin("toRadixNumber", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("toRadixNumber", "value", "num"){
+        (_,_, value: Val, num: Int) =>
+          value match {
+            case Val.Num(x) =>
+              if(x < 0)  Val.Lazy(Val.Str("-" + Integer.toString(x.toInt.abs, num))).force
+              else Val.Lazy(Val.Str(Integer.toString(x.toInt, num))).force
+            case Val.Str(x) =>
+              if(x.startsWith("-"))  Val.Lazy(Val.Str("-" + Integer.toString(x.toInt.abs, num))).force
+              else Val.Lazy(Val.Str(Integer.toString(x.toInt, num))).force
+            case x => throw new IllegalArgumentException(
+              "Expected Binary, got: " + x.prettyName);
+              //DW functions does not support null
+          }
       }
-       */
     ),
     "Objects" -> library(
-      /*
-      //TODO
-      builtin("divideBy", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+      builtin("divideBy", "obj", "num"){
+        (ev,fs, obj: Val.Obj, num: Int) =>
+          val out = collection.mutable.Buffer.empty[Val.Lazy]
+
+          obj.getVisibleKeys().sliding(num,num).foreach({
+            map =>
+              val currentObject = collection.mutable.Map[String, Val.Obj.Member]()
+              map.foreachEntry((key, _) => currentObject += (key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))))
+              out.append(Val.Lazy(new Val.Obj(currentObject, _ => (), None)))
+          })
+          Val.Arr(out.toSeq)
       },
-      //TODO
-      builtin("entrySet", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("entrySet", "obj"){
+        (ev,fs, obj: Val.Obj) =>
+          Val.Arr(obj.getVisibleKeys().toSeq.collect({
+            case(key,_) =>
+              val currentObj = scala.collection.mutable.Map[String, Val.Obj.Member]()
+              currentObj += ("key" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Str(key)).force))
+              currentObj += ("value" -> Val.Obj.Member(add =false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
+
+              Val.Lazy(new Val.Obj(currentObj, _ => (), None))
+          }))
       },
-      //TODO
-      builtin("everyEntry", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("everyEntry", "value", "funct"){
+        (ev,fs, value: Val, funct: Applyer) =>
+          value match {
+            case obj: Val.Obj =>
+              val args = funct.f.params.allIndices.size>1
+              if(args)
+                Val.bool(obj.getVisibleKeys().toSeq.forall(key => funct.apply(Val.Lazy(obj.value(key._1, -1)(fs, ev)), Val.Lazy(Val.Str(key._1))) == Val.True))
+              else
+                Val.bool(obj.getVisibleKeys().toSeq.forall(key => funct.apply(Val.Lazy(obj.value(key._1, -1)(fs, ev))) == Val.True))
+            case Val.Null => Val.Lazy(Val.True).force
+            case i => throw new IllegalArgumentException(
+              "Expected Array, got: " + i.prettyName);
+          }
       },
-      //TODO
-      builtin("keySet", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("keySet", "obj"){
+        (_,_, obj: Val.Obj) =>
+          Val.Arr(
+            obj.getVisibleKeys()
+              .collect{case (k, _) => Val.Lazy(Val.Str(k))}.toSeq
+          )
       },
-      //TODO
-      builtin("mergeWith", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("mergeWith", "valueOne", "valueTwo"){
+        (ev,fs, valueOne: Val, valueTwo: Val) =>
+          val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
+          valueOne match {
+            case obj: Val.Obj =>
+              valueTwo match {
+                case obj2: Val.Obj =>
+                  obj2.getVisibleKeys().foreachEntry(
+                    (key, _) => out+=(key -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => obj2.value(key, -1)(fs,ev)))
+                  )
+                  val keySet = obj2.getVisibleKeys().keySet
+                  obj.getVisibleKeys().foreachEntry(
+                    (key, _) => if(!keySet.contains(key)) out+=(key -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => obj.value(key, -1)(fs,ev)))
+                  )
+                  new Val.Obj(out, _ => (), None)
+                case Val.Null => valueOne
+                case i => throw new IllegalArgumentException(
+                  "Expected Object, got: " + i.prettyName);
+              }
+            case Val.Null =>
+              valueTwo match {
+                case _: Val.Obj => valueTwo
+                case i => throw new IllegalArgumentException(
+                  "Expected Object, got: " + i.prettyName);
+              }
+            case i => throw new IllegalArgumentException(
+              "Expected Object, got: " + i.prettyName);
+          }
       },
-      //TODO
-      builtin("nameSet", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("nameSet", "obj"){
+        (_,_, obj: Val.Obj) =>
+          Val.Arr(
+            obj.getVisibleKeys()
+              .collect{case (k, _) => Val.Lazy(Val.Str(k))}.toSeq
+          )
       },
-      //TODO
-      builtin("someEntry", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("someEntry", "value", "funct"){
+        (ev,fs, value: Val, funct: Applyer) =>
+          value match {
+            case obj: Val.Obj =>
+              Val.bool(obj.getVisibleKeys().exists(
+                item => funct.apply(Val.Lazy(obj.value(item._1, -1)(fs, ev)), Val.Lazy(Val.Str(item._1))) == Val.True
+              ))
+            case Val.Null => Val.Lazy(Val.False).force
+            case i => throw new IllegalArgumentException(
+              "Expected Object, got: " + i.prettyName);
+          }
       },
-      //TODO
-      builtin("someEntry", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("takeWhile", "obj", "funct"){
+        (ev,fs, obj: Val.Obj, funct: Applyer) =>
+          val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
+          obj.getVisibleKeys().takeWhile(
+            item => funct.apply(Val.Lazy(obj.value(item._1, -1)(fs, ev)), Val.Lazy(Val.Str(item._1))) == Val.True
+          ).foreachEntry((key,_) => out+=(key -> Val.Obj.Member(add=false, Visibility.Normal, (_,_,_,_) => obj.value(key, -1)(fs,ev))))
+
+          new Val.Obj(out, _ => (), None)
       },
-      //TODO
-      builtin("takeWhile", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
-      },
-      //TODO
+
       builtin("valueSet", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
-      },
-       */
+        (ev,fs, obj: Val.Obj) =>
+          val out = collection.mutable.Buffer.empty[Val.Lazy]
+          for((key,_) <- obj.getVisibleKeys()){
+            out.append(Val.Lazy(obj.value(key, -1)(fs, ev)))
+          }
+          Val.Arr(out.toSeq)
+      }
     ),
     "Strings" -> library(
       builtin("appendIfMissing", "str1", "str2"){
-        (ev,fs, str: String, append: String) =>
-          var ret = str;
-          if(!str.contains(append)){
-            ret=(str + append)
+        (_,_, value: Val, append: String) =>
+          value match {
+            case Val.Str(str) =>
+              var ret = str
+              if(!str.endsWith(append)){
+                ret = str + append
+              }
+              Val.Lazy(Val.Str(ret)).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String got: " + value.prettyName);
           }
-          Val.Lazy(Val.Str(ret)).force
       },
+
       builtin("camelize", "str"){
-        (ev,fs, str: Val) =>
+        (_,_, str: Val) =>
           str match{
             case Val.Str(value) =>
               //regex fo _CHAR
-              var regex = "(_+)([0-9A-Za-z])".r("underscore", "letter")
+              val regex = "(_+)([0-9A-Za-z])".r("underscore", "letter")
 
               //Start string at first non underscore, lower case it
               var temp = value.substring("[^_]".r.findFirstMatchIn(value).map(_.start).toList.head )
               temp = temp.replaceFirst(temp.charAt(0).toString, temp.charAt(0).toLower.toString)
 
               //replace and uppercase
-              temp = regex.replaceAllIn(temp, m => s"${(m group "letter").toUpperCase()}");
+              temp = regex.replaceAllIn(temp, m => s"${(m group "letter").toUpperCase()}")
               Val.Lazy(Val.Str(temp)).force;
 
             case Val.Null =>
@@ -1263,31 +1404,70 @@ object DW {
               "Expected String got: " + str.prettyName);
           }
       },
-      /*
-      //TODO
+
       builtin("capitalize", "str"){
-        (ev,fs, str: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, str: Val) =>
+          str match{
+            case Val.Str(value) =>
+              //regex fo _CHAR
+              val regex = "([_\\s-]+)([0-9A-Za-z])([A-Z]+|)".r("one", "two", "three")
+              val middleRegex = "([a-z])([A-Z])".r("end", "start")
+
+              //Start string at first non underscore, lower case it
+              var temp = value.substring("[0-9A-Za-z]".r.findFirstMatchIn(value).map(_.start).toList.head )
+              temp = temp.replaceFirst(temp.charAt(0).toString, temp.charAt(0).toUpper.toString)
+
+              //replace and uppercase
+              temp = regex.replaceAllIn(temp, m => s" ${(m group "two").toUpperCase()+(m group "three").toLowerCase()}")
+              temp = middleRegex.replaceAllIn(temp, m => s"${m group "end"} ${(m group "start").toUpperCase()}")
+
+              Val.Lazy(Val.Str(temp)).force;
+
+            case Val.Null =>
+              Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String got: " + str.prettyName);
+          }
       },
-       */
+
       builtin("charCode", "str"){
-        (ev,fs, str: String) =>
+        (_,_, str: String) =>
           str.codePointAt(0)
       },
-      builtin("charCodeAt", "str", "num"){
-        (ev,fs, str: String, num: Int) =>
-          str.codePointAt(num)
 
+      builtin("charCodeAt", "str", "num"){
+        (_,_, str: String, num: Int) =>
+          str.codePointAt(num)
       },
-      /*
-      //TODO
-      builtin("dasherize", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("dasherize", "str"){
+        (_,_, str: Val) =>
+          str match{
+            case Val.Str(value) =>
+              //regex fo _CHAR
+              val regex = "([_\\s-]+)([0-9A-Za-z])([A-Z]+|)".r("one", "two", "three")
+              val middleRegex = "([a-z])([A-Z])".r("end", "start")
+
+              //Start string at first non underscore, lower case it
+              var temp = value
+
+              //replace and uppercase
+              temp = regex.replaceAllIn(temp, m => s"-${(m group "two")+(m group "three").toLowerCase()}")
+              temp = middleRegex.replaceAllIn(temp, m => s"${m group "end"}-${m group "start"}")
+
+              temp = temp.toLowerCase()
+
+              Val.Lazy(Val.Str(temp)).force;
+
+            case Val.Null =>
+              Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String got: " + str.prettyName);
+          }
       },
-       */
+
       builtin("fromCharCode", "num"){
-        (ev,fs, num: Int) =>
+        (_,_, num: Int) =>
           String.valueOf(num.asInstanceOf[Char])
       },
 
@@ -1298,7 +1478,7 @@ object DW {
               if("^[A-Za-z]+$".r.matches(value)) {true}
               else {false}
             case Val.Null => false
-            case Val.Num(x) => false
+            case Val.Num(_) => false
             case Val.True | Val.False => true
             case _ => throw new IllegalArgumentException(
               "Expected String, got: " + str.prettyName);
@@ -1306,13 +1486,13 @@ object DW {
       },
 
       builtin("isAlphanumeric", "str"){
-        (ev,fs, str: Val) =>
+        (_,_, str: Val) =>
           str match {
             case Val.Str(value) =>
               if("^[A-Za-z0-9]+$".r.matches(value)) {true}
               else {false}
             case Val.Null => false
-            case Val.Num(x) => true
+            case Val.Num(_) => true
             case Val.True | Val.False => true
             case _ => throw new IllegalArgumentException(
               "Expected String, got: " + str.prettyName);
@@ -1320,123 +1500,316 @@ object DW {
       },
 
       builtin("isLowerCase", "str"){
-        (ev,fs, str: Val) =>
+        (_,_, str: Val) =>
           str match {
             case Val.Str(value) =>
               if("^[a-z]+$".r.matches(value)) {true}
               else {false}
             case Val.Null => false
-            case Val.Num(x) => false
+            case Val.Num(_) => false
             case Val.True | Val.False => true
             case _ => throw new IllegalArgumentException(
               "Expected String, got: " + str.prettyName);
           }
       },
+
       builtin("isNumeric", "str"){
         (_,_, str: Val) =>
           str match {
             case Val.Str(value) =>
               if("^[0-9]+$".r.matches(value)) {true}
               else {false}
-            case Val.Null => false
-            case Val.Num(x) => true
-            case Val.True | Val.False => false
+            case Val.Num(_) => true
+            case Val.True | Val.False | Val.Null => false
             case _ => throw new IllegalArgumentException(
               "Expected String, got: " + str.prettyName);
           }
       },
-      /*
-      //TODO
-      builtin("isUpperCase", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("isUpperCase", "str"){
+        (_,_, str: Val) =>
+          str match {
+            case Val.Str(value) =>
+              if("^[A-Z]+$".r.matches(value)) {true}
+              else {false}
+            case Val.Num(_) => false
+            case Val.True | Val.False | Val.Null => false
+            case _ => throw new IllegalArgumentException(
+              "Expected String, got: " + str.prettyName);
+          }
       },
-      //TODO
-      builtin("isWhitespace", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("isWhitespace", "str"){
+        (_,_, str: Val) =>
+          str match {
+            case Val.Str(value) => value.trim().isEmpty
+            case Val.Num(_) => false
+            case Val.True | Val.False | Val.Null => false
+            case _ => throw new IllegalArgumentException(
+              "Expected String, got: " + str.prettyName);
+          }
       },
-      //TODO
-      builtin("leftPad", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("leftPad", "str", "offset"){
+        (_,_, str: Val, offset: Int) =>
+          str match {
+            case Val.Str(value) =>
+              Val.Lazy(Val.Str(("%" + offset + "s").format(value))).force
+            case Val.True =>
+              Val.Lazy(Val.Str(("%" + offset + "s").format("true"))).force
+            case Val.False =>
+              Val.Lazy(Val.Str(("%" + offset + "s").format("false"))).force
+            case Val.Num(x) =>
+              //TODO change to use sjsonnet's Format and DecimalFormat
+              Val.Lazy(Val.Str(("%" + offset + "s").format(new DecimalFormat("0.#").format(x)))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String, got: " + str.prettyName)
+          }
       },
-      //TODO
-      builtin("ordinalize", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("ordinalize", "num"){
+        (_,_, num: Val) =>
+          (num match { //convert number value to string
+            case Val.Null => "null"
+            case Val.Str(value) =>
+              if("^[0-9]+$".r.matches(value)) {value}
+              else {"X"}
+            case Val.Num(value) => value.toInt.toString
+            case _ => throw new IllegalArgumentException(
+              "Expected Number, got: " + num.prettyName)
+          }) match { //convert string number to ordinalized string number
+            case "null" => Val.Lazy(Val.Null).force
+            case "X" => throw new IllegalArgumentException(
+              "Expected Number, got: " + num.prettyName)
+            case str =>
+              if(str.endsWith("11") || str.endsWith("12") || str.endsWith("13")){
+                Val.Lazy(Val.Str(str + "th")).force
+              }
+              else{
+                if(str.endsWith("1")){ Val.Lazy(Val.Str(str + "st")).force }
+                else if(str.endsWith("2")){ Val.Lazy(Val.Str(str + "nd")).force }
+                else if(str.endsWith("3")){ Val.Lazy(Val.Str(str + "rd")).force }
+                else { Val.Lazy(Val.Str(str + "th")).force }
+              }
+          }
       },
-      //TODO
+
       builtin("pluralize", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Str(str) =>
+              val comparator = str.toLowerCase()
+              val specialSList = List("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
+              if(specialSList.contains(comparator)) { Val.Lazy(Val.Str(str + "s")).force }
+              else if (comparator.isEmpty) Val.Lazy(Val.Str("")).force
+              else {
+                if(comparator.endsWith("y")) { Val.Lazy(Val.Str(str.substring(0,str.length-1) + "ies")).force }
+                else if(comparator.endsWith("x")) { Val.Lazy(Val.Str(str + "es")).force }
+                else { Val.Lazy(Val.Str(str + "s")).force }
+              }
+            case Val.Null => Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected Number, got: " + value.prettyName)
+          }
       },
-      //TODO
-      builtin("prependifMissing", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("prependIfMissing", "str1", "str2"){
+        (_,_, value: Val, append: String) =>
+          value match {
+            case Val.Str(str) =>
+              var ret = str
+              if(!str.startsWith(append)){
+                ret = append + str
+              }
+              Val.Lazy(Val.Str(ret)).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String got: " + value.prettyName);
+          }
       },
-      //TODO
-      builtin("repeat", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("repeat", "str", "num"){
+        (_,_, str: String, num: Int) =>
+          var ret = ""
+          for(_ <- 0 until num){
+            ret += str
+          }
+          Val.Lazy(Val.Str(ret)).force
       },
-      //TODO
-      builtin("rightPad", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("rightPad", "str", "offset"){
+        (_,_, value: Val, offset: Int) =>
+          value match {
+            case Val.Str(str) =>
+              Val.Lazy(Val.Str(str.padTo(offset, ' '))).force
+            case Val.Num(x) =>
+              //TODO change to use sjsonnet's Format and DecimalFormat
+              Val.Lazy(Val.Str(new DecimalFormat("0.#").format(x).padTo(offset, ' '))).force
+            case Val.True =>
+              Val.Lazy(Val.Str("true".padTo(offset, ' '))).force
+            case Val.False =>
+              Val.Lazy(Val.Str("false".padTo(offset, ' '))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String, got: " + value.prettyName)
+          }
       },
-      //TODO
+
       builtin("singularize", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+        (_,_, value: Val) =>
+          value match {
+            case Val.Str(s) =>
+              if(s.endsWith("ies"))
+                Val.Lazy(Val.Str(s.substring(0,s.length-3) +"y")).force
+              else if(s.endsWith("es"))
+                Val.Lazy(Val.Str(s.substring(0,s.length-2))).force
+              else
+                Val.Lazy(Val.Str(s.substring(0,s.length-1))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("substringAfter", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("substringAfter", "value", "sep"){
+        (_,_, value: Val, sep: String) =>
+          value match {
+            case Val.Str(s) =>
+              Val.Lazy(Val.Str(s.substring(
+                s.indexOf(sep) match {
+                  case -1 => s.length
+                  case i => if(sep.equals("")) i else i+1
+                }
+              ))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("substringAfterLast", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("substringAfterLast", "value", "sep"){
+        (_,_, value: Val, sep: String) =>
+          value match {
+            case Val.Str(s) =>
+              val split = s.split(sep)
+              if(sep.equals("")) Val.Lazy(Val.Str("")).force
+              else if(split.length==1) Val.Lazy(Val.Str("")).force
+              else Val.Lazy(Val.Str(split(split.length-1))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("substringBefore", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("substringBefore", "value", "sep"){
+        (_,_, value: Val, sep: String) =>
+          value match {
+            case Val.Str(s) =>
+              Val.Lazy(Val.Str(s.substring(0,
+                s.indexOf(sep) match {
+                  case -1 => 0
+                  case i => i
+                }
+              ))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("substringBeforeLast", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("substringBeforeLast", "value", "sep"){
+        (_,_, value: Val, sep: String) =>
+          value match {
+            case Val.Str(s) =>
+              Val.Lazy(Val.Str(s.substring(0,
+                s.lastIndexOf(sep) match {
+                  case -1 => 0
+                  case i => i
+                }
+              ))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("underscore", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("underscore", "str"){
+        (_,_, str: Val) =>
+          str match{
+            case Val.Str(value) =>
+              //regex fo _CHAR
+              val regex = "([_\\s-]+)([0-9A-Za-z])([A-Z]+|)".r("one", "two", "three")
+              val middleRegex = "([a-z])([A-Z])".r("end", "start")
+
+              //Start string at first non underscore, lower case it
+              var temp = value.substring("[0-9A-Za-z]".r.findFirstMatchIn(value).map(_.start).toList.head )
+              temp = temp.replaceFirst(temp.charAt(0).toString, temp.charAt(0).toLower.toString)
+
+              //replace and uppercase
+              temp = regex.replaceAllIn(temp, m => s"_${(m group "two")+(m group "three")}")
+              temp = middleRegex.replaceAllIn(temp, m => s"${m group "end"}_${m group "start"}")
+
+              Val.Lazy(Val.Str(temp.toLowerCase)).force;
+
+            case Val.Null =>
+              Val.Lazy(Val.Null).force
+            case _ => throw new IllegalArgumentException(
+              "Expected String got: " + str.prettyName);
+          }
       },
-      //TODO
-      builtin("unwrap", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("unwrap", "value", "wrapper"){
+        (_,_, value: Val, wrapper: String) =>
+          value match {
+            case Val.Str(str) =>
+              val starts = str.startsWith(wrapper)
+              val ends = str.endsWith(wrapper)
+              if(starts && ends) Val.Lazy(Val.Str(str.substring(0+wrapper.length, str.length-wrapper.length))).force
+              else if(starts) Val.Lazy(Val.Str(str.substring(0+wrapper.length, str.length) + wrapper)).force
+              else if(ends) Val.Lazy(Val.Str(wrapper + str.substring(0, str.length-wrapper.length))).force
+              else  Val.Lazy(Val.Str(str)).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("withMaxSize", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("withMaxSize", "value", "num"){
+        (_,_, value: Val, num: Int) =>
+          value match {
+            case Val.Str(str) =>
+              if(str.length<=num) Val.Lazy(Val.Str(str)).force
+              else Val.Lazy(Val.Str(str.substring(0,num))).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("wrapifMissing", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
+
+      builtin("wrapIfMissing", "value", "wrapper"){
+        (_,_, value: Val, wrapper: String) =>
+          value match {
+            case Val.Str(str) =>
+              val ret = new StringBuilder(str)
+              if(!str.startsWith(wrapper)) ret.insert(0, wrapper)
+              if(!str.endsWith(wrapper)) ret.append(wrapper)
+              Val.Lazy(Val.Str(ret.toString())).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
       },
-      //TODO
-      builtin("wrapWith", "value"){
-        (ev,fs, value: Val) =>
-          Val.Lazy(Val.Null).force
-      },
-       */
+
+      builtin("wrapWith", "value", "wrapper"){
+        (_,_, value: Val, wrapper: String) =>
+          value match {
+            case Val.Str(str) => Val.Lazy(Val.Str( wrapper + str + wrapper)).force
+            case Val.Null => Val.Lazy(Val.Null).force
+            case i => throw new IllegalArgumentException(
+              "Expected String, got: " + i.prettyName)
+          }
+      }
     )
   )
 }
