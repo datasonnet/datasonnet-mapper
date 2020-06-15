@@ -20,9 +20,10 @@ import scala.util.Random
 object DW {
 
   def distinctBy(array: Seq[Val.Lazy], funct: Applyer): Val = {
-    val args = funct.f.params.argIndices.size > 1
+    val args = funct.f.params.allIndices.size
     val out = collection.mutable.Buffer.empty[Val.Lazy]
-    if (args) { // 2 args
+
+    if (args == 2) { // 2 args
       array.zipWithIndex.foreach(
         item =>
           if (!out.zipWithIndex.map { // out array does not contain item
@@ -32,7 +33,7 @@ object DW {
           }
       )
     }
-    else { // 1 arg
+    else if (args == 1) { // 1 arg
       array.foreach(
         item =>
           if (!out.map(funct.apply(_)).contains(funct.apply(item))) {
@@ -40,14 +41,18 @@ object DW {
           }
       )
     }
+    else {
+      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+    }
+
     Val.Arr(out.toSeq)
   }
 
   def distinctBy(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val = {
-    val args = funct.f.params.argIndices.size > 1
+    val args = funct.f.params.allIndices.size
     val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
 
-    if (args) { // 2 args
+    if (args == 2) { // 2 args
       obj.getVisibleKeys().keySet.foreach(
         key => {
           val outObj = new Val.Obj(out, _ => (), None)
@@ -62,7 +67,7 @@ object DW {
         }
       )
     }
-    else { //1 arg
+    else if (args == 1) { //1 arg
       obj.getVisibleKeys().keySet.foreach(
         key => {
           val outObj = new Val.Obj(out, _ => (), None)
@@ -74,18 +79,25 @@ object DW {
         }
       )
     }
+    else {
+      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+    }
+
     new Val.Obj(out, _ => (), None)
   }
 
   def filter(array: Seq[Val.Lazy], funct: Applyer): Val = {
-    val args = funct.f.params.allIndices.size > 1
+    val args = funct.f.params.allIndices.size
     Val.Arr(
-      if (args)
+      if (args == 2)
         array.zipWithIndex.filter({
           case (lazyItem, index) => funct.apply(lazyItem, Val.Lazy(Val.Num(index))) == Val.True
         }).map(_._1)
-      else
+      else if (args == 1)
         array.filter(lazyItem => funct.apply(lazyItem) == Val.True)
+      else {
+        throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+      }
     )
   }
 
@@ -106,19 +118,22 @@ object DW {
               key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
           }): _*)
       }
-      else {
+      else if (args == 1) {
         scala.collection.mutable.Map(
           obj.getVisibleKeys().keySet.toSeq.collect({
             case key if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev))) == Val.True =>
               key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
           }): _*)
+      }
+      else {
+        throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2 or 3, but got: " + args)
       }, _ => (), None) // end of new object to return
   }
 
   def flatMap(array: Seq[Val.Lazy], funct: Applyer): Val = {
-    val args = funct.f.params.allIndices.size > 1
+    val args = funct.f.params.allIndices.size
     val out = collection.mutable.Buffer.empty[Val.Lazy]
-    if (args) { // 2 args
+    if (args == 2) { // 2 args
       for (v <- array) {
         v.force match {
           case Val.Arr(inner) =>
@@ -130,7 +145,7 @@ object DW {
         }
       }
     }
-    else { //  1 arg
+    else if (args == 1) { //  1 arg
       for (v <- array) {
         v.force match {
           case Val.Arr(inner) =>
@@ -140,13 +155,16 @@ object DW {
         }
       }
     }
+    else {
+      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+    }
     Val.Arr(out.toSeq)
   }
 
   def groupBy(s: Seq[Val.Lazy], funct: Applyer): Val = {
-    val args = funct.f.params.allIndices.size > 1
+    val args = funct.f.params.allIndices.size
     val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
-    if (args) {
+    if (args == 2) {
       for ((item, index) <- s.zipWithIndex) {
 
         val key = funct.apply(item, Val.Lazy(Val.Num(index)))
@@ -162,7 +180,7 @@ object DW {
           out += (key.cast[Val.Str].value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Arr(array.toSeq)))
         }
       }
-    } else {
+    } else if (args == 1) {
       for (item <- s) {
 
         val key = funct.apply(item)
@@ -179,13 +197,17 @@ object DW {
         }
       }
     }
+    else {
+      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+    }
+
     new Val.Obj(out, _ => (), None)
   }
 
   def groupBy(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val = {
     val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
-    val args = funct.f.params.allIndices.size > 1
-    if (args) {
+    val args = funct.f.params.allIndices.size
+    if (args == 2) {
       for ((key, _) <- obj.getVisibleKeys()) {
         val functKey = funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)))
 
@@ -202,7 +224,7 @@ object DW {
         }
       }
     }
-    else {
+    else if (args == 1) {
       for ((key, _) <- obj.getVisibleKeys()) {
         val functKey = funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)))
 
@@ -219,18 +241,25 @@ object DW {
         }
       }
     }
+    else {
+      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+    }
+
     new Val.Obj(out, _ => (), None)
   }
 
   def map(array: Seq[Val.Lazy], funct: Applyer): Val = {
-    val args = funct.f.params.allIndices.size > 1
+    val args = funct.f.params.allIndices.size
     Val.Arr(
-      if (args) { //2 args
+      if (args == 2) { //2 args
         array.zipWithIndex.map {
           case (item, index) => Val.Lazy(funct.apply(item, Val.Lazy(Val.Num(index))))
         }
-      } else { // 1 arg
+      } else if (args == 1) { // 1 arg
         array.map(item => Val.Lazy(funct.apply(item)))
+      }
+      else {
+        throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
       }
     )
   }
@@ -264,7 +293,7 @@ object DW {
       }
       new Val.Obj(out, _ => (), None)
     }
-    else {
+    else if (args.equals(1)) {
       for ((key, _) <- obj.getVisibleKeys()) {
         funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))) match {
           case s: Val.Obj =>
@@ -277,28 +306,34 @@ object DW {
       }
       new Val.Obj(out, _ => (), None)
     }
+    else {
+      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2 or 3, but got: " + args)
+    }
   }
 
   def orderBy(array: Seq[Val.Lazy], funct: Applyer): Val = {
-    val args = funct.f.params.allIndices.size > 1
-    if (args) {
+    val args = funct.f.params.allIndices.size
+    if (args == 2) {
       Val.Arr(
         array.zipWithIndex.sortBy(
           it => funct.apply(it._1, Val.Lazy(Val.Num(it._2))).toString
         ).map(_._1))
     }
-    else {
+    else if (args == 1) {
       Val.Arr(array.sortBy(it => funct.apply(it).toString))
+    }
+    else {
+      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
     }
   }
 
   def orderBy(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val = {
-    val args = funct.f.params.allIndices.size > 1
+    val args = funct.f.params.allIndices.size
     var out = scala.collection.mutable.Map.empty[String, Val.Obj.Member]
     for ((item, _) <- obj.getVisibleKeys()) {
       out += (item -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(item, -1)(fs, ev)))
     }
-    if (args) {
+    if (args == 2) {
       new Val.Obj(
         scala.collection.mutable.Map(
           out.toSeq.sortWith {
@@ -308,7 +343,7 @@ object DW {
           }: _*),
         _ => (), None)
     }
-    else {
+    else if (args == 1) {
       new Val.Obj(
         scala.collection.mutable.Map(
           out.toSeq.sortWith {
@@ -317,6 +352,9 @@ object DW {
                 funct.apply(Val.Lazy(Val.Str(it2))).toString
           }: _*),
         _ => (), None)
+    }
+    else {
+      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
     }
   }
 
@@ -333,11 +371,15 @@ object DW {
         item => Val.Lazy(funct.apply(Val.Lazy(obj.value(item, -1)(fs, ev)), Val.Lazy(Val.Str(item))))
       ))
     }
-    else {
+    else if (args.equals(1)) {
       out.appendAll(obj.getVisibleKeys().keySet.map(
         item => Val.Lazy(funct.apply(Val.Lazy(obj.value(item, -1)(fs, ev))))
       ))
     }
+    else {
+      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2 or 3, but got: " + args)
+    }
+
     Val.Arr(out.toSeq)
   }
 
@@ -997,10 +1039,14 @@ object DW {
 
       builtin("firstWith", "arr", "funct") {
         (_, _, arr: Val.Arr, funct: Applyer) =>
-          if (funct.f.params.allIndices.size > 1)
+          val args = funct.f.params.allIndices.size
+          if (args == 2)
             arr.value.zipWithIndex.find(item => funct.apply(item._1, Val.Lazy(Val.Num(item._2))) == Val.True).map(_._1).getOrElse(Val.Lazy(Val.Null)).force
-          else
+          else if (args == 1)
             arr.value.find(funct.apply(_) == Val.True).getOrElse(Val.Lazy(Val.Null)).force
+          else {
+            throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+          }
       },
 
       builtin("indexOf", "array", "value") {
@@ -1278,11 +1324,15 @@ object DW {
         (ev, fs, value: Val, funct: Applyer) =>
           value match {
             case obj: Val.Obj =>
-              val args = funct.f.params.allIndices.size > 1
-              if (args)
+              val args = funct.f.params.allIndices.size
+              if (args == 2)
                 Val.bool(obj.getVisibleKeys().toSeq.forall(key => funct.apply(Val.Lazy(obj.value(key._1, -1)(fs, ev)), Val.Lazy(Val.Str(key._1))) == Val.True))
-              else
+              else if (args == 1)
                 Val.bool(obj.getVisibleKeys().toSeq.forall(key => funct.apply(Val.Lazy(obj.value(key._1, -1)(fs, ev))) == Val.True))
+
+              else {
+                throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+              }
             case Val.Null => Val.Lazy(Val.True).force
             case i => throw new IllegalArgumentException(
               "Expected Array, got: " + i.prettyName);
