@@ -1,9 +1,9 @@
 /** DataSonnet
 version=1.0
-output.application/csv.UseHeader=false
+output.application/csv.UseHeader=true
 output.application/csv.Quote='
 output.application/csv.Separator=|
-output.application/csv.Escape=\\
 output.application/csv.NewLine=\n
+output.application/csv.Headers=First Name,Last Name,Phone
 */
 payload

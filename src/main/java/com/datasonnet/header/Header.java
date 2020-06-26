@@ -32,6 +32,9 @@ public class Header {
             String headerCommentSection = dataSonnetDocument.substring(0, dataSonnetDocument.indexOf("*/"));
             headerCommentSection = headerCommentSection.replace(DATASONNET_HEADER, "").replace("*/","");
 
+            //Should not contain single backslash char at the end of the line
+            headerCommentSection = headerCommentSection.replace("=\\\n", "=\\\\\n");
+
             JavaPropsMapper mapper = new JavaPropsMapper();
             JavaPropsSchema schema = new JavaPropsSchema() {
                 class HeaderSplitter extends JPropPathSplitter

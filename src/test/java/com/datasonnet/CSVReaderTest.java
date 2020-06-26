@@ -46,5 +46,17 @@ public class CSVReaderTest {
         assertEquals("{\"fName\":\"Eugene\",\"num\":\"234\"}", mapped.getContentsAsString());
     }
 
+    @Test
+    void testCSVReaderEscapeChar() throws IOException, URISyntaxException {
+        Document data = new StringDocument(
+                TestResourceReader.readFileAsString("readCSVEscapeCharTest.csv"),
+                "application/csv"
+        );
+        String datasonnet = TestResourceReader.readFileAsString("readCSVEscapeCharTest.ds");
+        Mapper mapper = new Mapper(datasonnet);
+        String mapped = mapper.transform(data, Collections.emptyMap(), "application/json").getContentsAsString();
+        assertEquals("[[\"Test\",\"Double \\\" Quote\",\"1234566\",\"234\"]]", mapped);
+    }
+
 
 }

@@ -74,9 +74,8 @@ public class CSVWriterTest {
 
         Mapper mapper = new Mapper(datasonnet);
 
-
         String mapped = mapper.transform(data, Collections.emptyMap(), "application/json").getContentsAsString();
-        String expected = "{\"embeddedCSVValue\":\"'William'|'Shakespeare'|'(123)456-7890'\\n'Christopher'|'Marlow'|'(987)654-3210'\\n\"}";
+        String expected = "{\"embeddedCSVValue\":\"'First Name'|'Last Name'|'Phone'\\n'William'|'Shakespeare'|'(123)456-7890'\\n'Christopher'|'Marlow'|'(987)654-3210'\\n\"}";
         assertEquals(expected.trim(), mapped.trim());
     }
 

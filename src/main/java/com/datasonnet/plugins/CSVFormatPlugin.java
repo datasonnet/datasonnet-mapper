@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class CSVFormatPlugin implements DataFormatPlugin<String> {
 
@@ -71,7 +73,10 @@ public class CSVFormatPlugin implements DataFormatPlugin<String> {
 
         if (useHeader) {
             if (params != null && params.containsKey(HEADERS)) {
-                List<String> headers = (List)params.get(HEADERS);
+                Object headersParam = params.get(HEADERS);
+                List<String> headers = headersParam instanceof List ?
+                                            (List<String>) headersParam :
+                                            Pattern.compile(",").splitAsStream((String)headersParam).collect(Collectors.toList());
                 for (String header : headers) {
                     builder.addColumn(header);
                 }
@@ -98,7 +103,7 @@ public class CSVFormatPlugin implements DataFormatPlugin<String> {
 
     @Override
     public String[] getSupportedIdentifiers() {
-        return new String[] { "application/csv", "text/csv", "csv" };
+        return new String[]{"application/csv", "text/csv", "csv"};
     }
 
     private CsvSchema.Builder getBuilder(Map<String, Object> params) {
@@ -125,19 +130,25 @@ public class CSVFormatPlugin implements DataFormatPlugin<String> {
     }
 
     @Override
+    public Map<String, String> getWriteParameters() {
+        Map<String, String> writeParams = new HashMap<>();
+        writeParams.put(USE_HEADER, "Set to \"true\" if the CSV first row has column names");
+        writeParams.put(QUOTE_CHAR, "CSV quote character");
+        writeParams.put(SEPARATOR_CHAR, "CSV separator character");
+        writeParams.put(NEW_LINE, "New line character");
+        writeParams.put(HEADERS, "List of headers");
+        return Collections.unmodifiableMap(writeParams);
+    }
+
+    @Override
     public Map<String, String> getReadParameters() {
         Map<String, String> readParams = new HashMap<>();
         readParams.put(USE_HEADER, "Set to \"true\" if the CSV first row has column names");
         readParams.put(QUOTE_CHAR, "CSV quote character");
         readParams.put(SEPARATOR_CHAR, "CSV separator character");
-        readParams.put(ESCAPE_CHAR, "CSV escape character");
         readParams.put(NEW_LINE, "New line character");
+        readParams.put(ESCAPE_CHAR, "CSV escape character");
         return Collections.unmodifiableMap(readParams);
-    }
-
-    @Override
-    public Map<String, String> getWriteParameters() {
-        return getReadParameters();
     }
 
     @Override

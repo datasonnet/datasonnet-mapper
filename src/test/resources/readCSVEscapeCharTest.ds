@@ -1,0 +1,9 @@
+/** DataSonnet
+version=1.0
+input.payload.application/csv.UseHeader=false
+input.payload.application/csv.Quote='
+input.payload.application/csv.Separator=|
+input.payload.application/csv.Escape=\
+input.payload.application/csv.NewLine=\n
+*/
+payload
