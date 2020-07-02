@@ -1,6 +1,0 @@
-PV_XLAsn
-ASNNum,CompNum,DeliveryRef,LinkedToPO,character,character,integer,character
-integer,integer,character,logical,character,character,integer,character
-zzzzzzz9,zzzzz9,X(30),yes/no,X(50),X(8),9,X(8)
-1234,1,GR50603589938,Yes,89938,50,0,24742
-1234,1,GR50603590027,Yes,90027,50,0,24742
