@@ -1,0 +1,2648 @@
+# DataWeave Libraries
+:toc:
+:toclevels: 1
+
+## Core
+
+### `abs(double num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-abs[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#math[Sjsonnet version].
+
+*Example:*
+
+------------------------
+[DW.Core.abs(-2), DW.Core.abs(2.5), DW.Core.abs(-3.4), DW.Core.abs(3)]
+------------------------
+.Result
+------------------------
+[ 2, 2.5, 3.4, 3 ]
+------------------------
+### `avg(array arr)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-avg[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{ a: DW.Core.avg([1, 1000]), b: DW.Core.avg([1, 2, 3]) }
+------------------------
+.Result
+------------------------
+{ "a": 500.5, "b": 2.0 }
+------------------------
+### `ceil(double num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-ceil[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#math[Sjsonnet version].
+
+*Example:*
+
+------------------------
+[ DW.Core.ceil(1.5), DW.Core.ceil(2.1), DW.Core.ceil(3) ]
+------------------------
+.Result
+------------------------
+[ 2, 3, 3 ]
+------------------------
+### `contains(array arr, any value)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-contains[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#member[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.contains([ 1, 2, 3, 4 ], 2)
+------------------------
+.Result
+------------------------
+true
+------------------------
+### `daysBetween(string date1, string date2)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-daysbetween[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.daysBetween('2016-10-01T23:57:59-03:00', '2017-10-01T23:57:59-03:00') //error
+------------------------
+.Result
+------------------------
+365
+------------------------
+### `distinctBy(array arr, function(item,index))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-distinctby[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.distinctBy([0, 1, 2, 3, 3, 2, 1, 4], function(it,ind) it)
+------------------------
+.Result
+------------------------
+[ 0, 1, 2, 3, 4]
+------------------------
+### `endsWith(string main, string sub)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-endswith[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#endsWith[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.endsWith("Hello World!", "!")
+------------------------
+.Result
+------------------------
+true
+------------------------
+### `entriesOf(object obj)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-entriesof[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.entriesOf({testK:  "testV"})
+------------------------
+.Result
+------------------------
+[
+  {
+    "key": "testK",
+    "value": "testV"
+  }
+]
+------------------------
+### `filter(array arr, function(item,index))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-filter[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#filter[Sjsonnet version].
+
+This function has a native xref:libraries.adoc#_filterexarray_objects_string_key_string_value_function_filter_funcfunctionvalue1_value2_value1_value2[DataSonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.filter([9,2,3,4,5], function(it,ind) it > 2)
+------------------------
+.Result
+------------------------
+[9,3,4,5]
+------------------------
+### `filterObject(object obj, function(value,key,index))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-filterobject[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local obj ={
+  "testK": "testV",
+  "test2": "value2"
+};
+
+{
+  ind: DW.Core.filterObject(obj, function(value,key,index) index == 0),
+  key: DW.Core.filterObject(obj, function(value,key,index) key == "testK")
+}
+------------------------
+.Result
+------------------------
+{
+  "ind": {
+    "test2": "value2"
+  },
+  "key": {
+    "testK": "testV"
+  },
+}
+------------------------
+### `find(array arr,any value)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-find[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#find[Sjsonnet version].
+
+*Example:*
+*
+
+------------------------
+DW.Core.find(["Bond", "James", "Bond"], "Bond")
+------------------------
+.Result
+------------------------
+[0,2]
+------------------------
+### `flatMap(array arr, function(item,index))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-flatmap[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#flatMap[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.flatMap([[3,5],[1,2,5]], function(v,i) v)
+------------------------
+.Result
+------------------------
+[3,5,1,2,5]
+------------------------
+### `flatten(array arr)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-flatten[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#flattenArrays[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.flatten([ [1,2,3], [4,5,[6]], [], [null] ])
+------------------------
+.Result
+------------------------
+[ 1, 2, 3, 4, 5, [6], null ]
+------------------------
+### `floor(double num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-floor[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#math[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.floor(0.22)
+------------------------
+.Result
+------------------------
+0
+------------------------
+### `groupBy(array arr, function(item,index))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-groupby[DataWeave Documentation]
+
+This function has a native xref:libraries.adoc#_groupbyarray_arr_string_keyname[DataSonnet version].
+
+*Example:*
+
+------------------------
+local input = [
+  { "name": "Foo", "language": "Java" },
+  { "name": "Bar", "language": "Scala" },
+  { "name": "FooBar", "language": "Java"}
+];
+
+DW.Core.groupBy(input, function(it,idx) it.language)
+------------------------
+.Result
+------------------------
+{
+  "Java":[
+    {"name":"Foo","language":"Java"},
+    {"name":"FooBar","language":"Java"}
+  ],
+  "Scala":[
+    {"name":"Bar","language":"Scala"}
+  ]
+}
+------------------------
+### `isBlank(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-isblank[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+[DW.Core.isBlank(""),DW.Core.isBlank("    "), DW.Core.isBlank(null)]
+------------------------
+.Result
+------------------------
+[true,true,true]
+------------------------
+### `isDecimal(double num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-isdecimal[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.isDecimal(0.22)
+------------------------
+.Result
+------------------------
+true
+------------------------
+### `isEmpty(any value)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-isempty[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+[DW.Core.isEmpty(""),
+DW.Core.isEmpty({}),
+DW.Core.isEmpty([]),
+DW.Core.isEmpty(null)]
+------------------------
+.Result
+------------------------
+[true,true,true,true]
+------------------------
+### `isEven(double num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-iseven[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.isEven(50)
+------------------------
+.Result
+------------------------
+true
+------------------------
+### `isInteger(double num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-isinteger[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.isInteger(50)
+------------------------
+.Result
+------------------------
+true
+------------------------
+### `isLeapYear(string date)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-isleapyear[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.isLeapYear("2017-10-01T23:57:59")
+------------------------
+.Result
+------------------------
+false
+------------------------
+### `isOdd(double num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-isodd[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.isOdd(5)
+------------------------
+.Result
+------------------------
+true
+------------------------
+### `joinBy(array arr, string sep)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-joinby[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#join[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.joinBy([1,2,3,4], "-")
+------------------------
+.Result
+------------------------
+"1-2-3-4"
+------------------------
+### `keysOf(object obj)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-keysof[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#objectFields[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.keysOf({test: 1})
+------------------------
+.Result
+------------------------
+["test"]
+------------------------
+### `lower(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-lower[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#asciiLower[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.lower("Hello World!")
+------------------------
+.Result
+------------------------
+"hello world!"
+------------------------
+### `map(array arr, function(item,index))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-map[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#map[Sjsonnet version]: map and
+ https://jsonnet.org/ref/stdlib.html#mapWithIndex[mapWithIndex].
+
+*Example:*
+
+------------------------
+DW.Core.map(['a','b','c'], function(value,index) value+'_'+index
+------------------------
+.Result
+------------------------
+["a_0", "b_1", "c_2"]
+------------------------
+### `mapObject(object obj, function(value,key,index))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-mapobject[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#mapWithKey[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.mapObject({"a":"b","c":"d"}, function(v,k,i) {[v]:{ [k]: i}})
+------------------------
+.Result
+------------------------
+{"b":{"a":0},"d":{"c":1}}
+------------------------
+### `match(string str, string regex)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-match[DataWeave Documentation]
+
+Differences: DataWeave uses a set of `/` to denote the start and end of a regex expression
+but this implementation just uses a string
+
+This function has a native xref:libraries.adoc#_regexpartialmatchstring_pattern_string_input[DataSonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.match("m2@mulesoft.com", "([a-z]*)@([a-z]*).com")
+------------------------
+.Result
+------------------------
+["me@mulesoft.com","me","mulesoft"]
+------------------------
+### `matches(string str, string regex)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-matches[DataWeave Documentation]
+
+Differences: DataWeave uses a set of `/` to denote the start and end of a regex expression
+but this implementation just uses a string
+
+*Example:*
+
+------------------------
+DW.Core.matches("admin123", "a.*\\d+")
+------------------------
+.Result
+------------------------
+true
+------------------------
+### `max(array arr)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-max[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+[
+  DW.Core.max([false,true,false]),
+  DW.Core.max(["a", "b" , "c"]),
+  DW.Core.max([5,1,88,3])
+]
+------------------------
+.Result
+------------------------
+[true, "c", 88]
+------------------------
+### `maxBy(array arr, function(item))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-maxby[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+[
+  DW.Core.maxBy([false,true,false],function(i) i),
+  DW.Core.maxBy(["a", "b" , "c"],function(i) i),
+  DW.Core.maxBy([5,1,88,3],function(i) i)
+]
+------------------------
+.Result
+------------------------
+[true, "c", 88]
+------------------------
+### `min(array arr)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-min[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+[
+  DW.Core.min([false,true,false]),
+  DW.Core.min(["a", "b" , "c"]),
+  DW.Core.min([5,1,88,3])
+]
+------------------------
+.Result
+------------------------
+[false, "a", 1]
+------------------------
+### `minBy(array arr, function(item))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-minby[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+[
+  DW.Core.minBy([false,true,false],function(i) i),
+  DW.Core.minBy(["a", "b" , "c"],function(i) i),
+  DW.Core.minBy([5,1,88,3],function(i) i)
+]
+------------------------
+.Result
+------------------------
+[false, "a", 1]
+------------------------
+### `mod(double num1, double num2)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-mod[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#math[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.mod(2,2)
+------------------------
+.Result
+------------------------
+0
+------------------------
+### `namesOf(object obj)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-namesof[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.namesOf({ "a" : true, "b" : 1})
+------------------------
+.Result
+------------------------
+["a", "b"]
+------------------------
+### `now()`
+
+*Not Implemented*
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-now[DataWeave Documentation]
+
+This function has a native xref:libraries.adoc#_now[DataSonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.now()
+------------------------
+.Result
+------------------------
+"2020-07-02T18:50:55.298Z"
+------------------------
+### `orderBy(in, function)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-orderby[DataWeave Documentation]
+
+#### `orderBy(object obj, function(value,key))`
+
+*Example:*
+
+------------------------
+DW.Core.orderBy({a:3,b:2,c:1}, function(v,k) v)
+------------------------
+.Result
+------------------------
+{
+  "c": 1,
+  "b": 2,
+  "a": 3
+}
+------------------------
+
+#### `orderBy(array arr, function(item,index))`
+
+*Example:*
+
+------------------------
+DW.Core.orderBy([0,5,1,3,2,1], function(it,ind) it)
+------------------------
+.Result
+------------------------
+[0,1,1,2,3,5]
+------------------------
+
+### `pluck(object obj, function(value,key,index))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-pluck[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.pluck({"a":"b","c":"d"}, function(v,k,ind) ind)
+------------------------
+.Result
+------------------------
+[0,1]
+------------------------
+### `pow(double num1, double num2)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-pow[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#math[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.pow(5,2)
+------------------------
+.Result
+------------------------
+25
+------------------------
+### `random()`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-random[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.random
+------------------------
+.Result
+------------------------
+0.7
+------------------------
+### `randomInt(double num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-randomInt[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.randomInt(10)
+------------------------
+.Result
+------------------------
+5
+------------------------
+### `read(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-read[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.read("") //error
+------------------------
+.Result
+------------------------
+""
+------------------------
+### `readUrl(string str, string type)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-readurl[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.readUrl("http://httpbin.org/get?test=true").args
+------------------------
+.Result
+------------------------
+{
+  "test": "true"
+}
+------------------------
+### `reduce(array arr, function(item,accumulator), any initial)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-reduce[DataWeave Documentation]
+
+Differences: initial value must be specified
+
+*Example:*
+
+------------------------
+DW.Core.reduce([2.3], function(it,acc) it+acc, 0)
+------------------------
+.Result
+------------------------
+5
+------------------------
+### `replace(string str, string regex, string replacement)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-replace[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.replace("123-456-7890", ".*-", "")
+------------------------
+.Result
+------------------------
+"7890"
+------------------------
+### `round(double num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-round[DataWeave Documentation]
+
+This function has a native xref:libraries.adoc#_rounddouble_num_int_precision[DataSonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.round(0.22)
+------------------------
+.Result
+------------------------
+0
+------------------------
+### `scan(string str, string regex)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-scan[DataWeave Documentation]
+
+This function has a native xref:libraries.adoc#_regexscanstring_pattern_string_input[DataSonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.scan("anypt@mulesoft.com,max@mulesoft.com", "([a-z]*)@([a-z]*).com")
+------------------------
+.Result
+------------------------
+[
+  ["anypt@mulesoft.com","anypt","mulesoft"],
+  ["max@mulesoft.com","max","mulesoft"]
+]
+------------------------
+### `sizeOf(any in)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-sizeof[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#length[Sjsonnet version].
+
+*Example:*
+
+------------------------
+{
+  str: DW.Core.sizeOf("Hello World!"),
+  array: DW.Core.sizeOf([1,2]),
+  obj: DW.Core.sizeOf({a: 1})
+}
+------------------------
+.Result
+------------------------
+{
+  "str": 12,
+  "array": 2,
+  "obj": 1
+}
+------------------------
+### `splitBy(string str, string regex)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-splitby[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#split[Sjsonnet version].
+
+*Example:*
+
+------------------------
+{
+  str: DW.Core.splitBy("a-b-c-d","-"),
+  regex: DW.Core.splitBy("a-b-c-d","[b]")
+}
+------------------------
+.Result
+------------------------
+{
+  "str": ["a", "b", "c"],
+  "regex": ["a-", "-c"]
+}
+------------------------
+### `sqrt(double num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-sqrt[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#math[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.sqrt(4)
+------------------------
+.Result
+------------------------
+2
+------------------------
+### `startsWith(string str, string sub)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-startswith[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#startsWith[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.startsWith("Hello World!", "Hell")
+------------------------
+.Result
+------------------------
+true
+------------------------
+### `sum(srray arr)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-sum[DataWeave Documentation]
+
+This function has a native xref:libraries.adoc#_sumarray_arr[DataSonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.sum([2,7,4,8,3,2,2])
+------------------------
+.Result
+------------------------
+28
+------------------------
+### `to(double start, double end)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-to[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#range[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.to(0,3)
+------------------------
+.Result
+------------------------
+[0,1,2,3]
+------------------------
+### `trim(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-trim[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.trim("   Hello   World   ")
+------------------------
+.Result
+------------------------
+"Hello   World"
+------------------------
+### `typeOf(any value)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-typeof[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#type[Sjsonnet version].
+
+*Example:*
+
+------------------------
+{
+  string: DW.Core.typeOf(""),
+  "null": DW.Core.typeOf(null),
+  bool: DW.Core.typeOf(true),
+  object: DW.Core.typeOf({}),
+  array: DW.Core.typeOf([])
+}
+------------------------
+.Result
+------------------------
+{
+  "string": "string",
+  "null": "null",
+  "bool": "boolean",
+  "object": "object",
+  "array": "array"
+}
+------------------------
+### `unzip(array arr)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-unzip[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.unzip([[0,"a"],[1,"b"],[2,"c"],[ 3,"d"]])
+------------------------
+.Result
+------------------------
+[[0,1,2,3],["a","b","c","d"]]
+------------------------
+### `upper(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-upper[DataWeave Documentation]
+
+This function has a native https://jsonnet.org/ref/stdlib.html#asciiUpper[Sjsonnet version].
+
+*Example:*
+
+------------------------
+DW.Core.upper("Hello World!")
+------------------------
+.Result
+------------------------
+"HELLO WORLD!"
+------------------------
+### `uuid()`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-uuid[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.uuid
+------------------------
+.Result
+------------------------
+"7cc64d24-f2ad-4d43-8893-fa24a0789a99"
+------------------------
+### `valuesOf(object obj)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-valuesof[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.valuesOf({a: true, b: 1})
+------------------------
+.Result
+------------------------
+[true,1]
+------------------------
+### `zip(array arr1, array arr2)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-core-functions-zip[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Core.zip([0,1], ["a","b"])
+------------------------
+.Result
+------------------------
+[ [0,"a"], [1,"b"] ]
+------------------------
+## Crypto
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-crypto[DataWeave Documentation]
+
+This library has a native xref:libraries.adoc#_crypto[DataSonnet version].
+
+### `HMACBinary(string secret, string content, string algorithm)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-crypto-functions-hmacbinary[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Crypto.HMACBinary("key_re_loca", "xxxx")
+------------------------
+.Result
+------------------------
+".-\ufffd\ufffd\u0012\ufffdۊ\ufffd\ufffd\u0000\ufffd\u0012\u0018R\ufffd\ufffd=\ufffd*"
+------------------------
+### `HMACWith(string secret, string content, string algorithm)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-crypto-functions-hmacwith[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Crypto.HMACWith("secret_key", "Some Value to Hash", "HmacSHA256")
+------------------------
+.Result
+------------------------
+"b51b4fe8c4e37304605753272b5b4321f9644a9b09cb1179d7016c25041d1747"
+------------------------
+### `MD5(string content)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-crypto-functions-md5[DataWeave Documentation]
+
+This function has a native xref:libraries.adoc#hashstring-value-string-algorithm[DataSonnet version].
+
+*Example:*
+
+------------------------
+DW.Crypto.MD5("asd")
+------------------------
+.Result
+------------------------
+"7815696ecbf1c96e6894b779456d330e"
+------------------------
+### `SHA1(string content)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-crypto-functions-sha1[DataWeave Documentation]
+
+This function has a native xref:libraries.adoc#hashstring-value-string-algorithm[DataSonnet version].
+
+*Example:*
+
+------------------------
+DW.Crypto.SHA1("dsasd")
+------------------------
+.Result
+------------------------
+"2fa183839c954e6366c206367c9be5864e4f4a65"
+------------------------
+### `hashWith(string content, string algorithm)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-crypto-functions-hashwith[DataWeave Documentation]
+
+This function has a native xref:libraries.adoc#hashstring-value-string-algorithm[DataSonnet version].
+
+*Example:*
+
+------------------------
+DW.Crypto.hashWith("hello", "MD2")
+------------------------
+.Result
+------------------------
+"\ufffd\u0004ls\ufffd\u00031\ufffdh\ufffd}8\u0004\ufffd\u0006U"
+------------------------
+## Arrays
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays[DataWeave Documentation]
+
+### `countBy(array arr, function(item))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-countby[DataWeave Documentation]
+
+This function has a native xref:libraries.adoc#_countsarray_arr_function_keyfid[DataSonnet version].
+
+*Example:*
+
+------------------------
+DW.Arrays.countBy([1, 2, 3, 4], function(it) (it % 2) == 0)
+------------------------
+.Result
+------------------------
+2
+------------------------
+### `divideBy(array arr, int size)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-divideby[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "divideBy" : [
+      { "divideBy2" : DW.Arrays.divideBy([1, 2, 3, 4, 5],2) },
+      { "divideBy2" : DW.Arrays.divideBy([1, 2, 3, 4, 5, 6],2) },
+      { "divideBy3" : DW.Arrays.divideBy([1, 2, 3, 4, 5],3) }
+  ]
+}
+------------------------
+.Result
+------------------------
+{
+ "divideBy": [
+  {
+    "divideBy2": [
+      [ 1, 2 ],
+      [ 3, 4 ],
+      [ 5 ]
+    ]
+  },
+  {
+    "divideBy2": [
+      [ 1, 2 ],
+      [ 3, 4 ],
+      [ 5, 6 ]
+    ]
+  },
+    {
+      "divideBy3": [
+        [ 1, 2, 3 ],
+        [ 4, 5 ]
+      ]
+    }
+ ]
+}
+------------------------
+### `drop(array arr, int index)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-drop[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local users=["Marcus", "Jake", "Julian"];
+DW.Arrays.drop(users, 2)
+------------------------
+.Result
+------------------------
+[
+  "Julian"
+]
+------------------------
+### `dropWhile(array arr, function(item))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-dropwhile[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local arr=[1,2,3,2,1];
+dropWhile(arr, function(it) it < 3)
+------------------------
+.Result
+------------------------
+[3,2,1]
+------------------------
+### `every(array arr, function(item))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-every[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{ "results" : [
+    DW.Arrays.every([1,1,1], function(it) it == 1),
+    DW.Arrays.every([1,2,1], function(it) it == 1)
+   ]
+}
+------------------------
+.Result
+------------------------
+{
+   "results": [true, false]
+}
+------------------------
+### `firstWith(array arr, function(item,index))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-firstwith[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local users = [{name: "Mariano", lastName: "Achaval"}, {name: "Ana", lastName: "Felisatti"}, {name: "Mariano", lastName: "de Sousa"}];
+{
+  a: DW.Arrays.firstWith(users, function(user, index) user.name == "Mariano"),
+  b: DW.Arrays.firstWith(users, function(user, index) user.name == "Peter")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": {
+    "name": "Mariano",
+    "lastName": "Achaval"
+  },
+  "b": null
+}
+------------------------
+### `indexOf(array arr, any value)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-indexof[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local users = ["Mariano", "Leandro", "Julian"];
+DW.Arrays.indexOf(users, "Julian")
+------------------------
+.Result
+------------------------
+2
+------------------------
+### `indexWhere(array arr, function(item))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-indexwhere[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local users = ["Mariano", "Leandro", "Julian"];
+DW.Arrays.indexWhere(users, function(item) DW.Core.startsWith(item,"Jul"))
+------------------------
+.Result
+------------------------
+2
+------------------------
+### `join(array arr1, array arr2, function(item1), function(item2))`
+
+*Not Implemented*
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-join[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local users = [{id: "1", name:"Mariano"},{id: "2", name:"Leandro"},{id: "3", name:"Julian"},{id: "5", name:"Julian"}];
+local products = [{ownerId: "1", name:"DataWeave"},{ownerId: "1", name:"BAT"}, {ownerId: "3", name:"DataSense"}, {ownerId: "4", name:"SmartConnectors"}];
+DW.Arrays.join(users, products, function(user) user.id, function(product) product.ownerId)
+------------------------
+.Result
+------------------------
+[
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "DataWeave"
+    }
+  },
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "BAT"
+    }
+  },
+  {
+    "l": {
+      "id": "3",
+      "name": "Julian"
+    },
+    "r": {
+      "ownerId": "3",
+      "name": "DataSense"
+    }
+  }
+]
+------------------------
+### `leftJoin(array arr1, array arr2, function(item1), function(item2))`
+
+*Not Implemented*
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-leftjoin[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local users = [{id: "1", name:"Mariano"},{id: "2", name:"Leandro"},{id: "3", name:"Julian"},{id: "5", name:"Julian"}];
+local products = [{ownerId: "1", name:"DataWeave"},{ownerId: "1", name:"BAT"}, {ownerId: "3", name:"DataSense"}, {ownerId: "4", name:"SmartConnectors"}];
+DW.Arrays.leftJoin(users, products, function(user) user.id, function(product) product.ownerId)
+------------------------
+.Result
+------------------------
+[
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "DataWeave"
+    }
+  },
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "BAT"
+    }
+  },
+  {
+    "l": {
+      "id": "2",
+      "name": "Leandro"
+    }
+  },
+  {
+    "l": {
+      "id": "3",
+      "name": "Julian"
+    },
+    "r": {
+      "ownerId": "3",
+      "name": "DataSense"
+    }
+  },
+  {
+    "l": {
+      "id": "5",
+      "name": "Julian"
+    }
+  }
+]
+------------------------
+### `outerJoin(array arr1, array arr2, function(item1), function(item2))`
+
+*Not Implemented*
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-outerjoin[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local users = [{id: "1", name:"Mariano"},{id: "2", name:"Leandro"},{id: "3", name:"Julian"},{id: "5", name:"Julian"}];
+local products = [{ownerId: "1", name:"DataWeave"},{ownerId: "1", name:"BAT"}, {ownerId: "3", name:"DataSense"}, {ownerId: "4", name:"SmartConnectors"}];
+outerJoin(users, products, (user) -> user.id, (product) -> product.ownerId)
+------------------------
+.Result
+------------------------
+[
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "DataWeave"
+    }
+  },
+  {
+    "l": {
+      "id": "1",
+      "name": "Mariano"
+    },
+    "r": {
+      "ownerId": "1",
+      "name": "BAT"
+    }
+  },
+  {
+    "l": {
+      "id": "2",
+      "name": "Leandro"
+    }
+  },
+  {
+    "l": {
+      "id": "3",
+      "name": "Julian"
+    },
+    "r": {
+      "ownerId": "3",
+      "name": "DataSense"
+    }
+  },
+  {
+    "l": {
+      "id": "5",
+      "name": "Julian"
+    }
+  },
+  {
+    "r": {
+      "ownerId": "4",
+      "name": "SmartConnectors"
+    }
+  }
+]
+------------------------
+### `partition(array arr, function(item))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-partition[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local arr = [0,1,2,3,4,5];
+DW.Arrays.partition(arr, function(item) (item % 2) == 0)
+------------------------
+.Result
+------------------------
+{
+  "success": [
+    0,
+    2,
+    4
+  ],
+  "failure": [
+    1,
+    3,
+    5
+  ]
+}
+------------------------
+### `slice(array arr, int start, int end)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-slice[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local arr = [0,1,2,3,4,5];
+DW.Arrays.slice(arr, 1, 4)
+------------------------
+.Result
+------------------------
+[1,2,3]
+------------------------
+### `some(array arr, function(item))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-some[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+ { "results" : [
+      DW.Arrays.some([1,2,3], function(it) (it % 2) == 0),
+      DW.Arrays.some([1,2,3], function(it) it == 100)
+   ]
+}
+------------------------
+.Result
+------------------------
+{
+   "results": [true,false]
+}
+------------------------
+### `splitAt(array arr, int index)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-splitat[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local users = ["Mariano", "Leandro", "Julian"];
+DW.Arrays.splitAt(users,1)
+------------------------
+.Result
+------------------------
+{
+  "l": [
+    "Mariano"
+  ],
+  "r": [
+    "Leandro",
+    "Julian"
+  ]
+}
+------------------------
+### `splitWhere(array arr, function(item))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-splitwhere[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local users = ["Mariano", "Leandro", "Julian", "Tomo"];
+DW.Arrays.splitWhere(users, function(item) item DW.Core.startsWith("Jul"))
+------------------------
+.Result
+------------------------
+{
+  "l": [
+    "Mariano",
+    "Leandro"
+  ],
+  "r": [
+    "Julian",
+    "Tomo"
+  ]
+}
+------------------------
+### `sumBy(array arr, function(item))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-sumby[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Arrays.sumBy([ { a: 1 }, { a: 2 }, { a: 3 } ], function(item) item.a)
+------------------------
+.Result
+------------------------
+6
+------------------------
+### `take(array arr, int index)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-take[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local users = ["Mariano", "Leandro", "Julian"];
+DW.Arrays.take(users, 2)
+------------------------
+.Result
+------------------------
+["Mariano","Leandro"]
+------------------------
+### `takeWhile(array arr, function(item))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-arrays-functions-takewhile[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local arr = [0,1,2,1];
+DW.Arrays.takeWhile(arr, function(item) item <= 1)
+------------------------
+.Result
+------------------------
+[0,1]
+------------------------
+## Binaries
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-binaries[DataWeave Documentation]
+
+Differences: Because DataSonnet is built differently, this library does not transfer
+well and is still being worked on
+
+### `fromBase64(string base64)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-binaries-functions-frombase64[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Binaries.fromBase64("SGVsbG9Xb3JsZA==")
+------------------------
+.Result
+------------------------
+"HelloWorld"
+------------------------
+### `fromHex(string hex)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-binaries-functions-fromhex[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Binaries.fromHex("48656C6C6F576F726C64")
+------------------------
+.Result
+------------------------
+"HelloWorld"
+------------------------
+### `readLinesWith(string binary, string encoding)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-binaries-functions-readlineswith[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Binaries.readLinesWith("Line1\nLine2\n","UTF-8")
+------------------------
+.Result
+------------------------
+[
+  "Line1",
+  "Line2"
+]
+------------------------
+### `toBase64(string binary)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-binaries-functions-tobase64[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Binaries.toBase64("HelloWorld")
+------------------------
+.Result
+------------------------
+"SGVsbG9Xb3JsZA=="
+------------------------
+### `toHex(string binary)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-binaries-functions-toHex[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Binaries.toHex("HelloWorld")
+------------------------
+.Result
+------------------------
+"48656C6C6F576F726C64"
+------------------------
+### `writeLinesWith(array arr, string encoding): Binary`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-binaries-functions-writelineswith[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Binaries.writeLinesWith(["Line1", "Line2"],"UTF-8")
+------------------------
+.Result
+------------------------
+"Line1\nLine2\n"
+------------------------
+## Numbers
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-numbers[DataWeave Documentation]
+
+### `fromBinary(string value)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-numbers-functions-frombinary[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+    a: fromBinary("-10"),
+    b: fromBinary("11111000111010111010110100101011100001001110000011010101100010111101001011100000100010011000011101100101101001111101111010110010010100110010100100000000000000000000000000000000000000000000000000000000000000"),
+    c: fromBinary(0),
+    d: fromBinary(null),
+    e: fromBinary("100"),
+}
+------------------------
+.Result
+------------------------
+{
+  "a": -2,
+  "b": 100000000000000000000000000000000000000000000000000000000000000,
+  "c": 0,
+  "d": null,
+  "e": 4
+}
+------------------------
+### `fromHex(string value)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-numbers-functions-fromhex[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+    a: fromHex("-1"),
+    b: fromHex("3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000"),
+    c: fromHex(0),
+    d: fromHex(null),
+    e: fromHex("f"),
+}
+------------------------
+.Result
+------------------------
+{
+  "a": -1,
+  "b": 100000000000000000000000000000000000000000000000000000000000000,
+  "c": 0,
+  "d": null,
+  "e": 15
+}
+------------------------
+### `fromRadixNumber(string value, int base)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-numbers-functions-fromradixnumber[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+    a: fromRadixNumber("10", 2),
+    b: fromRadixNumber("FF", 16)
+}
+------------------------
+.Result
+------------------------
+{
+  "a": 2,
+  "b": 255
+}
+------------------------
+### `toBinary(int num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-numbers-functions-tobinary[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+    a: toBinary(-2),
+    b: toBinary(100000000000000000000000000000000000000000000000000000000000000),
+    c: toBinary(0),
+    d: toBinary(null),
+    e: toBinary(2),
+}
+------------------------
+.Result
+------------------------
+{
+  "a": "-10",
+  "b": "11111000111010111010110100101011100001001110000011010101100010111101001011100000100010011000011101100101101001111101111010110010010100110010100100000000000000000000000000000000000000000000000000000000000000",
+  "c": "0",
+  "d": null,
+  "e": "10"
+}
+------------------------
+### `toHex(int num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-numbers-functions-tohex[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+    a: toHex(-1),
+    b: toHex(100000000000000000000000000000000000000000000000000000000000000),
+    c: toHex(0),
+    d: toHex(null),
+    e: toHex(15),
+}
+------------------------
+.Result
+------------------------
+{
+  "a": "-1",
+  "b": "3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000",
+  "c": "0",
+  "d": null,
+  "e": "f"
+}
+------------------------
+### `toRadixNumber(int num, int base): String`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-numbers-functions-toradixnumber[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+    a: toRadixNumber(2, 2),
+    b: toRadixNumber(255, 16)
+}
+------------------------
+.Result
+------------------------
+{
+  "a": "10",
+  "b": "ff"
+}
+------------------------
+## Objects
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-objects[DataWeave Documentation]
+
+### `divideBy(object obj, int size): Array`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-objects-functions-divideby[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{ "divideBy" : DW.Objects.divideBy({"a": 1, "b" : true, "a" : 2, "b" : false, "c" : 3}, 2) }
+------------------------
+.Result
+------------------------
+{
+  "divideBy": [
+    {
+      "a": 1,
+      "b": true
+    },
+    {
+      "a": 2,
+      "b": false
+    },
+    {
+      "c": 3
+    }
+  ]
+}
+------------------------
+### `entrySet(object obj)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-objects-functions-entryset[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{ "entrySet" : DW.Objects.entrySet({"a":1,"b":2}) }
+------------------------
+.Result
+------------------------
+{
+  "entrySet": [
+    {
+      "key": "a",
+      "value": 1,
+      "attributes": {
+
+      }
+    },
+    {
+      "key": "b",
+      "value": 2,
+      "attributes": {
+
+      }
+    }
+  ]
+}
+------------------------
+### `everyEntry(object obj, function(value,key))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-objects-functions-everyentry[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+    a: DW.Objects.everyEntry({},function(value, key)std.isString(value)),
+    b: DW.Objects.everyEntry({a: "", b: "123"}, function(value, key) std.isString(value)),
+    c: DW.Objects.everyEntry({a: "", b: 123},function(value, key) std.isString(value)),
+    d: DW.Objects.everyEntry({a: "", b: 123},function(value, key) key == "a"),
+    e: DW.Objects.everyEntry({a: ""}, function(value, key) key == "b"),
+    f: DW.Objects.everyEntry(null, function(value, key) key == "a")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": true,
+  "b": true,
+  "c": false,
+  "d": false,
+  "e": true,
+  "f": true
+}
+------------------------
+### `keySet(object obj)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-objects-functions-keyset[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{ "keySet" : DW.Objects.keySet({ "a" : true, "b" : 1}) }
+------------------------
+.Result
+------------------------
+{ "keySet" : ["a","b"] }
+------------------------
+### `mergeWith(object obj1, object obj2)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-objects-functions-mergewith[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+DW.Objects.mergeWith({ "a" : true, "b" : 1},{ "a" : false, "c" : "Test"})
+------------------------
+.Result
+------------------------
+{
+    "b": 1,
+    "a": false,
+    "c": "Test"
+}
+------------------------
+### `nameSet(object obj)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-objects-functions-nameset[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{ "nameSet" : DW.Objects.nameSet({ "a" : true, "b" : 1}) }
+------------------------
+.Result
+------------------------
+{ "nameSet" : ["a","b"] }
+------------------------
+### `someEntry(object obj, function(value,key))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-objects-functions-someentry[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+    a: DW.Objects.someEntry({},function(value, key)std.isString(value)),
+    b: DW.Objects.someEntry({a: "", b: "123"}, function(value, key) std.isString(value)),
+    c: DW.Objects.someEntry({a: "", b: 123},function(value, key) std.isString(value)),
+    d: DW.Objects.someEntry({a: "", b: 123},function(value, key) key == "a"),
+    e: DW.Objects.someEntry({a: ""}, function(value, key) key == "b"),
+    f: DW.Objects.someEntry(null, function(value, key) key == "a")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": true,
+  "e": false,
+  "f": false
+}
+------------------------
+### `takeWhile(object obj, function(value,key))`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-objects-functions-takewhile[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+local obj = {
+  "a": 1,
+  "b": 2,
+  "c": 5,
+  "d": 1
+};
+DW.Objects.takeWhile(obj, function(value,key) value < 3)
+------------------------
+.Result
+------------------------
+{
+  "a": 1,
+  "b": 2
+}
+------------------------
+### `valueSet(object obj)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-objects-functions-valueset[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{ "valueSet" : DW.Objects.valueSet({a: true, b: 1}) }
+------------------------
+.Result
+------------------------
+{ "valueSet" : [true,1] }
+------------------------
+## Strings
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings[DataWeave Documentation]
+
+### `appendIfMissing(string main, string sub)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-appendifmissing[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.appendIfMissing(null, ""),
+  "b": DW.Strings.appendIfMissing("abc", ""),
+  "c": DW.Strings.appendIfMissing("", "xyz") ,
+  "d": DW.Strings.appendIfMissing("abc", "xyz") ,
+  "e": DW.Strings.appendIfMissing("abcxyz", "xyz")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "abcxyz",
+  "e": "abcxyz"
+}
+------------------------
+### `camelize(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-camelize[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a" : DW.Strings.camelize("customer_first_name"),
+  "b" : DW.Strings.camelize("_name_starts_with_underscore")
+}
+------------------------
+.Result
+------------------------
+{
+   "a": "customerFirstName",
+   "b": "nameStartsWithUnderscore"
+}
+------------------------
+### `capitalize(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-capitalize[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a" : DW.Strings.capitalize("customer"),
+  "b" : DW.Strings.capitalize("customer_first_name"),
+  "c" : DW.Strings.capitalize("customer NAME"),
+  "d" : DW.Strings.capitalize("customerName")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": "Customer",
+  "b": "Customer First Name",
+  "c": "Customer Name",
+  "d": "Customer Name"
+}
+------------------------
+### `charCode(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-charcode[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "charCode" : DW.Strings.charCode("Mule")
+}
+------------------------
+.Result
+------------------------
+{ "charCode" : 77 }
+------------------------
+### `charCodeAt(string str, int index)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-charcodeat[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "charCodeAt" : DW.Strings.charCodeAt("MuleSoft", 1)
+}
+------------------------
+.Result
+------------------------
+{ "charCodeAt": 117 }
+------------------------
+### `dasherize(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-dasherize[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a" : DW.Strings.dasherize("customer"),
+  "b" : DW.Strings.dasherize("customer_first_name"),
+  "c" : DW.Strings.dasherize("customer NAME"),
+  "d" : DW.Strings.dasherize("customerName")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": "customer",
+  "b": "customer-first-name",
+  "c": "customer-name",
+  "d": "customer-name"
+}
+------------------------
+### `fromCharCode(int num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-fromcharcode[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "fromCharCode" : DW.Strings.fromCharCode(117)
+}
+------------------------
+.Result
+------------------------
+{ "fromCharCode": "u" }
+------------------------
+### `isAlpha(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-isalpha[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.isAlpha(null),
+  "b": DW.Strings.isAlpha(""),
+  "c": DW.Strings.isAlpha("  "),
+  "d": DW.Strings.isAlpha("abc"),
+  "e": DW.Strings.isAlpha("ab2c"),
+  "f": DW.Strings.isAlpha("ab-c")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false
+}
+------------------------
+### `isAlphanumeric(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-isalphanumeric[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.isAlphanumeric(null),
+  "b": DW.Strings.isAlphanumeric(""),
+  "c": DW.Strings.isAlphanumeric("  "),
+  "d": DW.Strings.isAlphanumeric("abc"),
+  "e": DW.Strings.isAlphanumeric("ab c"),
+  "f": DW.Strings.isAlphanumeric("ab2c"),
+  "g": DW.Strings.isAlphanumeric("ab-c")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": true,
+  "g": false
+}
+------------------------
+### `isLowerCase(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-islowercase[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.isLowerCase(null),
+  "b": DW.Strings.isLowerCase(""),
+  "c": DW.Strings.isLowerCase("  "),
+  "d": DW.Strings.isLowerCase("abc"),
+  "e": DW.Strings.isLowerCase("aBC"),
+  "f": DW.Strings.isLowerCase("a c"),
+  "g": DW.Strings.isLowerCase("a1c"),
+  "h": DW.Strings.isLowerCase("a/c")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false
+}
+------------------------
+### `isNumeric(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-isnumeric[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.isNumeric(null),
+  "b": DW.Strings.isNumeric(""),
+  "c": DW.Strings.isNumeric("  "),
+  "d": DW.Strings.isNumeric("123"),
+  "e": DW.Strings.isNumeric("१२३"),
+  "f": DW.Strings.isNumeric("12 3"),
+  "g": DW.Strings.isNumeric("ab2c"),
+  "h": DW.Strings.isNumeric("12-3"),
+  "i": DW.Strings.isNumeric("12.3"),
+  "j": DW.Strings.isNumeric("-123"),
+  "k": DW.Strings.isNumeric("+123")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": true,
+  "f": false,
+  "g": false,
+  "h": false,
+  "i": false,
+  "j": false,
+  "k": false
+}
+------------------------
+### `isUpperCase(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-isuppercase[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.isUpperCase(null),
+  "b": DW.Strings.isUpperCase(""),
+  "c": DW.Strings.isUpperCase("  "),
+  "d": DW.Strings.isUpperCase("ABC"),
+  "e": DW.Strings.isUpperCase("aBC"),
+  "f": DW.Strings.isUpperCase("A C"),
+  "g": DW.Strings.isUpperCase("A1C"),
+  "h": DW.Strings.isUpperCase("A/C")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": false,
+  "b": false,
+  "c": false,
+  "d": true,
+  "e": false,
+  "f": false,
+  "g": false,
+  "h": false
+}
+------------------------
+### `isWhitespace(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-iswhitespace[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.isWhitespace(null),
+  "b": DW.Strings.isWhitespace(""),
+  "c": DW.Strings.isWhitespace("  "),
+  "d": DW.Strings.isWhitespace("abc"),
+  "e": DW.Strings.isWhitespace("ab2c"),
+  "f": DW.Strings.isWhitespace("ab-c")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": false,
+  "b": true,
+  "c": true,
+  "d": false,
+  "e": false,
+  "f": false
+}
+------------------------
+### `leftPad(string str, int size): String`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-leftpad[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+   "a": DW.Strings.leftPad(null, 3),
+   "b": DW.Strings.leftPad("", 3),
+   "c": DW.Strings.leftPad("bat", 5),
+   "d": DW.Strings.leftPad("bat", 3),
+   "e": DW.Strings.leftPad("bat", -1)
+}
+------------------------
+.Result
+------------------------
+{
+  "a": null,
+  "b": "   ",
+  "c": "  bat",
+  "d": "bat",
+  "e": "bat"
+}
+------------------------
+### `ordinalize(int num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-ordinalize[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.ordinalize(1),
+  "b": DW.Strings.ordinalize(2),
+  "c": DW.Strings.ordinalize(5),
+  "d": DW.Strings.ordinalize(103)
+}
+------------------------
+.Result
+------------------------
+{
+   "a": "1st",
+   "b": "2nd",
+   "c": "5th",
+   "d": "103rd"
+}
+------------------------
+### `pluralize(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-pluralize[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{ "pluralize" : DW.Strings.pluralize("box") }
+------------------------
+.Result
+------------------------
+{ "pluralize" : "boxes" }
+------------------------
+### `prependIfMissing(string main, string sub)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-prependifmissing[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.prependIfMissing(null, ""),
+  "b": DW.Strings.prependIfMissing("abc", ""),
+  "c": DW.Strings.prependIfMissing("", "xyz"),
+  "d": DW.Strings.prependIfMissing("abc", "xyz"),
+  "e": DW.Strings.prependIfMissing("xyzabc", "xyz")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": null,
+  "b": "abc",
+  "c": "xyz",
+  "d": "xyzabc",
+  "e": "xyzabc"
+}
+------------------------
+### `repeat(string str, int num)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-repeat[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.repeat("e", 0),
+  "b": DW.Strings.repeat("e", 3),
+  "c": DW.Strings.repeat("e", -2)
+}
+------------------------
+.Result
+------------------------
+{
+  "a": "",
+  "b": "eee",
+  "c": ""
+}
+------------------------
+### `rightPad(string str, int size)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-rightpad[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.rightPad(null, 3),
+  "b": DW.Strings.rightPad("", 3),
+  "c": DW.Strings.rightPad("bat", 5),
+  "d": DW.Strings.rightPad("bat", 3),
+  "e": DW.Strings.rightPad("bat", -1)
+}
+------------------------
+.Result
+------------------------
+{
+  "a": null,
+  "b": "   ",
+  "c": "bat  ",
+  "d": "bat",
+  "e": "bat"
+}
+------------------------
+### `singularize(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-singularize[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{ "singularize" : DW.Strings.singularize("boxes") }
+------------------------
+.Result
+------------------------
+{ "singularize" : "box" }
+------------------------
+### `substringAfter(string main, string separator)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-substringafter[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.substringAfter(null, "'"),
+  "b": DW.Strings.substringAfter("", "-"),
+  "c": DW.Strings.substringAfter("abc", "b"),
+  "d": DW.Strings.substringAfter("abcba", "b"),
+  "e": DW.Strings.substringAfter("abc", "d"),
+  "f": DW.Strings.substringAfter("abc", "")
+}
+------------------------
+.Result
+------------------------
+{
+
+  "a": null,
+  "b": "",
+  "c": "c",
+  "d": "cba",
+  "e": "",
+  "f": "bc"
+}
+------------------------
+### `substringAfterLast(string main, string separator)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-substringafterlast[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.substringAfterLast(null, "'"),
+  "b": DW.Strings.substringAfterLast("", "-"),
+  "c": DW.Strings.substringAfterLast("abc", "b"),
+  "d": DW.Strings.substringAfterLast("abcba", "b"),
+  "e": DW.Strings.substringAfterLast("abc", "d"),
+  "f": DW.Strings.substringAfterLast("abc", "")
+}
+------------------------
+.Result
+------------------------
+{
+ "a": null,
+ "b": "",
+ "c": "c",
+ "d": "a",
+ "e": "",
+ "f": null
+}
+------------------------
+### `substringBefore(string main, string separator)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-substringbefore[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.substringBefore(null, "'"),
+  "b": DW.Strings.substringBefore("", "-"),
+  "c": DW.Strings.substringBefore("abc", "b"),
+  "d": DW.Strings.substringBefore("abc", "c"),
+  "e": DW.Strings.substringBefore("abc", "d"),
+  "f": DW.Strings.substringBefore("abc", "")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "ab",
+  "e": "",
+  "f": ""
+}
+------------------------
+### `substringBeforeLast(string main, string separator)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-substringbeforelast[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.substringBeforeLast(null, "'"),
+  "b": DW.Strings.substringBeforeLast("", "-"),
+  "c": DW.Strings.substringBeforeLast("abc", "b"),
+  "d": DW.Strings.substringBeforeLast("abcba", "b"),
+  "e": DW.Strings.substringBeforeLast("abc", "d"),
+  "f": DW.Strings.substringBeforeLast("abc", "")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": null,
+  "b": "",
+  "c": "a",
+  "d": "abc",
+  "e": "",
+  "f": "ab"
+}
+------------------------
+### `underscore(string str)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-underscore[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+   "a" : DW.Strings.underscore("customer"),
+   "b" : DW.Strings.underscore("customer-first-name"),
+   "c" : DW.Strings.underscore("customer NAME"),
+   "d" : DW.Strings.underscore("customerName")
+}
+------------------------
+.Result
+------------------------
+{
+   "a": "customer",
+   "b": "customer_first_name",
+   "c": "customer_name",
+   "d": "customer_name"
+}
+------------------------
+### `unwrap(string main, string wrapper)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-unwrap[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.unwrap(null, ""),
+  "b": DW.Strings.unwrap(null, '\0'),
+  "c": DW.Strings.unwrap("'abc'", "'"),
+  "d": DW.Strings.unwrap("AABabcBAA", 'A'),
+  "e": DW.Strings.unwrap("A", '#'),
+  "f": DW.Strings.unwrap("#A", '#'),
+  "g": DW.Strings.unwrap("A#", '#')
+}
+------------------------
+.Result
+------------------------
+{
+  "a": null,
+  "b": null,
+  "c": "abc",
+  "d": "ABabcBA",
+  "e": "A",
+  "f": "A#",
+  "g": "#A"
+}
+------------------------
+### `withMaxSize(string str, int size)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-withmaxsize[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+   a: DW.Strings.withMaxSize("123",10),
+   b: DW.Strings.withMaxSize("123",3),
+   c: DW.Strings.withMaxSize("123",2),
+   d: DW.Strings.withMaxSize("",0),
+   e: DW.Strings.withMaxSize(null,23)
+}
+------------------------
+.Result
+------------------------
+{
+  "a": "123",
+  "b": "123",
+  "c": "12",
+  "d": "",
+  "e": null
+}
+------------------------
+### `wrapIfMissing(string main, string wrapper)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-wrapifmissing[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+   "a": DW.Strings.wrapIfMissing(null, "'"),
+   "b": DW.Strings.wrapIfMissing("", "'"),
+   "c": DW.Strings.wrapIfMissing("ab", "x"),
+   "d": DW.Strings.wrapIfMissing("'ab'", "'"),
+   "e": DW.Strings.wrapIfMissing("/", '/'),
+   "f": DW.Strings.wrapIfMissing("a/b/c", '/'),
+   "g": DW.Strings.wrapIfMissing("/a/b/c", '/'),
+   "h": DW.Strings.wrapIfMissing("a/b/c/", '/')
+}
+------------------------
+.Result
+------------------------
+{
+   "a": null,
+   "b": "'",
+   "c": "xabx",
+   "d": "'ab'",
+   "e": "/",
+   "f": "/a/b/c/",
+   "g": "/a/b/c/",
+   "h": "/a/b/c/"
+}
+------------------------
+### `wrapWith(string main, string wrapper)`
+
+https://docs.mulesoft.com/mule-runtime/4.3/dw-strings-functions-wrapwith[DataWeave Documentation]
+
+*Example:*
+
+------------------------
+{
+  "a": DW.Strings.wrapWith(null, "'"),
+  "b": DW.Strings.wrapWith("", "'"),
+  "c": DW.Strings.wrapWith("ab", "x"),
+  "d": DW.Strings.wrapWith("'ab'", "'"),
+  "e": DW.Strings.wrapWith("ab", "'")
+}
+------------------------
+.Result
+------------------------
+{
+  "a": null,
+  "b": "''",
+  "c": "xabx",
+  "d": "''ab''",
+  "e": "'ab'"
+}
+------------------------
