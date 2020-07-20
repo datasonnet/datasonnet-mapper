@@ -17,11 +17,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class CSVFormatPlugin implements DataFormatPlugin<String> {
 
     public static String USE_HEADER = "UseHeader";
     public static String QUOTE_CHAR = "Quote";
+    public static String DISABLE_QUOTES = "DisableQuotes";
     public static String SEPARATOR_CHAR = "Separator";
     public static String ESCAPE_CHAR = "Escape";
     public static String NEW_LINE = "NewLine";
@@ -71,7 +74,10 @@ public class CSVFormatPlugin implements DataFormatPlugin<String> {
 
         if (useHeader) {
             if (params != null && params.containsKey(HEADERS)) {
-                List<String> headers = (List)params.get(HEADERS);
+                Object headersParam = params.get(HEADERS);
+                List<String> headers = headersParam instanceof List ?
+                        (List<String>) headersParam :
+                        Pattern.compile(",").splitAsStream((String)headersParam).collect(Collectors.toList());
                 for (String header : headers) {
                     builder.addColumn(header);
                 }
@@ -108,8 +114,14 @@ public class CSVFormatPlugin implements DataFormatPlugin<String> {
         builder.setUseHeader(useHeader);
 
         if (params != null) {
-            if (params.get(QUOTE_CHAR) != null) {
+            boolean disableQuotes = false;
+            if (params.get(DISABLE_QUOTES) != null) {
+                disableQuotes = new Boolean(params.get(DISABLE_QUOTES).toString());
+            }
+            if (params.get(QUOTE_CHAR) != null && !disableQuotes) {
                 builder.setQuoteChar(params.get(QUOTE_CHAR).toString().charAt(0));
+            } else if (disableQuotes) {
+                builder.disableQuoteChar();
             }
             if (params.get(SEPARATOR_CHAR) != null) {
                 builder.setColumnSeparator(params.get(SEPARATOR_CHAR).toString().charAt(0));
@@ -125,6 +137,15 @@ public class CSVFormatPlugin implements DataFormatPlugin<String> {
     }
 
     @Override
+    public Map<String, String> getWriteParameters() {
+        Map<String, String> writeParams = new HashMap<>();
+        writeParams.putAll(getReadParameters());
+        writeParams.put(DISABLE_QUOTES, "Disable CSV quotes");
+        writeParams.put(HEADERS, "List of headers");
+        return Collections.unmodifiableMap(writeParams);
+    }
+
+    @Override
     public Map<String, String> getReadParameters() {
         Map<String, String> readParams = new HashMap<>();
         readParams.put(USE_HEADER, "Set to \"true\" if the CSV first row has column names");
@@ -133,11 +154,6 @@ public class CSVFormatPlugin implements DataFormatPlugin<String> {
         readParams.put(ESCAPE_CHAR, "CSV escape character");
         readParams.put(NEW_LINE, "New line character");
         return Collections.unmodifiableMap(readParams);
-    }
-
-    @Override
-    public Map<String, String> getWriteParameters() {
-        return getReadParameters();
     }
 
     @Override

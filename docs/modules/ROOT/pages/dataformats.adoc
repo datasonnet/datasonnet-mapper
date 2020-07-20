@@ -386,7 +386,7 @@ Providing an optional `params` object allows more control over the format of the
 |`,`
 
 |`Escape`
-|CSV escape character
+|CSV escape character (only used for parsing CSV)
 |`\\`
 
 |`NewLine`
@@ -458,9 +458,24 @@ Creates a CSV out of an array of JSON objects, using default quote, separator, e
 }
 ------------------------
 
-Providing an optional `params` object allows for more control over the format of the output CSV. Quote, separator, escape and new line characters can be specified, CSV can be created without headers - in this case the input can be an array of arrays. In addition, a list of columns can be specified to override the JSON object names. In addition to the parameters described in the `read` section, the following CSV output-only parameters are supported:
+Providing an optional `params` object allows for more control over the format of the output CSV. Quote, separator, and new line characters can be specified, CSV can be created without headers - in this case the input can be an array of arrays. In addition, a list of columns can be specified to override the JSON object names. In addition to the parameters described in the `read` section, the following CSV output-only parameters are supported:
 
-* `Headers` - an array of strings to use as column names
+[%header, cols=3*a]
+|===
+|Parameter
+|Description
+|Default value
+
+|`DisableQuotes`
+|If set to `true`, CSV quotes will not be used and the value of the `Quote` parameter will be ignored
+|`false`
+
+|`Headers`
+|an array of strings to use as column names (has no effect if `UseHeader` is set to `false`)
+|`"`
+|===
+
+
 
 *Example*
 
@@ -485,7 +500,6 @@ local params = {
     "UseHeader": false,
     "Quote": "'",
     "Separator": "|",
-    "Escape": "\\",
     "NewLine": "\n"
 };
 
