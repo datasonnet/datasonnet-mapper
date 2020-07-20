@@ -808,8 +808,17 @@ object DW {
       //TODO add read mediatype
       builtin("readUrl", "url") {
         (_, _, url: String) =>
-          val out = new Scanner(new URL(url).openStream(), "UTF-8").useDelimiter("\\A").next()
-          Materializer.reverse(UjsonUtil.jsonObjectValueOf(out));
+          url match {
+            case str if str.startsWith("classpath://") =>
+              val source = io.Source.fromInputStream(getClass.getClassLoader.getResourceAsStream(str.replaceFirst("classpath://","")))
+              val out =
+                try { source.mkString }
+                catch { case ex: NullPointerException => "null"}
+              Materializer.reverse(UjsonUtil.jsonObjectValueOf(out));
+            case _ =>
+              val out = new Scanner(new URL(url).openStream(), "UTF-8").useDelimiter("\\A").next()
+              Materializer.reverse(UjsonUtil.jsonObjectValueOf(out));
+          }
       },
 
       //TODO needs work to get default from function

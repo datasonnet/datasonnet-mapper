@@ -555,10 +555,15 @@ public class DWCoreTest {
     }
 
     @Test
-    void testDW_readURL() {
+    void testDW_readUrl() {
         Mapper mapper = new Mapper(lib + pack + ".readUrl(\"https://jsonplaceholder.typicode.com/posts/1\").id\n", new ArrayList<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("1", value);
+
+        //classpath test
+        mapper = new Mapper(lib + pack + ".readUrl(\"classpath://DW_readUrlTest.json\").message\n", new ArrayList<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("Hello World!", value);
     }
 
     //@Disabled
