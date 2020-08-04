@@ -2,7 +2,7 @@ package com.datasonnet.document;
 
 public class JavaObjectDocument extends AbstractBaseDocument {
 
-    private Object contents;
+    private final Object contents;
 
     public JavaObjectDocument(Object contents) {
         this.contents = contents;
@@ -10,7 +10,7 @@ public class JavaObjectDocument extends AbstractBaseDocument {
 
     @Override
     public boolean canGetContentsAs(Class klass) {
-        if(Object.class.equals(klass)) {
+        if ((this.contents != null) && (klass.isAssignableFrom(this.contents.getClass()))) {
             return true;
         }
         return super.canGetContentsAs(klass);
