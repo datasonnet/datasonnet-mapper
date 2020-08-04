@@ -24,6 +24,7 @@ public class CSVFormatPlugin implements DataFormatPlugin<String> {
 
     public static String USE_HEADER = "UseHeader";
     public static String QUOTE_CHAR = "Quote";
+    public static String DISABLE_QUOTES = "DisableQuotes";
     public static String SEPARATOR_CHAR = "Separator";
     public static String ESCAPE_CHAR = "Escape";
     public static String NEW_LINE = "NewLine";
@@ -75,8 +76,9 @@ public class CSVFormatPlugin implements DataFormatPlugin<String> {
             if (params != null && params.containsKey(HEADERS)) {
                 Object headersParam = params.get(HEADERS);
                 List<String> headers = headersParam instanceof List ?
-                                            (List<String>) headersParam :
-                                            Pattern.compile(",").splitAsStream((String)headersParam).collect(Collectors.toList());
+                        (List<String>) headersParam :
+                        Pattern.compile(",").splitAsStream((String)headersParam).collect(Collectors.toList());
+
                 for (String header : headers) {
                     builder.addColumn(header);
                 }
@@ -113,8 +115,14 @@ public class CSVFormatPlugin implements DataFormatPlugin<String> {
         builder.setUseHeader(useHeader);
 
         if (params != null) {
-            if (params.get(QUOTE_CHAR) != null) {
+            boolean disableQuotes = false;
+            if (params.get(DISABLE_QUOTES) != null) {
+                disableQuotes = new Boolean(params.get(DISABLE_QUOTES).toString());
+            }
+            if (params.get(QUOTE_CHAR) != null && !disableQuotes) {
                 builder.setQuoteChar(params.get(QUOTE_CHAR).toString().charAt(0));
+            } else if (disableQuotes) {
+                builder.disableQuoteChar();
             }
             if (params.get(SEPARATOR_CHAR) != null) {
                 builder.setColumnSeparator(params.get(SEPARATOR_CHAR).toString().charAt(0));
@@ -136,6 +144,7 @@ public class CSVFormatPlugin implements DataFormatPlugin<String> {
         writeParams.put(QUOTE_CHAR, "CSV quote character");
         writeParams.put(SEPARATOR_CHAR, "CSV separator character");
         writeParams.put(NEW_LINE, "New line character");
+        writeParams.put(DISABLE_QUOTES, "Disable CSV quotes");
         writeParams.put(HEADERS, "List of headers");
         return Collections.unmodifiableMap(writeParams);
     }
