@@ -9,7 +9,7 @@ public class UjsonUtil {
     }
 
     public static Value jsonObjectValueOf(String jsonData) {
-        return ujson.package$.MODULE$.read(ujson.Readable.fromString(jsonData));
+        return ujson.package$.MODULE$.read(ujson.Readable.fromString(jsonData), true);
     }
 
     public static String jsonObjectValueTo(Value value) {
