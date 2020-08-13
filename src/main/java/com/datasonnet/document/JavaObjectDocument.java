@@ -10,10 +10,15 @@ public class JavaObjectDocument extends AbstractBaseDocument {
 
     @Override
     public boolean canGetContentsAs(Class klass) {
-        if ((this.contents != null) && (klass.isAssignableFrom(this.contents.getClass()))) {
-            return true;
+        if (this.contents != null) {
+            if (klass.isAssignableFrom(this.contents.getClass())) {
+                return true;
+            } else {
+                return super.canGetContentsAs(klass);
+            }
         }
-        return super.canGetContentsAs(klass);
+
+        return true;
     }
 
     @Override
