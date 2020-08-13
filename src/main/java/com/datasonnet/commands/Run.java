@@ -1,8 +1,10 @@
 package com.datasonnet.commands;
 
-import com.datasonnet.document.Document;
 import com.datasonnet.Mapper;
-import com.datasonnet.document.StringDocument;
+import com.datasonnet.document.DefaultDocument;
+import com.datasonnet.document.Document;
+import com.datasonnet.document.MediaType;
+import com.datasonnet.document.MediaTypes;
 import picocli.CommandLine;
 
 import java.io.BufferedReader;
@@ -50,10 +52,13 @@ public class Run implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        Mapper mapper = new Mapper(Main.readFile(datasonnet), combinedArguments().keySet(), imports(), !alreadyWrapped, true);
-        Document result = mapper.transform(new StringDocument(payload(), suffix(datasonnet)), combinedArguments(), outputType);
-        String contents = result.getContentsAsString();
+        Mapper mapper = new Mapper(Main.readFile(datasonnet), combinedArguments().keySet(), imports(), !alreadyWrapped);
+        Document<String> result = mapper
+                .transform(new DefaultDocument<>(payload(), MediaTypes.forExtension(suffix(datasonnet)).get()),
+                        combinedArguments(), MediaType.valueOf(outputType));
+        String contents = result.getContent();
         System.out.println(contents);
+
         return null;
     }
 
@@ -80,19 +85,19 @@ public class Run implements Callable<Void> {
         }
     }
 
-    private Map<String, Document> combinedArguments() throws IOException {
-        return Collections.unmodifiableMap(new HashMap<String, Document>() {{
+    private Map<String, Document<?>> combinedArguments() throws IOException {
+        return Collections.unmodifiableMap(new HashMap<String, Document<String>>() {{
             for(Map.Entry<String, String> entry : arguments.entrySet()) {
-                put(entry.getKey(), new StringDocument(entry.getValue(), "application/json"));
+                put(entry.getKey(), new DefaultDocument<>(entry.getValue(), MediaTypes.APPLICATION_JSON));
             }
+
             for(Map.Entry<String, File> entry : argumentFiles.entrySet()) {
                 File file = entry.getValue();
                 String contents = Main.readFile(file);
-                put(entry.getKey(), new StringDocument(contents, suffix(file)));
+                put(entry.getKey(), new DefaultDocument<>(contents, MediaTypes.forExtension(suffix(file)).get()));
             }
         }});
     }
-
 
     private Map<String, String> imports() throws IOException {
         Map imports = new HashMap<>();

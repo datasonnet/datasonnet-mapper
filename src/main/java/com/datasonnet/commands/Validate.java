@@ -2,6 +2,7 @@ package com.datasonnet.commands;
 
 
 import com.datasonnet.Mapper;
+import com.datasonnet.spi.DataFormatService;
 import picocli.CommandLine;
 
 import java.io.File;
@@ -26,7 +27,12 @@ public class Validate implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        Mapper mapper = new Mapper(Main.readFile(datasonnet), Collections.emptyList(), !includesFunction);
+        Mapper mapper = new Mapper(Main.readFile(datasonnet),
+                Collections.emptyList(), // inputs
+                Collections.emptyMap(),  // imports
+                !includesFunction,       // should wrap as func
+                Collections.emptyList(),  // additional libs
+                DataFormatService.DEFAULT); // default service
         System.out.println("Validates!");
         return null;
     }
