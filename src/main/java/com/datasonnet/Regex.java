@@ -1,19 +1,14 @@
 package com.datasonnet;
 
-import com.datasonnet.spi.UjsonUtil;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.datasonnet.spi.ujsonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.re2j.Matcher;
 import com.google.re2j.Pattern;
-import sjsonnet.Applyer;
-import sjsonnet.EvalScope;
-import sjsonnet.Val;
 import ujson.Value;
 
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -32,7 +27,7 @@ public class Regex {
         Matcher matcher = pattern.matcher(str);
         ArrayNode regexMatch = scan(matcher);
 
-        return regexMatch != null ? UjsonUtil.jsonObjectValueOf(regexMatch.toString()) : Value.Null();
+        return regexMatch != null ? ujsonUtils.parse(regexMatch.toString()) : Value.Null();
     }
 
     public static String regexQuoteMeta(String str) {
@@ -54,7 +49,7 @@ public class Regex {
 
         while (matcher.find()) {
             ObjectNode nextMatch = getRegexMatch(matcher);
-            matcher.appendReplacement(sb, replace.apply(UjsonUtil.jsonObjectValueOf(nextMatch.toString())));
+            matcher.appendReplacement(sb, replace.apply(ujsonUtils.parse(nextMatch.toString())));
         }
         matcher.appendTail(sb);
         return sb.toString();
@@ -74,7 +69,7 @@ public class Regex {
             return Value.Null();
         }
 
-        return UjsonUtil.jsonObjectValueOf(getRegexMatch(matcher).toString());
+        return ujsonUtils.parse(getRegexMatch(matcher).toString());
     }
 
     private static ArrayNode scan(Matcher matcher) throws RegexException {
