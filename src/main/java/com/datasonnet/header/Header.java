@@ -1,129 +1,168 @@
 package com.datasonnet.header;
 
-import com.fasterxml.jackson.dataformat.javaprop.JavaPropsMapper;
-import com.fasterxml.jackson.dataformat.javaprop.JavaPropsSchema;
-import com.fasterxml.jackson.dataformat.javaprop.util.JPropNode;
-import com.fasterxml.jackson.dataformat.javaprop.util.JPropPathSplitter;
+import com.datasonnet.document.*;
 
-import java.io.IOException;
-import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Header {
-    public static String DATASONNET_HEADER = "/** DataSonnet";
-    public static String DATASONNET_VERSION = "version";
-    public static String DATASONNET_OUTPUT = "output";
-    public static String DATASONNET_INPUT = "input";
-    public static String DATASONNET_OUTPUT_PRESERVE_ORDER = "preserveOrder";
+    public static final String DATASONNET_HEADER = "/** DataSonnet";
+    public static final String DATASONNET_VERSION = "version";
+    public static final String DATASONNET_INPUT = "input";
+    public static final String DATASONNET_OUTPUT = "output";
+    public static final String DATASONNET_PRESERVE_ORDER = "preseveOrder";
+    public static final String DATAFORMAT_PREFIX = "dataformat";
+    public static final String DATAFORMAT_DEFAULT = "*";
+    private final String version;
+    private final boolean preserveOrder;
+    private final Map<String, MediaType> namedInputs;
+    private final MediaType output;
+    // using maps to facilitate only one per super/sub type
+    private final Map<Integer, MediaType> allInputs;
+    private final Map<Integer, MediaType> dataFormats;
+    public Header(String version,
+                  boolean preserveOrder,
+                  Map<String, MediaType> namedInputs,
+                  MediaType output,
+                  Map<Integer, MediaType> allInputs,
+                  Map<Integer, MediaType> dataFormats) {
+        this.version = version;
+        this.preserveOrder = preserveOrder;
+        this.namedInputs = namedInputs;
+        this.output = output;
+        this.allInputs = allInputs;
+        this.dataFormats = dataFormats;
+    }
 
-    public static String DATAFORMAT_PREFIX = "dataformat";
-    public static String DATAFORMAT_DEFAULT = "*";
+    private static final Header EMPTY =
+            new Header("1.0", true, Collections.emptyMap(), MediaTypes.ALL, Collections.emptyMap(), Collections.emptyMap());
 
-    private String version = "1.0";
-    private Map dataFormatParameters = Collections.emptyMap();
-
-    public static Header parseHeader(String dataSonnetDocument) throws HeaderParseException {
-        Header header = new Header();
-
-        if (dataSonnetDocument.trim().startsWith(DATASONNET_HEADER)) {
-            String headerCommentSection = dataSonnetDocument.substring(0, dataSonnetDocument.indexOf("*/"));
-            headerCommentSection = headerCommentSection.replace(DATASONNET_HEADER, "").replace("*/","");
-
-            JavaPropsMapper mapper = new JavaPropsMapper();
-            JavaPropsSchema schema = new JavaPropsSchema() {
-                class HeaderSplitter extends JPropPathSplitter
-                {
-                    protected final char _pathSeparatorChar = '.';
-
-                    public HeaderSplitter()
-                    {
-                        super(true);
-                    }
-
-                    @Override
-                    public JPropNode splitAndAdd(JPropNode parent,
-                                                 String key, String value)
-                    {
-                        JPropNode curr = parent;
-                        // split on the path separator character not preceded by a backslash
-                        String[] segments = key.split("(?<!\\\\)" + Pattern.quote("" + _pathSeparatorChar));
-                        for (String segment : segments) {
-                            curr = _addSegment(curr, segment.replaceAll("\\\\", ""));
-                        }
-                        return curr.setValue(value);
-                    }
-                }
-
-                @Override
-                public JPropPathSplitter pathSplitter() {
-                    return new HeaderSplitter();
-                };
-            };
-
-            try {
-                Properties props = new Properties();
-                props.load(new StringReader(headerCommentSection));
-                Map propsMap = mapper.readPropertiesAs(props, schema, Map.class);
-                if (propsMap.containsKey(DATASONNET_VERSION)) {
-                    header.setVersion((String)propsMap.get(DATASONNET_VERSION));
-                }
-                header.dataFormatParameters = propsMap;
-            } catch (IOException|IllegalArgumentException e) {
-                throw new HeaderParseException("Error parsing DataSonnet Header: " + e.getMessage(), e);
-            }
+    public static Header parseHeader(String script) throws HeaderParseException {
+        if (!script.trim().startsWith(DATASONNET_HEADER)) {
+            return EMPTY;
         }
 
-        return header;
+        try {
+            String headerSection = script
+                    .substring(0, script.indexOf("*/"))
+                    .replace(DATASONNET_HEADER, "").replace("*/", "");
+
+            AtomicReference<String> version = new AtomicReference<>("1.0");
+            boolean preserve = true;
+            AtomicReference<MediaType> output = new AtomicReference<>();
+            Map<String, MediaType> inputs = new HashMap<>(4);
+            Map<Integer, MediaType> allInputs = new HashMap<>(4);
+            Map<Integer, MediaType> dataformat = new HashMap<>(4);
+
+            for (String line : headerSection.split(System.lineSeparator())) {
+                if (line.startsWith(DATASONNET_VERSION)) {
+                    String[] tokens = line.split("=", 2);
+                    version.set(tokens[1]);
+                } else if (line.startsWith(DATASONNET_PRESERVE_ORDER)) {
+                    String[] tokens = line.split("=", 2);
+                    preserve = Boolean.parseBoolean(tokens[1]);
+                } else if (line.startsWith(DATASONNET_INPUT)) {
+                    String[] tokens = line.split(" ", 3);
+                    if (DATAFORMAT_DEFAULT.equals(tokens[1])) {
+                        MediaType toAdd = MediaType.valueOf(tokens[2]);
+                        allInputs.put(toAdd.getType().hashCode() + toAdd.getSubtype().hashCode(),
+                                toAdd);
+                    } else {
+                        inputs.put(tokens[1], MediaType.valueOf(tokens[2]));
+                    }
+                } else if (line.startsWith(DATASONNET_OUTPUT)) {
+                    String[] tokens = line.split(" ", 2);
+                    output.set(MediaType.valueOf(tokens[1]));
+                } else if (line.startsWith(DATAFORMAT_PREFIX)) {
+                    String[] tokens = line.split(" ", 2);
+                    MediaType toAdd = MediaType.valueOf(tokens[1]);
+                    dataformat.put(toAdd.getType().hashCode() + toAdd.getSubtype().hashCode(),
+                            toAdd);
+                }
+            }
+
+            return new Header(version.get(), preserve, inputs, output.get(), allInputs, dataformat);
+        } catch (InvalidMediaTypeException exc) {
+            // TODO: 8/3/20 capture the header line
+            throw new HeaderParseException("Could not parse media type from header", exc);
+        }
     }
 
     public String getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
-        this.version = version;
+    public Map<String, MediaType> getNamedInputs() {
+        return Collections.unmodifiableMap(namedInputs);
+    }
+
+    public MediaType getOutput() {
+        return output;
+    }
+
+    public Collection<MediaType> getAllInputs() {
+        return Collections.unmodifiableCollection(allInputs.values());
+    }
+
+    public Collection<MediaType> getDataFormats() {
+        return Collections.unmodifiableCollection(dataFormats.values());
     }
 
     public boolean isPreserveOrder() {
-        Map output = getOrEmpty(dataFormatParameters, Header.DATASONNET_OUTPUT);
-        boolean preserveOrder = new Boolean(output.getOrDefault(Header.DATASONNET_OUTPUT_PRESERVE_ORDER, "true").toString());
         return preserveOrder;
     }
 
-    public Map<String, Object> getDefaultParameters(String mimeType) {
-        Map defaultParams = getOrEmpty(dataFormatParameters, Header.DATAFORMAT_DEFAULT);
-        Map defMimeTypeParams = getOrEmpty(defaultParams, mimeType);
-        return Collections.unmodifiableMap(defMimeTypeParams);
+    public <T> Document<T> combineInputParams(String inputName, Document<T> doc) {
+        if (EMPTY == this) {
+            return doc;
+        }
+
+        Map<String, String> params = new HashMap<>(4);
+        MediaType mediaType = doc.getMediaType();
+        Integer key = mediaType.getType().hashCode() + mediaType.getSubtype().hashCode();
+
+        if (dataFormats.containsKey(key)) {
+            params.putAll(dataFormats.get(key).getParameters());
+        }
+
+        if (allInputs.containsKey(key)) {
+            params.putAll(allInputs.get(key).getParameters());
+        }
+
+        if (namedInputs.containsKey(inputName)) {
+            MediaType inputType = namedInputs.get(inputName);
+            if (inputType != null && inputType.equalsTypeAndSubtype(mediaType)) {
+                params.putAll(inputType.getParameters());
+            }
+        }
+
+        params.putAll(mediaType.getParameters());
+
+        return ((DefaultDocument<T>) doc).withMediaType(new MediaType(mediaType, params));
     }
 
-    public Map<String, Object> getInputParameters(String name, String mimeType) {
-        Map input = getOrEmpty(dataFormatParameters, Header.DATASONNET_INPUT);
-        Map defaultInput = getOrEmpty(input, Header.DATAFORMAT_DEFAULT);
-        Map defaultInputMimeTypeParams = getOrEmpty(defaultInput, mimeType);
+    public MediaType combineOutputParams(MediaType mediaType) {
+        if (EMPTY == this) {
+            return mediaType;
+        }
 
-        Map paramInput = getOrEmpty(input, name);
-        Map mimeTypeParams = getOrEmpty(paramInput, mimeType);
+        Map<String, String> params = new HashMap<>(4);
+        Integer key = mediaType.getType().hashCode() + mediaType.getSubtype().hashCode();
 
-        return overlay(overlay(getDefaultParameters(mimeType), defaultInputMimeTypeParams),
-                       mimeTypeParams);
-    }
+        if (dataFormats.containsKey(key)) {
+            params.putAll(dataFormats.get(key).getParameters());
+        }
 
-    public Map<String, Object> getOutputParameters(String mimeType) {
-        Map output = getOrEmpty(dataFormatParameters, Header.DATASONNET_OUTPUT);
-        Map mimeTypeParams = getOrEmpty(output, mimeType);
+        if (output != null && output.equalsTypeAndSubtype(mediaType)) {
+            params.putAll(output.getParameters());
+        }
 
-        return overlay(getDefaultParameters(mimeType), mimeTypeParams);
-    }
+        params.putAll(mediaType.getParameters());
 
-    private Map<String, Object> getOrEmpty(Map<String, Object> map, String key) {
-        return (Map)map.getOrDefault(key, Collections.emptyMap());
-    }
-    private Map<String, Object> overlay(Map<String, Object> defaults, Map<String, Object> overlay) {
-        Map<String, Object> output = new HashMap(defaults);
-        output.putAll(overlay);
-        return output;
+        return new MediaType(mediaType, params);
     }
 }
