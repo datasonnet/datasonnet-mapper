@@ -1,5 +1,4 @@
 local params = {
-    "OutputClass": "com.datasonnet.javatest.Gizmo",
     "DateFormat": "yyyy-MM-dd"
 };
 

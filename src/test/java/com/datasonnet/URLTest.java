@@ -1,15 +1,11 @@
 package com.datasonnet;
 
-import com.datasonnet.document.StringDocument;
-import com.datasonnet.util.TestResourceReader;
-import org.json.JSONException;
+import com.datasonnet.document.DefaultDocument;
+import com.datasonnet.document.MediaType;
+import com.datasonnet.document.MediaTypes;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.Collections;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -20,10 +16,10 @@ public class URLTest {
         String data = "Hello World";
         String encodedData = "Hello+World";
         Mapper mapper = new Mapper("DS.URL.encode(payload)");
-        String result = mapper.transform(new StringDocument(data, "text/plain"), Collections.emptyMap(), "text/plain").getContentsAsString();
+        String result = mapper.transform(new DefaultDocument<String>(data, MediaTypes.TEXT_PLAIN), Collections.emptyMap(), MediaTypes.TEXT_PLAIN).getContent();
         assertEquals(encodedData, result);
         mapper = new Mapper("DS.URL.decode(payload)");
-        result = mapper.transform(new StringDocument(result, "text/plain"), Collections.emptyMap(), "text/plain").getContentsAsString();
+        result = mapper.transform(new DefaultDocument<String>(result, MediaTypes.TEXT_PLAIN), Collections.emptyMap(), MediaTypes.TEXT_PLAIN).getContent();
         assertEquals(data, result);
     }
 

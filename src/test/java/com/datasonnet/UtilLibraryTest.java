@@ -1,6 +1,8 @@
 package com.datasonnet;
 
-import com.datasonnet.document.StringDocument;
+import com.datasonnet.document.DefaultDocument;
+import com.datasonnet.document.MediaType;
+import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.Test;
 
@@ -15,15 +17,15 @@ public class UtilLibraryTest {
         String jsonData = TestResourceReader.readFileAsString("utilLibDuplicatesTest.json");
 
         Mapper mapper = new Mapper("DS.Util.duplicates(payload.primitive)");
-        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
+        String mappedJson = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
         assertEquals(mappedJson, "[\"hello\",\"world\"]");
 
         mapper = new Mapper("DS.Util.duplicates(payload.complex, function(x) x.language.name)");
-        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
+        mappedJson = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
         assertEquals(mappedJson, "[{\"language\":{\"name\":\"Java8\",\"version\":\"1.8.0\"}}]");
 
         mapper = new Mapper("DS.Util.duplicates(payload.moreComplex, function(x) std.substr(x.language.version, 0, 3))");
-        mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
+        mappedJson = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
         assertEquals(mappedJson, "[{\"language\":{\"name\":\"Java1.8\",\"version\":\"1.8_152\"}}]");
     }
 
@@ -37,7 +39,7 @@ public class UtilLibraryTest {
     void testReverse() throws Exception {
         String jsonData = "[\"a\",\"b\",\"c\",\"d\"]";
         Mapper mapper = new Mapper("DS.Util.reverse(payload)");
-        String mappedJson = mapper.transform(new StringDocument(jsonData, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
+        String mappedJson = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
 
         assertEquals(mappedJson, "[\"d\",\"c\",\"b\",\"a\"]");
     }
@@ -67,7 +69,7 @@ public class UtilLibraryTest {
         String ds = TestResourceReader.readFileAsString(dsFileName);
 
         Mapper mapper = new Mapper(ds);
-        String mappedJson = mapper.transform(new StringDocument(input, "application/json"), Collections.emptyMap(), "application/json").getContentsAsString();
+        String mappedJson = mapper.transform(new DefaultDocument<String>(input, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
 
         assertEquals(mappedJson, "true");
     }

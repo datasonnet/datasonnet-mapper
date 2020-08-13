@@ -1,9 +1,9 @@
 local params = {
-    "UseHeader": false,
+    "UseHeader": "false",
     "Quote": "'",
     "Separator": "|",
     "Escape": "\\",
-    "NewLine": "\n"
+    "NewLine": "LF"
 };
 
 {

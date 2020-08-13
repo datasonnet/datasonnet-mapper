@@ -1,21 +1,17 @@
 package com.datasonnet;
 
+import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
-import com.datasonnet.document.StringDocument;
+import com.datasonnet.document.MediaTypes;
 import com.datasonnet.javatest.Gizmo;
-import com.datasonnet.javatest.Manufacturer;
 import com.datasonnet.javatest.WsdlGeneratedObj;
-import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.util.TestResourceReader;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,14 +29,14 @@ public class JavaWriterTest {
         String json = TestResourceReader.readFileAsString("javaTest.json");
         String mapping = TestResourceReader.readFileAsString("writeJavaTest.ds");
 
-        Document data = new StringDocument(json, "application/json");
+        Document<String> data = new DefaultDocument<>(json, MediaTypes.APPLICATION_JSON);
 
         Mapper mapper = new Mapper(mapping);
 
 
-        Document mapped = mapper.transform(data, new HashMap<>(), "application/java");
+        Document<Gizmo> mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, Gizmo.class);
 
-        Object result = mapped.getContentsAsObject();
+        Object result = mapped.getContent();
         assertTrue(result instanceof Gizmo);
 
         Gizmo gizmo = (Gizmo)result;
@@ -60,9 +56,9 @@ public class JavaWriterTest {
         mapper = new Mapper(mapping);
 
 
-        mapped = mapper.transform(data, new HashMap<>(), "application/java");
+        Document<Map> mappedMap = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, Map.class);
 
-        result = mapped.getContentsAsObject();
+        result = mappedMap.getContent();
         assertTrue(result instanceof java.util.HashMap);
 
         Map gizmoMap = (Map)result;
@@ -75,7 +71,7 @@ public class JavaWriterTest {
     @Test
     void testJavaWriteFunction() throws Exception {
         String json = TestResourceReader.readFileAsString("javaTest.json");
-        Document data = new StringDocument(json, "application/json");
+        Document<String> data = new DefaultDocument<>(json, MediaTypes.APPLICATION_JSON);
 
         //Test calling write() function
         String mapping = TestResourceReader.readFileAsString("writeJavaFunctionTest.ds");
@@ -83,21 +79,22 @@ public class JavaWriterTest {
 
 
         try {
-            mapper.transform(data, new HashMap<>(), "application/java");
+            mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA);
             fail("Should not succeed");
         } catch(Exception e) {
-            assertTrue(e.getMessage().contains("does not return output that can be rendered as a String"), "Failed with wrong message: " + e.getMessage());
+            // this error is now thrown by jackson as it _will_ try to write a String...
+            assertTrue(e.getMessage().contains("Unable to convert to target type"), "Failed with wrong message: " + e.getMessage());
         }
     }
 
     @Test
     void testJAXBElementMapping() throws Exception {
-        Document data = new StringDocument("{}", "application/json");
+        Document<String> data = new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON);
         String mapping = TestResourceReader.readFileAsString("writeJAXBElement.ds");
         Mapper mapper = new Mapper(mapping);
 
-        Document mapped = mapper.transform(data, new HashMap<>(), "application/java");
-        Object result = mapped.getContentsAsObject();
+        Document<WsdlGeneratedObj> mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, WsdlGeneratedObj.class);
+        Object result = mapped.getContent();
         assertTrue(result instanceof WsdlGeneratedObj);
 
         JAXBContext jaxbContext = JAXBContext.newInstance(WsdlGeneratedObj.class );

@@ -1,11 +1,10 @@
 package com.datasonnet;
 
+import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
-import com.datasonnet.document.StringDocument;
-import com.datasonnet.spi.DataFormatService;
+import com.datasonnet.document.MediaType;
+import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.TestResourceReader;
-import com.datasonnet.Mapper;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -17,33 +16,33 @@ public class CSVReaderTest {
 
     @Test
     void testCSVReader() throws URISyntaxException, IOException {
-        Document data = new StringDocument(
+        Document<String> data = new DefaultDocument<String>(
                 TestResourceReader.readFileAsString("readCSVTest.csv"),
-                "application/csv"
+                MediaTypes.APPLICATION_CSV
         );
 
         Mapper mapper = new Mapper("{ fName: payload[0][\"First Name\"] }");
 
 
-        Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
+        Document<String> mapped = mapper.transform(data, Collections.emptyMap(), MediaTypes.APPLICATION_JSON);
 
-        assertEquals("{\"fName\":\"Eugene\"}", mapped.getContentsAsString());
+        assertEquals("{\"fName\":\"Eugene\"}", mapped.getContent());
     }
 
     @Test
     void testCSVReaderExt() throws IOException, URISyntaxException {
-        Document data = new StringDocument(
+        Document<String> data = new DefaultDocument<>(
                 TestResourceReader.readFileAsString("readCSVExtTest.csv"),
-                "application/csv"
+                MediaTypes.APPLICATION_CSV
         );
         String jsonnet = TestResourceReader.readFileAsString("readCSVExtTest.ds");
 
         Mapper mapper = new Mapper(jsonnet);
 
 
-        Document mapped = mapper.transform(data, Collections.emptyMap(), "application/json");
+        Document<String> mapped = mapper.transform(data, Collections.emptyMap(), MediaTypes.APPLICATION_JSON);
 
-        assertEquals("{\"fName\":\"Eugene\",\"num\":\"234\"}", mapped.getContentsAsString());
+        assertEquals("{\"fName\":\"Eugene\",\"num\":\"234\"}", mapped.getContent());
     }
 
 
