@@ -2,23 +2,28 @@ package com.datasonnet
 
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, Period, ZoneId, ZoneOffset}
-import java.util.Collections
 import java.util.function.Function
 
 import com.datasonnet
-import com.datasonnet.spi.{DataFormatPlugin, DataFormatService}
-import sjsonnet.Std.builtinWithDefaults
-import sjsonnet.{Applyer, Error, EvalScope, Expr, Materializer, Val}
-import com.datasonnet.wrap.Library.library
-import pprint.PPrinter
+import com.datasonnet.document.{DefaultDocument, MediaType}
+import com.datasonnet.spi.{DataFormatService, Library, ujsonUtils}
 import sjsonnet.ReadWriter.StringRead
-import sjsonnet.Std._
+import sjsonnet.Std.{builtinWithDefaults, _}
+import sjsonnet.{Applyer, Error, EvalScope, Expr, Materializer, Val}
 import ujson.Value
 
-object DS {
+object DS extends Library {
 
-  def libraries(dataFormats: DataFormatService):  Map[String, Val] = Map(
-    "ZonedDateTime" -> library(
+  override def namespace() = "DS"
+
+  override def libsonnets(): Set[String] = Set("Util")
+
+  override def functions(dataFormats: DataFormatService): Map[String, Val.Func] = Map(
+    builtin0("test") { (vals, ev, fs) => "test val" }
+  )
+
+  override def modules(dataFormats: DataFormatService): Map[String, Val.Obj] = Map(
+    "ZonedDateTime" -> moduleFrom(
       builtin0("now") { (vals, ev, fs) => Instant.now().toString() },
 
       builtin("offset", "datetime", "period") { (ev, fs, v1: String, v2: String) =>
@@ -59,7 +64,7 @@ object DS {
         val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
         datetimeObj.toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE)
       },
-  
+
       builtin("toLocalTime", "datetime", "format") { (ev, fs, datetime: String, format: String) =>
         val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
         datetimeObj.toLocalTime().format(DateTimeFormatter.ISO_LOCAL_TIME)
@@ -71,7 +76,7 @@ object DS {
       }
     ),
 
-    "Formats" -> library(
+    "Formats" -> moduleFrom(
       builtinWithDefaults("read",
                           "data" -> None,
                           "mimeType" -> None,
@@ -79,7 +84,7 @@ object DS {
         val data = args("data").cast[Val.Str].value
         val mimeType = args("mimeType").cast[Val.Str].value
         val params = if (args("params") == Val.Null) {
-          Mapper.objectify(Map.empty)
+          Library.emptyObj
         } else {
           args("params").cast[Val.Obj]
         }
@@ -92,7 +97,7 @@ object DS {
         val data = args("data")
         val mimeType = args("mimeType").cast[Val.Str].value
         val params = if (args("params") == Val.Null) {
-          Mapper.objectify(Map.empty)
+          Library.emptyObj
         } else {
           args("params").cast[Val.Obj]
         }
@@ -101,7 +106,7 @@ object DS {
 
     ),
 
-    "LocalDateTime" -> library(
+    "LocalDateTime" -> moduleFrom(
       builtin0("now") { (vs, extVars, wd) =>
         val datetimeObj = java.time.LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
         datetimeObj.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
@@ -134,7 +139,7 @@ object DS {
       }
     ),
 
-    "Crypto" -> library(
+    "Crypto" -> moduleFrom(
       builtin("hash", "value", "algorithm") {
         (ev, fs, value: String, algorithm: String) =>
           Crypto.hash(value, algorithm)
@@ -153,14 +158,14 @@ object DS {
       },
     ),
 
-    "JsonPath" -> library(
+    "JsonPath" -> moduleFrom(
       builtin("select", "json", "path") {
         (ev, fs, json: Val, path: String) =>
           Materializer.reverse(ujson.read(JsonPath.select(ujson.write(Materializer.apply(json)(ev)), path)))
       },
     ),
 
-    "Regex" -> library(
+    "Regex" -> moduleFrom(
       builtin("regexFullMatch", "expr", "str") {
         (ev, fs, expr: String, str: String) =>
           Materializer.reverse(Regex.regexFullMatch(expr, str))
@@ -206,7 +211,7 @@ object DS {
       },
     ),
 
-    "URL" -> library(
+    "URL" -> moduleFrom(
       builtinWithDefaults("encode",
         "data" -> None,
         "encoding" -> Some(Expr.Str(0, "UTF-8"))) { (args, ev) =>
@@ -215,6 +220,7 @@ object DS {
 
         java.net.URLEncoder.encode(data, encoding)
       },
+
       builtinWithDefaults("decode",
         "data" -> None,
         "encoding" -> Some(Expr.Str(0, "UTF-8"))) { (args, ev) =>
@@ -222,85 +228,29 @@ object DS {
         val encoding = args("encoding").cast[Val.Str].value
 
         java.net.URLDecoder.decode(data, encoding)
-      },
+      }
     )
   )
 
-  def read(dataFormats: DataFormatService, data: String, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {
-    val plugin = dataFormats.getPluginFor(mimeType)
-    if (plugin == null) {
-      throw new Error.Delegate("No suitable plugin found for mime type: " + mimeType)
-    }
-    val javaParams = toJavaReadParams(ev, params, plugin)
-    val json = try {
-      plugin.getClass.getMethod("read", classOf[String], classOf[java.util.Map[String, Object]])
-      plugin.asInstanceOf[DataFormatPlugin[String]].read(data, javaParams)
-    } catch {
-      case _ => throw new Error.Delegate("The data format plugin for " + mimeType +
-        " does not take Strings, which is required for conversions inside DataSonnet code")
-    }
+  private def read(dataFormats: DataFormatService, data: String, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {
+    val Array(supert, subt) = mimeType.split("/", 2)
+    val paramsAsJava = ujsonUtils.javaObjectFrom(ujson.read(Materializer.apply(params)(ev)).obj).asInstanceOf[java.util.Map[String, String]]
+    val doc = new DefaultDocument(data, new MediaType(supert, subt, paramsAsJava))
 
-    Materializer.reverse(json)
+    val plugin = dataFormats.thatAccepts(doc)
+      .orElseThrow(() => Error.Delegate("No suitable plugin found for mime type: " + mimeType))
+
+    Materializer.reverse(plugin.read(doc))
   }
 
-  def write(dataFormats: DataFormatService, json: Val, mimeType: String, params: Val.Obj, ev: EvalScope): String = {
-    val plugin = dataFormats.getPluginFor(mimeType)
-    if (plugin == null) {
-      throw new Error.Delegate("No suitable plugin found for mime type: " + mimeType);
-    }
-    val javaParams = toJavaWriteParams(ev, params, plugin)
-    val output = plugin.write(Materializer.apply(json)(ev), javaParams, mimeType)
-    if (output.canGetContentsAs(classOf[String])) {
-      output.getContentsAsString()
-    } else {
-      throw new Error.Delegate("The data format plugin for " + mimeType +
-        " does not return output that can be rendered as a String, which is required for conversions inside" +
-        "DataSonnet code")
-    }
-  }
+  private def write(dataFormats: DataFormatService, json: Val, mimeType: String, params: Val.Obj, ev: EvalScope): String = {
+    val Array(supert, subt) = mimeType.split("/", 2)
+    val paramsAsJava = ujsonUtils.javaObjectFrom(ujson.read(Materializer.apply(params)(ev)).obj).asInstanceOf[java.util.Map[String, String]]
+    val mediaType = new MediaType(supert, subt, paramsAsJava)
 
-  def toJavaReadParams(ev: EvalScope, params: Val.Obj, plugin: DataFormatPlugin[_]) =
-    toJavaParams(ev, params, plugin.getReadParameters(), plugin)
+    val plugin = dataFormats.thatProduces(mediaType, classOf[String])
+      .orElseThrow(() => Error.Delegate("No suitable plugin found for mime type: " + mimeType))
 
-  def toJavaWriteParams(ev: EvalScope, params: Val.Obj, plugin: DataFormatPlugin[_]) =
-    toJavaParams(ev, params, plugin.getWriteParameters(), plugin)
-
-  def toJavaParams(ev: EvalScope, params: Val.Obj, supported: java.util.Map[String, String], plugin: DataFormatPlugin[_]) = {
-    val scalaParams = ujson.read(Materializer.apply(params)(ev)).obj;
-    val javaParams = new java.util.HashMap[String, Object]()
-    //Convert to Java map
-    for ((k, v) <- scalaParams) {
-      if (!supported.containsKey(k)) {
-        throw new Error.Delegate("The parameter " + k + " is not supported by plugin " + plugin.getPluginId)
-      }
-      javaParams.put(k, toJavaObject(v))
-    }
-
-    javaParams
-  }
-
-  def toJavaObject(v: ujson.Value): java.lang.Object = {
-    if (v.isInstanceOf[ujson.Bool]) {
-      new java.lang.Boolean(v.bool)
-    } else if (v.isInstanceOf[ujson.Str]) {
-      v.str
-    } else if (v.isInstanceOf[ujson.Num]) {
-      new java.lang.Double(v.num)
-    } else if (v.isInstanceOf[ujson.Obj]) {
-      val javaMap = new java.util.HashMap[String, Object]()
-      for ((k, vv) <- v.obj) {
-        javaMap.put(k, toJavaObject(vv))
-      }
-      javaMap
-    } else if (v.isInstanceOf[ujson.Arr]) {
-      val javaArr = new java.util.ArrayList[Object]()
-      for ((vv) <- v.arr) {
-        javaArr.add(toJavaObject(vv))
-      }
-      javaArr
-    } else {
-      //TODO support other types or throw an exception???
-      null
-    }
+    plugin.write(Materializer.apply(json)(ev), mediaType, classOf[String]).getContent
   }
 }
