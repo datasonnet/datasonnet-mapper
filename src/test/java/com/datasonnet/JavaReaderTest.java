@@ -77,4 +77,13 @@ public class JavaReaderTest {
         String result = mapped.getContent();
         JSONAssert.assertEquals("{\"testField\":{\"name\":\"{http://com.datasonnet.test}testField\",\"declaredType\":\"com.datasonnet.javatest.TestField\",\"value\":{\"test\":\"HelloWorld\"}}}", result, true);
     }
+
+    @Test
+    void testNullJavaObject() throws Exception {
+        Document nullObj = new JavaObjectDocument(null);
+        Mapper mapper = new Mapper("payload == null");
+        Document mapped = mapper.transform(nullObj, new HashMap<>(), "application/java");
+        Boolean result = mapped.canGetContentsAs(Boolean.class);
+        assertTrue(result);
+    }
 }
