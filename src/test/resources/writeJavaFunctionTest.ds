@@ -12,5 +12,5 @@ local obj = {
 };
 
 {
-    test: DS.Formats.write(obj, "application/java", params)
+    test: ds.write(obj, "application/java", params)
 }

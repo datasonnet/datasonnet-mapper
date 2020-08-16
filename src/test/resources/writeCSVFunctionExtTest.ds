@@ -7,5 +7,5 @@ local params = {
 };
 
 {
-    embeddedCSVValue: DS.Formats.write(payload, "application/csv", params)
+    embeddedCSVValue: ds.write(payload, "application/csv", params)
 }

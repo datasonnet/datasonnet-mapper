@@ -15,10 +15,10 @@ public class URLTest {
     void testEncodeDecode() throws Exception {
         String data = "Hello World";
         String encodedData = "Hello+World";
-        Mapper mapper = new Mapper("DS.URL.encode(payload)");
+        Mapper mapper = new Mapper("ds.url.encode(payload)");
         String result = mapper.transform(new DefaultDocument<String>(data, MediaTypes.TEXT_PLAIN), Collections.emptyMap(), MediaTypes.TEXT_PLAIN).getContent();
         assertEquals(encodedData, result);
-        mapper = new Mapper("DS.URL.decode(payload)");
+        mapper = new Mapper("ds.url.decode(payload)");
         result = mapper.transform(new DefaultDocument<String>(result, MediaTypes.TEXT_PLAIN), Collections.emptyMap(), MediaTypes.TEXT_PLAIN).getContent();
         assertEquals(data, result);
     }

@@ -9,7 +9,6 @@ import java.util.{Base64, Scanner}
 import java.util.function.Function
 
 import com.datasonnet
-import com.datasonnet.DW.pluck
 import com.datasonnet.document.{DefaultDocument, MediaType}
 import com.datasonnet.spi.{DataFormatService, Library, ujsonUtils}
 import sjsonnet.Expr.Member.Visibility
@@ -231,7 +230,7 @@ object DS extends Library {
       (ev, fs, value: Val, funct: Applyer) =>
         value match {
           case obj: Val.Obj =>
-            pluck(obj, funct, ev, fs)
+            mapEntrySet(obj, funct, ev, fs)
           case Val.Null => Val.Lazy(Val.Null).force
           case _ => throw new IllegalArgumentException(
             "Expected Object, got: " + value.prettyName);
@@ -2162,6 +2161,31 @@ object DS extends Library {
     else {
       throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
     }
+  }
+
+  private def mapEntrySet(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val = {
+    val args = funct.f.params.allIndices.size
+    val out = collection.mutable.Buffer.empty[Val.Lazy]
+    if (args.equals(3)) {
+      out.appendAll(obj.getVisibleKeys().keySet.zipWithIndex.map(
+        item => Val.Lazy(funct.apply(Val.Lazy(obj.value(item._1, -1)(fs, ev)), Val.Lazy(Val.Str(item._1)), Val.Lazy(Val.Num(item._2))))
+      ))
+    }
+    else if (args.equals(2)) {
+      out.appendAll(obj.getVisibleKeys().keySet.map(
+        item => Val.Lazy(funct.apply(Val.Lazy(obj.value(item, -1)(fs, ev)), Val.Lazy(Val.Str(item))))
+      ))
+    }
+    else if (args.equals(1)) {
+      out.appendAll(obj.getVisibleKeys().keySet.map(
+        item => Val.Lazy(funct.apply(Val.Lazy(obj.value(item, -1)(fs, ev))))
+      ))
+    }
+    else {
+      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2 or 3, but got: " + args)
+    }
+
+    Val.Arr(out.toSeq)
   }
 
 }
