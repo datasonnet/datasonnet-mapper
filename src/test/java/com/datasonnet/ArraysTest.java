@@ -104,6 +104,30 @@ public class ArraysTest {
         assertEquals("2", value);
     }
 
+    @Test
+    void testArrays_join() {
+        Mapper mapper = new Mapper(lib + pack + ".join([{\"id\":1,\"v\":\"a\"},{\"id\":1,\"v\":\"b\"}],[{\"id\":1,\"v\":\"c\"}], function(item) item.id,function(item) item.id)\n", new ArrayList<>(), new HashMap<>(),true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[{r:{id:1,v:c},l:{id:1,v:a}},{r:{id:1,v:c},l:{id:1,v:b}}]", value);
+
+    }
+
+    @Test
+    void testArrays_leftJoin() {
+        Mapper mapper = new Mapper(lib + pack + ".leftJoin([{\"id\":1,\"v\":\"a\"},{\"id\":1,\"v\":\"b\"},{\"id\":2,\"v\":\"d\"}],[{\"id\":1,\"v\":\"c\"},{\"id\":3,\"v\":\"e\"}], function(item) item.id,function(item) item.id)\n", new ArrayList<>(), new HashMap<>(),true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[{r:{id:1,v:c},l:{id:1,v:a}},{r:{id:1,v:c},l:{id:1,v:b}},{l:{id:2,v:d}}]", value);
+
+    }
+
+    @Test
+    void testArrays_outerJoin() {
+        Mapper mapper = new Mapper(lib + pack + ".outerJoin([{\"id\":1,\"v\":\"a\"},{\"id\":1,\"v\":\"b\"},{\"id\":2,\"v\":\"d\"}],[{\"id\":1,\"v\":\"c\"},{\"id\":3,\"v\":\"e\"}], function(item) item.id,function(item) item.id)\n", new ArrayList<>(), new HashMap<>(),true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[{r:{id:1,v:c},l:{id:1,v:a}},{r:{id:1,v:c},l:{id:1,v:b}},{l:{id:2,v:d}},{r:{id:3,v:e}}]", value);
+
+    }
+
 
     @Test
     void testArrays_partition() {

@@ -12,7 +12,7 @@ import com.datasonnet
 import com.datasonnet.document.{DefaultDocument, MediaType}
 import com.datasonnet.spi.{DataFormatService, Library, ujsonUtils}
 import sjsonnet.Expr.Member.Visibility
-import sjsonnet.ReadWriter.StringRead
+import sjsonnet.ReadWriter.{ApplyerRead, ArrRead, FuncRead, StringRead}
 import sjsonnet.Std.{builtin, builtinWithDefaults, _}
 import sjsonnet.{Applyer, Error, EvalScope, Expr, FileScope, Materializer, Val}
 import ujson.Value
@@ -990,24 +990,114 @@ object DS extends Library {
         (_, _, array: Val.Arr, funct: Applyer) =>
           array.value.indexWhere(funct.apply(_) == Val.Lazy(Val.True).force)
       },
-      /* TODO: No builtin functions that allow 4 parameters
-      //TODO
-      builtin("join", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          //arr.value.
-          Val.Lazy(Val.Null).force
+
+      builtin0("join", "arrL", "arryR", "functL", "functR"){
+        (vals, ev,fs) =>
+          //map the input values
+          val valSeq = validate(vals, ev, fs, Array(ArrRead, ArrRead, ApplyerRead, ApplyerRead))
+          val arrL = valSeq(0).asInstanceOf[Val.Arr]
+          val arrR = valSeq(1).asInstanceOf[Val.Arr]
+          val functL = valSeq(2).asInstanceOf[Applyer]
+          val functR = valSeq(3).asInstanceOf[Applyer]
+
+          val out = collection.mutable.Buffer.empty[Val.Lazy]
+
+          arrL.value.foreach({
+            valueL => val compareL = functL.apply(valueL)
+              //append all that match the condition
+              out.appendAll(arrR.value.collect({
+                case valueR if compareL.equals(functR.apply(valueR)) =>
+                  val temp = scala.collection.mutable.Map[String, Val.Obj.Member]()
+                  temp += ("l" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueL.force))
+                  temp += ("r" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueR.force))
+                  Val.Lazy(new Val.Obj(temp, _ => (), None))
+              }))
+          })
+          Val.Arr(out.toSeq)
       },
-      //TODO
-      builtin("leftJoin", "arrayL", "arrayR", "funct"){
-        (ev,fs, arrayL: Val.Arr, arrayR: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+
+      builtin0("leftJoin", "arrL", "arryR", "functL", "functR"){
+        (vals, ev,fs) =>
+          //map the input values
+          val valSeq = validate(vals, ev, fs, Array(ArrRead, ArrRead, ApplyerRead, ApplyerRead))
+          val arrL = valSeq(0).asInstanceOf[Val.Arr]
+          val arrR = valSeq(1).asInstanceOf[Val.Arr]
+          val functL = valSeq(2).asInstanceOf[Applyer]
+          val functR = valSeq(3).asInstanceOf[Applyer]
+
+          //make backup array for leftovers
+          var leftoversL = arrL.value
+
+          val out = collection.mutable.Buffer.empty[Val.Lazy]
+
+          arrL.value.foreach({
+            valueL => val compareL = functL.apply(valueL)
+              //append all that match the condition
+              out.appendAll(arrR.value.collect({
+                case valueR if compareL.equals(functR.apply(valueR)) =>
+                  val temp = scala.collection.mutable.Map[String, Val.Obj.Member]()
+                  //remove matching values from the leftOvers arrays
+                  leftoversL = leftoversL.filter(item => !item.force.equals(valueL.force))
+
+                  temp += ("l" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueL.force))
+                  temp += ("r" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueR.force))
+                  Val.Lazy(new Val.Obj(temp, _ => (), None))
+              }))
+          })
+
+          out.appendAll(leftoversL.map(
+            leftOver =>
+              Val.Lazy(new Val.Obj(
+                scala.collection.mutable.Map("l" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => leftOver.force)),
+                _ => (), None))
+          ))
+          Val.Arr(out.toSeq)
       },
-      //TODO
-      builtin("outerJoin", "arr", "funct"){
-        (ev,fs, arr: Val.Arr, funct: Applyer) =>
-          Val.Lazy(Val.Null).force
+
+      builtin0("outerJoin", "arrL", "arryR", "functL", "functR"){
+        (vals, ev,fs) =>
+          //map the input values
+          val valSeq = validate(vals, ev, fs, Array(ArrRead, ArrRead, ApplyerRead, ApplyerRead))
+          val arrL = valSeq(0).asInstanceOf[Val.Arr]
+          val arrR = valSeq(1).asInstanceOf[Val.Arr]
+          val functL = valSeq(2).asInstanceOf[Applyer]
+          val functR = valSeq(3).asInstanceOf[Applyer]
+
+          //make backup array for leftovers
+          var leftoversL = arrL.value
+          var leftoversR = arrR.value
+
+          val out = collection.mutable.Buffer.empty[Val.Lazy]
+
+          arrL.value.foreach({
+            valueL => val compareL = functL.apply(valueL)
+              //append all that match the condition
+              out.appendAll(arrR.value.collect({
+                case valueR if compareL.equals(functR.apply(valueR)) =>
+                  val temp = scala.collection.mutable.Map[String, Val.Obj.Member]()
+                  //remove matching values from the leftOvers arrays
+                  leftoversL = leftoversL.filter(item => !item.force.equals(valueL.force))
+                  leftoversR = leftoversR.filter(item => !item.force.equals(valueR.force))
+
+                  temp += ("l" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueL.force))
+                  temp += ("r" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueR.force))
+                  Val.Lazy(new Val.Obj(temp, _ => (), None))
+              }))
+          })
+
+          out.appendAll(leftoversL.map(
+            leftOver =>
+              Val.Lazy(new Val.Obj(
+                scala.collection.mutable.Map("l" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => leftOver.force)),
+                _ => (), None))
+            ).appendedAll(leftoversR.map(
+              leftOver =>
+                Val.Lazy(new Val.Obj(
+                  scala.collection.mutable.Map("r" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => leftOver.force)),
+                  _ => (), None)))
+          ))
+          Val.Arr(out.toSeq)
       },
-       */
 
       builtin("partition", "arr", "funct") {
         (_, _, array: Val.Arr, funct: Applyer) =>
