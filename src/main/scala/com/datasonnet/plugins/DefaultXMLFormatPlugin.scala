@@ -11,7 +11,7 @@ import com.datasonnet.spi.{AbstractDataFormatPlugin, PluginException}
 import ujson.Value
 
 import scala.collection.mutable
-import scala.jdk.CollectionConverters.{MapHasAsScala, SetHasAsJava}
+import scala.jdk.CollectionConverters.MapHasAsScala
 
 // See: http://wiki.open311.org/JSON_and_XML_Conversion/#the-badgerfish-convention
 // http://www.sklar.com/badgerfish/
@@ -38,45 +38,35 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
   val DS_AUTO_EMPTY = "autoemptyelements"
   val DS_NULL_AS_EMPTY = "nullasemptyelement"
 
-  getWriterParams.addAll(Set(
-    AbstractDataFormatPlugin.DS_PARAM_INDENT,
-    DS_NS_SEPARATOR,
-    DS_ATTRIBUTE_KEY_PREFIX,
-    DS_TEXT_KEY_PREFIX,
-    DS_CDATA_KEY_PREFIX,
-    DS_NAMESPACE_DECLARATIONS,
-    DS_ROOT_ELEMENT,
-    DS_OMIT_DECLARATION,
-    DS_VERSION,
-    DS_AUTO_EMPTY,
-    DS_NULL_AS_EMPTY
-  ).asJava)
+  supportedTypes.add(MediaTypes.APPLICATION_XML)
+  supportedTypes.add(MediaTypes.TEXT_XML)
+  supportedTypes.add(new MediaType("application", "*+xml"))
 
-  getReaderParams.addAll(Set(
-    DS_NS_SEPARATOR,
-    DS_ATTRIBUTE_KEY_PREFIX,
-    DS_TEXT_KEY_PREFIX,
-    DS_CDATA_KEY_PREFIX,
-    DS_NAMESPACE_DECLARATIONS
-  ).asJava)
+  writerParams.add(AbstractDataFormatPlugin.DS_PARAM_INDENT)
+  writerParams.add(DS_NS_SEPARATOR)
+  writerParams.add(DS_ATTRIBUTE_KEY_PREFIX)
+  writerParams.add(DS_TEXT_KEY_PREFIX)
+  writerParams.add(DS_CDATA_KEY_PREFIX)
+  writerParams.add(DS_NAMESPACE_DECLARATIONS)
+  writerParams.add(DS_ROOT_ELEMENT)
+  writerParams.add(DS_OMIT_DECLARATION)
+  writerParams.add(DS_VERSION)
+  writerParams.add(DS_AUTO_EMPTY)
+  writerParams.add(DS_NULL_AS_EMPTY)
 
-  getReaderSupportedClasses.addAll(Set(
-    classOf[String],
-    classOf[java.net.URL],
-    classOf[java.io.File],
-    classOf[java.io.InputStream]
-  ).asJava)
+  readerParams.add(DS_NS_SEPARATOR)
+  readerParams.add(DS_ATTRIBUTE_KEY_PREFIX)
+  readerParams.add(DS_TEXT_KEY_PREFIX)
+  readerParams.add(DS_CDATA_KEY_PREFIX)
+  readerParams.add(DS_NAMESPACE_DECLARATIONS)
 
-  getWriterSupportedClasses.addAll(Set(
-    classOf[String],
-    classOf[OutputStream]
-  ).asJava)
+  readerSupportedClasses.add(classOf[String].asInstanceOf[java.lang.Class[_]])
+  readerSupportedClasses.add(classOf[java.net.URL].asInstanceOf[java.lang.Class[_]])
+  readerSupportedClasses.add(classOf[java.io.File].asInstanceOf[java.lang.Class[_]])
+  readerSupportedClasses.add(classOf[java.io.InputStream].asInstanceOf[java.lang.Class[_]])
 
-  override def supportedTypes(): java.util.Set[MediaType] = {
-    Set(MediaTypes.APPLICATION_XML,
-      MediaTypes.TEXT_XML,
-      new MediaType("application", "*+xml")).asJava
-  }
+  writerSupportedClasses.add(classOf[String].asInstanceOf[java.lang.Class[_]])
+  writerSupportedClasses.add(classOf[OutputStream].asInstanceOf[java.lang.Class[_]])
 
   @throws[PluginException]
   override def read(doc: document.Document[_]): Value = {

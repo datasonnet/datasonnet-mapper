@@ -22,28 +22,23 @@ import java.util.Set;
 
 public class DefaultJSONFormatPlugin extends AbstractDataFormatPlugin {
     public DefaultJSONFormatPlugin() {
-        WRITER_PARAMS.add(DS_PARAM_INDENT);
+        supportedTypes.add(MediaTypes.APPLICATION_JSON);
+        supportedTypes.add(new MediaType("application", "*+json"));
 
-        READER_SUPPORTED_CLASSES.add(java.lang.String.class);
-        READER_SUPPORTED_CLASSES.add(java.lang.CharSequence.class);
-        READER_SUPPORTED_CLASSES.add(java.nio.file.Path.class);
-        READER_SUPPORTED_CLASSES.add(java.io.File.class);
-        READER_SUPPORTED_CLASSES.add(java.nio.ByteBuffer.class);
-        READER_SUPPORTED_CLASSES.add(byte[].class);
+        writerParams.add(DS_PARAM_INDENT);
 
-        WRITER_SUPPORTED_CLASSES.add(java.lang.String.class);
-        WRITER_SUPPORTED_CLASSES.add(java.lang.CharSequence.class);
-        WRITER_SUPPORTED_CLASSES.add(java.nio.ByteBuffer.class);
-        WRITER_SUPPORTED_CLASSES.add(java.io.OutputStream.class);
-        WRITER_SUPPORTED_CLASSES.add(byte[].class);
-    }
+        readerSupportedClasses.add(java.lang.String.class);
+        readerSupportedClasses.add(java.lang.CharSequence.class);
+        readerSupportedClasses.add(java.nio.file.Path.class);
+        readerSupportedClasses.add(java.io.File.class);
+        readerSupportedClasses.add(java.nio.ByteBuffer.class);
+        readerSupportedClasses.add(byte[].class);
 
-    @Override
-    public Set<MediaType> supportedTypes() {
-        Set<MediaType> set = new HashSet<>();
-        set.add(MediaTypes.APPLICATION_JSON);
-        set.add(new MediaType("application", "*+json"));
-        return set;
+        writerSupportedClasses.add(java.lang.String.class);
+        writerSupportedClasses.add(java.lang.CharSequence.class);
+        writerSupportedClasses.add(java.nio.ByteBuffer.class);
+        writerSupportedClasses.add(java.io.OutputStream.class);
+        writerSupportedClasses.add(byte[].class);
     }
 
     @Override

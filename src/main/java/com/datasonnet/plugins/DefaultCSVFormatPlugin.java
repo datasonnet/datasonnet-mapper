@@ -41,27 +41,24 @@ public class DefaultCSVFormatPlugin extends BaseJacksonDataFormatPlugin {
     }
 
     public DefaultCSVFormatPlugin() {
-        READER_PARAMS.add(DS_PARAM_USE_HEADER);
-        READER_PARAMS.add(DS_PARAM_QUOTE_CHAR);
-        READER_PARAMS.add(DS_PARAM_SEPARATOR_CHAR);
-        READER_PARAMS.add(DS_PARAM_ESCAPE_CHAR);
-        READER_PARAMS.add(DS_PARAM_NEW_LINE);
-        READER_PARAMS.add(DS_PARAM_HEADERS);
+        supportedTypes.add(MediaTypes.APPLICATION_CSV);
 
-        WRITER_PARAMS.addAll(READER_PARAMS);
+        readerParams.add(DS_PARAM_USE_HEADER);
+        readerParams.add(DS_PARAM_QUOTE_CHAR);
+        readerParams.add(DS_PARAM_SEPARATOR_CHAR);
+        readerParams.add(DS_PARAM_ESCAPE_CHAR);
+        readerParams.add(DS_PARAM_NEW_LINE);
+        readerParams.add(DS_PARAM_HEADERS);
 
-        READER_SUPPORTED_CLASSES.add(InputStream.class);
-        READER_SUPPORTED_CLASSES.add(byte[].class);
-        READER_SUPPORTED_CLASSES.add(String.class);
+        writerParams.addAll(readerParams);
 
-        WRITER_SUPPORTED_CLASSES.add(OutputStream.class);
-        WRITER_SUPPORTED_CLASSES.add(byte[].class);
-        WRITER_SUPPORTED_CLASSES.add(String.class);
-    }
+        readerSupportedClasses.add(InputStream.class);
+        readerSupportedClasses.add(byte[].class);
+        readerSupportedClasses.add(String.class);
 
-    @Override
-    public Set<MediaType> supportedTypes() {
-        return Collections.singleton(MediaTypes.APPLICATION_CSV);
+        writerSupportedClasses.add(OutputStream.class);
+        writerSupportedClasses.add(byte[].class);
+        writerSupportedClasses.add(String.class);
     }
 
     private boolean isUseHeader(MediaType mediaType) {

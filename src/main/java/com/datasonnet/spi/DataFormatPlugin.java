@@ -17,14 +17,7 @@ public interface DataFormatPlugin {
         return false;
     }
 
-    default Set<String> getReaderParams() {
-        return Collections.emptySet();
-    }
-
-    default Set<String> getWriterParams() {
-        return Collections.emptySet();
-    }
-
     ujson.Value read(Document<?> doc) throws PluginException;
+
     <T> Document<T> write(Value input, MediaType mediaType, Class<T> targetType) throws PluginException;
 }

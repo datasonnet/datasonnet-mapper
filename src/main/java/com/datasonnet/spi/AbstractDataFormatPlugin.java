@@ -11,28 +11,11 @@ import java.util.Set;
 public abstract class AbstractDataFormatPlugin implements DataFormatPlugin {
     public static final String DS_PARAM_INDENT = "indent";
 
-    protected final Set<String> READER_PARAMS = new HashSet<>();
-    protected final Set<String> WRITER_PARAMS = new HashSet<>();
-    protected final Set<Class<?>> READER_SUPPORTED_CLASSES = new HashSet<>();
-    protected final Set<Class<?>> WRITER_SUPPORTED_CLASSES = new HashSet<>();
-
-    protected Set<Class<?>> getReaderSupportedClasses() {
-        return READER_SUPPORTED_CLASSES;
-    }
-
-    protected Set<Class<?>> getWriterSupportedClasses() {
-        return WRITER_SUPPORTED_CLASSES;
-    }
-
-    @Override
-    public Set<String> getReaderParams() {
-        return READER_PARAMS;
-    }
-
-    @Override
-    public Set<String> getWriterParams() {
-        return WRITER_PARAMS;
-    }
+    protected final Set<MediaType> supportedTypes = new HashSet<>(4);
+    protected final Set<String> readerParams = new HashSet<>();
+    protected final Set<String> writerParams = new HashSet<>();
+    protected final Set<Class> readerSupportedClasses = new HashSet<>(8);
+    protected final Set<Class<?>> writerSupportedClasses = new HashSet<>(8);
 
     @Override
     public Value read(Document<?> doc) throws PluginException {
@@ -48,9 +31,9 @@ public abstract class AbstractDataFormatPlugin implements DataFormatPlugin {
     public boolean canRead(Document<?> doc) {
         MediaType requestedType = doc.getMediaType();
 
-        for (MediaType supportedType : supportedTypes()) {
+        for (MediaType supportedType : supportedTypes) {
             if (supportedType.includes(requestedType) &&
-                    parametersAreSupported(requestedType, READER_PARAMS) &&
+                    parametersAreSupported(requestedType, readerParams) &&
                     canReadClass(doc.getContent().getClass())) {
                 return true;
             }
@@ -62,9 +45,9 @@ public abstract class AbstractDataFormatPlugin implements DataFormatPlugin {
     @Override
     public boolean canWrite(MediaType requestedType, Class<?> clazz) {
 
-        for (MediaType supportedType : supportedTypes()) {
+        for (MediaType supportedType : supportedTypes) {
             if (supportedType.includes(requestedType) &&
-                    parametersAreSupported(requestedType, WRITER_PARAMS) &&
+                    parametersAreSupported(requestedType, writerParams) &&
                     canWriteClass(clazz)) {
                 return true;
             }
@@ -73,10 +56,8 @@ public abstract class AbstractDataFormatPlugin implements DataFormatPlugin {
         return false;
     }
 
-    public abstract Set<MediaType> supportedTypes();
-
     protected boolean canReadClass(Class<?> cls) {
-        for (Class<?> supported : READER_SUPPORTED_CLASSES) {
+        for (Class<?> supported : readerSupportedClasses) {
             if (supported.isAssignableFrom(cls)) {
                 return true;
             }
@@ -85,7 +66,7 @@ public abstract class AbstractDataFormatPlugin implements DataFormatPlugin {
     }
 
     protected boolean canWriteClass(Class<?> clazz) {
-        for (Class<?> supported : WRITER_SUPPORTED_CLASSES) {
+        for (Class<?> supported : writerSupportedClasses) {
             if (supported.equals(clazz)) {
                 return true;
             }

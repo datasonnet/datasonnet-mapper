@@ -36,13 +36,10 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
     }
 
     public DefaultJavaFormatPlugin() {
-        READER_PARAMS.add(DS_PARAM_DATE_FORMAT);
-        WRITER_PARAMS.add(DS_PARAM_DATE_FORMAT);
-    }
+        supportedTypes.add(MediaTypes.APPLICATION_JAVA);
 
-    @Override
-    public Set<MediaType> supportedTypes() {
-        return Collections.singleton(MediaTypes.APPLICATION_JAVA);
+        readerParams.add(DS_PARAM_DATE_FORMAT);
+        writerParams.add(DS_PARAM_DATE_FORMAT);
     }
 
     @Override

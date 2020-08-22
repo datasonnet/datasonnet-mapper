@@ -7,7 +7,6 @@ import com.datasonnet.document.MediaTypes;
 import com.datasonnet.spi.AbstractDataFormatPlugin;
 import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.ujsonUtils;
-import ujson.Str;
 import ujson.Value;
 
 import java.util.Collections;
@@ -15,13 +14,10 @@ import java.util.Set;
 
 public class DefaultPlainTextFormatPlugin extends AbstractDataFormatPlugin {
     public DefaultPlainTextFormatPlugin() {
-        READER_SUPPORTED_CLASSES.add(String.class);
-        WRITER_SUPPORTED_CLASSES.add(String.class);
-    }
+        supportedTypes.add(MediaTypes.TEXT_PLAIN);
 
-    @Override
-    public Set<MediaType> supportedTypes() {
-        return Collections.singleton(MediaTypes.TEXT_PLAIN);
+        readerSupportedClasses.add(String.class);
+        writerSupportedClasses.add(String.class);
     }
 
     public Value read(Document<?> doc) throws PluginException {
