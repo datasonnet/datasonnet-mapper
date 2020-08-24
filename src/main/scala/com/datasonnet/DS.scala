@@ -5,14 +5,14 @@ import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.time.{Instant, Period, ZoneId, ZoneOffset}
-import java.util.{Base64, Scanner}
 import java.util.function.Function
+import java.util.{Base64, Scanner}
 
 import com.datasonnet
 import com.datasonnet.document.{DefaultDocument, MediaType}
 import com.datasonnet.spi.{DataFormatService, Library, ujsonUtils}
 import sjsonnet.Expr.Member.Visibility
-import sjsonnet.ReadWriter.{ApplyerRead, ArrRead, FuncRead, StringRead}
+import sjsonnet.ReadWriter.{ApplyerRead, ArrRead, StringRead}
 import sjsonnet.Std.{builtin, builtinWithDefaults, _}
 import sjsonnet.{Applyer, Error, EvalScope, Expr, FileScope, Materializer, Val}
 import ujson.Value
@@ -39,7 +39,7 @@ object DS extends Library {
         }
     },
 
-    builtin("entrySet", "obj") {
+    builtin("entriesOf", "obj") {
       (ev, fs, obj: Val.Obj) =>
         Val.Arr(obj.getVisibleKeys().keySet.collect({
           case key =>
@@ -205,7 +205,7 @@ object DS extends Library {
         }).mkString(sep)
     },
 
-    builtin("keySet", "obj") {
+    builtin("keysOf", "obj") {
       (_, _, obj: Val.Obj) =>
         Val.Arr(obj.getVisibleKeys().keySet.map(item => Val.Lazy(Val.Str(item))).toSeq)
     },
@@ -226,11 +226,11 @@ object DS extends Library {
         }
     },
 
-    builtin("mapEntrySet", "value", "funct") {
+    builtin("mapEntries", "value", "funct") {
       (ev, fs, value: Val, funct: Applyer) =>
         value match {
           case obj: Val.Obj =>
-            mapEntrySet(obj, funct, ev, fs)
+            mapEntries(obj, funct, ev, fs)
           case Val.Null => Val.Lazy(Val.Null).force
           case _ => throw new IllegalArgumentException(
             "Expected Object, got: " + value.prettyName);
@@ -510,7 +510,7 @@ object DS extends Library {
         Val.Lazy(Val.Str(sb.toString())).force
     },
 
-    builtin("valueSet", "obj") {
+    builtin("valuesOf", "obj") {
       (ev, fs, obj: Val.Obj) =>
         Val.Arr(obj.getVisibleKeys().keySet.map(key => Val.Lazy(obj.value(key, -1)(fs, ev))).toSeq)
     },
@@ -2353,7 +2353,7 @@ object DS extends Library {
     }
   }
 
-  private def mapEntrySet(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val = {
+  private def mapEntries(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val = {
     val args = funct.f.params.allIndices.size
     val out = collection.mutable.Buffer.empty[Val.Lazy]
     if (args.equals(3)) {

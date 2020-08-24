@@ -493,12 +493,12 @@ public class CoreTest {
     }
 
     @Test
-    void test_mapEntrySet() {
-        Mapper mapper = new Mapper(lib + ".mapEntrySet({\"a\":\"b\",\"c\":\"d\"}, function(value,key,index) index )\n", new ArrayList<>(), new HashMap<>(),true);
+    void test_mapEntries() {
+        Mapper mapper = new Mapper(lib + ".mapEntries({\"a\":\"b\",\"c\":\"d\"}, function(value,key,index) index )\n", new ArrayList<>(), new HashMap<>(),true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[0,1]", value);
 
-        mapper = new Mapper(lib + ".mapEntrySet({\"a\":\"b\",\"c\":\"d\"}, function(value,key,index) { [value] : { [key]: index} }\n)\n", new ArrayList<>(), new HashMap<>(),true);
+        mapper = new Mapper(lib + ".mapEntries({\"a\":\"b\",\"c\":\"d\"}, function(value,key,index) { [value] : { [key]: index} }\n)\n", new ArrayList<>(), new HashMap<>(),true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[{b:{a:0}},{d:{c:1}}]", value);
 
@@ -725,8 +725,8 @@ public class CoreTest {
     }
 
     @Test
-    void test_valueSet(){
-        Mapper mapper = new Mapper(lib+".valueSet({ \"a\" : true, \"b\" : 1, \"c\":[], \"d\":\"d\"})\n", new ArrayList<>(), new HashMap<>(),true);
+    void test_valuesOf(){
+        Mapper mapper = new Mapper(lib+".valuesOf({ \"a\" : true, \"b\" : 1, \"c\":[], \"d\":\"d\"})\n", new ArrayList<>(), new HashMap<>(),true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[true,1,[],d]", value);
     }

@@ -35,10 +35,10 @@ public class ObjectsTest {
     }
 
     @Test
-    void testObjects_entrySet(){
+    void testObjects_entriesOf(){
         String input="{\"test1\":\"x\",\"test2\":{\"inTest3\":\"x\",\"inTest4\":{}},\"test10\":[{},{}]}";
         String compare="[{value:x,key:test1},{value:{inTest3:x,inTest4:{}},key:test2},{value:[{},{}],key:test10}]";
-        Mapper mapper = new Mapper(lib+".entrySet(" + input + ")", new ArrayList<>(), new HashMap<>(),true);
+        Mapper mapper = new Mapper(lib+".entriesOf(" + input + ")", new ArrayList<>(), new HashMap<>(),true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals(compare, value);
     }
@@ -67,8 +67,8 @@ public class ObjectsTest {
     }
 
     @Test
-    void testObjects_keySet(){
-        Mapper mapper = new Mapper(lib+".keySet({ \"a\" : true, \"b\" : 1})\n", new ArrayList<>(), new HashMap<>(),true);
+    void testObjects_keysOf(){
+        Mapper mapper = new Mapper(lib+".keysOf({ \"a\" : true, \"b\" : 1})\n", new ArrayList<>(), new HashMap<>(),true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[a,b]", value);
     }
@@ -124,8 +124,8 @@ public class ObjectsTest {
     }
 
     @Test
-    void testObjects_valueSet(){
-        Mapper mapper = new Mapper(lib+".valueSet({ \"a\" : true, \"b\" : 1, \"c\":[], \"d\":\"d\"})\n", new ArrayList<>(), new HashMap<>(),true);
+    void testObjects_valuesOf(){
+        Mapper mapper = new Mapper(lib+".valuesOf({ \"a\" : true, \"b\" : 1, \"c\":[], \"d\":\"d\"})\n", new ArrayList<>(), new HashMap<>(),true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[true,1,[],d]", value);
     }
