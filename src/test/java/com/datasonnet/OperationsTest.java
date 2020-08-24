@@ -65,4 +65,18 @@ public class OperationsTest {
         assertEquals("{b:2}", value);
     }
 
+    @Test
+    void testOperations_append() {
+        Mapper mapper = new Mapper(lib + pack + ".append([1,2,3],4)\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[1,2,3,4]", value);
+    }
+
+    @Test
+    void testOperations_prepend() {
+        Mapper mapper = new Mapper(lib + pack + ".prepend([1,2,3],4)\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[4,1,2,3]", value);
+    }
+
 }

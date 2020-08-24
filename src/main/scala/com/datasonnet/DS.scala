@@ -1890,6 +1890,7 @@ object DS extends Library {
           }
       }
     ),
+
     "ops" -> moduleFrom(
 
       builtin("combine", "first", "second") {
@@ -1988,6 +1989,18 @@ object DS extends Library {
             case i => throw new IllegalArgumentException(
               "Expected Array or Object, got: " + i.prettyName)
           }
+      },
+
+      builtin("append", "first", "second") {
+        (_, _, arr: Val.Arr, second: Val) =>
+          val out = collection.mutable.Buffer.empty[Val.Lazy]
+          Val.Arr(out.appendAll(arr.value).append(Val.Lazy(second)).toSeq)
+      },
+
+      builtin("prepend", "first", "second") {
+        (_, _, arr: Val.Arr, second: Val) =>
+          val out = collection.mutable.Buffer.empty[Val.Lazy]
+          Val.Arr(out.append(Val.Lazy(second)).appendAll(arr.value).toSeq)
       },
     )
   )
