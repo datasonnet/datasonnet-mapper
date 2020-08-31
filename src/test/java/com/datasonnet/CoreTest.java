@@ -738,6 +738,68 @@ public class CoreTest {
         assertEquals("[[1,a],[2,b]]", value);
     }
 
+    @Test
+    void test_combine() {
+        Mapper mapper = new Mapper(lib + ".combine([1],[2])\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[1,2]", value);
 
+        mapper = new Mapper(lib + ".combine({a:1},{b:2})\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{a:1,b:2}", value);
+
+        mapper = new Mapper(lib + ".combine(1,2)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("12", value);
+
+        mapper = new Mapper(lib + ".combine(1.2,2)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("1.22", value);
+
+        mapper = new Mapper(lib + ".combine(\"1\",2)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("12", value);
+
+        mapper = new Mapper(lib + ".combine(\"1\",\"2\")\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("12", value);
+    }
+
+
+    @Test
+    void test_remove() {
+        Mapper mapper = new Mapper(lib + ".remove([1,2,1],1)\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[2]", value);
+
+        mapper = new Mapper(lib + ".remove({a:1,b:2},\"a\")\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{b:2}", value);
+    }
+
+    @Test
+    void test_removeMatch() {
+        Mapper mapper = new Mapper(lib + ".removeMatch([1,2,1],[1,3])\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[2]", value);
+
+        mapper = new Mapper(lib + ".removeMatch({a:1,b:2},{a:1,c:3})\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{b:2}", value);
+    }
+
+    @Test
+    void test_append() {
+        Mapper mapper = new Mapper(lib + ".append([1,2,3],4)\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[1,2,3,4]", value);
+    }
+
+    @Test
+    void test_prepend() {
+        Mapper mapper = new Mapper(lib + ".prepend([1,2,3],4)\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[4,1,2,3]", value);
+    }
 
 }
