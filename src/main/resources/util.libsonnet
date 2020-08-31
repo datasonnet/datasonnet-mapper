@@ -63,114 +63,6 @@
           [ obj for obj in listOfObjects if filter_func(PortXMapper.select(obj, key), value) ],
 
     /*
-     * Partitions an array into a Object that contains Arrays, according to the discriminator lambda you define
-     * The discriminator can be a path inside the objects to group, e.g. 'language.name'
-     *
-     * Example:
-     *    groupBy(payload.languages, 'language.name')
-     *
-     *    Input:
-     *    {
-     *      "languages": [
-     *        {
-     *          "name": "Foo",
-     *          "language": {
-     *              "name": "Java",
-     *              "version": "1.8"
-     *          }
-     *        },
-     *        {
-     *          "name": "Bar",
-     *          "language": {
-     *              "name": "Scala",
-     *              "version": "1.0"
-     *          }
-     *        },
-     *        {
-     *          "name": "FooBar",
-     *          "language": {
-     *              "name": "Java",
-     *              "version": "1.7"
-     *          }
-     *        }
-     *      ]
-     *    }
-     *
-     *    Output:
-     *    {
-     *       "languages": {
-     *          "Java": [
-     *             {
-     *                "language": {
-     *                   "name": "Java",
-     *                   "version": "1.8"
-     *                },
-     *                "name": "Foo"
-     *             },
-     *             {
-     *                "language": {
-     *                   "name": "Java",
-     *                   "version": "1.7"
-     *                },
-     *                "name": "FooBar"
-     *             }
-     *          ],
-     *          "Scala": [
-     *             {
-     *                "language": {
-     *                   "name": "Scala",
-     *                   "version": "1.0"
-     *                },
-     *                "name": "Bar"
-     *             }
-     *          ]
-     *       }
-     *    }
-     */
-    groupBy(arr, keyName)::
-        local keys(arr, key) = std.uniq(std.sort([ PortXMapper.select(obj, key) for obj in arr ]));
-
-        {
-            [key]: PortXMapper.filterEx(arr, keyName, key)
-                for key in keys(arr, keyName)
-        },
-
-    /*
-     * Removes a property with given name from the object and returns the remaining object
-     *
-     * Example:
-     *
-     *    remove(flight, 'availableSeats')
-     *
-     *    Input:
-     *    {
-     *      "availableSeats": 45,
-     *      "airlineName": "Delta",
-     *      "aircraftBrand": "Boeing",
-     *      "aircraftType": "717",
-     *      "departureDate": "01/20/2019",
-     *      "origin": "PHX",
-     *      "destination": "SEA"
-     *    }
-     *
-     *    Output:
-     *    {
-     *      "airlineName": "Delta",
-     *      "aircraftBrand": "Boeing",
-     *      "aircraftType": "717",
-     *      "departureDate": "01/20/2019",
-     *      "origin": "PHX",
-     *      "destination": "SEA"
-     *    }
-     *
-     */
-    remove(object, keyName):: {
-      [ key ]: object[key]
-         for key in std.objectFields(object)
-         if key != keyName
-    },
-
-    /*
      * Removes fields with names matching any of the array values from the object
      */
     removeAll(obj, arr)::
@@ -254,14 +146,6 @@
         ],
 
     /*
-     * Parses a string which contains a double number and returns its numeric representation
-     */
-    parseDouble(str)::
-        local parts = std.split(str, ".");
-        local intPart = std.parseInt(parts[0]);
-        intPart + (if (std.length(parts) > 1) then std.parseInt(parts[1]) * std.pow(10, -std.length(parts[1])) else 0) * if (intPart < 0) then -1 else 1,
-
-    /*
      * Returns an array containing duplicate elements from input array
      */
     duplicates(arr, keyF=defaultF, set=true)::
@@ -275,35 +159,6 @@
                                             },
                                        );
         if set then std.set(aggregates.duplicates, keyF) else aggregates.duplicates,
-
-    /*
-     * Returns sum of all elements in the array
-     */
-    sum(arr)::
-        std.foldl(function(aggregate, num) aggregate + num, payload, 0),
-
-    /*
-     * Rounds a double to the number of digits after the decimal point
-     */
-    round(num, precision)::
-        assert std.isNumber(num) : "Argument 'num' must be a number, got " + std.type(num);
-        assert std.isNumber(precision) &&
-               precision >= 0 &&
-               std.length(std.split(std.toString(precision), '.')) < 2 : "Argument 'precision' must be an integer number greater than or equal to 0";
-
-        local shift = std.pow(10,precision);
-        local shiftedNum = num * shift;
-        local stringRep = std.format("%f", shiftedNum);
-        local decimalParts = std.split(stringRep, ".");
-
-        if std.length(decimalParts) < 2 then num else
-            local nextDigit = self.parseDouble(decimalParts[1][0]);
-            local rnd = if num >= 0 then
-                           if (nextDigit >= 5) then std.ceil(shiftedNum) else std.floor(shiftedNum)
-                        else
-                           if (nextDigit >= 5) then std.floor(shiftedNum) else std.ceil(shiftedNum);
-            local rounded = rnd / shift;
-            self.parseDouble(std.format("%." + precision + "f", rounded)),
 
     /*
      * Returns an object where keys are the results of calling keyF on the values, and the values are the counts of values that produced the corresponding key.

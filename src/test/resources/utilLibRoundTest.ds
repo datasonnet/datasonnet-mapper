@@ -1,6 +1,6 @@
-assert ds.util.round(123.562567558, 1) == 123.6 : "#1 failed %f" % ds.util.round(123.562567558, 1);
-assert ds.util.round(123.562567558, 6) == 123.562568 : "#2 failed %f" % round(123.562567558, 6);
-assert ds.util.round(-123.562567558, 1) == -123.6 : "#3 failed %f" % ds.util.round(-123.562567558, 1);
-assert ds.util.round(-123.562567558, 6) == -123.562568 : "#4 failed %f" % ds.util.round(-123.562567558, 6);
+assert ds.math.round(123.562567558, 1) == 123.6 : "#1 failed %f" % ds.math.round(123.562567558, 1);
+assert ds.math.round(123.562567558, 6) == 123.562568 : "#2 failed %f" % math(123.562567558, 6);
+assert ds.math.round(-123.562567558, 1) == -123.6 : "#3 failed %f" % ds.math.round(-123.562567558, 1);
+assert ds.math.round(-123.562567558, 6) == -123.562568 : "#4 failed %f" % ds.math.round(-123.562567558, 6);
 
 true

@@ -26,7 +26,7 @@ local expected = {
    ]
  };
 
-local result = ds.util.groupBy(payload.languages, 'language.name');
+local result = ds.groupBy(payload.languages, function(value) value.language.name);
 
 assert expected == result;
 

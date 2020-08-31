@@ -1,6 +1,7 @@
 package com.datasonnet
 
 import java.net.URL
+import java.math.{BigDecimal, RoundingMode}
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -606,6 +607,11 @@ object DS extends Library {
 
     builtin("parseHex", "str"){ (ev, fs, str: String) =>
       Integer.parseInt(str, 16)
+    },
+
+    // migrated from util.libsonnet
+    builtin("parseDouble", "str"){ (ev, fs, str: String) =>
+      str.toDouble
     }
   )
 
@@ -855,9 +861,17 @@ object DS extends Library {
           (Random.nextInt((num - 0) + 1) + 0).intValue()
       },
 
-      builtin("round", "num") {
-        (_, _, num: Double) =>
+      builtinWithDefaults("round",
+        "num" -> None,
+      "precision" -> Some(Expr.Num(0, 0))){ (args, ev) =>
+        val num = args("num").cast[Val.Num].value
+        val prec = args("precision").cast[Val.Num].value.toInt
+
+        if (prec == 0) {
           Math.round(num).intValue()
+        } else {
+          BigDecimal.valueOf(num).setScale(prec, RoundingMode.HALF_UP).doubleValue()
+        }
       },
 
       builtin("sqrt", "num") {
@@ -2001,7 +2015,7 @@ object DS extends Library {
         (_, _, arr: Val.Arr, second: Val) =>
           val out = collection.mutable.Buffer.empty[Val.Lazy]
           Val.Arr(out.append(Val.Lazy(second)).appendAll(arr.value).toSeq)
-      },
+      }
     )
   )
 
