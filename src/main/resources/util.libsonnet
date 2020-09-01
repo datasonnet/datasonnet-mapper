@@ -116,36 +116,6 @@
         std.foldl(function(aggregate, x) if std.isArray(x) then aggregate + PortXMapper.deepFlattenArrays(x) else aggregate + [x], arr, []),
 
     /*
-     * Returns an array with elements in reverse order.
-     *
-     * Example:
-     *
-     *    reverse(arr)
-     *
-     *    Input:
-     *    [
-     *       "a",
-     *       "b",
-     *       "c",
-     *       "d"
-     *    ]
-     *
-     *    Output:
-     *    [
-     *       "d",
-     *       "c",
-     *       "b",
-     *       "a",
-     *    ]
-     *
-     */
-    reverse(arr)::
-        [
-            arr[std.length(arr) - idx - 1]
-            for idx in std.range(0, std.length(arr) - 1)
-        ],
-
-    /*
      * Returns an array containing duplicate elements from input array
      */
     duplicates(arr, keyF=defaultF, set=true)::

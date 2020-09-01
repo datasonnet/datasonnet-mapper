@@ -38,7 +38,7 @@ public class UtilLibraryTest {
     @Test
     void testReverse() throws Exception {
         String jsonData = "[\"a\",\"b\",\"c\",\"d\"]";
-        Mapper mapper = new Mapper("ds.util.reverse(payload)");
+        Mapper mapper = new Mapper("ds.reverse(payload)");
         String mappedJson = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
 
         assertEquals(mappedJson, "[\"d\",\"c\",\"b\",\"a\"]");

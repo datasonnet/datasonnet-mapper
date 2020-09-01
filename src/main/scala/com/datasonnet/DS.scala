@@ -18,6 +18,7 @@ import sjsonnet.Std.{builtin, builtinWithDefaults, _}
 import sjsonnet.{Applyer, Error, EvalScope, Expr, FileScope, Materializer, Val}
 import ujson.Value
 
+import scala.collection.mutable
 import scala.util.Random
 
 object DS extends Library {
@@ -722,6 +723,21 @@ object DS extends Library {
       (_, _, arr: Val.Arr, second: Val) =>
         val out = collection.mutable.Buffer.empty[Val.Lazy]
         Val.Arr(out.append(Val.Lazy(second)).appendAll(arr.value).toSeq)
+    },
+
+    builtin("reverse", "collection") {
+      (ev, fs, collection: Val) =>
+        collection match {
+          case Val.Arr(arr) => Val.Arr(arr.reverse)
+          case obj: Val.Obj =>
+            var result: Seq[(String, Val.Obj.Member)] = Seq()
+            obj.getVisibleKeys().foreach(entry => result = result.prepended(
+              entry._1 -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(entry._1, -1)(fs, ev))
+            ))
+            new Val.Obj(mutable.LinkedHashMap(result: _*), _ => (), None)
+          case i => throw new IllegalArgumentException(
+            "Expected Array or Object, got: " + i.prettyName)
+        }
     }
   )
 

@@ -802,4 +802,12 @@ public class CoreTest {
         assertEquals("[4,1,2,3]", value);
     }
 
+
+    @Test
+    void test_reverse() {
+        Mapper mapper = new Mapper(lib + ".reverse({first: '1', second: '2'})\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{second:2,first:1}", value);
+    }
+
 }
