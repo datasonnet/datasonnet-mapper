@@ -56,7 +56,7 @@ public class CSVWriterTest {
                 MediaTypes.APPLICATION_JSON
         );
 
-        Mapper mapper = new Mapper("{ embeddedCSVValue: DS.Formats.write(payload, \"application/csv\") }");
+        Mapper mapper = new Mapper("{ embeddedCSVValue: ds.write(payload, \"application/csv\") }");
 
 
         String mapped = mapper.transform(data, Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();

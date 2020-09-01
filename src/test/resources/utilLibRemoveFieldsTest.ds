@@ -21,6 +21,6 @@ local filteredArr = [
                       }
                     ];
 
-local result = [ DS.Util.removeAll(user, filterKeys) for user in payload ];
+local result = [ ds.util.removeAll(user, filterKeys) for user in payload ];
 
 result == filteredArr

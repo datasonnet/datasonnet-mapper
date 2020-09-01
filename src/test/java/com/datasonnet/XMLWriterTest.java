@@ -124,7 +124,7 @@ public class XMLWriterTest {
 
         Mapper mapper = new Mapper("local params = {\n" +
                 "    \"XmlVersion\" : \"1.1\"\n" +
-                "};DS.Formats.write(payload, \"application/xml\", params)");
+                "};ds.write(payload, \"application/xml\", params)");
 
 
         String mappedXml = mapper.transform(new DefaultDocument<>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.TEXT_PLAIN).getContent();
@@ -184,7 +184,7 @@ public class XMLWriterTest {
     void testXMLRoot() throws Exception {
         String jsonData = TestResourceReader.readFileAsString("xmlRoot.json");
 
-        Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/xml\")");
+        Mapper mapper = new Mapper("ds.write(payload, \"application/xml\")");
 
 
         try {
@@ -210,7 +210,7 @@ public class XMLWriterTest {
     void simpleJsonTest() throws Exception {
         String jsonData = TestResourceReader.readFileAsString("test.json");
 
-        Mapper mapper = new Mapper("DS.Formats.write(payload, \"application/xml\")");
+        Mapper mapper = new Mapper("ds.write(payload, \"application/xml\")");
 
         String mappedXml = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
 
