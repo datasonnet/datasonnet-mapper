@@ -30,11 +30,11 @@ public abstract class AbstractDataFormatPlugin implements DataFormatPlugin {
     @Override
     public boolean canRead(Document<?> doc) {
         MediaType requestedType = doc.getMediaType();
-
         for (MediaType supportedType : supportedTypes) {
             if (supportedType.includes(requestedType) &&
                     parametersAreSupported(requestedType, readerParams) &&
-                    canReadClass(doc.getContent().getClass())) {
+                    // TODO: 9/2/20 write tests for null handling
+                    (doc.getContent() == null || canReadClass(doc.getContent().getClass()))) {
                 return true;
             }
         }

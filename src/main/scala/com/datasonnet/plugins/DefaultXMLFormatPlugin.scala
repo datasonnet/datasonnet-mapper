@@ -70,6 +70,8 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
 
   @throws[PluginException]
   override def read(doc: document.Document[_]): Value = {
+    if (doc.getContent == null) return ujson.Null
+
     val effectiveParams = EffectiveParams(doc.getMediaType)
 
     doc.getContent.getClass match {

@@ -54,6 +54,10 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
 
     @Override
     public Value read(Document<?> doc) throws PluginException {
+        if (doc.getContent() == null) {
+            return ujson.Value.Null();
+        }
+
         ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
 
         if (doc.getMediaType().getParameters().containsKey(DS_PARAM_DATE_FORMAT)) {

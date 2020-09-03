@@ -21,6 +21,10 @@ public class DefaultPlainTextFormatPlugin extends AbstractDataFormatPlugin {
     }
 
     public Value read(Document<?> doc) throws PluginException {
+        if (doc.getContent() == null) {
+            return ujson.Value.Null();
+        }
+
         if (String.class.isAssignableFrom(doc.getContent().getClass())){
             return ujsonUtils.strOf((String) doc.getContent());
         } else {
