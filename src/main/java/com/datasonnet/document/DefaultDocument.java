@@ -11,7 +11,11 @@ public class DefaultDocument<T> implements Document<T> {
 
     public DefaultDocument(T content, MediaType mediaType) {
         this.content = content;
-        this.mediaType = mediaType;
+        if (mediaType != null) {
+            this.mediaType = mediaType;
+        } else {
+            this.mediaType = MediaTypes.APPLICATION_JAVA;
+        }
     }
 
     public DefaultDocument<T> withMediaType(MediaType mediaType) {
