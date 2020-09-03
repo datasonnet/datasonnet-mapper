@@ -44,7 +44,6 @@ public abstract class AbstractDataFormatPlugin implements DataFormatPlugin {
 
     @Override
     public boolean canWrite(MediaType requestedType, Class<?> clazz) {
-
         for (MediaType supportedType : supportedTypes) {
             if (supportedType.includes(requestedType) &&
                     parametersAreSupported(requestedType, writerParams) &&
@@ -67,7 +66,7 @@ public abstract class AbstractDataFormatPlugin implements DataFormatPlugin {
 
     protected boolean canWriteClass(Class<?> clazz) {
         for (Class<?> supported : writerSupportedClasses) {
-            if (supported.equals(clazz)) {
+            if (clazz.isAssignableFrom(supported)) {
                 return true;
             }
         }
@@ -93,5 +92,4 @@ public abstract class AbstractDataFormatPlugin implements DataFormatPlugin {
 
         return true;
     }
-
 }

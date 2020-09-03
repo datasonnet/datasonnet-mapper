@@ -71,6 +71,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         return ujsonFrom(inputAsNode);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> Document<T> write(Value input, MediaType mediaType, Class<T> targetType) throws PluginException {
         ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
@@ -84,7 +85,13 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
 
         try {
             Object inputAsJava = ujsonUtils.javaObjectFrom(input);
-            T converted = mapper.convertValue(inputAsJava, targetType);
+            T converted;
+
+            if (Object.class.equals(targetType)) {
+                converted = (T) inputAsJava;
+            } else {
+                converted = mapper.convertValue(inputAsJava, targetType);
+            }
 
             return new DefaultDocument<>(converted);
         } catch (IllegalArgumentException e) {

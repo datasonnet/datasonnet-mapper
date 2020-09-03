@@ -105,14 +105,14 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
       throw new PluginException("Object must have only one root element")
     }
 
-    if (classOf[String].eq(targetType)) {
+    if (targetType.isAssignableFrom(classOf[String])) {
       val writer = new StringWriter()
       XML.writeXML(writer, inputAsObj.head.asInstanceOf[(String, ujson.Obj)], effectiveParams)
 
       new DefaultDocument(writer.toString, MediaTypes.APPLICATION_XML).asInstanceOf[document.Document[T]]
     }
 
-    else if (classOf[OutputStream].eq(targetType)) {
+    else if (targetType.isAssignableFrom(classOf[OutputStream])) {
       val out = new BufferedOutputStream(new ByteArrayOutputStream)
       XML.writeXML(new OutputStreamWriter(out, charset), inputAsObj.head.asInstanceOf[(String, ujson.Obj)], effectiveParams)
 

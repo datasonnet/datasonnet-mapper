@@ -35,7 +35,7 @@ public class DefaultPlainTextFormatPlugin extends AbstractDataFormatPlugin {
     @SuppressWarnings("unchecked")
     @Override
     public <T> Document<T> write(Value input, MediaType mediaType, Class<T> targetType) throws PluginException {
-        if (String.class.equals(targetType)) {
+        if (targetType.isAssignableFrom(String.class)) {
             return (Document<T>) new DefaultDocument<>(ujsonUtils.stringValueOf(input), MediaTypes.TEXT_PLAIN);
         } else {
             throw new IllegalArgumentException("Only strings can be written as plain text.");

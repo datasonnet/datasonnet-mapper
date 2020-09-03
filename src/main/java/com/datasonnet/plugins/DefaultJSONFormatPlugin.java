@@ -86,29 +86,27 @@ public class DefaultJSONFormatPlugin extends AbstractDataFormatPlugin {
         
         int indent = mediaType.getParameters().containsKey(DS_PARAM_INDENT) ? 4 : -1;
 
-        if (OutputStream.class.equals(targetType)) {
+        if (targetType.isAssignableFrom(String.class)) {
+            return new DefaultDocument<>((T) ujsonUtils.write(input, indent, false), MediaTypes.APPLICATION_JSON);
+        }
+
+        if (targetType.isAssignableFrom(CharSequence.class)) {
+            return new DefaultDocument<>((T) ujsonUtils.write(input, indent, false), MediaTypes.APPLICATION_JSON);
+        }
+
+        if (targetType.isAssignableFrom(ByteBuffer.class)) {
+            return new DefaultDocument<>((T) ByteBuffer.wrap(ujsonUtils.write(input, indent, false).getBytes(charset)), MediaTypes.APPLICATION_JSON);
+        }
+
+        if (targetType.isAssignableFrom(byte[].class)) {
+            return new DefaultDocument<>((T) ujsonUtils.write(input, indent, false).getBytes(charset), MediaTypes.APPLICATION_JSON);
+        }
+
+        if (targetType.isAssignableFrom(OutputStream.class)) {
             BufferedOutputStream out = new BufferedOutputStream(new ByteArrayOutputStream());
             ujsonUtils.writeTo(input, new OutputStreamWriter(out, charset), indent, false);
 
             return new DefaultDocument<>((T) out, MediaTypes.APPLICATION_JSON);
-        }
-
-        String result = ujsonUtils.write(input, indent, false);
-
-        if (String.class.equals(targetType)) {
-            return new DefaultDocument<>((T) result, MediaTypes.APPLICATION_JSON);
-        }
-
-        if (CharSequence.class.equals(targetType)) {
-            return new DefaultDocument<>((T) result, MediaTypes.APPLICATION_JSON);
-        }
-
-        if (ByteBuffer.class.equals(targetType)) {
-            return new DefaultDocument<>((T) ByteBuffer.wrap(result.getBytes(charset)), MediaTypes.APPLICATION_JSON);
-        }
-
-        if (byte[].class.equals(targetType)) {
-            return new DefaultDocument<>((T) result.getBytes(charset), MediaTypes.APPLICATION_JSON);
         }
 
         throw new PluginException(new IllegalArgumentException("Unsupported document content class, use the test method canRead before invoking read"));
