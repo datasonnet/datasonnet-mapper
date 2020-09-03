@@ -5,17 +5,17 @@ import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import ujson.Value;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public abstract class AbstractDataFormatPlugin implements DataFormatPlugin {
     public static final String DS_PARAM_INDENT = "indent";
 
-    protected final Set<MediaType> supportedTypes = new HashSet<>(4);
-    protected final Set<String> readerParams = new HashSet<>();
-    protected final Set<String> writerParams = new HashSet<>();
-    protected final Set<Class> readerSupportedClasses = new HashSet<>(8);
-    protected final Set<Class<?>> writerSupportedClasses = new HashSet<>(8);
+    protected final Set<MediaType> supportedTypes = new LinkedHashSet<>(4);
+    protected final Set<String> readerParams = new LinkedHashSet<>();
+    protected final Set<String> writerParams = new LinkedHashSet<>();
+    protected final Set<Class<?>> readerSupportedClasses = new LinkedHashSet<>(8);
+    protected final Set<Class<?>> writerSupportedClasses = new LinkedHashSet<>(8);
 
     @Override
     public Value read(Document<?> doc) throws PluginException {
