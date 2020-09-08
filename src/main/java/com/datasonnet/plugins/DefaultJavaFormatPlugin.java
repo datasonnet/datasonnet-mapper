@@ -10,6 +10,7 @@ import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.ujsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import ujson.Value;
 
@@ -33,6 +34,8 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         DEFAULT_OBJECT_MAPPER.registerModule(module);
         DEFAULT_OBJECT_MAPPER.addMixIn(JAXBElement.class, JAXBElementMixIn.class);
         DEFAULT_OBJECT_MAPPER.setDateFormat(new SimpleDateFormat(DEFAULT_DS_DATE_FORMAT));
+        // TODO: 9/8/20 add test for empty beans
+        DEFAULT_OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
 
     public DefaultJavaFormatPlugin() {
