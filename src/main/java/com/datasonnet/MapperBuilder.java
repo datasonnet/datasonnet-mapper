@@ -46,7 +46,7 @@ public class MapperBuilder {
         return this;
     }
 
-    public MapperBuilder addLibrary(Library lib) {
+    public MapperBuilder withLibrary(Library lib) {
         Objects.requireNonNull(lib);
         if (libs.isEmpty()) {
             libs = new ArrayList<>(2);
@@ -56,7 +56,7 @@ public class MapperBuilder {
         return this;
     }
 
-    public MapperBuilder shouldWrapAsFunction(boolean asFunction) {
+    public MapperBuilder wrapAsFunction(boolean asFunction) {
         this.asFunction = asFunction;
         return this;
     }
