@@ -738,6 +738,14 @@ object DS extends Library {
           case i => throw new IllegalArgumentException(
             "Expected Array or Object, got: " + i.prettyName)
         }
+    },
+
+    builtin("or", "first", "second") {
+      (ev, fs, first: Val, second: Val) =>
+        first match {
+          case Val.Null => second
+          case _ => first
+        }
     }
   )
 

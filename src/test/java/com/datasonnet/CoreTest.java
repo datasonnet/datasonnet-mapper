@@ -810,4 +810,10 @@ public class CoreTest {
         assertEquals("{second:2,first:1}", value);
     }
 
+    @Test
+    void test_or() {
+        Mapper mapper = new Mapper(lib + ".or(null, 'abc')\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("abc", value);
+    }
 }
