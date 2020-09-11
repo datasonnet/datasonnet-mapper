@@ -274,7 +274,7 @@ public class MediaTypes {
 
     public static final MediaType APPLICATION_JAVA;
 
-    public static final String APPLICATION_JAVA_VALUE = "application/java";
+    public static final String APPLICATION_JAVA_VALUE = "application/x-java-object";
 
     public static final MediaType APPLICATION_CSV;
 
@@ -312,7 +312,7 @@ public class MediaTypes {
         TEXT_PLAIN = new MediaType("text", "plain");
         TEXT_XML = new MediaType("text", "xml");
 
-        APPLICATION_JAVA = new MediaType("application", "java");
+        APPLICATION_JAVA = new MediaType("application", "x-java-object");
         APPLICATION_CSV = new MediaType("application", "csv");
     }
 

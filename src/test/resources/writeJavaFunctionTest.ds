@@ -12,5 +12,5 @@ local obj = {
 };
 
 {
-    test: ds.write(obj, "application/java", params)
+    test: ds.write(obj, "application/x-java-object", params)
 }
