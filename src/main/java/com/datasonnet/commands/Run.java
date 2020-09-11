@@ -100,7 +100,7 @@ public class Run implements Callable<Void> {
     }
 
     private Map<String, String> imports() throws IOException {
-        Map imports = new HashMap<>();
+        Map<String, String> imports = new HashMap<>();
         for(File importFile : importFiles) {
             String name = importFile.getPath();
             String contents = Main.readFile(importFile);

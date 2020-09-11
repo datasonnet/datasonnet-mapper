@@ -443,7 +443,7 @@ object DS extends Library {
 
     builtin("splitBy", "str", "regex") {
       (_, _, str: String, regex: String) =>
-        Val.Arr(regex.r.split(str).map(item => Val.Lazy(Val.Str(item))))
+        Val.Arr(regex.r.split(str).toIndexedSeq.map(item => Val.Lazy(Val.Str(item))))
     },
 
     builtin("startsWith", "str1", "str2") {
@@ -809,7 +809,7 @@ object DS extends Library {
             .parse(datetimeone, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
           val datetwo = java.time.ZonedDateTime
             .parse(datetimetwo, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
-          Val.Num(ChronoUnit.DAYS.between(dateone, datetwo)).value.abs;
+          ChronoUnit.DAYS.between(dateone, datetwo).abs.toDouble;
       },
 
       builtin("isLeapYear", "datetime") {
@@ -1339,7 +1339,7 @@ object DS extends Library {
       builtin("readLinesWith", "value", "encoding") {
         (_, _, value: String, enc: String) =>
           Val.Arr(
-            new String(value.getBytes(), enc).split('\n').collect({
+            new String(value.getBytes(), enc).split('\n').toIndexedSeq.collect({
               case str => Val.Lazy(Val.Str(str))
             })
           )

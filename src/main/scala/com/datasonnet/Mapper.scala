@@ -89,29 +89,29 @@ class Mapper(var script: String,
            inputNames: java.lang.Iterable[String],
            imports: java.util.Map[String, String],
            asFunction: Boolean,
-           additionalLibs: java.util.Collection[Library]) {
+           additionalLibs: java.util.Collection[Library]) = {
     this(script, inputNames, imports, asFunction, additionalLibs, DataFormatService.DEFAULT)
   }
 
   def this(script: String,
            inputNames: java.lang.Iterable[String],
            imports: java.util.Map[String, String],
-           asFunction: Boolean) {
+           asFunction: Boolean) = {
     this(script, inputNames, imports, asFunction, Collections.emptyList())
   }
 
   def this(script: String,
            inputNames: java.lang.Iterable[String],
-           imports: java.util.Map[String, String]) {
+           imports: java.util.Map[String, String]) = {
     this(script, inputNames, imports, true, Collections.emptyList())
   }
 
   def this(script: String,
-           inputNames: java.lang.Iterable[String]) {
+           inputNames: java.lang.Iterable[String]) = {
     this(script, inputNames, Collections.emptyMap())
   }
 
-  def this(script: String) {
+  def this(script: String) = {
     this(script, Collections.emptySet())
   }
 

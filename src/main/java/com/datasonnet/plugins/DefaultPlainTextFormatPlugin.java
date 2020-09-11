@@ -22,7 +22,7 @@ public class DefaultPlainTextFormatPlugin extends AbstractDataFormatPlugin {
 
     public Value read(Document<?> doc) throws PluginException {
         if (doc.getContent() == null) {
-            return ujson.Value.Null();
+            return ujson.Null$.MODULE$;
         }
 
         if (String.class.isAssignableFrom(doc.getContent().getClass())){

@@ -79,10 +79,11 @@ class BadgerFishHandler(params: EffectiveParams) extends DefaultHandler2 {
   override def endElement(uri: String, _localName: String, qname: String): Unit = {
     captureText()
     val newName = qname.replaceFirst(":", params.nsSeparator)
-    val current = badgerStack.pop
+    val current = badgerStack.pop()
     val parent = badgerStack.top.obj.value
     if (parent.contains(newName)) {
-      parent(newName) match {
+      (parent(newName): @unchecked) match {
+        // added @unchecked to suppress non-exhaustive match warning, we will only see Arrs or Objs
         case ujson.Arr(arr) => arr.addOne(current.obj)
         case ujson.Obj(existing) => parent.addOne(newName, ujson.Arr(existing, current.obj))
       }

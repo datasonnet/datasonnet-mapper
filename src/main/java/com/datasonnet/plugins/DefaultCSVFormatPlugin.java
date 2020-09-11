@@ -71,7 +71,7 @@ public class DefaultCSVFormatPlugin extends BaseJacksonDataFormatPlugin {
     @Override
     public Value read(Document<?> doc) throws PluginException {
         if (doc.getContent() == null) {
-            return ujson.Value.Null();
+            return ujson.Null$.MODULE$;
         }
 
         CsvSchema.Builder builder = this.getBuilder(doc.getMediaType());

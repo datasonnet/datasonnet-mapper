@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.re2j.Matcher;
 import com.google.re2j.Pattern;
+import ujson.Null$;
 import ujson.Value;
 
 import java.lang.reflect.Field;
@@ -27,7 +28,7 @@ public class Regex {
         Matcher matcher = pattern.matcher(str);
         ArrayNode regexMatch = scan(matcher);
 
-        return regexMatch != null ? ujsonUtils.parse(regexMatch.toString()) : Value.Null();
+        return regexMatch != null ? ujsonUtils.parse(regexMatch.toString()) : Null$.MODULE$;
     }
 
     public static String regexQuoteMeta(String str) {
@@ -66,7 +67,7 @@ public class Regex {
 
         boolean hasMatch = isFull ? matcher.matches() : matcher.find();
         if (!hasMatch) {
-            return Value.Null();
+            return Null$.MODULE$;
         }
 
         return ujsonUtils.parse(getRegexMatch(matcher).toString());
@@ -113,6 +114,8 @@ public class Regex {
 
         return regexMatch;
     }
+
+    @SuppressWarnings("unchecked")
     private static Map<String, Integer> getNamedGroupsFromMatcher(Matcher matcher) throws RegexException {
         try {
             Field namedGroupsMapField = Matcher.class.getDeclaredField("namedGroups");

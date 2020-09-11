@@ -44,7 +44,7 @@ public class DefaultJSONFormatPlugin extends AbstractDataFormatPlugin {
     @Override
     public Value read(Document<?> doc) throws PluginException {
         if (doc.getContent() == null) {
-            return ujson.Value.Null();
+            return ujson.Null$.MODULE$;
         }
 
         Class<?> targetType = doc.getContent().getClass();
