@@ -6,7 +6,7 @@
 
     <groupId>com.datasonnet</groupId>
     <artifactId>datasonnet-mapper</artifactId>
-    <version>0.4.0-MS3-SNAPSHOT</version>
+    <version>0.4.0-MS3</version>
 
     <licenses>
         <license>
@@ -70,11 +70,6 @@
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
                 <version>4.4.0</version>
-                <configuration>
-                    <args>
-                        <arg>-deprecation</arg>
-                    </args>
-                </configuration>
                 <executions>
                     <execution>
                         <id>scala-compile-first</id>
@@ -109,8 +104,6 @@
                     </annotationProcessorPaths>
                     <compilerArgs>
                         <arg>-Aproject=${project.groupId}/${project.artifactId}</arg>
-                        <arg>-Xlint:deprecation</arg>
-                        <arg>-Xlint:unchecked</arg>
                     </compilerArgs>
                 </configuration>
                 <executions>
