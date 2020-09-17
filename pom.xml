@@ -6,7 +6,7 @@
 
     <groupId>com.datasonnet</groupId>
     <artifactId>datasonnet-mapper</artifactId>
-    <version>0.4.0-MS3</version>
+    <version>0.4.1-MS3-SNAPSHOT</version>
 
     <licenses>
         <license>
