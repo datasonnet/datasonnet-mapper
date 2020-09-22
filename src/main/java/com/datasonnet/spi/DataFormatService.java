@@ -14,9 +14,9 @@ public class DataFormatService {
     private final List<DataFormatPlugin> plugins;
     public static final DataFormatService DEFAULT =
             new DataFormatService(Arrays.asList(
-                    DefaultXMLFormatPlugin$.MODULE$,
                     new DefaultJSONFormatPlugin(),
                     new DefaultJavaFormatPlugin(),
+                    DefaultXMLFormatPlugin$.MODULE$,
                     new DefaultCSVFormatPlugin(),
                     new DefaultPlainTextFormatPlugin()));
 
