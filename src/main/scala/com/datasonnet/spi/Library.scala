@@ -11,6 +11,7 @@ import scala.io.Source
 
 object Library {
   val emptyObj = new Val.Obj(mutable.HashMap.empty[String, Obj.Member], _ => (), None)
+  def memberOf(value: Val): Obj.Member = Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => value)
 }
 
 abstract class Library {

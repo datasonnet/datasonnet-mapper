@@ -2206,89 +2206,48 @@ object DS extends Library {
 
   private def groupBy(s: Seq[Val.Lazy], funct: Applyer): Val = {
     val args = funct.f.params.allIndices.size
-    val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
+    val out = mutable.Map[String, mutable.IndexedBuffer[Val.Lazy]]()
     if (args == 2) {
       for ((item, index) <- s.zipWithIndex) {
-
-        val key = funct.apply(item, Val.Lazy(Val.Num(index)))
-        if (!new Val.Obj(out, _ => (), None)
-          .getVisibleKeys()
-          .contains(key.cast[Val.Str].value)) {
-
-          val array = collection.mutable.Buffer.empty[Val.Lazy]
-          array.appendAll(s.zipWithIndex.collect({
-            case (item2, index2) if key == funct.apply(item2, Val.Lazy(Val.Num(index2))) =>
-              item2
-          }))
-          out += (key.cast[Val.Str].value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Arr(array.toSeq)))
-        }
+        val key = funct.apply(item, Val.Lazy(Val.Num(index))).cast[Val.Str]
+        out.getOrElseUpdate(key.value, mutable.IndexedBuffer[Val.Lazy]()).addOne(item)
       }
     } else if (args == 1) {
       for (item <- s) {
-
-        val key = funct.apply(item)
-        if (!new Val.Obj(out, _ => (), None)
-          .getVisibleKeys()
-          .contains(key.cast[Val.Str].value)) {
-
-          val array = collection.mutable.Buffer.empty[Val.Lazy]
-          array.appendAll(s.collect({
-            case item2 if key == funct.apply(item2) =>
-              item2
-          }))
-          out += (key.cast[Val.Str].value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Arr(array.toSeq)))
-        }
+        val key = funct.apply(item).cast[Val.Str]
+        out.getOrElseUpdate(key.value, mutable.IndexedBuffer[Val.Lazy]()).addOne(item)
       }
     }
     else {
       throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
     }
 
-    new Val.Obj(out, _ => (), None)
+    new Val.Obj(out.map(keyVal => (keyVal._1, Library.memberOf(Val.Arr(keyVal._2.toIndexedSeq)))), _ => (), None)
   }
 
   private def groupBy(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val = {
-    val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
     val args = funct.f.params.allIndices.size
+    val out = mutable.Map[String, mutable.LinkedHashMap[String, Val.Obj.Member]]()
     if (args == 2) {
       for ((key, _) <- obj.getVisibleKeys()) {
-        val functKey = funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)))
-
-        if (!new Val.Obj(out, _ => (), None)
-          .getVisibleKeys()
-          .contains(functKey.cast[Val.Str].value)) {
-
-          val currentObj = scala.collection.mutable.Map[String, Val.Obj.Member]()
-          currentObj.addAll(obj.getVisibleKeys().collect({
-            case (key2, _) if functKey == funct.apply(Val.Lazy(obj.value(key2, -1)(fs, ev)), Val.Lazy(Val.Str(key2))) =>
-              key2 -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key2, -1)(fs, ev))
-          }))
-          out += (functKey.cast[Val.Str].value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Obj(currentObj, _ => (), None)))
-        }
+        val item = obj.value(key, -1)(fs, ev)
+        val functKey = funct.apply(Val.Lazy(item), Val.Lazy(Val.Str(key))).cast[Val.Str]
+        out.getOrElseUpdate(functKey.value, mutable.LinkedHashMap[String, Val.Obj.Member]()).addOne(key, Library.memberOf(item))
       }
     }
     else if (args == 1) {
       for ((key, _) <- obj.getVisibleKeys()) {
-        val functKey = funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)))
-
-        if (!new Val.Obj(out, _ => (), None)
-          .getVisibleKeys()
-          .contains(functKey.cast[Val.Str].value)) {
-
-          val currentObj = scala.collection.mutable.Map[String, Val.Obj.Member]()
-          currentObj.addAll(obj.getVisibleKeys().collect({
-            case (key2, _) if functKey == funct.apply(Val.Lazy(obj.value(key2, -1)(fs, ev))) =>
-              key2 -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key2, -1)(fs, ev))
-          }))
-          out += (functKey.cast[Val.Str].value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Obj(currentObj, _ => (), None)))
-        }
+        val item = obj.value(key, -1)(fs, ev)
+        val functKey = funct.apply(Val.Lazy(item)).cast[Val.Str]
+        out.getOrElseUpdate(functKey.value, mutable.LinkedHashMap[String, Val.Obj.Member]()).addOne(key, Library.memberOf(item))
       }
     }
     else {
       throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
     }
 
-    new Val.Obj(out, _ => (), None)
+    new Val.Obj(out.map(keyVal => (keyVal._1, Library.memberOf(new Val.Obj(keyVal._2, _ => (), None)))), _ => (), None)
+
   }
 
   private def map(array: Seq[Val.Lazy], funct: Applyer): Val = {
