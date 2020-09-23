@@ -1,19 +1,3 @@
-/*
- * Copyright 2002-2019 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.datasonnet.document;
 
 /*-
@@ -24,6 +8,22 @@ package com.datasonnet.document;
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2002-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -47,58 +47,40 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.TreeSet;
 
-import static com.datasonnet.document.MediaTypes.APPLICATION_CSV;
-import static com.datasonnet.document.MediaTypes.APPLICATION_JSON;
-import static com.datasonnet.document.MediaTypes.APPLICATION_XML;
 import static com.datasonnet.document.MediaTypes.PARAM_CHARSET;
 import static com.datasonnet.document.MediaTypes.PARAM_QUALITY_FACTOR;
-import static com.datasonnet.document.MediaTypes.TEXT_PLAIN;
 
-// TODO: 8/6/20 refactor to only the pieces we need
-// also make sure to get the license headers right and point out every modification
-// for this and other code form springframework
-
-// jam01:   made isQuotedString(String) public
-//          remove escape char in unquote(String)
-//          add null check in isQuotedString(String)
+/**
+ * Represents a MediaType as defined in the HTTP Specification.
+ *
+ * <p>
+ * This file is a derived work of org.springframework.util.MimeType and org.springframework.http.MediaType classes from
+ * Spring Framework v5.3.0-M1. Modifications made to the original work include:
+ * <li>Combining both classes into a single file, removing references to MimeType</li>
+ * <li>Added null check to isQuotedString</li>
+ * <li>Replace escape chars from parameter values in unquote</li>
+ * <li>Made checkParameters and support methods static</li>
+ * <li>Removed parameters validation in constructor</li>
+ * <li>unquote each param value in constructor</li>
+ * </p>
+ *
+ * @author Arjen Poutsma (2002-2020)
+ * @author Juergen Hoeller (2002-2020)
+ * @author Rossen Stoyanchev (2002-2020)
+ * @author Sebastien Deleuze (2002-2020)
+ * @author Kazuki Shimizu (2002-2020)
+ * @author Sam Brannen (2002-2020)
+ * @author Jose Montoya
+ * @see MediaTypeUtils
+ * @see MediaTypes
+ * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.1.1">HTTP 1.1: Semantics and Content, section 3.1.1.1</a>
+ * @since 0.3.0
+ */
 public class MediaType implements Comparable<MediaType>, Serializable {
+    private static final long serialVersionUID = 2069937152339670231L;
 
-    public MediaType copyParameters(MediaType... mediaTypes) {
-        Map<String, String> params = new LinkedHashMap<>(getParameters());
-        for (MediaType medType : mediaTypes) {
-            params.putAll(medType.parameters);
-        }
-
-        if (this.parameters.equals(params)) {
-            return this;
-        }
-
-        return new MediaType(this, params);
-    }
-
-    // org.springframework.util.MimeType: start
-    /**
-     * Represents a MIME Type, as originally defined in RFC 2046 and subsequently
-     * used in other Internet protocols including HTTP.
-     *
-     * <p>This class, however, does not contain support for the q-parameters used
-     * in HTTP content negotiation. Those can be found in the subclass
-     * {@code org.springframework.http.MediaType} in the {@code spring-web} module.
-     *
-     * <p>Consists of a {@linkplain #getType() type} and a {@linkplain #getSubtype() subtype}.
-     * Also has functionality to parse MIME Type values from a {@code String} using
-     * {@link #valueOf(String)}. For more parsing options see {@link MediaTypeUtils}.
-     *
-     * @author Arjen Poutsma
-     * @author Juergen Hoeller
-     * @author Rossen Stoyanchev
-     * @author Sam Brannen
-     * @since 0.3.0
-     * @see MediaTypeUtils
-     */
     protected static final String WILDCARD_TYPE = "*";
 
     private static final BitSet TOKEN;
@@ -148,12 +130,132 @@ public class MediaType implements Comparable<MediaType>, Serializable {
     private volatile String toStringValue;
 
     /**
+     * Create a new {@code MediaType} for the given primary type.
+     * <p>The {@linkplain #getSubtype() subtype} is set to "&#42;", parameters empty.
+     *
+     * @param type the primary type
+     * @throws IllegalArgumentException if any of the parameters contain illegal characters
+     */
+    public MediaType(String type) {
+        this(type, WILDCARD_TYPE);
+    }
+
+    /**
+     * Create a new {@code MediaType} for the given primary type and subtype.
+     * <p>The parameters are empty.
+     *
+     * @param type    the primary type
+     * @param subtype the subtype
+     * @throws IllegalArgumentException if any of the parameters contain illegal characters
+     */
+    public MediaType(String type, String subtype) {
+        this(type, subtype, Collections.emptyMap());
+    }
+
+    /**
+     * Create a new {@code MediaType} for the given type, subtype, and character set.
+     *
+     * @param type    the primary type
+     * @param subtype the subtype
+     * @param charset the character set
+     * @throws IllegalArgumentException if any of the parameters contain illegal characters
+     */
+    public MediaType(String type, String subtype, Charset charset) {
+        this(type, subtype, Collections.singletonMap(PARAM_CHARSET, charset.name()));
+    }
+
+    /**
+     * Create a new {@code MediaType} for the given type, subtype, and quality value.
+     *
+     * @param type         the primary type
+     * @param subtype      the subtype
+     * @param qualityValue the quality value
+     * @throws IllegalArgumentException if any of the parameters contain illegal characters
+     */
+    public MediaType(String type, String subtype, double qualityValue) {
+        this(type, subtype, Collections.singletonMap(PARAM_QUALITY_FACTOR, Double.toString(qualityValue)));
+    }
+
+    /**
+     * Copy-constructor that copies the type, subtype and parameters of the given
+     * {@code MediaType}, and allows to set the specified character set.
+     *
+     * @param other   the other media type
+     * @param charset the character set
+     * @throws IllegalArgumentException if any of the parameters contain illegal characters
+     * @since 0.3.0
+     */
+    public MediaType(MediaType other, Charset charset) {
+        this(other.getType(), other.getSubtype(), addCharsetParameter(charset, other.getParameters()));
+    }
+
+    /**
+     * Copy-constructor that copies the type and subtype of the given {@code MediaType},
+     * and allows for different parameters.
+     *
+     * @param other      the other media type
+     * @param parameters the parameters, may be {@code null}
+     * @throws IllegalArgumentException if any of the parameters contain illegal characters
+     */
+    public MediaType(MediaType other, @Nullable Map<String, String> parameters) {
+        this(other.getType(), other.getSubtype(), parameters);
+    }
+
+    /**
+     * Create a new {@code MediaType} for the given type, subtype, and parameters.
+     *
+     * @param type       the primary type
+     * @param subtype    the subtype
+     * @param parameters the parameters, may be {@code null}
+     * @throws IllegalArgumentException if any of the parameters contain illegal characters
+     */
+    public MediaType(String type, String subtype, @Nullable Map<String, String> parameters) {
+        if (type == null || type.isEmpty()) {
+            throw new IllegalArgumentException("'type' must not be empty");
+        }
+
+        if (subtype == null || subtype.isEmpty()) {
+            throw new IllegalArgumentException("'subtype' must not be empty");
+        }
+
+        checkToken(type);
+        checkToken(subtype);
+        this.type = type.toLowerCase(Locale.ENGLISH);
+        this.subtype = subtype.toLowerCase(Locale.ENGLISH);
+        if ((parameters != null && !parameters.isEmpty())) {
+            Map<String, String> map = new LinkedHashMap<>(parameters.size());
+            parameters.forEach((attribute, value) -> {
+                map.put(attribute.toLowerCase(Locale.ENGLISH), unquote(value));
+            });
+            this.parameters = Collections.unmodifiableMap(map);
+        } else {
+            this.parameters = Collections.emptyMap();
+        }
+    }
+
+    /**
+     * Create a new {@code MediaType} for the given {@link MediaType}.
+     * The type, subtype and parameters information is copied and {@code MediaType}-specific
+     * checks on parameters are performed.
+     *
+     * @param other the MIME type
+     * @throws IllegalArgumentException if any of the parameters contain illegal characters
+     * @since 0.3.0
+     */
+    public MediaType(MediaType other) {
+        this.type = other.type;
+        this.subtype = other.subtype;
+        this.parameters = other.parameters;
+        this.toStringValue = other.toStringValue;
+    }
+
+    /**
      * Checks the given token string for illegal characters, as defined in RFC 2616,
      * section 2.2.
+     *
      * @throws IllegalArgumentException in case of illegal characters
      * @see <a href="https://tools.ietf.org/html/rfc2616#section-2.2">HTTP 1.1, section 2.2</a>
      */
-    // jam01: made static
     private static void checkToken(String token) {
         for (int i = 0; i < token.length(); i++) {
             char ch = token.charAt(i);
@@ -163,32 +265,24 @@ public class MediaType implements Comparable<MediaType>, Serializable {
         }
     }
 
-    // jam01: made this public
-    public static boolean isQuotedString(String s) {
-        // jam01 addition: start
+    private static boolean isQuotedString(String s) {
         if (s == null) {
             return false;
         }
-        // end
 
         if (s.length() < 2) {
             return false;
-        }
-        else {
+        } else {
             return ((s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("'") && s.endsWith("'")));
         }
     }
 
-    // jam01: made static
     protected static String unquote(String s) {
         if (!isQuotedString(s)) {
             return s;
         }
 
-        return s.substring(1, s.length() - 1)
-            // jam01 addition: start
-            .replaceAll("\\\\(.)", "$1");
-        // end
+        return s.substring(1, s.length() - 1).replaceAll("\\\\(.)", "$1");
     }
 
     /**
@@ -203,6 +297,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
      * Indicates whether the {@linkplain #getSubtype() subtype} is the wildcard
      * character <code>&#42;</code> or the wildcard character followed by a suffix
      * (e.g. <code>&#42;+xml</code>).
+     *
      * @return whether the subtype is a wildcard
      */
     public boolean isWildcardSubtype() {
@@ -212,6 +307,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
     /**
      * Indicates whether this MIME Type is concrete, i.e. whether neither the type
      * nor the subtype is a wildcard character <code>&#42;</code>.
+     *
      * @return whether this MIME Type is concrete
      */
     public boolean isConcrete() {
@@ -234,6 +330,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
 
     /**
      * Return the character set, as indicated by a {@code charset} parameter, if any.
+     *
      * @return the character set, or {@code null} if not available
      * @since 0.3.0
      */
@@ -245,6 +342,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
 
     /**
      * Return a generic parameter value, given a parameter name.
+     *
      * @param name the parameter name
      * @return the parameter value, or {@code null} if not present
      */
@@ -255,6 +353,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
 
     /**
      * Return all generic parameter values.
+     *
      * @return a read-only map (possibly empty, never {@code null})
      */
     public Map<String, String> getParameters() {
@@ -264,6 +363,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
     /**
      * Similar to {@link #equals(Object)} but based on the type and subtype
      * only, i.e. ignoring parameters.
+     *
      * @param other the other mime type to compare to
      * @return whether the two mime types have the same type and subtype
      * @since 0.3.0
@@ -279,6 +379,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
      * Unlike {@link Collection#contains(Object)} which relies on
      * {@link MediaType#equals(Object)}, this method only checks the type and the
      * subtype, but otherwise ignores parameters.
+     *
      * @param mimeTypes the list of mime types to perform the check against
      * @return whether the list contains the given mime type
      * @since 0.3.0
@@ -310,6 +411,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
      * Determine if the parameters in this {@code MimeType} and the supplied
      * {@code MimeType} are equal, performing case-insensitive comparisons
      * for {@link Charset Charsets}.
+     *
      * @since 0.3.0
      */
     private boolean parametersAreEqual(MediaType other) {
@@ -326,8 +428,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
                 if (!SpringFrameworkUtils.nullSafeEquals(getCharset(), other.getCharset())) {
                     return false;
                 }
-            }
-            else if (!SpringFrameworkUtils.nullSafeEquals(entry.getValue(), other.parameters.get(key))) {
+            } else if (!SpringFrameworkUtils.nullSafeEquals(entry.getValue(), other.parameters.get(key))) {
                 return false;
             }
         }
@@ -374,6 +475,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
 
     /**
      * Compares this MIME Type to another alphabetically.
+     *
      * @param other the MIME Type to compare to
      * @see MediaTypeUtils#sortBySpecificity(List)
      */
@@ -421,8 +523,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
                         return comp;
                     }
                 }
-            }
-            else {
+            } else {
                 String thisValue = getParameters().get(thisAttribute);
                 String otherValue = other.getParameters().get(otherAttribute);
                 if (otherValue == null) {
@@ -455,24 +556,18 @@ public class MediaType implements Comparable<MediaType>, Serializable {
         public int compare(T mimeType1, T mimeType2) {
             if (mimeType1.isWildcardType() && !mimeType2.isWildcardType()) {  // */* < audio/*
                 return 1;
-            }
-            else if (mimeType2.isWildcardType() && !mimeType1.isWildcardType()) {  // audio/* > */*
+            } else if (mimeType2.isWildcardType() && !mimeType1.isWildcardType()) {  // audio/* > */*
                 return -1;
-            }
-            else if (!mimeType1.getType().equals(mimeType2.getType())) {  // audio/basic == text/html
+            } else if (!mimeType1.getType().equals(mimeType2.getType())) {  // audio/basic == text/html
                 return 0;
-            }
-            else {  // mediaType1.getType().equals(mediaType2.getType())
+            } else {  // mediaType1.getType().equals(mediaType2.getType())
                 if (mimeType1.isWildcardSubtype() && !mimeType2.isWildcardSubtype()) {  // audio/* < audio/basic
                     return 1;
-                }
-                else if (mimeType2.isWildcardSubtype() && !mimeType1.isWildcardSubtype()) {  // audio/basic > audio/*
+                } else if (mimeType2.isWildcardSubtype() && !mimeType1.isWildcardSubtype()) {  // audio/basic > audio/*
                     return -1;
-                }
-                else if (!mimeType1.getSubtype().equals(mimeType2.getSubtype())) {  // audio/basic == audio/wave
+                } else if (!mimeType1.getSubtype().equals(mimeType2.getSubtype())) {  // audio/basic == audio/wave
                     return 0;
-                }
-                else {  // mediaType2.getSubtype().equals(mediaType2.getSubtype())
+                } else {  // mediaType2.getSubtype().equals(mediaType2.getSubtype())
                     return compareParameters(mimeType1, mimeType2);
                 }
             }
@@ -484,150 +579,8 @@ public class MediaType implements Comparable<MediaType>, Serializable {
             return Integer.compare(paramsSize2, paramsSize1);  // audio/basic;level=1 < audio/basic
         }
     }
-    // MimeType: end
 
-
-    // org.springframework.http.MediaType: start
-    /**
-     * A subclass of {MimeType} that adds support for quality parameters
-     * as defined in the HTTP specification.
-     *
-     * @author Arjen Poutsma
-     * @author Juergen Hoeller
-     * @author Rossen Stoyanchev
-     * @author Sebastien Deleuze
-     * @author Kazuki Shimizu
-     * @author Sam Brannen
-     * @since 0.3.0
-     * @see <a href="https://tools.ietf.org/html/rfc7231#section-3.1.1.1">
-     *     HTTP 1.1: Semantics and Content, section 3.1.1.1</a>
-     */
-
-    private static final long serialVersionUID = 2069937152339670231L;
-
-    /**
-     * Create a new {@code MediaType} for the given primary type.
-     * <p>The {@linkplain #getSubtype() subtype} is set to "&#42;", parameters empty.
-     * @param type the primary type
-     * @throws IllegalArgumentException if any of the parameters contain illegal characters
-     */
-    public MediaType(String type) {
-        this(type, WILDCARD_TYPE);
-    }
-
-    /**
-     * Create a new {@code MediaType} for the given primary type and subtype.
-     * <p>The parameters are empty.
-     * @param type the primary type
-     * @param subtype the subtype
-     * @throws IllegalArgumentException if any of the parameters contain illegal characters
-     */
-    public MediaType(String type, String subtype) {
-        this(type, subtype, Collections.emptyMap());
-    }
-
-    /**
-     * Create a new {@code MediaType} for the given type, subtype, and character set.
-     * @param type the primary type
-     * @param subtype the subtype
-     * @param charset the character set
-     * @throws IllegalArgumentException if any of the parameters contain illegal characters
-     */
-    public MediaType(String type, String subtype, Charset charset) {
-        this(type, subtype, Collections.singletonMap(PARAM_CHARSET, charset.name()));
-    }
-
-    /**
-     * Create a new {@code MediaType} for the given type, subtype, and quality value.
-     * @param type the primary type
-     * @param subtype the subtype
-     * @param qualityValue the quality value
-     * @throws IllegalArgumentException if any of the parameters contain illegal characters
-     */
-    public MediaType(String type, String subtype, double qualityValue) {
-        this(type, subtype, Collections.singletonMap(PARAM_QUALITY_FACTOR, Double.toString(qualityValue)));
-    }
-
-    /**
-     * Copy-constructor that copies the type, subtype and parameters of the given
-     * {@code MediaType}, and allows to set the specified character set.
-     * @param other the other media type
-     * @param charset the character set
-     * @throws IllegalArgumentException if any of the parameters contain illegal characters
-     * @since 0.3.0
-     */
-    public MediaType(MediaType other, Charset charset) {
-        this(other.getType(), other.getSubtype(), addCharsetParameter(charset, other.getParameters()));
-    }
-
-    /**
-     * Copy-constructor that copies the type and subtype of the given {@code MediaType},
-     * and allows for different parameters.
-     * @param other the other media type
-     * @param parameters the parameters, may be {@code null}
-     * @throws IllegalArgumentException if any of the parameters contain illegal characters
-     */
-    public MediaType(MediaType other, @Nullable Map<String, String> parameters) {
-        this(other.getType(), other.getSubtype(), parameters);
-    }
-
-    /**
-     * Create a new {@code MediaType} for the given type, subtype, and parameters.
-     * @param type the primary type
-     * @param subtype the subtype
-     * @param parameters the parameters, may be {@code null}
-     * @throws IllegalArgumentException if any of the parameters contain illegal characters
-     */
-    public MediaType(String type, String subtype, @Nullable Map<String, String> parameters) {
-        // extracted from MimeType: start
-        if (type == null || type.isEmpty()) {
-            throw new IllegalArgumentException("'type' must not be empty");
-        }
-
-        if (subtype == null || subtype.isEmpty()) {
-            throw new IllegalArgumentException("'subtype' must not be empty");
-        }
-
-        checkToken(type);
-        checkToken(subtype);
-        this.type = type.toLowerCase(Locale.ENGLISH);
-        this.subtype = subtype.toLowerCase(Locale.ENGLISH);
-        if ((parameters != null && !parameters.isEmpty())) {
-            Map<String, String> map = new LinkedHashMap<>(parameters.size());
-            parameters.forEach((attribute, value) -> {
-                // jam01: removed param check here, unquote
-                map.put(attribute.toLowerCase(Locale.ENGLISH), unquote(value));
-            });
-            this.parameters = Collections.unmodifiableMap(map);
-        }
-        else {
-            this.parameters = Collections.emptyMap();
-        }
-        // extracted from MimeType: end
-    }
-
-    /**
-     * Create a new {@code MediaType} for the given {@link MediaType}.
-     * The type, subtype and parameters information is copied and {@code MediaType}-specific
-     * checks on parameters are performed.
-     * @param other the MIME type
-     * @throws IllegalArgumentException if any of the parameters contain illegal characters
-     * @since 0.3.0
-     */
-    public MediaType(MediaType other) {
-        // extracted from MimeType: start
-        this.type = other.type;
-        this.subtype = other.subtype;
-        this.parameters = other.parameters;
-        this.toStringValue = other.toStringValue;
-        // extracted from MimeType: end
-
-        // jam01: remove check params
-    }
-
-    // jam01: made static
     protected static void checkParameters(String attribute, String value) {
-        // extracted from MimeType: start
         if (attribute == null || attribute.isEmpty()) {
             throw new IllegalArgumentException("'attribute' must not be empty");
         }
@@ -640,11 +593,9 @@ public class MediaType implements Comparable<MediaType>, Serializable {
         if (PARAM_CHARSET.equals(attribute)) {
             value = unquote(value);
             Charset.forName(value);
-        }
-        else if (!isQuotedString(value)) {
+        } else if (!isQuotedString(value)) {
             checkToken(value);
         }
-        // extracted from MimeType: end
 
         if (PARAM_QUALITY_FACTOR.equals(attribute)) {
             value = unquote(value);
@@ -659,6 +610,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
     /**
      * Return the quality factor, as indicated by a {@code q} parameter, if any.
      * Defaults to {@code 1.0}.
+     *
      * @return the quality factor as double value
      */
     public double getQualityValue() {
@@ -673,20 +625,19 @@ public class MediaType implements Comparable<MediaType>, Serializable {
      * This method is <b>not</b> symmetric.
      * <p>Simply calls {@link MediaType#includes(MediaType)} but declared with a
      * {@code MediaType} parameter for binary backwards compatibility.
+     *
      * @param other the reference media type with which to compare
      * @return {@code true} if this media type includes the given media type;
      * {@code false} otherwise
      */
     public boolean includes(@Nullable MediaType other) {
-        // extracted from MimeType: start
         if (other == null) {
             return false;
         }
         if (isWildcardType()) {
             // */* includes anything
             return true;
-        }
-        else if (getType().equals(other.getType())) {
+        } else if (getType().equals(other.getType())) {
             if (getSubtype().equals(other.getSubtype())) {
                 return true;
             }
@@ -695,23 +646,19 @@ public class MediaType implements Comparable<MediaType>, Serializable {
                 int thisPlusIdx = getSubtype().lastIndexOf('+');
                 if (thisPlusIdx == -1) {
                     return true;
-                }
-                else {
+                } else {
                     // application/*+xml includes application/soap+xml
                     int otherPlusIdx = other.getSubtype().lastIndexOf('+');
                     if (otherPlusIdx != -1) {
                         String thisSubtypeNoSuffix = getSubtype().substring(0, thisPlusIdx);
                         String thisSubtypeSuffix = getSubtype().substring(thisPlusIdx + 1);
                         String otherSubtypeSuffix = other.getSubtype().substring(otherPlusIdx + 1);
-                        if (thisSubtypeSuffix.equals(otherSubtypeSuffix) && WILDCARD_TYPE.equals(thisSubtypeNoSuffix)) {
-                            return true;
-                        }
+                        return thisSubtypeSuffix.equals(otherSubtypeSuffix) && WILDCARD_TYPE.equals(thisSubtypeNoSuffix);
                     }
                 }
             }
         }
         return false;
-        // extracted from MimeType: end
     }
 
     /**
@@ -721,19 +668,18 @@ public class MediaType implements Comparable<MediaType>, Serializable {
      * {@link #includes}, except that it <b>is</b> symmetric.
      * <p>Simply calls {@link MediaType#isCompatibleWith(MediaType)} but declared with a
      * {@code MediaType} parameter for binary backwards compatibility.
+     *
      * @param other the reference media type with which to compare
      * @return {@code true} if this media type is compatible with the given media type;
      * {@code false} otherwise
      */
     public boolean isCompatibleWith(@Nullable MediaType other) {
-        // extracted from MimeType: start
         if (other == null) {
             return false;
         }
         if (isWildcardType() || other.isWildcardType()) {
             return true;
-        }
-        else if (getType().equals(other.getType())) {
+        } else if (getType().equals(other.getType())) {
             if (getSubtype().equals(other.getSubtype())) {
                 return true;
             }
@@ -743,25 +689,22 @@ public class MediaType implements Comparable<MediaType>, Serializable {
                 int otherPlusIdx = other.getSubtype().lastIndexOf('+');
                 if (thisPlusIdx == -1 && otherPlusIdx == -1) {
                     return true;
-                }
-                else if (thisPlusIdx != -1 && otherPlusIdx != -1) {
+                } else if (thisPlusIdx != -1 && otherPlusIdx != -1) {
                     String thisSubtypeNoSuffix = getSubtype().substring(0, thisPlusIdx);
                     String otherSubtypeNoSuffix = other.getSubtype().substring(0, otherPlusIdx);
                     String thisSubtypeSuffix = getSubtype().substring(thisPlusIdx + 1);
                     String otherSubtypeSuffix = other.getSubtype().substring(otherPlusIdx + 1);
-                    if (thisSubtypeSuffix.equals(otherSubtypeSuffix) &&
-                            (WILDCARD_TYPE.equals(thisSubtypeNoSuffix) || WILDCARD_TYPE.equals(otherSubtypeNoSuffix))) {
-                        return true;
-                    }
+                    return thisSubtypeSuffix.equals(otherSubtypeSuffix) &&
+                            (WILDCARD_TYPE.equals(thisSubtypeNoSuffix) || WILDCARD_TYPE.equals(otherSubtypeNoSuffix));
                 }
             }
         }
         return false;
-        // extracted from MimeType: end
     }
 
     /**
      * Return a replica of this instance with the quality value of the given {@code MediaType}.
+     *
      * @return the same instance if the given MediaType doesn't have a quality value,
      * or a new one otherwise
      */
@@ -776,6 +719,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
 
     /**
      * Return a replica of this instance with its quality value removed.
+     *
      * @return the same instance if the media type doesn't contain a quality value,
      * or a new one otherwise
      */
@@ -793,6 +737,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
      * Parse the given String value into a {@code MediaType} object,
      * with this method name following the 'valueOf' naming convention
      * (as supported by {org.springframework.core.convert.ConversionService}.
+     *
      * @param value the string to parse
      * @throws InvalidMediaTypeException if the media type value cannot be parsed
      * @see #parseMediaType(String)
@@ -803,6 +748,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
 
     /**
      * Parse the given String into a single {@code MediaType}.
+     *
      * @param mediaType the string to parse
      * @return the media type
      * @throws InvalidMediaTypeException if the media type value cannot be parsed
@@ -810,8 +756,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
     public static MediaType parseMediaType(String mediaType) {
         try {
             return MediaTypeUtils.parseMediaType(mediaType);
-        }
-        catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             throw new InvalidMediaTypeException(mediaType, ex.getMessage());
         }
     }
@@ -819,6 +764,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
     /**
      * Parse the comma-separated string into a list of {@code MediaType} objects.
      * <p>This method can be used to parse an Accept or Content-Type header.
+     *
      * @param mediaTypes the string to parse
      * @return the list of media types
      * @throws InvalidMediaTypeException if the media type value cannot be parsed
@@ -843,6 +789,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
      * Parse the given list of (potentially) comma-separated strings into a
      * list of {@code MediaType} objects.
      * <p>This method can be used to parse an Accept or Content-Type header.
+     *
      * @param mediaTypes the string to parse
      * @return the list of media types
      * @throws InvalidMediaTypeException if the media type value cannot be parsed
@@ -851,11 +798,9 @@ public class MediaType implements Comparable<MediaType>, Serializable {
     public static List<MediaType> parseMediaTypes(@Nullable List<String> mediaTypes) {
         if (mediaTypes == null || mediaTypes.isEmpty()) {
             return Collections.emptyList();
-        }
-        else if (mediaTypes.size() == 1) {
+        } else if (mediaTypes.size() == 1) {
             return parseMediaTypes(mediaTypes.get(0));
-        }
-        else {
+        } else {
             List<MediaType> result = new ArrayList<>(8);
             for (String mediaType : mediaTypes) {
                 result.addAll(parseMediaTypes(mediaType));
@@ -863,9 +808,11 @@ public class MediaType implements Comparable<MediaType>, Serializable {
             return result;
         }
     }
+
     /**
      * Return a string representation of the given list of {@code MediaType} objects.
      * <p>This method can be used to for an {@code Accept} or {@code Content-Type} header.
+     *
      * @param mediaTypes the media types to create a string representation for
      * @return the string representation
      */
@@ -896,6 +843,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
      * <blockquote>audio/basic;level=1 &lt; audio/basic</blockquote>
      * <blockquote>audio/basic == text/html</blockquote>
      * <blockquote>audio/basic == audio/wave</blockquote>
+     *
      * @param mediaTypes the list of media types to be sorted
      * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.3.2">HTTP 1.1: Semantics
      * and Content, section 5.3.2</a>
@@ -924,6 +872,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
      * <li>if the two media types have a different amount of {@linkplain #getParameter(String) parameters}, then the
      * media type with the most parameters is ordered before the other.</li>
      * </ol>
+     *
      * @param mediaTypes the list of media types to be sorted
      * @see #getQualityValue()
      */
@@ -937,6 +886,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
     /**
      * Sorts the given list of {@code MediaType} objects by specificity as the
      * primary criteria and quality value the secondary.
+     *
      * @see MediaType#sortBySpecificity(List)
      * @see MediaType#sortByQualityValue(List)
      */
@@ -956,27 +906,20 @@ public class MediaType implements Comparable<MediaType>, Serializable {
         int qualityComparison = Double.compare(quality2, quality1);
         if (qualityComparison != 0) {
             return qualityComparison;  // audio/*;q=0.7 < audio/*;q=0.3
-        }
-        else if (mediaType1.isWildcardType() && !mediaType2.isWildcardType()) {  // */* < audio/*
+        } else if (mediaType1.isWildcardType() && !mediaType2.isWildcardType()) {  // */* < audio/*
             return 1;
-        }
-        else if (mediaType2.isWildcardType() && !mediaType1.isWildcardType()) {  // audio/* > */*
+        } else if (mediaType2.isWildcardType() && !mediaType1.isWildcardType()) {  // audio/* > */*
             return -1;
-        }
-        else if (!mediaType1.getType().equals(mediaType2.getType())) {  // audio/basic == text/html
+        } else if (!mediaType1.getType().equals(mediaType2.getType())) {  // audio/basic == text/html
             return 0;
-        }
-        else {  // mediaType1.getType().equals(mediaType2.getType())
+        } else {  // mediaType1.getType().equals(mediaType2.getType())
             if (mediaType1.isWildcardSubtype() && !mediaType2.isWildcardSubtype()) {  // audio/* < audio/basic
                 return 1;
-            }
-            else if (mediaType2.isWildcardSubtype() && !mediaType1.isWildcardSubtype()) {  // audio/basic > audio/*
+            } else if (mediaType2.isWildcardSubtype() && !mediaType1.isWildcardSubtype()) {  // audio/basic > audio/*
                 return -1;
-            }
-            else if (!mediaType1.getSubtype().equals(mediaType2.getSubtype())) {  // audio/basic == audio/wave
+            } else if (!mediaType1.getSubtype().equals(mediaType2.getSubtype())) {  // audio/basic == audio/wave
                 return 0;
-            }
-            else {
+            } else {
                 int paramsSize1 = mediaType1.getParameters().size();
                 int paramsSize2 = mediaType2.getParameters().size();
                 return Integer.compare(paramsSize2, paramsSize1);  // audio/basic;level=1 < audio/basic
@@ -1000,6 +943,5 @@ public class MediaType implements Comparable<MediaType>, Serializable {
             return super.compareParameters(mediaType1, mediaType2);
         }
     };
-    // MediaType: end
 }
 

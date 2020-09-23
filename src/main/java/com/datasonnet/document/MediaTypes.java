@@ -16,11 +16,44 @@ package com.datasonnet.document;
  * limitations under the License.
  */
 
+/*
+ * Copyright 2002-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import java.util.Optional;
 
+/**
+ * Collection of well known MediaTypes.
+ *
+ * <p>
+ * This file is a derived work of org.springframework.util.MimeType and org.springframework.http.MediaType classes from
+ * Spring Framework v5.3.0-M1. Modifications made to the original work include:
+ * <li>Collected declared MimeTypes and MediaTypes</li>
+ * <li>Added CSV and Java MediaType</li>
+ * </p>
+ *
+ * @author Arjen Poutsma (2002-2020)
+ * @author Juergen Hoeller (2002-2020)
+ * @author Rossen Stoyanchev (2002-2020)
+ * @author Sebastien Deleuze (2002-2020)
+ * @author Kazuki Shimizu (2002-2020)
+ * @author Sam Brannen (2002-2020)
+ * @author Jose Montoya
+ * @since 0.3.0
+ */
 public class MediaTypes {
-
-    // jam01: moved media types from MediaType and MediaTypeUtils here
     /**
      * Public constant media type that includes all media ranges (i.e. "&#42;/&#42;").
      */
@@ -32,7 +65,7 @@ public class MediaTypes {
     public static final String ALL_VALUE = "*/*";
 
     /**
-     *  Public constant media type for {@code application/atom+xml}.
+     * Public constant media type for {@code application/atom+xml}.
      */
     public static final MediaType APPLICATION_ATOM_XML;
 
@@ -43,12 +76,14 @@ public class MediaTypes {
 
     /**
      * Public constant media type for {@code application/cbor}.
+     *
      * @since 0.3.0
      */
     public static final MediaType APPLICATION_CBOR;
 
     /**
      * A String equivalent of {@link MediaTypes#APPLICATION_CBOR}.
+     *
      * @since 0.3.0
      */
     public static final String APPLICATION_CBOR_VALUE = "application/cbor";
@@ -85,64 +120,74 @@ public class MediaTypes {
 
     /**
      * Public constant media type for {@code application/pdf}.
+     *
      * @since 0.3.0
      */
     public static final MediaType APPLICATION_PDF;
 
     /**
      * A String equivalent of {@link MediaTypes#APPLICATION_PDF}.
+     *
      * @since 0.3.0
      */
     public static final String APPLICATION_PDF_VALUE = "application/pdf";
 
     /**
      * Public constant media type for {@code application/problem+json}.
-     * @since 0.3.0
+     *
      * @see <a href="https://tools.ietf.org/html/rfc7807#section-6.1">
-     *     Problem Details for HTTP APIs, 6.1. application/problem+json</a>
+     * Problem Details for HTTP APIs, 6.1. application/problem+json</a>
+     * @since 0.3.0
      */
     public static final MediaType APPLICATION_PROBLEM_JSON;
 
     /**
      * A String equivalent of {@link MediaTypes#APPLICATION_PROBLEM_JSON}.
+     *
      * @since 0.3.0
      */
     public static final String APPLICATION_PROBLEM_JSON_VALUE = "application/problem+json";
 
     /**
      * Public constant media type for {@code application/problem+xml}.
-     * @since 0.3.0
+     *
      * @see <a href="https://tools.ietf.org/html/rfc7807#section-6.2">
-     *     Problem Details for HTTP APIs, 6.2. application/problem+xml</a>
+     * Problem Details for HTTP APIs, 6.2. application/problem+xml</a>
+     * @since 0.3.0
      */
     public static final MediaType APPLICATION_PROBLEM_XML;
 
     /**
      * A String equivalent of {@link MediaTypes#APPLICATION_PROBLEM_XML}.
+     *
      * @since 0.3.0
      */
     public static final String APPLICATION_PROBLEM_XML_VALUE = "application/problem+xml";
 
     /**
      * Public constant media type for {@code application/rss+xml}.
+     *
      * @since 0.3.0
      */
     public static final MediaType APPLICATION_RSS_XML;
 
     /**
      * A String equivalent of {@link MediaTypes#APPLICATION_RSS_XML}.
+     *
      * @since 0.3.0
      */
     public static final String APPLICATION_RSS_XML_VALUE = "application/rss+xml";
 
     /**
      * Public constant media type for {@code application/stream+json}.
+     *
      * @since 0.3.0
      */
     public static final MediaType APPLICATION_STREAM_JSON;
 
     /**
      * A String equivalent of {@link MediaTypes#APPLICATION_STREAM_JSON}.
+     *
      * @since 0.3.0
      */
     public static final String APPLICATION_STREAM_JSON_VALUE = "application/stream+json";
@@ -209,37 +254,43 @@ public class MediaTypes {
 
     /**
      * Public constant media type for {@code multipart/mixed}.
+     *
      * @since 0.3.0
      */
     public static final MediaType MULTIPART_MIXED;
 
     /**
      * A String equivalent of {@link MediaTypes#MULTIPART_MIXED}.
+     *
      * @since 0.3.0
      */
     public static final String MULTIPART_MIXED_VALUE = "multipart/mixed";
 
     /**
      * Public constant media type for {@code multipart/related}.
+     *
      * @since 0.3.0
      */
     public static final MediaType MULTIPART_RELATED;
 
     /**
      * A String equivalent of {@link MediaTypes#MULTIPART_RELATED}.
+     *
      * @since 0.3.0
      */
     public static final String MULTIPART_RELATED_VALUE = "multipart/related";
 
     /**
      * Public constant media type for {@code text/event-stream}.
-     * @since 0.3.0
+     *
      * @see <a href="https://www.w3.org/TR/eventsource/">Server-Sent Events W3C recommendation</a>
+     * @since 0.3.0
      */
     public static final MediaType TEXT_EVENT_STREAM;
 
     /**
      * A String equivalent of {@link MediaTypes#TEXT_EVENT_STREAM}.
+     *
      * @since 0.3.0
      */
     public static final String TEXT_EVENT_STREAM_VALUE = "text/event-stream";
@@ -256,12 +307,14 @@ public class MediaTypes {
 
     /**
      * Public constant media type for {@code text/markdown}.
+     *
      * @since 0.3.0
      */
     public static final MediaType TEXT_MARKDOWN;
 
     /**
      * A String equivalent of {@link MediaTypes#TEXT_MARKDOWN}.
+     *
      * @since 0.3.0
      */
     public static final String TEXT_MARKDOWN_VALUE = "text/markdown";
@@ -286,8 +339,6 @@ public class MediaTypes {
      */
     public static final String TEXT_XML_VALUE = "text/xml";
 
-    // jam01: added
-
     public static final MediaType APPLICATION_JAVA;
 
     public static final String APPLICATION_JAVA_VALUE = "application/x-java-object";
@@ -300,7 +351,7 @@ public class MediaTypes {
     public static final String PARAM_CHARSET = "charset";
 
     public static final String PARAM_QUALITY_FACTOR = "q";
-    
+
     static {
         // Not using "valueOf' to avoid static init cost
         ALL = new MediaType("*", "*");
@@ -327,7 +378,6 @@ public class MediaTypes {
         TEXT_MARKDOWN = new MediaType("text", "markdown");
         TEXT_PLAIN = new MediaType("text", "plain");
         TEXT_XML = new MediaType("text", "xml");
-
         APPLICATION_JAVA = new MediaType("application", "x-java-object");
         APPLICATION_CSV = new MediaType("application", "csv");
     }
@@ -335,11 +385,16 @@ public class MediaTypes {
     // TODO: 8/11/20 add explicit file extension support to MediaType class
     public static Optional<MediaType> forExtension(String ext) {
         switch (ext) {
-            case "json": return Optional.of(APPLICATION_JSON);
-            case "xml": return Optional.of(APPLICATION_XML);
-            case "csv": return Optional.of(APPLICATION_CSV);
-            case "txt": return Optional.of(TEXT_PLAIN);
-            default: return Optional.empty();
+            case "json":
+                return Optional.of(APPLICATION_JSON);
+            case "xml":
+                return Optional.of(APPLICATION_XML);
+            case "csv":
+                return Optional.of(APPLICATION_CSV);
+            case "txt":
+                return Optional.of(TEXT_PLAIN);
+            default:
+                return Optional.empty();
         }
     }
 }

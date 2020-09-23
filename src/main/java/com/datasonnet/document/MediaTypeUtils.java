@@ -1,19 +1,3 @@
-/*
- * Copyright 2002-2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.datasonnet.document;
 
 /*-
@@ -24,6 +8,22 @@ package com.datasonnet.document;
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Copyright 2002-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -57,17 +57,25 @@ import java.util.stream.Collectors;
 /**
  * Miscellaneous {@link MediaType} utility methods.
  *
- * @author Arjen Poutsma
- * @author Rossen Stoyanchev
- * @author Dimitrios Liapis
- * @author Brian Clozel
- * @author Sam Brannen
+ * <p>
+ * This file is a derived work of org.springframework.util.MimeTypeUtils class from
+ * Spring Framework v5.3.0-M1. Modifications made to the original work include:
+ * <li>Handle escape chars when parsing params in parseMediaTypeInternal</li>
+ * <li>Check parameter validity when parsing params in parseMediaTypeInternal</li>
+ * </p>
+ *
+ * @author Arjen Poutsma (2002-2020)
+ * @author Rossen Stoyanchev (2002-2020)
+ * @author Dimitrios Liapis (2002-2020)
+ * @author Brian Clozel (2002-2020)
+ * @author Sam Brannen (2002-2020)
+ * @author Jose Montoya
  * @since 0.3.0
  */
 public abstract class MediaTypeUtils {
 
     private static final byte[] BOUNDARY_CHARS =
-            new byte[] {'-', '_', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
+            new byte[]{'-', '_', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g',
                     'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A',
                     'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
                     'V', 'W', 'X', 'Y', 'Z'};
@@ -86,6 +94,7 @@ public abstract class MediaTypeUtils {
     /**
      * Parse the given String into a single {@code MimeType}.
      * Recently parsed {@code MimeType} are cached for further retrieval.
+     *
      * @param mediaType the string to parse
      * @return the mime type
      * @throws InvalidMediaTypeException if the string cannot be parsed
@@ -136,12 +145,9 @@ public abstract class MediaTypeUtils {
                     if (!quoted) {
                         break;
                     }
-                }
-                else if (ch == '"') {
+                } else if (ch == '"') {
                     quoted = !quoted;
-                }
-                // jam01: added escape logic
-                else if (ch == '\\') {
+                } else if (ch == '\\') {
                     nextIndex++; // skip the escaped char too. eg: "\";"
                 }
                 nextIndex++;
@@ -155,12 +161,13 @@ public abstract class MediaTypeUtils {
                 if (eqIndex >= 0) {
                     String attribute = parameter.substring(0, eqIndex).trim();
                     String value = parameter.substring(eqIndex + 1).trim();
-                    // jam01: added check here
+
                     try {
                         MediaType.checkParameters(attribute, value);
                     } catch (IllegalArgumentException ex) {
                         throw new InvalidMediaTypeException(mimeType, ex.getMessage());
                     }
+
                     parameters.put(attribute, value);
                 }
             }
@@ -170,17 +177,16 @@ public abstract class MediaTypeUtils {
 
         try {
             return new MediaType(type, subtype, parameters);
-        }
-        catch (UnsupportedCharsetException ex) {
+        } catch (UnsupportedCharsetException ex) {
             throw new InvalidMediaTypeException(mimeType, "unsupported charset '" + ex.getCharsetName() + "'");
-        }
-        catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException ex) {
             throw new InvalidMediaTypeException(mimeType, ex.getMessage());
         }
     }
 
     /**
      * Parse the comma-separated string into a list of {@code MimeType} objects.
+     *
      * @param mimeTypes the string to parse
      * @return the list of mime types
      * @throws InvalidMediaTypeException if the string cannot be parsed
@@ -200,6 +206,7 @@ public abstract class MediaTypeUtils {
      * Tokenize the given comma-separated string of {@code MimeType} objects
      * into a {@code List<String>}. Unlike simple tokenization by ",", this
      * method takes into account quoted parameters.
+     *
      * @param mediaTypes the string to tokenize
      * @return the list of tokens
      * @since 0.3.0
@@ -236,13 +243,14 @@ public abstract class MediaTypeUtils {
 
     /**
      * Return a string representation of the given list of {@code MimeType} objects.
+     *
      * @param mimeTypes the string to parse
      * @return the list of mime types
      * @throws IllegalArgumentException if the String cannot be parsed
      */
     public static String toString(Collection<? extends MediaType> mimeTypes) {
         StringBuilder builder = new StringBuilder();
-        for (Iterator<? extends MediaType> iterator = mimeTypes.iterator(); iterator.hasNext();) {
+        for (Iterator<? extends MediaType> iterator = mimeTypes.iterator(); iterator.hasNext(); ) {
             MediaType mimeType = iterator.next();
             mimeType.appendTo(builder);
             if (iterator.hasNext()) {
@@ -272,6 +280,7 @@ public abstract class MediaTypeUtils {
      * <blockquote>audio/basic;level=1 &lt; audio/basic</blockquote>
      * <blockquote>audio/basic == text/html</blockquote> <blockquote>audio/basic ==
      * audio/wave</blockquote>
+     *
      * @param mimeTypes the list of mime types to be sorted
      * @see <a href="https://tools.ietf.org/html/rfc7231#section-5.3.2">HTTP 1.1: Semantics
      * and Content, section 5.3.2</a>
@@ -326,6 +335,7 @@ public abstract class MediaTypeUtils {
      * <p>This implementation is backed by a {@code ConcurrentHashMap} for storing
      * the cached values and a {@code ConcurrentLinkedQueue} for ordering the keys
      * and choosing the least recently used key when the cache is at full capacity.
+     *
      * @param <K> the type of the key used for caching
      * @param <V> the type of the cached values
      */
@@ -366,8 +376,7 @@ public abstract class MediaTypeUtils {
                         this.queue.offer(key);
                     }
                     return cached;
-                }
-                finally {
+                } finally {
                     this.lock.readLock().unlock();
                 }
             }
@@ -375,7 +384,7 @@ public abstract class MediaTypeUtils {
             try {
                 // Retrying in case of concurrent reads on the same key
                 cached = this.cache.get(key);
-                if (cached  != null) {
+                if (cached != null) {
                     if (this.queue.removeLastOccurrence(key)) {
                         this.queue.offer(key);
                     }
@@ -395,8 +404,7 @@ public abstract class MediaTypeUtils {
                 this.cache.put(key, value);
                 this.size = cacheSize + 1;
                 return value;
-            }
-            finally {
+            } finally {
                 this.lock.writeLock().unlock();
             }
         }
