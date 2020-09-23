@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<additionalHeaders>
+    <scalapkg_style>
+        <!-- see mycila JAVAPKG_STYLE -->
+        <firstLine>EOL/*-</firstLine>
+        <beforeEachLine> * </beforeEachLine>
+        <endLine> */</endLine>
+        <skipLine>^package [a-z]+(\.[a-z][a-z0-9]*)*$</skipLine>
+        <firstLineDetectionPattern>(EOL)*(\s|\t)*/\*.*$</firstLineDetectionPattern>
+        <lastLineDetectionPattern>.*\*/(\s|\t)*$</lastLineDetectionPattern>
+        <allowBlankLines>false</allowBlankLines>
+        <isMultiline>true</isMultiline>
+        <padLines>false</padLines>
+    </scalapkg_style>
+</additionalHeaders>
