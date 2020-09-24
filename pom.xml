@@ -89,24 +89,13 @@
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <version>${mycila.version}</version>
-                <executions>
-                    <execution>
-                        <id>license-headers</id>
-                        <goals>
-                            <goal>format</goal>
-                        </goals>
-                        <phase>process-resources</phase>
-                        <configuration>
+                <configuration>
+                    <licenseSets>
+                        <licenseSet>
                             <header>${project.basedir}/src/build/license-header.txt</header>
                             <headerDefinitions>
                                 <headerDefinition>${project.basedir}/src/build/headers-definition.xml</headerDefinition>
                             </headerDefinitions>
-                            <mapping>
-                                <java>JAVAPKG_STYLE</java>
-                                <scala>SCALAPKG_STYLE</scala>
-                                <libsonnet>JAVADOC_STYLE</libsonnet>
-                                <Dockerfile>SCRIPT_STYLE</Dockerfile>
-                            </mapping>
                             <excludes>
                                 <exclude>**/NOTICE</exclude>
                                 <exclude>**/LICENSE</exclude>
@@ -117,7 +106,21 @@
                                 <exclude>src/test/resources/**</exclude>
                                 <exclude>**/target/**</exclude>
                             </excludes>
-                        </configuration>
+                        </licenseSet>
+                    </licenseSets>
+                    <mapping>
+                        <java>JAVAPKG_STYLE</java>
+                        <scala>SCALAPKG_STYLE</scala>
+                        <libsonnet>JAVADOC_STYLE</libsonnet>
+                        <Dockerfile>SCRIPT_STYLE</Dockerfile>
+                    </mapping>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>license-headers</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
                     </execution>
                 </executions>
                 <dependencies>
