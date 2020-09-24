@@ -87,10 +87,10 @@ class CodePointShrink implements Shrink<Integer> {
 
         Comparator<Integer> comparator =
                 comparing((Function<Integer, Boolean>) Character::isLowerCase)
-                        .thenComparing(Character::isUpperCase)
-                        .thenComparing(Character::isDigit)
+                        .thenComparing((Function<Integer, Boolean>) Character::isUpperCase)
+                        .thenComparing((Function<Integer, Boolean>) Character::isDigit)
                         .thenComparing(cp -> Integer.valueOf(' ').equals(cp))
-                        .thenComparing(Character::isSpaceChar)
+                        .thenComparing((Function<Integer, Boolean>) Character::isSpaceChar)
                         .thenComparing(naturalOrder());
         return Collections.unmodifiableList(shrinks.stream()
                 .filter(filter)
