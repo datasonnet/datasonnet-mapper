@@ -28,6 +28,7 @@ ui:
     url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/master/raw/build/ui-bundle.zip?job=bundle-stable
     snapshot: true
 
+  # see: https://docs.antora.org/antora/2.3/publish-to-github-pages/#use-the-supplemental-ui
   supplemental_files:
       - path: ui.yml
         contents: |

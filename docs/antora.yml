@@ -1,6 +1,6 @@
 name: datasonnet
 title: DataSonnet
-version: '0.4.1-MS3-SNAPSHOT'
+version: latest
 start_page: ROOT:index.adoc
 nav:
 - modules/ROOT/nav.adoc
