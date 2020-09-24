@@ -15,9 +15,8 @@
 #
 
 site:
-  title: INTERNAL DataSonnet Mapper Docs
-  # the 404 page and sitemap files only get generated when the url property is set
-  # url: https://antora.gitlab.io/demo/docs-site
+  title: DataSonnet Mapper Documentation
+  url: https://MS3Inc.github.io/datasonnet-mapper
   start_page: datasonnet::index.adoc
 content:
   sources:
