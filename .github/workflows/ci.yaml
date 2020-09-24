@@ -17,7 +17,7 @@ jobs:
         run: ./mvnw -V --no-transfer-progress --batch-mode clean verify
   build_site:
     name: "Build site with Antora"
-    if: ${{ github.ref == 'refs/heads/master' }}
+    if: github.ref == 'refs/heads/main'
     runs-on: [ ubuntu-latest ]
     steps:
       - name: Checkout
@@ -33,7 +33,7 @@ jobs:
           path: "${{ github.workspace }}/build/site"
   deploy_site:
     name: "Deploy GitHub Pages"
-    if: ${{ github.ref == 'refs/heads/master' }}
+    if: github.ref == 'refs/heads/main'
     runs-on: [ ubuntu-latest ]
     needs: [ build_site ]
     steps:
