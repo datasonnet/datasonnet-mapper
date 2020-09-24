@@ -1,4 +1,4 @@
-package com.datasonnet.document;
+package com.datasonnet;
 
 /*-
  * Copyright 2019-2020 the original author or authors.
@@ -16,12 +16,45 @@ package com.datasonnet.document;
  * limitations under the License.
  */
 
+/*
+ * Copyright 2002-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import org.jetbrains.annotations.Nullable;
 
-// jam01: removed nullSafeEquals support for Arrays
-class SpringFrameworkUtils {
-
-    // org.springframework.util.StringUtils: start
+/**
+ * Miscellaneous collection of utility methods.
+ *
+ * <p>
+ * This file is a derived work of org.springframework.util.StringUtils and org.springframework.util.ObjectUtils classes from
+ * Spring Framework v5.3.0-M1. Modifications made to the original work include:
+ * <li>Removed support for arrays in nullSafeEquals</li>
+ * </p>
+ *
+ * <p>Thanks to Alex Ruiz for contributing several enhancements to this class!</p>
+ *
+ * @author Juergen Hoeller (2002-2020)
+ * @author Keith Donald (2002-2020)
+ * @author Rod Johnson (2002-2020)
+ * @author Rob Harrop (2002-2020)
+ * @author Chris Beams (2002-2020)
+ * @author Sam Brannen (2002-2020)
+ * @author Jose Montoya
+ * @since 0.3.0
+ */
+public class Utils {
     /**
      * Check whether the given {@code String} contains actual <em>text</em>.
      * <p>More specifically, this method returns {@code true} if the
@@ -34,7 +67,7 @@ class SpringFrameworkUtils {
      * see #hasLength(String)
      * see Character#isWhitespace
      */
-    static boolean hasText(@Nullable String str) {
+    public static boolean hasText(@Nullable String str) {
         return (str != null && !str.isEmpty() && containsText(str));
     }
 
@@ -47,9 +80,7 @@ class SpringFrameworkUtils {
         }
         return false;
     }
-    // StringUtils: end
 
-    // org.springframework.util.ObjectUtils: start
     /**
      * Determine if the given objects are equal, returning {@code true} if
      * both are {@code null} or {@code false} if only one is {@code null}.
@@ -58,7 +89,7 @@ class SpringFrameworkUtils {
      * @return whether the given objects are equal
      * @see Object#equals(Object)
      */
-    static boolean nullSafeEquals(@Nullable Object o1, @Nullable Object o2) {
+    public static boolean nullSafeEquals(@Nullable Object o1, @Nullable Object o2) {
         if (o1 == o2) {
             return true;
         }

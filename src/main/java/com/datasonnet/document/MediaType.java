@@ -32,6 +32,7 @@ package com.datasonnet.document;
  * limitations under the License.
  */
 
+import com.datasonnet.Utils;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
@@ -425,10 +426,10 @@ public class MediaType implements Comparable<MediaType>, Serializable {
                 return false;
             }
             if (PARAM_CHARSET.equals(key)) {
-                if (!SpringFrameworkUtils.nullSafeEquals(getCharset(), other.getCharset())) {
+                if (!Utils.nullSafeEquals(getCharset(), other.getCharset())) {
                     return false;
                 }
-            } else if (!SpringFrameworkUtils.nullSafeEquals(entry.getValue(), other.parameters.get(key))) {
+            } else if (!Utils.nullSafeEquals(entry.getValue(), other.parameters.get(key))) {
                 return false;
             }
         }
@@ -778,7 +779,7 @@ public class MediaType implements Comparable<MediaType>, Serializable {
         List<String> tokenizedTypes = MediaTypeUtils.tokenize(mediaTypes);
         List<MediaType> result = new ArrayList<>(tokenizedTypes.size());
         for (String type : tokenizedTypes) {
-            if (SpringFrameworkUtils.hasText(type)) {
+            if (Utils.hasText(type)) {
                 result.add(parseMediaType(type));
             }
         }

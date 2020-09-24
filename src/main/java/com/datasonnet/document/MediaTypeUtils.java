@@ -32,6 +32,7 @@ package com.datasonnet.document;
  * limitations under the License.
  */
 
+import com.datasonnet.Utils;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.charset.StandardCharsets;
@@ -197,7 +198,7 @@ public abstract class MediaTypeUtils {
         }
 
         return tokenize(mimeTypes).stream()
-                .filter(SpringFrameworkUtils::hasText)
+                .filter(Utils::hasText)
                 .map(MediaTypeUtils::parseMediaType)
                 .collect(Collectors.toList());
     }
