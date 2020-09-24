@@ -1,1 +1,17 @@
-{"letter":{"$1":"\n    Dear Mr. ","name":{"$1":"John Smith"},"$2":".\n    Your order ","orderid":{"$1":"1032"},"$3":"\n    will be shipped on ","shipdate":{"$1":"2001-07-13"},"$4":".\n"}}
+{
+  "letter": {
+    "$1": "\n    Dear Mr. ",
+    "name": {
+      "$1": "John Smith"
+    },
+    "$2": ".\n    Your order ",
+    "orderid": {
+      "$1": "1032"
+    },
+    "$3": "\n    will be shipped on ",
+    "shipdate": {
+      "$1": "2001-07-13"
+    },
+    "$4": ".\n"
+  }
+}

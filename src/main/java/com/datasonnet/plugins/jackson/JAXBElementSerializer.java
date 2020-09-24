@@ -32,6 +32,7 @@ public class JAXBElementSerializer extends StdSerializer<JAXBElement> {
     public JAXBElementSerializer(Class<JAXBElement> t) {
         super(t);
     }
+
     @Override
     public void serialize(JAXBElement value, JsonGenerator gen, SerializerProvider provider) throws IOException {
         gen.writeStartObject();

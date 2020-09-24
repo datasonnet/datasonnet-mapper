@@ -33,8 +33,6 @@ import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
 
 public class DefaultJSONFormatPlugin extends AbstractDataFormatPlugin {
     public DefaultJSONFormatPlugin() {
@@ -99,7 +97,7 @@ public class DefaultJSONFormatPlugin extends AbstractDataFormatPlugin {
         if (charset == null) {
             charset = Charset.defaultCharset();
         }
-        
+
         int indent = mediaType.getParameters().containsKey(DS_PARAM_INDENT) ? 4 : -1;
 
         if (targetType.isAssignableFrom(String.class)) {

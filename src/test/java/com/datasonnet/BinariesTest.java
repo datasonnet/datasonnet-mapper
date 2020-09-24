@@ -16,7 +16,6 @@ package com.datasonnet;
  * limitations under the License.
  */
 
-import com.datasonnet.Mapper;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,7 @@ public class BinariesTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final String lib = "ds" +".";
+    private final String lib = "ds" + ".";
     private final String pack = "binaries";
 
     @Test

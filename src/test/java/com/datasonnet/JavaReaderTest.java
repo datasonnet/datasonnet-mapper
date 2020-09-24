@@ -18,7 +18,6 @@ package com.datasonnet;
 
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
-import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.javatest.Gizmo;
 import com.datasonnet.javatest.Manufacturer;
@@ -34,9 +33,6 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 public class JavaReaderTest {
 
     @Test
@@ -45,7 +41,7 @@ public class JavaReaderTest {
         theGizmo.setName("gizmo");
         theGizmo.setQuantity(123);
         theGizmo.setInStock(true);
-        theGizmo.setColors(Arrays.asList("red","white","blue"));
+        theGizmo.setColors(Arrays.asList("red", "white", "blue"));
 
         Manufacturer manufacturer = new Manufacturer();
         manufacturer.setManufacturerName("ACME Corp.");
@@ -72,8 +68,8 @@ public class JavaReaderTest {
         testField.setTest("HelloWorld");
         WsdlGeneratedObj obj = new WsdlGeneratedObj();
         obj.setTestField(new JAXBElement<TestField>(new QName("http://com.datasonnet.test", "testField"),
-                                                    TestField.class,
-                                                    testField));
+                TestField.class,
+                testField));
         Document<WsdlGeneratedObj> data = new DefaultDocument<>(obj);
         Mapper mapper = new Mapper("payload");
         Document<String> mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JSON);

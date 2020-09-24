@@ -16,12 +16,12 @@ package com.datasonnet.plugins;
  * limitations under the License.
  */
 
-import com.datasonnet.document.MediaType;
-import com.datasonnet.document.MediaTypes;
-import com.datasonnet.spi.ujsonUtils;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
+import com.datasonnet.document.MediaType;
+import com.datasonnet.document.MediaTypes;
 import com.datasonnet.spi.PluginException;
+import com.datasonnet.spi.ujsonUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,11 +35,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 public class DefaultCSVFormatPlugin extends BaseJacksonDataFormatPlugin {
     public static final String DS_PARAM_USE_HEADER = "useheader";
@@ -103,27 +101,21 @@ public class DefaultCSVFormatPlugin extends BaseJacksonDataFormatPlugin {
                         .readTree((String) doc.getContent());
 
                 return ujsonFrom(result);
-            }
-
-            else if (byte[].class.isAssignableFrom(doc.getContent().getClass())) {
+            } else if (byte[].class.isAssignableFrom(doc.getContent().getClass())) {
                 JsonNode result = CSV_MAPPER
                         .readerFor(useHeader ? Map.class : List.class)
                         .with(csvSchema)
                         .readTree((byte[]) doc.getContent());
 
                 return ujsonFrom(result);
-            }
-
-            else if (InputStream.class.isAssignableFrom(doc.getContent().getClass())) {
+            } else if (InputStream.class.isAssignableFrom(doc.getContent().getClass())) {
                 JsonNode result = CSV_MAPPER
                         .readerFor(useHeader ? Map.class : List.class)
                         .with(csvSchema)
                         .readTree((InputStream) doc.getContent());
 
                 return ujsonFrom(result);
-            }
-
-            else {
+            } else {
                 throw new PluginException(new IllegalArgumentException("Unsupported document content class, use the test method canRead before invoking read"));
             }
         } catch (JsonProcessingException jpe) {
@@ -161,21 +153,16 @@ public class DefaultCSVFormatPlugin extends BaseJacksonDataFormatPlugin {
                         .with(csvSchema)
                         .writeValue(out, jsonTree);
                 return (Document<T>) new DefaultDocument<>(out, MediaTypes.APPLICATION_CSV);
-            }
-
-            else if (byte[].class.equals(targetType)) {
+            } else if (byte[].class.equals(targetType)) {
                 return (Document<T>) new DefaultDocument<>(CSV_MAPPER.writerFor(JsonNode.class)
-                    .with(csvSchema)
-                    .writeValueAsBytes(jsonTree), MediaTypes.APPLICATION_CSV);
+                        .with(csvSchema)
+                        .writeValueAsBytes(jsonTree), MediaTypes.APPLICATION_CSV);
 
-            }
-
-            else if (String.class.equals(targetType)) {
+            } else if (String.class.equals(targetType)) {
                 return (Document<T>) new DefaultDocument<>(CSV_MAPPER.writerFor(JsonNode.class)
-                    .with(csvSchema)
-                    .writeValueAsString(jsonTree), MediaTypes.APPLICATION_CSV);
-            }
-            else {
+                        .with(csvSchema)
+                        .writeValueAsString(jsonTree), MediaTypes.APPLICATION_CSV);
+            } else {
                 throw new PluginException(new IllegalArgumentException("Unsupported document content class, use the test method canWrite before invoking write"));
             }
         } catch (IOException e) {

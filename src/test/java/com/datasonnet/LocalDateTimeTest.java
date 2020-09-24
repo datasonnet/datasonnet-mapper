@@ -16,13 +16,11 @@ package com.datasonnet;
  * limitations under the License.
  */
 
-import com.datasonnet.Mapper;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

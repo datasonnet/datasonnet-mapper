@@ -28,7 +28,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(
@@ -80,7 +84,7 @@ public class Run implements Callable<Void> {
 
     private String suffix(File file) {
         String[] parts = file.getName().split(".");
-        if(parts.length > 1) {
+        if (parts.length > 1) {
             return parts[parts.length - 1];
         } else {
             return "";  // no suffix
@@ -88,11 +92,11 @@ public class Run implements Callable<Void> {
     }
 
     private String payload() throws IOException {
-        if(input == null) {
+        if (input == null) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
             StringBuilder contents = new StringBuilder();
             int current;
-            while((current = reader.read()) != -1) {
+            while ((current = reader.read()) != -1) {
                 contents.appendCodePoint(current);
             }
             return contents.toString();
@@ -103,11 +107,11 @@ public class Run implements Callable<Void> {
 
     private Map<String, Document<?>> combinedArguments() throws IOException {
         return Collections.unmodifiableMap(new HashMap<String, Document<String>>() {{
-            for(Map.Entry<String, String> entry : arguments.entrySet()) {
+            for (Map.Entry<String, String> entry : arguments.entrySet()) {
                 put(entry.getKey(), new DefaultDocument<>(entry.getValue(), MediaTypes.APPLICATION_JSON));
             }
 
-            for(Map.Entry<String, File> entry : argumentFiles.entrySet()) {
+            for (Map.Entry<String, File> entry : argumentFiles.entrySet()) {
                 File file = entry.getValue();
                 String contents = Main.readFile(file);
                 put(entry.getKey(), new DefaultDocument<>(contents, MediaTypes.forExtension(suffix(file)).get()));
@@ -117,7 +121,7 @@ public class Run implements Callable<Void> {
 
     private Map<String, String> imports() throws IOException {
         Map<String, String> imports = new HashMap<>();
-        for(File importFile : importFiles) {
+        for (File importFile : importFiles) {
             String name = importFile.getPath();
             String contents = Main.readFile(importFile);
             imports.put(name, contents);

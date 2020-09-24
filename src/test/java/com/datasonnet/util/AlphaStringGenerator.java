@@ -64,9 +64,8 @@ import java.util.List;
 
 import static com.pholser.junit.quickcheck.internal.Lists.shrinksOfOneItem;
 import static com.pholser.junit.quickcheck.internal.Sequences.halving;
-
-import static java.util.stream.Collectors.*;
-import static java.util.stream.StreamSupport.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 
 /**
@@ -87,7 +86,8 @@ public class AlphaStringGenerator extends Generator<String> {
         super(String.class);
     }
 
-    @Override public String generate(SourceOfRandomness random, GenerationStatus status) {
+    @Override
+    public String generate(SourceOfRandomness random, GenerationStatus status) {
         int[] codePoints = new int[status.size()];
 
         for (int i = 0; i < codePoints.length; ++i)
@@ -96,11 +96,13 @@ public class AlphaStringGenerator extends Generator<String> {
         return new String(codePoints, 0, codePoints.length);
     }
 
-    @Override public boolean canShrink(Object larger) {
+    @Override
+    public boolean canShrink(Object larger) {
         return super.canShrink(larger) && codePointsInRange((String) larger);
     }
 
-    @Override public List<String> doShrink(SourceOfRandomness random, String larger) {
+    @Override
+    public List<String> doShrink(SourceOfRandomness random, String larger) {
         List<String> shrinks = new ArrayList<>();
 
         List<Integer> codePoints = larger.codePoints().boxed().collect(toList());
@@ -116,7 +118,8 @@ public class AlphaStringGenerator extends Generator<String> {
         return Collections.unmodifiableList(shrinks);
     }
 
-    @Override public BigDecimal magnitude(Object value) {
+    @Override
+    public BigDecimal magnitude(Object value) {
         return BigDecimal.valueOf(narrow(value).length());
     }
 

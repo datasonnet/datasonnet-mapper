@@ -1,24 +1,24 @@
 [
   {
-    "name" : "Joe",
-    "gender" : "Male",
-    "age" : 46,
+    "name": "Joe",
+    "gender": "Male",
+    "age": 46,
     "insurance": true
   },
   {
-    "name" : "Bob",
-    "gender" : "Male",
-    "age" : 40,
+    "name": "Bob",
+    "gender": "Male",
+    "age": 40,
     "insurance": false
   },
   {
-    "name" : "Jane",
-    "gender" : "Female",
-    "age" : 33
+    "name": "Jane",
+    "gender": "Female",
+    "age": 33
   },
   {
-    "name" : "Mary",
-    "gender" : "Female",
-    "age" : 40
+    "name": "Mary",
+    "gender": "Female",
+    "age": 40
   }
 ]

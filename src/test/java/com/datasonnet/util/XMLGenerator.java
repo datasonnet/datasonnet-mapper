@@ -75,26 +75,32 @@ import java.io.IOException;
 // TODO: 9/23/20 state modifications
 public class XMLGenerator extends Generator<Document> {
 
-    private static DocumentBuilderFactory documentBuilderFactory =
+    private static final DocumentBuilderFactory documentBuilderFactory =
             DocumentBuilderFactory.newInstance();
 
-    private static GeometricDistribution geometricDistribution =
+    private static final GeometricDistribution geometricDistribution =
             new GeometricDistribution();
 
-    /** Mean number of child nodes for each XML element. */
+    /**
+     * Mean number of child nodes for each XML element.
+     */
     private static final double MEAN_NUM_CHILDREN = 4;
 
-    /** Mean number of attributes for each XML element. */
+    /**
+     * Mean number of attributes for each XML element.
+     */
     private static final double MEAN_NUM_ATTRIBUTES = 2;
 
     /**
      * Minimum size of XML tree.
+     *
      * @see {@link #configure(Size)}
      */
     private int minDepth = 0;
 
     /**
      * Maximum size of XML tree.
+     *
      * @see {@link #configure(Size)}
      */
     private int maxDepth = 4;
@@ -107,7 +113,7 @@ public class XMLGenerator extends Generator<Document> {
 
     /**
      * Configures the minimum/maximum size of the XML document.
-     *
+     * <p>
      * This method is not usually invoked directly. Instead, use
      * the `@Size` annotation on fuzzed parameters to configure
      * automatically.
@@ -135,6 +141,7 @@ public class XMLGenerator extends Generator<Document> {
 
     /**
      * Generators a random XML document.
+     *
      * @param random a source of pseudo-random values
      * @param status generation state
      * @return a randomly-generated XML document
@@ -175,16 +182,16 @@ public class XMLGenerator extends Generator<Document> {
 
     private void populateElement(Document document, Element elem, SourceOfRandomness random, GenerationStatus status, int depth) {
         // Add attributes
-        int numAttributes = Math.max(0, geometricDistribution.sampleWithMean(MEAN_NUM_ATTRIBUTES, random)-1);
+        int numAttributes = Math.max(0, geometricDistribution.sampleWithMean(MEAN_NUM_ATTRIBUTES, random) - 1);
         for (int i = 0; i < numAttributes; i++) {
             elem.setAttribute(makeString(random, status), makeString(random, status));
         }
         // Make children
         if (depth < minDepth || (depth < maxDepth && random.nextBoolean())) {
-            int numChildren = Math.max(0, geometricDistribution.sampleWithMean(MEAN_NUM_CHILDREN, random)-1);
+            int numChildren = Math.max(0, geometricDistribution.sampleWithMean(MEAN_NUM_CHILDREN, random) - 1);
             for (int i = 0; i < numChildren; i++) {
                 Element child = document.createElement(makeString(random, status));
-                populateElement(document, child, random, status, depth+1);
+                populateElement(document, child, random, status, depth + 1);
                 elem.appendChild(child);
             }
         } else if (random.nextBoolean()) {

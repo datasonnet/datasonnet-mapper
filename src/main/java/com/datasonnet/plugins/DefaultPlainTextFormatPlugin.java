@@ -25,9 +25,6 @@ import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.ujsonUtils;
 import ujson.Value;
 
-import java.util.Collections;
-import java.util.Set;
-
 public class DefaultPlainTextFormatPlugin extends AbstractDataFormatPlugin {
     public DefaultPlainTextFormatPlugin() {
         supportedTypes.add(MediaTypes.TEXT_PLAIN);
@@ -41,7 +38,7 @@ public class DefaultPlainTextFormatPlugin extends AbstractDataFormatPlugin {
             return ujson.Null$.MODULE$;
         }
 
-        if (String.class.isAssignableFrom(doc.getContent().getClass())){
+        if (String.class.isAssignableFrom(doc.getContent().getClass())) {
             return ujsonUtils.strOf((String) doc.getContent());
         } else {
             throw new PluginException(new IllegalArgumentException("Unsupported document content class, use the test method canRead before invoking read"));

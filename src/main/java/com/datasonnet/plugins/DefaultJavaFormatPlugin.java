@@ -32,10 +32,8 @@ import ujson.Value;
 
 import javax.xml.bind.JAXBElement;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
     private static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper();

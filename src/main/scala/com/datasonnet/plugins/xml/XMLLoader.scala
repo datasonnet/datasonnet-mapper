@@ -43,7 +43,7 @@ trait XMLLoader {
 
   /**
    * Loads XML from the given InputSource, using the supplied parser.
-   *  The methods available in scala.xml.XML use the XML parser in the JDK.
+   * The methods available in scala.xml.XML use the XML parser in the JDK.
    */
   def loadXML(source: InputSource, parser: SAXParser, params: EffectiveParams): ujson.Obj = {
     val adapter = new BadgerFishHandler(params)
@@ -58,6 +58,7 @@ trait XMLLoader {
 
   /** loads XML from given InputStream, Reader, sysID, InputSource, or URL. */
   def load(is: InputStream, params: EffectiveParams): ujson.Obj = loadXML(fromInputStream(is), parser, params)
+
   def load(url: URL, params: EffectiveParams): ujson.Obj = loadXML(fromInputStream(url.openStream()), parser, params)
 
   /** Loads XML from the given String. */

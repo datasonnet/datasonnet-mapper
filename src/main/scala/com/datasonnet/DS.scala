@@ -16,8 +16,8 @@ package com.datasonnet
  * limitations under the License.
  */
 
-import java.net.URL
 import java.math.{BigDecimal, RoundingMode}
+import java.net.URL
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -422,10 +422,14 @@ object DS extends Library {
       (_, _, url: String) =>
         url match {
           case str if str.startsWith("classpath://") =>
-            val source = io.Source.fromInputStream(getClass.getClassLoader.getResourceAsStream(str.replaceFirst("classpath://","")))
+            val source = io.Source.fromInputStream(getClass.getClassLoader.getResourceAsStream(str.replaceFirst("classpath://", "")))
             val out =
-              try { source.mkString }
-              catch { case ex: NullPointerException => "null"}
+              try {
+                source.mkString
+              }
+              catch {
+                case ex: NullPointerException => "null"
+              }
             Materializer.reverse(ujsonUtils.parse(out));
           case _ =>
             val out = new Scanner(new URL(url).openStream(), "UTF-8").useDelimiter("\\A").next()
@@ -570,34 +574,34 @@ object DS extends Library {
     },
 
     // funcs below taken from Std
-    builtin("isString", "v"){ (ev, fs, v: Val) =>
+    builtin("isString", "v") { (ev, fs, v: Val) =>
       v.isInstanceOf[Val.Str]
     },
 
-    builtin("isBoolean", "v"){ (ev, fs, v: Val) =>
+    builtin("isBoolean", "v") { (ev, fs, v: Val) =>
       v == Val.True || v == Val.False
     },
 
-    builtin("isNumber", "v"){ (ev, fs, v: Val) =>
+    builtin("isNumber", "v") { (ev, fs, v: Val) =>
       v.isInstanceOf[Val.Num]
     },
 
-    builtin("isObject", "v"){ (ev, fs, v: Val) =>
+    builtin("isObject", "v") { (ev, fs, v: Val) =>
       v.isInstanceOf[Val.Obj]
     },
 
-    builtin("isArray", "v"){ (ev, fs, v: Val) =>
+    builtin("isArray", "v") { (ev, fs, v: Val) =>
       v.isInstanceOf[Val.Arr]
     },
 
-    builtin("isFunction", "v"){ (ev, fs, v: Val) =>
+    builtin("isFunction", "v") { (ev, fs, v: Val) =>
       v.isInstanceOf[Val.Func]
     },
 
     // moved array to first position
-    builtin("foldLeft", "arr", "func", "init"){ (ev, fs, arr: Val.Arr, func: Applyer, init: Val) =>
+    builtin("foldLeft", "arr", "func", "init") { (ev, fs, arr: Val.Arr, func: Applyer, init: Val) =>
       var current = init
-      for(item <- arr.value){
+      for (item <- arr.value) {
         val c = current
         current = func.apply(Val.Lazy(c), item)
       }
@@ -605,29 +609,29 @@ object DS extends Library {
     },
 
     // moved array to first position
-    builtin("foldRight", "arr", "func", "init"){ (ev, fs, arr: Val.Arr, func: Applyer, init: Val) =>
+    builtin("foldRight", "arr", "func", "init") { (ev, fs, arr: Val.Arr, func: Applyer, init: Val) =>
       var current = init
-      for(item <- arr.value.reverse){
+      for (item <- arr.value.reverse) {
         val c = current
         current = func.apply(item, Val.Lazy(c))
       }
       current
     },
 
-    builtin("parseInt", "str"){ (ev, fs, str: String) =>
+    builtin("parseInt", "str") { (ev, fs, str: String) =>
       str.toInt
     },
 
-    builtin("parseOctal", "str"){ (ev, fs, str: String) =>
+    builtin("parseOctal", "str") { (ev, fs, str: String) =>
       Integer.parseInt(str, 8)
     },
 
-    builtin("parseHex", "str"){ (ev, fs, str: String) =>
+    builtin("parseHex", "str") { (ev, fs, str: String) =>
       Integer.parseInt(str, 16)
     },
 
     // migrated from util.libsonnet
-    builtin("parseDouble", "str"){ (ev, fs, str: String) =>
+    builtin("parseDouble", "str") { (ev, fs, str: String) =>
       str.toDouble
     },
 
@@ -639,18 +643,30 @@ object DS extends Library {
               case Val.Str(str2) => Val.Lazy(Val.Str(str.concat(str2))).force
               case Val.Num(num) =>
                 Val.Lazy(Val.Str(str.concat(
-                  if(Math.ceil(num) == Math.floor(num)){num.toInt.toString} else {num.toString}
+                  if (Math.ceil(num) == Math.floor(num)) {
+                    num.toInt.toString
+                  } else {
+                    num.toString
+                  }
                 ))).force
               case i => throw new IllegalArgumentException(
                 "Expected String, Number, got: " + i.prettyName)
             }
           case Val.Num(num) =>
-            val stringNum = if(Math.ceil(num) == Math.floor(num)){num.toInt.toString} else {num.toString}
+            val stringNum = if (Math.ceil(num) == Math.floor(num)) {
+              num.toInt.toString
+            } else {
+              num.toString
+            }
             second match {
               case Val.Str(str) => Val.Lazy(Val.Str(stringNum.concat(str))).force
               case Val.Num(num2) =>
                 Val.Lazy(Val.Str(stringNum.concat(
-                  if(Math.ceil(num2) == Math.floor(num2)){num2.toInt.toString} else {num2.toString}
+                  if (Math.ceil(num2) == Math.floor(num2)) {
+                    num2.toInt.toString
+                  } else {
+                    num2.toString
+                  }
                 ))).force
               case i => throw new IllegalArgumentException(
                 "Expected String, Number, got: " + i.prettyName)
@@ -928,7 +944,7 @@ object DS extends Library {
                 val v = Materializer.reverse(t)
                 Applyer(replaceF, ev, null).apply(Val.Lazy(v)) match {
                   case resultStr: Val.Str => resultStr.value
-                  case _  => throw new Error.Delegate("The result of the replacement function must be a String")
+                  case _ => throw new Error.Delegate("The result of the replacement function must be a String")
                 }
               }
             }
@@ -1013,7 +1029,7 @@ object DS extends Library {
 
       builtinWithDefaults("round",
         "num" -> None,
-      "precision" -> Some(Expr.Num(0, 0))){ (args, ev) =>
+        "precision" -> Some(Expr.Num(0, 0))) { (args, ev) =>
         val num = args("num").cast[Val.Num].value
         val prec = args("precision").cast[Val.Num].value.toInt
 
@@ -1041,54 +1057,54 @@ object DS extends Library {
       },
 
       // funcs below taken from Std but using Java's Math
-      builtin("clamp", "x", "minVal", "maxVal"){ (ev, fs, x: Double, minVal: Double, maxVal: Double) =>
+      builtin("clamp", "x", "minVal", "maxVal") { (ev, fs, x: Double, minVal: Double, maxVal: Double) =>
         Math.max(minVal, Math.min(x, maxVal))
       },
 
-      builtin("pow", "x", "n"){ (ev, fs, x: Double, n: Double) =>
+      builtin("pow", "x", "n") { (ev, fs, x: Double, n: Double) =>
         Math.pow(x, n)
       },
 
-      builtin("sin", "x"){ (ev, fs, x: Double) =>
+      builtin("sin", "x") { (ev, fs, x: Double) =>
         Math.sin(x)
       },
 
-      builtin("cos", "x"){ (ev, fs, x: Double) =>
+      builtin("cos", "x") { (ev, fs, x: Double) =>
         Math.cos(x)
       },
 
-      builtin("tan", "x"){ (ev, fs, x: Double) =>
+      builtin("tan", "x") { (ev, fs, x: Double) =>
         Math.tan(x)
       },
 
-      builtin("asin", "x"){ (ev, fs, x: Double) =>
+      builtin("asin", "x") { (ev, fs, x: Double) =>
         Math.asin(x)
       },
 
-      builtin("acos", "x"){ (ev, fs, x: Double) =>
+      builtin("acos", "x") { (ev, fs, x: Double) =>
         Math.acos(x)
       },
 
-      builtin("atan", "x"){ (ev, fs, x: Double) =>
+      builtin("atan", "x") { (ev, fs, x: Double) =>
         Math.atan(x)
       },
 
-      builtin("log", "x"){ (ev, fs, x: Double) =>
+      builtin("log", "x") { (ev, fs, x: Double) =>
         Math.log(x)
       },
 
-      builtin("exp", "x"){ (ev, fs, x: Double) =>
+      builtin("exp", "x") { (ev, fs, x: Double) =>
         Math.exp(x)
       },
 
-      builtin("mantissa", "x"){ (ev, fs, x: Double) =>
+      builtin("mantissa", "x") { (ev, fs, x: Double) =>
         val value = x
         val exponent = (Math.log(value) / Math.log(2)).toInt + 1
         val mantissa = value * Math.pow(2.0, -exponent)
         mantissa
       },
 
-      builtin("exponent", "x"){ (ev, fs, x: Double) =>
+      builtin("exponent", "x") { (ev, fs, x: Double) =>
         val value = x
         val exponent = (Math.log(value) / Math.log(2)).toInt + 1
         val mantissa = value * Math.pow(2.0, -exponent)
@@ -1155,8 +1171,8 @@ object DS extends Library {
           array.value.indexWhere(funct.apply(_) == Val.Lazy(Val.True).force)
       },
 
-      builtin0("join", "arrL", "arryR", "functL", "functR"){
-        (vals, ev,fs) =>
+      builtin0("join", "arrL", "arryR", "functL", "functR") {
+        (vals, ev, fs) =>
           //map the input values
           val valSeq = validate(vals, ev, fs, Array(ArrRead, ArrRead, ApplyerRead, ApplyerRead))
           val arrL = valSeq(0).asInstanceOf[Val.Arr]
@@ -1167,7 +1183,8 @@ object DS extends Library {
           val out = collection.mutable.Buffer.empty[Val.Lazy]
 
           arrL.value.foreach({
-            valueL => val compareL = functL.apply(valueL)
+            valueL =>
+              val compareL = functL.apply(valueL)
               //append all that match the condition
               out.appendAll(arrR.value.collect({
                 case valueR if compareL.equals(functR.apply(valueR)) =>
@@ -1180,8 +1197,8 @@ object DS extends Library {
           Val.Arr(out.toSeq)
       },
 
-      builtin0("leftJoin", "arrL", "arryR", "functL", "functR"){
-        (vals, ev,fs) =>
+      builtin0("leftJoin", "arrL", "arryR", "functL", "functR") {
+        (vals, ev, fs) =>
           //map the input values
           val valSeq = validate(vals, ev, fs, Array(ArrRead, ArrRead, ApplyerRead, ApplyerRead))
           val arrL = valSeq(0).asInstanceOf[Val.Arr]
@@ -1195,7 +1212,8 @@ object DS extends Library {
           val out = collection.mutable.Buffer.empty[Val.Lazy]
 
           arrL.value.foreach({
-            valueL => val compareL = functL.apply(valueL)
+            valueL =>
+              val compareL = functL.apply(valueL)
               //append all that match the condition
               out.appendAll(arrR.value.collect({
                 case valueR if compareL.equals(functR.apply(valueR)) =>
@@ -1218,8 +1236,8 @@ object DS extends Library {
           Val.Arr(out.toSeq)
       },
 
-      builtin0("outerJoin", "arrL", "arryR", "functL", "functR"){
-        (vals, ev,fs) =>
+      builtin0("outerJoin", "arrL", "arryR", "functL", "functR") {
+        (vals, ev, fs) =>
           //map the input values
           val valSeq = validate(vals, ev, fs, Array(ArrRead, ArrRead, ApplyerRead, ApplyerRead))
           val arrL = valSeq(0).asInstanceOf[Val.Arr]
@@ -1234,7 +1252,8 @@ object DS extends Library {
           val out = collection.mutable.Buffer.empty[Val.Lazy]
 
           arrL.value.foreach({
-            valueL => val compareL = functL.apply(valueL)
+            valueL =>
+              val compareL = functL.apply(valueL)
               //append all that match the condition
               out.appendAll(arrR.value.collect({
                 case valueR if compareL.equals(functR.apply(valueR)) =>
@@ -1254,11 +1273,11 @@ object DS extends Library {
               Val.Lazy(new Val.Obj(
                 scala.collection.mutable.Map("l" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => leftOver.force)),
                 _ => (), None))
-            ).appendedAll(leftoversR.map(
-              leftOver =>
-                Val.Lazy(new Val.Obj(
-                  scala.collection.mutable.Map("r" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => leftOver.force)),
-                  _ => (), None)))
+          ).appendedAll(leftoversR.map(
+            leftOver =>
+              Val.Lazy(new Val.Obj(
+                scala.collection.mutable.Map("r" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => leftOver.force)),
+                _ => (), None)))
           ))
           Val.Arr(out.toSeq)
       },

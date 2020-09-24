@@ -72,7 +72,8 @@ class CodePointShrink implements Shrink<Integer> {
         this.filter = filter;
     }
 
-    @Override public List<Integer> shrink(SourceOfRandomness random, Object larger) {
+    @Override
+    public List<Integer> shrink(SourceOfRandomness random, Object larger) {
         int codePoint = (Integer) larger;
 
         List<Integer> shrinks = new ArrayList<>();
@@ -86,10 +87,10 @@ class CodePointShrink implements Shrink<Integer> {
 
         Comparator<Integer> comparator =
                 comparing((Function<Integer, Boolean>) Character::isLowerCase)
-                        .thenComparing((Function<Integer, Boolean>) Character::isUpperCase)
-                        .thenComparing((Function<Integer, Boolean>) Character::isDigit)
+                        .thenComparing(Character::isUpperCase)
+                        .thenComparing(Character::isDigit)
                         .thenComparing(cp -> Integer.valueOf(' ').equals(cp))
-                        .thenComparing((Function<Integer, Boolean>) Character::isSpaceChar)
+                        .thenComparing(Character::isSpaceChar)
                         .thenComparing(naturalOrder());
         return Collections.unmodifiableList(shrinks.stream()
                 .filter(filter)

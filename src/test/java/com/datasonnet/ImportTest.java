@@ -41,7 +41,7 @@ public class ImportTest {
                     Collections.singletonMap("output.json", "a b"));
             String result = mapper.transform("{}");
             fail("Import should fail");
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("end-of-input at line 1 column 3"), "Found message: " + e.getMessage());
         }
     }
@@ -53,7 +53,7 @@ public class ImportTest {
                     Collections.singletonMap("output.json", "a.b"));
             String result = mapper.transform("{}");
             fail("Import should fail");
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("output.json line 1 column 1"), "Found message: " + e.getMessage());
             assertTrue(e.getMessage().contains("line 1 column 1 of the transformation"), "Found message: " + e.getMessage());
         }

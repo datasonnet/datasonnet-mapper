@@ -27,7 +27,9 @@ object Source {
   def fromFile(file: File) = new InputSource(new FileInputStream(file))
 
   def fromInputStream(is: InputStream): InputSource = new InputSource(is)
+
   def fromReader(reader: Reader): InputSource = new InputSource(reader)
+
   def fromString(string: String): InputSource = fromReader(new StringReader(string))
 }
 
@@ -36,7 +38,9 @@ object XML extends XMLLoader {
 
   /** Returns an XMLLoader whose load* methods will use the supplied SAXParser. */
   def withSAXParser(p: SAXParser): XMLLoader =
-    new XMLLoader { override val parser: SAXParser = p }
+    new XMLLoader {
+      override val parser: SAXParser = p
+    }
 
   def writeXML(sb: java.io.Writer, root: (String, ujson.Obj), effParams: EffectiveParams): Unit = {
     // TODO: get charset from params

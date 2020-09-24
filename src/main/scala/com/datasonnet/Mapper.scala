@@ -53,7 +53,7 @@ object Mapper {
   def evaluate(script: String, evaluator: Evaluator, cache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]], libraries: Map[String, Val], lineOffset: Int): Try[Val] = {
     for {
       fullParse <- cache.getOrElseUpdate(script, fastparse.parse(script, Parser.document(_))) match {
-        case f @ Parsed.Failure(l, i, e) => Failure(new IllegalArgumentException("Problem parsing: " + expandErrorLineNumber(f.trace().msg, lineOffset)))
+        case f@Parsed.Failure(l, i, e) => Failure(new IllegalArgumentException("Problem parsing: " + expandErrorLineNumber(f.trace().msg, lineOffset)))
         case Parsed.Success(r, index) => Success(r)
       }
 
@@ -148,7 +148,7 @@ class Mapper(var script: String,
   private val parseCache = collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]()
   private val evaluator = new NoFileEvaluator(script, DataSonnetPath("."), parseCache, importer, header.isPreserveOrder)
 
-  private val libraries = additionalLibs.asScala.foldLeft(DS.makeLib(dataFormats, evaluator, parseCache)){
+  private val libraries = additionalLibs.asScala.foldLeft(DS.makeLib(dataFormats, evaluator, parseCache)) {
     (acc, lib) => acc concat lib.makeLib(dataFormats, evaluator, parseCache)
   }
 

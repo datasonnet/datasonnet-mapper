@@ -17,16 +17,13 @@ package com.datasonnet;
  */
 
 import com.datasonnet.document.DefaultDocument;
-import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.TestResourceReader;
-import com.datasonnet.Mapper;
-
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.Collections;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JsonPathTest {
 

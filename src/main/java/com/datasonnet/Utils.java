@@ -60,6 +60,7 @@ public class Utils {
      * <p>More specifically, this method returns {@code true} if the
      * {@code String} is not {@code null}, its length is greater than 0,
      * and it contains at least one non-whitespace character.
+     *
      * @param str the {@code String} to check (may be {@code null})
      * @return {@code true} if the {@code String} is not {@code null}, its
      * length is greater than 0, and it does not contain whitespace only
@@ -84,6 +85,7 @@ public class Utils {
     /**
      * Determine if the given objects are equal, returning {@code true} if
      * both are {@code null} or {@code false} if only one is {@code null}.
+     *
      * @param o1 first Object to compare
      * @param o2 second Object to compare
      * @return whether the given objects are equal

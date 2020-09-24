@@ -24,7 +24,6 @@ import org.bouncycastle.util.encoders.Hex;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Base64;
@@ -39,8 +38,8 @@ public class Crypto {
                 new PaddedBufferedBlockCipher(engine);
         KeyParameter key = new KeyParameter(keyString.getBytes());
         cipher.init(true, key);
-        byte in[] = value.getBytes();
-        byte out[] = new byte[cipher.getOutputSize(in.length)];
+        byte[] in = value.getBytes();
+        byte[] out = new byte[cipher.getOutputSize(in.length)];
         int len1 = cipher.processBytes(in, 0, in.length, out, 0);
         try {
             cipher.doFinal(out, len1);
@@ -60,8 +59,8 @@ public class Crypto {
         StringBuffer result = new StringBuffer();
         KeyParameter key = new KeyParameter(keyString.getBytes());
         cipher.init(false, key);
-        byte out[] = Base64.getDecoder().decode(value);
-        byte out2[] = new byte[cipher.getOutputSize(out.length)];
+        byte[] out = Base64.getDecoder().decode(value);
+        byte[] out2 = new byte[cipher.getOutputSize(out.length)];
         int len2 = cipher.processBytes(out, 0, out.length, out2, 0);
         cipher.doFinal(out2, len2);
         String s2 = new String(out2);

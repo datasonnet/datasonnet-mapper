@@ -32,8 +32,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 
@@ -55,11 +55,11 @@ public class JavaWriterTest {
         Object result = mapped.getContent();
         assertTrue(result instanceof Gizmo);
 
-        Gizmo gizmo = (Gizmo)result;
+        Gizmo gizmo = (Gizmo) result;
         assertEquals("gizmo", gizmo.getName());
         assertEquals(123, gizmo.getQuantity());
         assertEquals(true, gizmo.isInStock());
-        assertEquals(Arrays.asList("red","white","blue"), gizmo.getColors());
+        assertEquals(Arrays.asList("red", "white", "blue"), gizmo.getColors());
         assertEquals("ACME Corp.", gizmo.getManufacturer().getManufacturerName());
         assertEquals("ACME123", gizmo.getManufacturer().getManufacturerCode());
 
@@ -77,7 +77,7 @@ public class JavaWriterTest {
         result = mappedMap.getContent();
         assertTrue(result instanceof java.util.HashMap);
 
-        Map gizmoMap = (Map)result;
+        Map gizmoMap = (Map) result;
         assertTrue(gizmoMap.get("colors") instanceof java.util.ArrayList);
         assertTrue(gizmoMap.get("manufacturer") instanceof java.util.HashMap);
 
@@ -97,7 +97,7 @@ public class JavaWriterTest {
         try {
             mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA);
             fail("Should not succeed");
-        } catch(Exception e) {
+        } catch (Exception e) {
             // this error is now thrown by jackson as it _will_ try to write a String...
             assertTrue(e.getMessage().contains("Unable to convert to target type"), "Failed with wrong message: " + e.getMessage());
         }
@@ -113,7 +113,7 @@ public class JavaWriterTest {
         Object result = mapped.getContent();
         assertTrue(result instanceof WsdlGeneratedObj);
 
-        JAXBContext jaxbContext = JAXBContext.newInstance(WsdlGeneratedObj.class );
+        JAXBContext jaxbContext = JAXBContext.newInstance(WsdlGeneratedObj.class);
         Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
         jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 

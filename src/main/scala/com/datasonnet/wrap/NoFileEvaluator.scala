@@ -16,7 +16,7 @@ package com.datasonnet.wrap
  * limitations under the License.
  */
 
-import sjsonnet.{Evaluator, Expr, Path, OsPath}
+import sjsonnet.{Evaluator, Expr, Path}
 
 class NoFileEvaluator(jsonnet: String,
                       path: Path,

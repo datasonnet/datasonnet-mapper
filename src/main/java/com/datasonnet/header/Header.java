@@ -16,9 +16,12 @@ package com.datasonnet.header;
  * limitations under the License.
  */
 
-import com.datasonnet.document.*;
+import com.datasonnet.document.DefaultDocument;
+import com.datasonnet.document.Document;
+import com.datasonnet.document.InvalidMediaTypeException;
+import com.datasonnet.document.MediaType;
+import com.datasonnet.document.MediaTypes;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,6 +43,7 @@ public class Header {
     // using maps to facilitate only one per super/sub type
     private final Map<Integer, MediaType> allInputs;
     private final Map<Integer, MediaType> dataFormats;
+
     public Header(String version,
                   boolean preserveOrder,
                   Map<String, MediaType> namedInputs,

@@ -47,8 +47,9 @@ public class InvalidMediaTypeException extends IllegalArgumentException {
 
     /**
      * Create a new InvalidMediaTypeException for the given media type.
+     *
      * @param mediaType the offending media type
-     * @param message a detail message indicating the invalid part
+     * @param message   a detail message indicating the invalid part
      */
     public InvalidMediaTypeException(String mediaType, String message) {
         super("Invalid media type \"" + mediaType + "\": " + message);

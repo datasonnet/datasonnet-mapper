@@ -16,16 +16,12 @@ package com.datasonnet;
  * limitations under the License.
  */
 
-import com.datasonnet.document.DefaultDocument;
-import com.datasonnet.document.Document;
-import com.datasonnet.document.MediaType;
 import com.datasonnet.header.Header;
-import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.Test;
 
 public class HeaderTest {
 
-    String headerStr ="/** DataSonnet\n" +
+    String headerStr = "/** DataSonnet\n" +
             "version=1.0\n" +
             "input payload application/xml;ds.xml.namespace-separator=\":\"\n" +
             "input * application/xml;ds.xml.text-value-key=__text\n" +

@@ -24,7 +24,10 @@ import com.datasonnet.plugins.DefaultJavaFormatPlugin;
 import com.datasonnet.plugins.DefaultPlainTextFormatPlugin;
 import com.datasonnet.plugins.DefaultXMLFormatPlugin$;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 public class DataFormatService {
     private final List<DataFormatPlugin> plugins;

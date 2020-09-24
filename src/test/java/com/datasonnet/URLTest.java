@@ -17,7 +17,6 @@ package com.datasonnet;
  */
 
 import com.datasonnet.document.DefaultDocument;
-import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import org.junit.jupiter.api.Test;
 

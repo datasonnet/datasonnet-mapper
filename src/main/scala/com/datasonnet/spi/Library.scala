@@ -27,20 +27,24 @@ import scala.io.Source
 
 object Library {
   val emptyObj = new Val.Obj(mutable.HashMap.empty[String, Obj.Member], _ => (), None)
+
   def memberOf(value: Val): Obj.Member = Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => value)
 }
 
 abstract class Library {
   def namespace(): String
+
   def functions(dataFormats: DataFormatService): Map[String, Val.Func]
+
   def modules(dataFormats: DataFormatService): Map[String, Val.Obj]
+
   def libsonnets(): Set[String]
 
   protected def moduleFrom(functions: (String, Val.Func)*): Val.Obj = new Val.Obj(
-    mutable.LinkedHashMap[String, Val.Obj.Member] (
-      functions.map{
-          case (k, v) =>(k, memberOf(v))
-        }: _*),
+    mutable.LinkedHashMap[String, Val.Obj.Member](
+      functions.map {
+        case (k, v) => (k, memberOf(v))
+      }: _*),
     _ => (),
     None
   )

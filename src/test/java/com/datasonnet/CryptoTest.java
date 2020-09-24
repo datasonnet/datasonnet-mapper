@@ -16,11 +16,8 @@ package com.datasonnet;
  * limitations under the License.
  */
 
-import com.datasonnet.Mapper;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;

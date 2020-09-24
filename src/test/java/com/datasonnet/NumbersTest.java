@@ -26,7 +26,7 @@ public class NumbersTest {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final String lib = "ds" +".";
+    private final String lib = "ds" + ".";
     private final String pack = "numbers";
 
     @Test
@@ -172,7 +172,6 @@ public class NumbersTest {
         assertEquals("3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000", value);
          */
     }
-
 
 
 }

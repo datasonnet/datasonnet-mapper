@@ -165,4 +165,5 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
       EffectiveParams(nsSep, txtPref, cdataPref, attrPref, omitDecl, ver, xmlns, nullEmpty, autoEmpty, Map.from(declarations))
     }
   }
+
 }

@@ -20,9 +20,6 @@ import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaType;
 import ujson.Value;
 
-import java.util.Collections;
-import java.util.Set;
-
 public interface DataFormatPlugin {
 
     default boolean canRead(Document<?> doc) {

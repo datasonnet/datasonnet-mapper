@@ -17,7 +17,11 @@ package com.datasonnet.javatest;
  */
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElementRef;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -31,10 +35,8 @@ public class WsdlGeneratedObj {
     /**
      * Gets the value of the testField property.
      *
-     * @return
-     *     possible object is
-     *     {@link JAXBElement }{@code <}{@link Object }{@code >}
-     *
+     * @return possible object is
+     * {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
     public JAXBElement<TestField> getTestField() {
         return testField;
@@ -43,10 +45,8 @@ public class WsdlGeneratedObj {
     /**
      * Sets the value of the testField property.
      *
-     * @param value
-     *     allowed object is
-     *     {@link JAXBElement }{@code <}{@link Object }{@code >}
-     *
+     * @param value allowed object is
+     *              {@link JAXBElement }{@code <}{@link Object }{@code >}
      */
     public void setTestField(JAXBElement<TestField> value) {
         this.testField = value;
