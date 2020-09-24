@@ -31,28 +31,28 @@ jobs:
         with:
           name: site
           path: "${{ github.workspace }}/build/site"
-    deploy_site:
-      name: "Deploy GitHub Pages"
-      if: github.ref == 'refs/heads/master'
-      runs-on: [ ubuntu-latest ]
-      needs: [ build_site ]
-      steps:
-        - name: Setup Node.js for use with actions
-          uses: actions/setup-node@v1.1.0
-          with:
-            version: 14.x
-        - name: Checkout
-          uses: actions/checkout@v2
-        - name: Download generated site
-          uses: actions/download-artifact@v1
-          with:
-            name: site
-            path: "${{ github.workspace }}/site"
-        - name: Deploy to GitHub Pages
-          uses: JamesIves/github-pages-deploy-action@3.6.1
-          with:
-            GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-            BRANCH: 'gh-pages'
-            FOLDER: "site"
-            COMMIT_MESSAGE: "[CI] Publish Documentation for ${{ github.sha }}"
-            CLEAN: true
+  deploy_site:
+    name: "Deploy GitHub Pages"
+    if: github.ref == 'refs/heads/master'
+    runs-on: [ ubuntu-latest ]
+    needs: [ build_site ]
+    steps:
+      - name: Setup Node.js for use with actions
+        uses: actions/setup-node@v1.1.0
+        with:
+          version: 14.x
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download generated site
+        uses: actions/download-artifact@v1
+        with:
+          name: site
+          path: "${{ github.workspace }}/site"
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@3.6.1
+        with:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          BRANCH: 'gh-pages'
+          FOLDER: "site"
+          COMMIT_MESSAGE: "[CI] Publish Documentation for ${{ github.sha }}"
+          CLEAN: true
