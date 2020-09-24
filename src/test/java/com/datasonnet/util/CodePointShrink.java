@@ -1,3 +1,27 @@
+package com.datasonnet.util;
+
+/*-
+ * The original work for this file is available under the terms of the
+ * MIT License. The derived work is made available under the terms of the
+ * Apache License, Version 2.0
+ */
+
+/*-
+ * Copyright 2019-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /*
  The MIT License
 
@@ -23,23 +47,8 @@
  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package com.datasonnet.util;
-
-/*-
- * Copyright 2019-2020 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+import com.pholser.junit.quickcheck.generator.Shrink;
+import com.pholser.junit.quickcheck.random.SourceOfRandomness;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,14 +58,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import com.pholser.junit.quickcheck.generator.Shrink;
-import com.pholser.junit.quickcheck.random.SourceOfRandomness;
+import static java.lang.Character.isUpperCase;
+import static java.util.Collections.addAll;
+import static java.util.Collections.reverse;
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.naturalOrder;
 
-import static java.lang.Character.*;
-import static java.util.Collections.*;
-import static java.util.Comparator.*;
-import static java.util.stream.Collectors.*;
-
+// TODO: 9/23/20 state modifications
 class CodePointShrink implements Shrink<Integer> {
     private final Predicate<? super Integer> filter;
 
