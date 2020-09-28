@@ -52,8 +52,7 @@ object DS extends Library {
             array.exists(_.force == value)
           case Val.Str(s) =>
             value.cast[Val.Str].value.r.findAllMatchIn(s).nonEmpty;
-          case _ => throw new IllegalArgumentException(
-            "Expected Array or String, got: " + container.prettyName);
+          case i => throw Error.Delegate("Expected Array or String, got: " + i.prettyName)
         }
     },
 
@@ -72,22 +71,18 @@ object DS extends Library {
     builtin("filter", "array", "funct") {
       (_, _, value: Val, funct: Applyer) =>
         value match {
-          case Val.Arr(array) =>
-            filter(array, funct)
+          case Val.Arr(array) => filter(array, funct)
           case Val.Null => Val.Lazy(Val.Null).force
-          case i => throw new IllegalArgumentException(
-            "Expected Array , got: " + i.prettyName);
+          case i => throw Error.Delegate("Expected Array, got: " + i.prettyName)
         }
     },
 
     builtin("filterObject", "obj", "func") {
       (ev, fs, value: Val, func: Applyer) =>
         value match {
-          case obj: Val.Obj =>
-            filterObject(obj, func, ev, fs)
+          case obj: Val.Obj => filterObject(obj, func, ev, fs)
           case Val.Null => Val.Lazy(Val.Null).force
-          case i => throw new IllegalArgumentException(
-            "Expected Object, got: " + i.prettyName);
+          case i => throw Error.Delegate("Expected Object, got: " + i.prettyName)
         }
     },
 
@@ -101,19 +96,16 @@ object DS extends Library {
             Val.Arr(s.zipWithIndex.collect({
               case (v, i) if v.force == value => Val.Lazy(Val.Num(i))
             }))
-          case _ => throw new IllegalArgumentException(
-            "Expected Array or String, got: " + container.prettyName);
+          case i => throw Error.Delegate("Expected Array or String, got: " + i.prettyName)
         }
     },
 
     builtin("flatMap", "array", "funct") {
       (_, _, array: Val, funct: Applyer) =>
         array match {
-          case Val.Arr(s) =>
-            flatMap(s, funct)
+          case Val.Arr(s) => flatMap(s, funct)
           case Val.Null => Val.Lazy(Val.Null).force
-          case _ => throw new IllegalArgumentException(
-            "Expected Array, got: " + array.prettyName);
+          case i => throw Error.Delegate("Expected Array, got: " + i.prettyName)
         }
     },
 
@@ -126,14 +118,12 @@ object DS extends Library {
               innerArray.force match {
                 case Val.Null => out.append(Val.Lazy(Val.Null))
                 case Val.Arr(v) => out.appendAll(v)
-                case _ => throw new IllegalArgumentException(
-                  "Expected Array, got: " + innerArray.force.prettyName);
+                case i => throw Error.Delegate("Expected Array, got: " + i.prettyName)
               }
             }
             Val.Arr(out.toSeq)
           case Val.Null => Val.Lazy(Val.Null).force
-          case _ => throw new IllegalArgumentException(
-            "Expected Array, got: " + array.prettyName);
+          case i => throw Error.Delegate("Expected Array, got: " + i.prettyName)
         }
     },
 
@@ -144,8 +134,7 @@ object DS extends Library {
             distinctBy(arr, funct)
           case obj: Val.Obj =>
             distinctBy(obj, funct, ev, fs)
-          case i => throw new IllegalArgumentException(
-            "Expected Array or Object, got: " + i.prettyName);
+          case i => throw Error.Delegate("Expected Array or Object, got: " + i.prettyName)
         }
     },
 
@@ -162,8 +151,7 @@ object DS extends Library {
           case obj: Val.Obj =>
             groupBy(obj, funct, ev, fs)
           case Val.Null => Val.Lazy(Val.Null).force
-          case _ => throw new IllegalArgumentException(
-            "Expected Array or Object, got: " + container.prettyName);
+          case i => throw Error.Delegate("Expected Array or Object, got: " + i.prettyName)
         }
     },
 
@@ -172,8 +160,7 @@ object DS extends Library {
         value match {
           case Val.Str(s) => s.trim().isEmpty
           case Val.Null => true
-          case _ => throw new IllegalArgumentException(
-            "Expected String, got: " + value.prettyName);
+          case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
         }
     },
 
@@ -189,8 +176,7 @@ object DS extends Library {
           case Val.Str(s) => s.isEmpty.booleanValue()
           case Val.Arr(s) => s.isEmpty.booleanValue()
           case s: Val.Obj => s.getVisibleKeys().isEmpty.booleanValue()
-          case _ => throw new IllegalArgumentException(
-            "Expected String, Array, or Object, got: " + container.prettyName);
+          case i => throw Error.Delegate("Expected String, Array, or Object, got: " + i.prettyName)
         }
     },
 
@@ -217,8 +203,7 @@ object DS extends Library {
             case Val.True => "true"
             case Val.False => "false"
             case Val.Num(x) => if (!x.isWhole) x.toString else x.intValue().toString
-            case i => throw new IllegalArgumentException(
-              "Expected String, Number, Boolean, got: " + i.prettyName);
+            case i => throw Error.Delegate("Expected String, Number, or Boolean, got: " + i.prettyName)
           }
         }).mkString(sep)
     },
@@ -239,8 +224,7 @@ object DS extends Library {
           case Val.Arr(seq) =>
             map(seq, funct)
           case Val.Null => Val.Lazy(Val.Null).force
-          case _ => throw new IllegalArgumentException(
-            "Expected Array, got: " + array.prettyName);
+          case i =>throw Error.Delegate("Expected Array, got: " + i.prettyName)
         }
     },
 
@@ -250,8 +234,7 @@ object DS extends Library {
           case obj: Val.Obj =>
             mapEntries(obj, funct, ev, fs)
           case Val.Null => Val.Lazy(Val.Null).force
-          case _ => throw new IllegalArgumentException(
-            "Expected Object, got: " + value.prettyName);
+          case i => throw Error.Delegate("Expected Object, got: " + i.prettyName)
         }
     },
 
@@ -261,8 +244,7 @@ object DS extends Library {
           case obj: Val.Obj =>
             mapObject(obj, funct, ev, fs)
           case Val.Null => Val.Lazy(Val.Null).force
-          case _ => throw new IllegalArgumentException(
-            "Expected Object, got: " + value.prettyName);
+          case i => throw Error.Delegate("Expected Object, got: " + i.prettyName)
         }
     },
 
@@ -297,8 +279,8 @@ object DS extends Library {
               if (value.force.cast[Val.Num].value < x.force.cast[Val.Num].value) {
                 value = x
               }
-            case i => throw new IllegalArgumentException(
-              "Array must be of type string,boolean, or number; got: " + i);
+            case i => throw Error.Delegate(
+              "Expected Array of type String, Boolean, or Number, got: Array of type " + i)
           }
         }
         value.force
@@ -322,8 +304,8 @@ object DS extends Library {
               if (funct.apply(value).cast[Val.Num].value < funct.apply(x).cast[Val.Num].value) {
                 value = x
               }
-            case i => throw new IllegalArgumentException(
-              "Array must be of type string,boolean, or number; got: " + i);
+            case i => throw Error.Delegate(
+              "Expected Array of type String, Boolean, or Number, got: Array of type " + i)
           }
         }
         value.force
@@ -346,8 +328,8 @@ object DS extends Library {
               if (value.force.cast[Val.Num].value > x.force.cast[Val.Num].value) {
                 value = x
               }
-            case i => throw new IllegalArgumentException(
-              "Array must be of type string,boolean, or number; got: " + i);
+            case i => throw Error.Delegate(
+              "Expected Array of type String, Boolean, or Number, got: Array of type " + i)
           }
         }
         value.force
@@ -371,8 +353,8 @@ object DS extends Library {
               if (funct.apply(value).cast[Val.Num].value > funct.apply(x).cast[Val.Num].value) {
                 value = x
               }
-            case i => throw new IllegalArgumentException(
-              "Array must be of type string,boolean, or number; got: " + i);
+            case i => throw Error.Delegate(
+              "Expected Array of type String, Boolean, or Number, got: Array of type " + i)
           }
         }
         value.force
@@ -386,8 +368,7 @@ object DS extends Library {
           case obj: Val.Obj =>
             orderBy(obj, funct, ev, fs)
           case Val.Null => Val.Lazy(Val.Null).force
-          case _ => throw new IllegalArgumentException(
-            "Expected Array or Object got: " + value.prettyName);
+          case i => throw Error.Delegate("Expected Array or Object, got: " + i.prettyName)
         }
     },
 
@@ -456,8 +437,7 @@ object DS extends Library {
           case Val.Arr(s) => s.size
           case s: Val.Func => s.params.allIndices.size
           case Val.Null => 0
-          case _ => throw new IllegalArgumentException(
-            "Expected Array, String, Object got: " + value.prettyName);
+          case i => throw Error.Delegate("Expected Array, String, or Object, got: " + i.prettyName)
         }
     },
 
@@ -491,11 +471,10 @@ object DS extends Library {
 
     builtin("unzip", "array") {
       (_, _, array: Val.Arr) =>
-        var size = array.value.map(
+        val size = array.value.map(
           _.force match {
             case Val.Arr(arr) => arr.size
-            case i => throw new IllegalArgumentException(
-              "Expected Array, got: " + i.prettyName);
+            case i => throw Error.Delegate("Expected Array, got: " + i.prettyName)
           }
         ).max
         val out = collection.mutable.Buffer.empty[Val.Lazy]
@@ -649,8 +628,7 @@ object DS extends Library {
                     num.toString
                   }
                 ))).force
-              case i => throw new IllegalArgumentException(
-                "Expected String, Number, got: " + i.prettyName)
+              case i => throw Error.Delegate("Expected String or Number, got: " + i.prettyName)
             }
           case Val.Num(num) =>
             val stringNum = if (Math.ceil(num) == Math.floor(num)) {
@@ -668,14 +646,12 @@ object DS extends Library {
                     num2.toString
                   }
                 ))).force
-              case i => throw new IllegalArgumentException(
-                "Expected String, Number, got: " + i.prettyName)
+              case i => throw Error.Delegate("Expected String or Number, got: " + i.prettyName)
             }
           case Val.Arr(arr) =>
             second match {
               case Val.Arr(arr2) => Val.Arr(arr.concat(arr2))
-              case i => throw new IllegalArgumentException(
-                "Expected Array, got: " + i.prettyName)
+              case i => throw Error.Delegate("Expected Array, got: " + i.prettyName)
             }
           case obj: Val.Obj =>
             val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
@@ -687,11 +663,10 @@ object DS extends Library {
                   case (sKey, _) => sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => secObj.value(sKey, -1)(fs, ev))
                 })
                 new Val.Obj(out, _ => (), None)
-              case i => throw new IllegalArgumentException(
-                "Expected Object, got: " + i.prettyName)
+              case i => throw Error.Delegate("Expected Object, got: " + i.prettyName)
             }
-          case i => throw new IllegalArgumentException(
-            i.prettyName + " is not a valid type.")
+          case i => throw Error.Delegate(
+            "Expected Array, Object, Number, or String, got: " + i.prettyName)
         }
     },
 
@@ -710,11 +685,9 @@ object DS extends Library {
                     case key if key != str =>
                       key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
                   }): _*), _ => (), None)
-              case i => throw new IllegalArgumentException(
-                "Expected String, got: " + i.prettyName)
+              case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
             }
-          case i => throw new IllegalArgumentException(
-            "Expected Array or Object, got: " + i.prettyName)
+          case i => throw Error.Delegate("Expected Array or Object, got: " + i.prettyName)
         }
     },
 
@@ -726,8 +699,7 @@ object DS extends Library {
               case Val.Arr(arr2) =>
                 //unfortunately cannot use diff here because of lazy values
                 Val.Arr(arr.filter(arrItem => !arr2.exists(arr2Item => arr2Item.force == arrItem.force)))
-              case i => throw new IllegalArgumentException(
-                "Expected Array, got: " + i.prettyName)
+              case i => throw Error.Delegate("Expected Array, got: " + i.prettyName)
             }
           case obj: Val.Obj =>
             second match {
@@ -737,11 +709,9 @@ object DS extends Library {
                     case key if !(obj2.containsKey(key) && obj.value(key, -1)(fs, ev) == obj2.value(key, -1)(fs, ev)) =>
                       key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
                   }): _*), _ => (), None)
-              case i => throw new IllegalArgumentException(
-                "Expected Object, got: " + i.prettyName)
+              case i => throw Error.Delegate("Expected Object, got: " + i.prettyName)
             }
-          case i => throw new IllegalArgumentException(
-            "Expected Array or Object, got: " + i.prettyName)
+          case i => throw Error.Delegate("Expected Array or Object, got: " + i.prettyName)
         }
     },
 
@@ -767,13 +737,12 @@ object DS extends Library {
               entry._1 -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(entry._1, -1)(fs, ev))
             ))
             new Val.Obj(mutable.LinkedHashMap(result: _*), _ => (), None)
-          case i => throw new IllegalArgumentException(
-            "Expected Array or Object, got: " + i.prettyName)
+          case i => throw Error.Delegate("Expected Array or Object, got: " + i.prettyName)
         }
     },
 
     builtin("or", "first", "second") {
-      (ev, fs, first: Val, second: Val) =>
+      (_, _, first: Val, second: Val) =>
         first match {
           case Val.Null => second
           case _ => first
@@ -944,14 +913,14 @@ object DS extends Library {
                 val v = Materializer.reverse(t)
                 Applyer(replaceF, ev, null).apply(Val.Lazy(v)) match {
                   case resultStr: Val.Str => resultStr.value
-                  case _ => throw new Error.Delegate("The result of the replacement function must be a String")
+                  case _ => throw Error.Delegate("The result of the replacement function must be a String")
                 }
               }
             }
             Regex.regexGlobalReplace(str, pattern, func)
           }
 
-          case _ => throw new Error.Delegate("'replace' parameter must be either String or Function")
+          case _ => throw Error.Delegate("'replace' parameter must be either String or Function")
         }
       }
     ),
@@ -990,8 +959,7 @@ object DS extends Library {
             case ((sum, length), num) =>
               (num.force match {
                 case Val.Num(x) => sum + x
-                case i => throw new IllegalArgumentException(
-                  "Expected Array of Numbers got: Array of " + i.prettyName)
+                case i => throw Error.Delegate("Expected Array pf Numbers, got: Array of " + i.prettyName)
               }, 1 + length)
           })
           sum / length
@@ -1050,8 +1018,7 @@ object DS extends Library {
           array.value.foldLeft(0.0)((sum, value) =>
             value.force match {
               case Val.Num(x) => sum + x
-              case i => throw new IllegalArgumentException(
-                "Expected Array of Numbers, got: " + i)
+              case i => throw Error.Delegate("Expected Array of Numbers, got: Array of " + i.prettyName)
             }
           )
       },
@@ -1097,18 +1064,12 @@ object DS extends Library {
         Math.exp(x)
       },
 
-      builtin("mantissa", "x") { (ev, fs, x: Double) =>
-        val value = x
-        val exponent = (Math.log(value) / Math.log(2)).toInt + 1
-        val mantissa = value * Math.pow(2.0, -exponent)
-        mantissa
+      builtin("mantissa", "x") { (_, _, x: Double) =>
+        x * Math.pow(2.0, -((Math.log(x) / Math.log(2)).toInt + 1))
       },
 
-      builtin("exponent", "x") { (ev, fs, x: Double) =>
-        val value = x
-        val exponent = (Math.log(value) / Math.log(2)).toInt + 1
-        val mantissa = value * Math.pow(2.0, -exponent)
-        exponent
+      builtin("exponent", "x") { (_, _, x: Double) =>
+        (Math.log(x) / Math.log(2)).toInt + 1
       }
     ),
 
@@ -1144,8 +1105,7 @@ object DS extends Library {
           value match {
             case Val.Arr(arr) => Val.bool(arr.forall(funct.apply(_) == Val.True))
             case Val.Null => Val.Lazy(Val.True).force
-            case i => throw new IllegalArgumentException(
-              "Expected Array, got: " + i.prettyName)
+            case i => throw Error.Delegate("Expected Array, got: " + i.prettyName)
           }
       },
 
@@ -1157,7 +1117,7 @@ object DS extends Library {
           else if (args == 1)
             arr.value.find(funct.apply(_) == Val.True).getOrElse(Val.Lazy(Val.Null)).force
           else {
-            throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+            throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
           }
       },
 
@@ -1308,8 +1268,7 @@ object DS extends Library {
             case Val.Arr(array) =>
               Val.bool(array.exists(item => funct.apply(item) == Val.True))
             case Val.Null => Val.Lazy(Val.Null).force
-            case i => throw new IllegalArgumentException(
-              "Expected Array, got: " + i.prettyName);
+            case i => throw Error.Delegate("Expected Array, got: " + i.prettyName)
           }
       },
 
@@ -1355,8 +1314,7 @@ object DS extends Library {
           value match {
             case Val.Num(x) => Val.Lazy(Val.Str(new String(Base64.getDecoder.decode(x.toString)))).force
             case Val.Str(x) => Val.Lazy(Val.Str(new String(Base64.getDecoder.decode(x)))).force
-            case x => throw new IllegalArgumentException(
-              "Expected String, got: " + x.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1366,8 +1324,7 @@ object DS extends Library {
             case Val.Str(x) => Val.Lazy(Val.Str(
               x.toSeq.sliding(2, 2).map(byte => Integer.parseInt(byte.unwrap, 16).toChar).mkString
             )).force
-            case x => throw new IllegalArgumentException(
-              "Expected String, got: " + x.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1387,8 +1344,7 @@ object DS extends Library {
               if (x % 1 == 0) Val.Lazy(Val.Str(new String(Base64.getEncoder.encode(x.toInt.toString.getBytes())))).force
               else Val.Lazy(Val.Str(new String(Base64.getEncoder.encode(x.toString.getBytes())))).force
             case Val.Str(x) => Val.Lazy(Val.Str(new String(Base64.getEncoder.encode(x.getBytes())))).force
-            case x => throw new IllegalArgumentException(
-              "Expected String, got: " + x.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1397,8 +1353,7 @@ object DS extends Library {
           value match {
             case Val.Num(x) => Val.Lazy(Val.Str(Integer.toString(x.toInt, 16).toUpperCase())).force
             case Val.Str(x) => Val.Lazy(Val.Str(x.getBytes().map(_.toHexString).mkString.toUpperCase())).force
-            case x => throw new IllegalArgumentException(
-              "Expected String, got: " + x.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1416,16 +1371,12 @@ object DS extends Library {
           value match {
             case Val.Num(x) =>
               if ("[^2-9]".r.matches(x.toString)) {
-                throw new IllegalArgumentException(
-                  "Expected Binary, got: Number")
+                throw Error.Delegate("Expected Binary, got: Number")
               }
               else Val.Lazy(Val.Num(Integer.parseInt(x.toInt.toString, 2))).force
-            //Val.Lazy(Val.Num( java.lang.Long.parseLong(x.toLong.toString,2))).force
             case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x, 2))).force;
-            //Val.Lazy(Val.Num( java.lang.Long.parseLong(x,2))).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case x => throw new IllegalArgumentException(
-              "Expected Binary, got: " + x.prettyName);
+            case i => throw Error.Delegate("Expected Binary, got: " + i.prettyName)
           }
       },
 
@@ -1434,14 +1385,12 @@ object DS extends Library {
           value match {
             case Val.Num(x) =>
               if ("[^0-9a-f]".r.matches(x.toString.toLowerCase())) {
-                throw new IllegalArgumentException(
-                  "Expected Binary, got: Number")
+                throw Error.Delegate("Expected Binary, got: Number")
               }
               else Val.Lazy(Val.Num(Integer.parseInt(x.toInt.toString.toLowerCase(), 16))).force;
             case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x.toLowerCase(), 16))).force;
             case Val.Null => Val.Lazy(Val.Null).force
-            case x => throw new IllegalArgumentException(
-              "Expected Binary, got: " + x.prettyName);
+            case i => throw Error.Delegate("Expected Binary, got: " + i.prettyName)
           }
       },
 
@@ -1450,8 +1399,7 @@ object DS extends Library {
           value match {
             case Val.Num(x) => Val.Lazy(Val.Num(Integer.parseInt(x.toInt.toString.toLowerCase(), num))).force;
             case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x.toLowerCase(), num))).force;
-            case x => throw new IllegalArgumentException(
-              "Expected Binary, got: " + x.prettyName);
+            case i => throw Error.Delegate("Expected Binary, got: " + i.prettyName)
             //null not supported in DW function
           }
       },
@@ -1466,8 +1414,7 @@ object DS extends Library {
               if (x.startsWith("-")) Val.Lazy(Val.Str(x.toInt.abs.toBinaryString)).force
               else Val.Lazy(Val.Str(x.toInt.toBinaryString)).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case x => throw new IllegalArgumentException(
-              "Expected Binary, got: " + x.prettyName);
+            case i => throw Error.Delegate("Expected Binary, got: " + i.prettyName)
           }
       },
 
@@ -1481,8 +1428,7 @@ object DS extends Library {
               if (x.startsWith("-")) Val.Lazy(Val.Str(x.toInt.abs.toHexString)).force
               else Val.Lazy(Val.Str(x.toInt.toHexString)).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case x => throw new IllegalArgumentException(
-              "Expected Binary, got: " + x.prettyName);
+            case i => throw Error.Delegate("Expected Binary, got: " + i.prettyName)
           }
       },
 
@@ -1495,8 +1441,7 @@ object DS extends Library {
             case Val.Str(x) =>
               if (x.startsWith("-")) Val.Lazy(Val.Str("-" + Integer.toString(x.toInt.abs, num))).force
               else Val.Lazy(Val.Str(Integer.toString(x.toInt, num))).force
-            case x => throw new IllegalArgumentException(
-              "Expected Binary, got: " + x.prettyName);
+            case i => throw Error.Delegate("Expected Binary, got: " + i.prettyName)
             //DW functions does not support null
           }
       }
@@ -1525,13 +1470,11 @@ object DS extends Library {
                 Val.bool(obj.getVisibleKeys().toSeq.forall(key => funct.apply(Val.Lazy(obj.value(key._1, -1)(fs, ev)), Val.Lazy(Val.Str(key._1))) == Val.True))
               else if (args == 1)
                 Val.bool(obj.getVisibleKeys().toSeq.forall(key => funct.apply(Val.Lazy(obj.value(key._1, -1)(fs, ev))) == Val.True))
-
               else {
-                throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+                throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
               }
             case Val.Null => Val.Lazy(Val.True).force
-            case i => throw new IllegalArgumentException(
-              "Expected Array, got: " + i.prettyName);
+            case i => throw Error.Delegate("Expected Array, got: " + i.prettyName)
           }
       },
 
@@ -1542,26 +1485,23 @@ object DS extends Library {
             case obj: Val.Obj =>
               valueTwo match {
                 case obj2: Val.Obj =>
-                  obj2.getVisibleKeys().foreachEntry(
+                  obj2.foreachVisibleKey(
                     (key, _) => out += (key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj2.value(key, -1)(fs, ev)))
                   )
                   val keySet = obj2.getVisibleKeys().keySet
-                  obj.getVisibleKeys().foreachEntry(
+                  obj.foreachVisibleKey(
                     (key, _) => if (!keySet.contains(key)) out += (key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
                   )
                   new Val.Obj(out, _ => (), None)
                 case Val.Null => valueOne
-                case i => throw new IllegalArgumentException(
-                  "Expected Object, got: " + i.prettyName);
+                case i => throw Error.Delegate("Expected Object, got: " + i.prettyName)
               }
             case Val.Null =>
               valueTwo match {
                 case _: Val.Obj => valueTwo
-                case i => throw new IllegalArgumentException(
-                  "Expected Object, got: " + i.prettyName);
+                case i => throw Error.Delegate("Expected Object, got: " + i.prettyName)
               }
-            case i => throw new IllegalArgumentException(
-              "Expected Object, got: " + i.prettyName);
+            case i => throw Error.Delegate("Expected Object, got: " + i.prettyName)
           }
       },
 
@@ -1573,8 +1513,7 @@ object DS extends Library {
                 item => funct.apply(Val.Lazy(obj.value(item._1, -1)(fs, ev)), Val.Lazy(Val.Str(item._1))) == Val.True
               ))
             case Val.Null => Val.Lazy(Val.False).force
-            case i => throw new IllegalArgumentException(
-              "Expected Object, got: " + i.prettyName);
+            case i => throw Error.Delegate("Expected Object, got: " + i.prettyName)
           }
       },
 
@@ -1600,8 +1539,7 @@ object DS extends Library {
               }
               Val.Lazy(Val.Str(ret)).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case _ => throw new IllegalArgumentException(
-              "Expected String got: " + value.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1622,8 +1560,7 @@ object DS extends Library {
 
             case Val.Null =>
               Val.Lazy(Val.Null).force
-            case _ => throw new IllegalArgumentException(
-              "Expected String got: " + str.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1647,8 +1584,7 @@ object DS extends Library {
 
             case Val.Null =>
               Val.Lazy(Val.Null).force
-            case _ => throw new IllegalArgumentException(
-              "Expected String got: " + str.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1683,8 +1619,7 @@ object DS extends Library {
 
             case Val.Null =>
               Val.Lazy(Val.Null).force
-            case _ => throw new IllegalArgumentException(
-              "Expected String got: " + str.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1706,8 +1641,7 @@ object DS extends Library {
             case Val.Null => false
             case Val.Num(_) => false
             case Val.True | Val.False => true
-            case _ => throw new IllegalArgumentException(
-              "Expected String, got: " + str.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1724,8 +1658,7 @@ object DS extends Library {
             case Val.Null => false
             case Val.Num(_) => true
             case Val.True | Val.False => true
-            case _ => throw new IllegalArgumentException(
-              "Expected String, got: " + str.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1742,8 +1675,7 @@ object DS extends Library {
             case Val.Null => false
             case Val.Num(_) => false
             case Val.True | Val.False => true
-            case _ => throw new IllegalArgumentException(
-              "Expected String, got: " + str.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1759,8 +1691,7 @@ object DS extends Library {
               }
             case Val.Num(_) => true
             case Val.True | Val.False | Val.Null => false
-            case _ => throw new IllegalArgumentException(
-              "Expected String, got: " + str.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1776,8 +1707,7 @@ object DS extends Library {
               }
             case Val.Num(_) => false
             case Val.True | Val.False | Val.Null => false
-            case _ => throw new IllegalArgumentException(
-              "Expected String, got: " + str.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1787,8 +1717,7 @@ object DS extends Library {
             case Val.Str(value) => value.trim().isEmpty
             case Val.Num(_) => false
             case Val.True | Val.False | Val.Null => false
-            case _ => throw new IllegalArgumentException(
-              "Expected String, got: " + str.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1805,8 +1734,7 @@ object DS extends Library {
               //TODO change to use sjsonnet's Format and DecimalFormat
               Val.Lazy(Val.Str(("%" + offset + "s").format(new DecimalFormat("0.#").format(x)))).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case _ => throw new IllegalArgumentException(
-              "Expected String, got: " + str.prettyName)
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1822,12 +1750,10 @@ object DS extends Library {
                 "X"
               }
             case Val.Num(value) => value.toInt.toString
-            case _ => throw new IllegalArgumentException(
-              "Expected Number, got: " + num.prettyName)
+            case _ => throw Error.Delegate("Expected Number, got: " + num.prettyName)
           }) match { //convert string number to ordinalized string number
             case "null" => Val.Lazy(Val.Null).force
-            case "X" => throw new IllegalArgumentException(
-              "Expected Number, got: " + num.prettyName)
+            case "X" => throw Error.Delegate("Expected Number, got: " + num.prettyName)
             case str =>
               if (str.endsWith("11") || str.endsWith("12") || str.endsWith("13")) {
                 Val.Lazy(Val.Str(str + "th")).force
@@ -1871,8 +1797,7 @@ object DS extends Library {
                 }
               }
             case Val.Null => Val.Lazy(Val.Null).force
-            case _ => throw new IllegalArgumentException(
-              "Expected Number, got: " + value.prettyName)
+            case i => throw Error.Delegate("Expected Number, got: " + i.prettyName)
           }
       },
 
@@ -1886,8 +1811,7 @@ object DS extends Library {
               }
               Val.Lazy(Val.Str(ret)).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case _ => throw new IllegalArgumentException(
-              "Expected String got: " + value.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1913,8 +1837,7 @@ object DS extends Library {
             case Val.False =>
               Val.Lazy(Val.Str("false".padTo(offset, ' '))).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case _ => throw new IllegalArgumentException(
-              "Expected String, got: " + value.prettyName)
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1929,8 +1852,7 @@ object DS extends Library {
               else
                 Val.Lazy(Val.Str(s.substring(0, s.length - 1))).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case i => throw new IllegalArgumentException(
-              "Expected String, got: " + i.prettyName)
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1945,8 +1867,7 @@ object DS extends Library {
                 }
               ))).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case i => throw new IllegalArgumentException(
-              "Expected String, got: " + i.prettyName)
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1959,8 +1880,7 @@ object DS extends Library {
               else if (split.length == 1) Val.Lazy(Val.Str("")).force
               else Val.Lazy(Val.Str(split(split.length - 1))).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case i => throw new IllegalArgumentException(
-              "Expected String, got: " + i.prettyName)
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1975,8 +1895,7 @@ object DS extends Library {
                 }
               ))).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case i => throw new IllegalArgumentException(
-              "Expected String, got: " + i.prettyName)
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -1991,8 +1910,7 @@ object DS extends Library {
                 }
               ))).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case i => throw new IllegalArgumentException(
-              "Expected String, got: " + i.prettyName)
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -2016,8 +1934,7 @@ object DS extends Library {
 
             case Val.Null =>
               Val.Lazy(Val.Null).force
-            case _ => throw new IllegalArgumentException(
-              "Expected String got: " + str.prettyName);
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -2032,8 +1949,7 @@ object DS extends Library {
               else if (ends) Val.Lazy(Val.Str(wrapper + str.substring(0, str.length - wrapper.length))).force
               else Val.Lazy(Val.Str(str)).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case i => throw new IllegalArgumentException(
-              "Expected String, got: " + i.prettyName)
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -2044,8 +1960,7 @@ object DS extends Library {
               if (str.length <= num) Val.Lazy(Val.Str(str)).force
               else Val.Lazy(Val.Str(str.substring(0, num))).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case i => throw new IllegalArgumentException(
-              "Expected String, got: " + i.prettyName)
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -2058,8 +1973,7 @@ object DS extends Library {
               if (!str.endsWith(wrapper)) ret.append(wrapper)
               Val.Lazy(Val.Str(ret.toString())).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case i => throw new IllegalArgumentException(
-              "Expected String, got: " + i.prettyName)
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       },
 
@@ -2068,8 +1982,7 @@ object DS extends Library {
           value match {
             case Val.Str(str) => Val.Lazy(Val.Str(wrapper + str + wrapper)).force
             case Val.Null => Val.Lazy(Val.Null).force
-            case i => throw new IllegalArgumentException(
-              "Expected String, got: " + i.prettyName)
+            case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       }
     )
@@ -2120,7 +2033,7 @@ object DS extends Library {
       )
     }
     else {
-      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+      throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
     }
 
     Val.Arr(out.toSeq)
@@ -2131,8 +2044,8 @@ object DS extends Library {
     val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
 
     if (args == 2) { // 2 args
-      obj.getVisibleKeys().keySet.foreach(
-        key => {
+      obj.foreachVisibleKey(
+        (key,_) => {
           val outObj = new Val.Obj(out, _ => (), None)
           if (!outObj.getVisibleKeys().keySet.map(outKey =>
             funct.apply(
@@ -2146,8 +2059,8 @@ object DS extends Library {
       )
     }
     else if (args == 1) { //1 arg
-      obj.getVisibleKeys().keySet.foreach(
-        key => {
+      obj.foreachVisibleKey(
+        (key,_) => {
           val outObj = new Val.Obj(out, _ => (), None)
           if (!outObj.getVisibleKeys().keySet.map(outKey =>
             funct.apply(Val.Lazy(outObj.value(outKey, -1)(fs, ev)))
@@ -2158,7 +2071,7 @@ object DS extends Library {
       )
     }
     else {
-      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+      throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
     }
 
     new Val.Obj(out, _ => (), None)
@@ -2172,9 +2085,9 @@ object DS extends Library {
           case (lazyItem, index) => funct.apply(lazyItem, Val.Lazy(Val.Num(index))) == Val.True
         }).map(_._1)
       else if (args == 1)
-        array.filter(lazyItem => funct.apply(lazyItem) == Val.True)
+        array.filter(lazyItem => funct.apply(lazyItem).equals(Val.True))
       else {
-        throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+        throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
       }
     )
   }
@@ -2204,7 +2117,7 @@ object DS extends Library {
           }): _*)
       }
       else {
-        throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2 or 3, but got: " + args)
+        throw Error.Delegate("Expected embedded function to have between 1 and 3 parameters, received: " + args)
       }, _ => (), None) // end of new object to return
   }
 
@@ -2218,8 +2131,7 @@ object DS extends Library {
             out.appendAll(inner.zipWithIndex.map({
               case (it, ind) => Val.Lazy(funct.apply(it, Val.Lazy(Val.Num(ind))))
             }))
-          case _ => throw new IllegalArgumentException(
-            "Expected Array of Arrays, got: Array of " + v.force.prettyName);
+          case i => throw Error.Delegate("Expected Array of Arrays, got: Array of " + v.force.prettyName)
         }
       }
     }
@@ -2228,13 +2140,12 @@ object DS extends Library {
         v.force match {
           case Val.Arr(inner) =>
             out.appendAll(inner.map(it => Val.Lazy(funct.apply(it))))
-          case _ => throw new IllegalArgumentException(
-            "Expected Array of Arrays, got: Array of " + v.force.prettyName);
+          case i => throw Error.Delegate("Expected Array of Arrays, got: Array of " + v.force.prettyName)
         }
       }
     }
     else {
-      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+      throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
     }
     Val.Arr(out.toSeq)
   }
@@ -2254,7 +2165,7 @@ object DS extends Library {
       }
     }
     else {
-      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+      throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
     }
 
     new Val.Obj(out.map(keyVal => (keyVal._1, Library.memberOf(Val.Arr(keyVal._2.toIndexedSeq)))), _ => (), None)
@@ -2264,21 +2175,21 @@ object DS extends Library {
     val args = funct.f.params.allIndices.size
     val out = mutable.Map[String, mutable.LinkedHashMap[String, Val.Obj.Member]]()
     if (args == 2) {
-      for ((key, _) <- obj.getVisibleKeys()) {
+      obj.foreachVisibleKey((key,_) =>{
         val item = obj.value(key, -1)(fs, ev)
         val functKey = funct.apply(Val.Lazy(item), Val.Lazy(Val.Str(key))).cast[Val.Str]
         out.getOrElseUpdate(functKey.value, mutable.LinkedHashMap[String, Val.Obj.Member]()).addOne(key, Library.memberOf(item))
-      }
+      })
     }
     else if (args == 1) {
-      for ((key, _) <- obj.getVisibleKeys()) {
+      obj.foreachVisibleKey((key,_)=>{
         val item = obj.value(key, -1)(fs, ev)
         val functKey = funct.apply(Val.Lazy(item)).cast[Val.Str]
         out.getOrElseUpdate(functKey.value, mutable.LinkedHashMap[String, Val.Obj.Member]()).addOne(key, Library.memberOf(item))
-      }
+      })
     }
     else {
-      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+      throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
     }
 
     new Val.Obj(out.map(keyVal => (keyVal._1, Library.memberOf(new Val.Obj(keyVal._2, _ => (), None)))), _ => (), None)
@@ -2296,7 +2207,7 @@ object DS extends Library {
         array.map(item => Val.Lazy(funct.apply(item)))
       }
       else {
-        throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+        throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
       }
     )
   }
@@ -2311,8 +2222,7 @@ object DS extends Library {
             out.addAll(s.getVisibleKeys().map {
               case (sKey, _) => sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
             })
-          case i => throw new IllegalArgumentException(
-            "Function must return an object, got: " + i.prettyName);
+          case i => Error.Delegate("Function must return an Object, got: " + i.prettyName)
         }
       }
       new Val.Obj(out, _ => (), None)
@@ -2324,8 +2234,7 @@ object DS extends Library {
             out.addAll(s.getVisibleKeys().map {
               case (sKey, _) => sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
             })
-          case i => throw new IllegalArgumentException(
-            "Function must return an object, got: " + i.prettyName);
+          case i => Error.Delegate("Function must return an Object, got: " + i.prettyName)
         }
       }
       new Val.Obj(out, _ => (), None)
@@ -2337,14 +2246,13 @@ object DS extends Library {
             out.addAll(s.getVisibleKeys().map {
               case (sKey, _) => sKey -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => s.value(sKey, -1)(fs, ev))
             })
-          case i => throw new IllegalArgumentException(
-            "Function must return an object, got: " + i.prettyName);
+          case i => Error.Delegate("Function must return an Object, got: " + i.prettyName)
         }
       }
       new Val.Obj(out, _ => (), None)
     }
     else {
-      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2 or 3, but got: " + args)
+      throw Error.Delegate("Expected embedded function to have between 1 and 3 parameters, received: " + args)
     }
   }
 
@@ -2360,7 +2268,7 @@ object DS extends Library {
       Val.Arr(array.sortBy(it => funct.apply(it).toString))
     }
     else {
-      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+      throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
     }
   }
 
@@ -2391,7 +2299,7 @@ object DS extends Library {
         _ => (), None)
     }
     else {
-      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2, but got: " + args)
+      throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
     }
   }
 
@@ -2414,7 +2322,7 @@ object DS extends Library {
       ))
     }
     else {
-      throw new IllegalArgumentException("Incorrect number of arguments in the provided function. Expected 1 or 2 or 3, but got: " + args)
+      throw Error.Delegate("Expected embedded function to have between 1 and 3 parameters, received: " + args)
     }
 
     Val.Arr(out.toSeq)
