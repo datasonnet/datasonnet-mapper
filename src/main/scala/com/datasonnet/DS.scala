@@ -2012,78 +2012,53 @@ object DS extends Library {
 
   private def distinctBy(array: Seq[Val.Lazy], funct: Applyer): Val = {
     val args = funct.f.params.allIndices.size
-    val out = collection.mutable.Buffer.empty[Val.Lazy]
 
-    if (args == 2) { // 2 args
-      array.zipWithIndex.foreach(
-        item =>
-          if (!out.zipWithIndex.map { // out array does not contain item
-            case (outItem, outIndex) => funct.apply(outItem, Val.Lazy(Val.Num(outIndex)))
-          }.contains(funct.apply(item._1, Val.Lazy(Val.Num(item._2))))) {
-            out.append(item._1)
-          }
-      )
-    }
-    else if (args == 1) { // 1 arg
-      array.foreach(
-        item =>
-          if (!out.map(funct.apply(_)).contains(funct.apply(item))) {
-            out.append(item)
-          }
-      )
-    }
-    else {
-      throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
-    }
-
-    Val.Arr(out.toSeq)
+    Val.Arr(
+      if (args == 2) { // 2 args
+        array.zipWithIndex.distinctBy(item => funct.apply(item._1, Val.Lazy(Val.Num(item._2)))).map(_._1)
+      }
+      else if (args == 1) { // 1 arg
+        array.distinctBy(item => funct.apply(item))
+      }
+      else {
+        throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
+      }
+    )
   }
 
   private def distinctBy(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val = {
     val args = funct.f.params.allIndices.size
-    val out = scala.collection.mutable.Map[String, Val.Obj.Member]()
 
-    if (args == 2) { // 2 args
-      obj.foreachVisibleKey(
-        (key,_) => {
-          val outObj = new Val.Obj(out, _ => (), None)
-          if (!outObj.getVisibleKeys().keySet.map(outKey =>
+    new Val.Obj(
+      if (args == 2) { // 2 args
+        scala.collection.mutable.Map(
+          obj.getVisibleKeys().keySet.toSeq.distinctBy(outKey =>
             funct.apply(
-              Val.Lazy(outObj.value(outKey, -1)(fs, ev)),
+              Val.Lazy(obj.value(outKey, -1)(fs, ev)),
               Val.Lazy(Val.Str(outKey))
-            )
-          ).contains(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))))) {
-            out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
-          }
-        }
-      )
-    }
-    else if (args == 1) { //1 arg
-      obj.foreachVisibleKey(
-        (key,_) => {
-          val outObj = new Val.Obj(out, _ => (), None)
-          if (!outObj.getVisibleKeys().keySet.map(outKey =>
-            funct.apply(Val.Lazy(outObj.value(outKey, -1)(fs, ev)))
-          ).contains(funct.apply(Val.Lazy(obj.value(key, -1)(fs, ev))))) {
-            out.+=(key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev)))
-          }
-        }
-      )
-    }
-    else {
-      throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
-    }
-
-    new Val.Obj(out, _ => (), None)
+            )).collect(key => key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
+          ): _*)
+      }
+      else if (args == 1) { //1 arg
+        scala.collection.mutable.Map(
+          obj.getVisibleKeys().keySet.toSeq.distinctBy(outKey =>
+            funct.apply(Val.Lazy(obj.value(outKey, -1)(fs, ev)))
+          ).collect(key => key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
+        ): _*)
+      }
+      else {
+        throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
+      }
+    ,_ => (), None)
   }
 
   private def filter(array: Seq[Val.Lazy], funct: Applyer): Val = {
     val args = funct.f.params.allIndices.size
     Val.Arr(
       if (args == 2)
-        array.zipWithIndex.filter({
-          case (lazyItem, index) => funct.apply(lazyItem, Val.Lazy(Val.Num(index))) == Val.True
-        }).map(_._1)
+        array.view.zipWithIndex.filter({
+          case (item, index) => funct.apply(item, Val.Lazy(Val.Num(index))) == Val.True
+        }).toSeq.map(_._1)
       else if (args == 1)
         array.filter(lazyItem => funct.apply(lazyItem).equals(Val.True))
       else {
