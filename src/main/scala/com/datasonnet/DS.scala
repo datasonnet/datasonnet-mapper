@@ -155,6 +155,18 @@ object DS extends Library {
         }
     },
 
+    /*builtin("groupByTest", "container", "funct") {
+      (ev, fs, container: Val, funct: Applyer) =>
+        container match {
+          case Val.Arr(s) =>
+            groupByTest(s, funct)
+          case obj: Val.Obj =>
+            groupBy(obj, funct, ev, fs)
+          case Val.Null => Val.Lazy(Val.Null).force
+          case i => throw Error.Delegate("Expected Array or Object, got: " + i.prettyName)
+        }
+    },*/
+
     builtin("isBlank", "value") {
       (_, _, value: Val) =>
         value match {
@@ -288,27 +300,21 @@ object DS extends Library {
 
     builtin("maxBy", "array", "funct") {
       (_, _, array: Val.Arr, funct: Applyer) =>
-        var value = array.value.head
-        val compareType = funct.apply(value).prettyName
-        for (x <- array.value) {
-          compareType match {
-            case "string" =>
-              if (funct.apply(value).toString < funct.apply(x).toString) {
-                value = x
-              }
-            case "boolean" =>
-              if (funct.apply(x) == Val.Lazy(Val.True).force) {
-                value = x
-              }
-            case "number" =>
-              if (funct.apply(value).cast[Val.Num].value < funct.apply(x).cast[Val.Num].value) {
-                value = x
-              }
-            case i => throw Error.Delegate(
-              "Expected Array of type String, Boolean, or Number, got: Array of type " + i)
-          }
+        val seqVal = array.value
+          funct.apply(seqVal.head).prettyName match{
+          case "string" =>
+            seqVal.maxBy(item => funct.apply(item).cast[Val.Str].value).force
+          case "boolean" =>
+            if(seqVal.forall( item => item.force.prettyName.equals("boolean")))
+              if (seqVal.exists(item => item.force == Val.True)) {
+                Val.True
+              } else { Val.False }
+            else throw Error.Delegate("Received a dirty array")
+          case "number" =>
+            seqVal.maxBy(item => funct.apply(item).cast[Val.Num].value).force
+          case i => throw Error.Delegate(
+            "Expected Array of type String, Boolean, or Number, got: Array of type " + i)
         }
-        value.force
     },
 
     builtin("min", "array") {
@@ -337,27 +343,21 @@ object DS extends Library {
 
     builtin("minBy", "array", "funct") {
       (_, _, array: Val.Arr, funct: Applyer) =>
-        var value = array.value.head
-        val compareType = funct.apply(value).prettyName
-        for (x <- array.value) {
-          compareType match {
-            case "string" =>
-              if (funct.apply(value).cast[Val.Str].value > funct.apply(x).cast[Val.Str].value) {
-                value = x
-              }
-            case "boolean" =>
-              if (funct.apply(x) == Val.Lazy(Val.False).force) {
-                value = x
-              }
-            case "number" =>
-              if (funct.apply(value).cast[Val.Num].value > funct.apply(x).cast[Val.Num].value) {
-                value = x
-              }
-            case i => throw Error.Delegate(
-              "Expected Array of type String, Boolean, or Number, got: Array of type " + i)
-          }
+        val seqVal = array.value
+        funct.apply(seqVal.head).prettyName match{
+          case "string" =>
+            seqVal.minBy(item => funct.apply(item).cast[Val.Str].value).force
+          case "boolean" =>
+            if(seqVal.forall( item => item.force.prettyName.equals("boolean")))
+              if (seqVal.exists(item => item.force == Val.False)) {
+                Val.False
+              } else { Val.True }
+            else throw Error.Delegate("Received a dirty array")
+          case "number" =>
+            seqVal.minBy(item => funct.apply(item).cast[Val.Num].value).force
+          case i => throw Error.Delegate(
+            "Expected Array of type String, Boolean, or Number, got: Array of type " + i)
         }
-        value.force
     },
 
     builtin("orderBy", "value", "funct") {
@@ -2055,11 +2055,11 @@ object DS extends Library {
   private def filter(array: Seq[Val.Lazy], funct: Applyer): Val = {
     val args = funct.f.params.allIndices.size
     Val.Arr(
-      if (args == 2)
+      if (args == 2) {
         array.view.zipWithIndex.filter({
           case (item, index) => funct.apply(item, Val.Lazy(Val.Num(index))) == Val.True
-        }).toSeq.map(_._1)
-      else if (args == 1)
+        }).map(_._1).toSeq
+      } else if (args == 1)
         array.filter(lazyItem => funct.apply(lazyItem).equals(Val.True))
       else {
         throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
@@ -2072,24 +2072,22 @@ object DS extends Library {
     new Val.Obj(
       if (args == 3) {
         scala.collection.mutable.Map(
-          obj.getVisibleKeys().keySet.zipWithIndex.toSeq.collect({
-            case (key, index) if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))) == Val.True =>
-              key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
-          }): _*)
+          obj.getVisibleKeys().keySet.zipWithIndex.filter({
+            case (key,index) => func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key)), Val.Lazy(Val.Num(index))) == Val.True
+          }).map(_._1).collect(key => key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
+          ).toSeq: _*)
       }
       else if (args == 2) {
         scala.collection.mutable.Map(
-          obj.getVisibleKeys().keySet.toSeq.collect({
-            case key if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))) == Val.True =>
-              key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
-          }): _*)
+          obj.getVisibleKeys().view.keySet
+            .filter(key => func.apply(Val.Lazy(obj.value(key, -1)(fs, ev)), Val.Lazy(Val.Str(key))) == Val.True)
+            .collect(key => key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))).toSeq: _*)
       }
       else if (args == 1) {
         scala.collection.mutable.Map(
-          obj.getVisibleKeys().keySet.toSeq.collect({
-            case key if func.apply(Val.Lazy(obj.value(key, -1)(fs, ev))) == Val.True =>
-              key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
-          }): _*)
+          obj.getVisibleKeys().view.keySet
+            .filter(key => func.apply(Val.Lazy(obj.value(key, -1)(fs, ev))) == Val.True)
+            .collect(key => key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))).toSeq: _*)
       }
       else {
         throw Error.Delegate("Expected embedded function to have between 1 and 3 parameters, received: " + args)
@@ -2106,7 +2104,7 @@ object DS extends Library {
             out.appendAll(inner.zipWithIndex.map({
               case (it, ind) => Val.Lazy(funct.apply(it, Val.Lazy(Val.Num(ind))))
             }))
-          case i => throw Error.Delegate("Expected Array of Arrays, got: Array of " + v.force.prettyName)
+          case i => throw Error.Delegate("Expected Array of Arrays, got: Array of " + i.prettyName)
         }
       }
     }
@@ -2115,7 +2113,7 @@ object DS extends Library {
         v.force match {
           case Val.Arr(inner) =>
             out.appendAll(inner.map(it => Val.Lazy(funct.apply(it))))
-          case i => throw Error.Delegate("Expected Array of Arrays, got: Array of " + v.force.prettyName)
+          case i => throw Error.Delegate("Expected Array of Arrays, got: Array of " + i.prettyName)
         }
       }
     }
@@ -2129,22 +2127,43 @@ object DS extends Library {
     val args = funct.f.params.allIndices.size
     val out = mutable.Map[String, mutable.IndexedBuffer[Val.Lazy]]()
     if (args == 2) {
-      for ((item, index) <- s.zipWithIndex) {
-        val key = funct.apply(item, Val.Lazy(Val.Num(index))).cast[Val.Str]
-        out.getOrElseUpdate(key.value, mutable.IndexedBuffer[Val.Lazy]()).addOne(item)
-      }
+      s.iterator.zipWithIndex.foreach({
+        case (item,index) =>
+          val key = funct.apply(item, Val.Lazy(Val.Num(index))).cast[Val.Str]
+          out.getOrElseUpdate(key.value, mutable.IndexedBuffer[Val.Lazy]()).addOne(item)
+      })
     } else if (args == 1) {
-      for (item <- s) {
+      s.foreach({ item =>
         val key = funct.apply(item).cast[Val.Str]
         out.getOrElseUpdate(key.value, mutable.IndexedBuffer[Val.Lazy]()).addOne(item)
-      }
+      })
     }
     else {
       throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
     }
-
     new Val.Obj(out.map(keyVal => (keyVal._1, Library.memberOf(Val.Arr(keyVal._2.toIndexedSeq)))), _ => (), None)
   }
+
+/*  private def groupByTest(s: Seq[Val.Lazy], funct: Applyer): Val = {
+    val args = funct.f.params.allIndices.size
+    new Val.Obj(
+      if (args == 2) {
+        scala.collection.mutable.Map(
+          s.zipWithIndex.groupBy( item => funct.apply(item._1, Val.Lazy(Val.Num(item._2))).cast[Val.Str]).map( x => (x._1, x._2.map(_._1)))
+            .collect(key => key._1.value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Arr(key._2)).force)).toSeq: _*)
+      }
+      else if (args == 1) {
+          scala.collection.mutable.Map(
+            s.groupBy( item => funct.apply(item).cast[Val.Str].value)
+              .map(item => item._1 ->  Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Arr(item._2)).force)).toSeq: _*)
+              //.collect(key => key._1.value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Arr(key._2)).force)).toSeq: _*)
+      }
+      else {
+        throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
+      },
+    _ => (), None)
+  }
+ */
 
   private def groupBy(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val = {
     val args = funct.f.params.allIndices.size
