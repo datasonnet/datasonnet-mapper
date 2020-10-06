@@ -1362,8 +1362,8 @@ object DS extends Library {
               if ("[^2-9]".r.matches(x.toString)) {
                 throw Error.Delegate("Expected Binary, got: Number")
               }
-              else Val.Lazy(Val.Num(Integer.parseInt(x.toInt.toString, 2))).force
-            case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x, 2))).force;
+              else Val.Lazy(Val.Num(BigInt.apply(x.toLong.toString,2).bigInteger.longValue())).force
+            case Val.Str(x) => Val.Lazy(Val.Num(BigInt.apply(x, 2).bigInteger.longValue())).force
             case Val.Null => Val.Lazy(Val.Null).force
             case i => throw Error.Delegate("Expected Binary, got: " + i.prettyName)
           }
@@ -1376,8 +1376,8 @@ object DS extends Library {
               if ("[^0-9a-f]".r.matches(x.toString.toLowerCase())) {
                 throw Error.Delegate("Expected Binary, got: Number")
               }
-              else Val.Lazy(Val.Num(Integer.parseInt(x.toInt.toString.toLowerCase(), 16))).force;
-            case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x.toLowerCase(), 16))).force;
+              else Val.Lazy(Val.Num(BigInt.apply(x.toLong.toString, 16).bigInteger.longValue())).force;
+            case Val.Str(x) => Val.Lazy(Val.Num(BigInt.apply(x, 16).bigInteger.longValue())).force;
             case Val.Null => Val.Lazy(Val.Null).force
             case i => throw Error.Delegate("Expected Binary, got: " + i.prettyName)
           }
@@ -1386,8 +1386,8 @@ object DS extends Library {
       builtin("fromRadixNumber", "value", "num") {
         (_, _, value: Val, num: Int) =>
           value match {
-            case Val.Num(x) => Val.Lazy(Val.Num(Integer.parseInt(x.toInt.toString.toLowerCase(), num))).force;
-            case Val.Str(x) => Val.Lazy(Val.Num(Integer.parseInt(x.toLowerCase(), num))).force;
+            case Val.Num(x) => Val.Lazy(Val.Num(BigInt.apply(x.toLong.toString, num).bigInteger.longValue() )).force
+            case Val.Str(x) => Val.Lazy(Val.Num(BigInt.apply(x, num).bigInteger.longValue() )).force
             case i => throw Error.Delegate("Expected Binary, got: " + i.prettyName)
             //null not supported in DW function
           }
@@ -1397,11 +1397,11 @@ object DS extends Library {
         (_, _, value: Val) =>
           value match {
             case Val.Num(x) =>
-              if (x < 0) Val.Lazy(Val.Str("-" + x.toInt.abs.toBinaryString)).force
-              else Val.Lazy(Val.Str(x.toInt.toBinaryString)).force
+              if (x < 0) Val.Lazy(Val.Str("-" + x.toLong.abs.toBinaryString)).force
+              else Val.Lazy(Val.Str(x.toLong.toBinaryString)).force
             case Val.Str(x) =>
-              if (x.startsWith("-")) Val.Lazy(Val.Str(x.toInt.abs.toBinaryString)).force
-              else Val.Lazy(Val.Str(x.toInt.toBinaryString)).force
+              if (x.startsWith("-")) Val.Lazy(Val.Str(x.toLong.abs.toBinaryString)).force
+              else Val.Lazy(Val.Str(x.toLong.toBinaryString)).force
             case Val.Null => Val.Lazy(Val.Null).force
             case i => throw Error.Delegate("Expected Binary, got: " + i.prettyName)
           }
@@ -1411,11 +1411,11 @@ object DS extends Library {
         (_, _, value: Val) =>
           value match {
             case Val.Num(x) =>
-              if (x < 0) Val.Lazy(Val.Str("-" + x.toInt.abs.toHexString)).force
-              else Val.Lazy(Val.Str(x.toInt.toHexString)).force
+              if (x < 0) Val.Lazy(Val.Str("-" + x.toLong.abs.toHexString)).force
+              else Val.Lazy(Val.Str(x.toLong.toHexString)).force
             case Val.Str(x) =>
-              if (x.startsWith("-")) Val.Lazy(Val.Str(x.toInt.abs.toHexString)).force
-              else Val.Lazy(Val.Str(x.toInt.toHexString)).force
+              if (x.startsWith("-")) Val.Lazy(Val.Str(x.toLong.abs.toHexString)).force
+              else Val.Lazy(Val.Str(x.toLong.toHexString)).force
             case Val.Null => Val.Lazy(Val.Null).force
             case i => throw Error.Delegate("Expected Binary, got: " + i.prettyName)
           }
@@ -1425,11 +1425,12 @@ object DS extends Library {
         (_, _, value: Val, num: Int) =>
           value match {
             case Val.Num(x) =>
-              if (x < 0) Val.Lazy(Val.Str("-" + Integer.toString(x.toInt.abs, num))).force
-              else Val.Lazy(Val.Str(Integer.toString(x.toInt, num))).force
+              if (x < 0) Val.Lazy(Val.Str("-" + BigInt.apply(x.toLong).toString(num))).force
+              else Val.Lazy(Val.Str(BigInt.apply(x.toLong).toString(num))).force
+            // Val.Lazy(Val.Str(Integer.toString(x.toInt, num))).force
             case Val.Str(x) =>
-              if (x.startsWith("-")) Val.Lazy(Val.Str("-" + Integer.toString(x.toInt.abs, num))).force
-              else Val.Lazy(Val.Str(Integer.toString(x.toInt, num))).force
+              if (x.startsWith("-")) Val.Lazy(Val.Str("-" + BigInt.apply(x.toLong).toString(num))).force
+              else Val.Lazy(Val.Str(BigInt.apply(x.toLong).toString(num))).force
             case i => throw Error.Delegate("Expected Binary, got: " + i.prettyName)
             //DW functions does not support null
           }

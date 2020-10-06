@@ -51,11 +51,10 @@ public class NumbersTest {
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("4", value);
 
-        /*Needs higher than 32 bit support
         mapper = new Mapper(lib + pack + ".fromBinary(\"1111111111111111111111111111111111111111111111111111111111111\")");
         value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("4611686018427387903", value);
-        */
+        assertEquals("2305843009213693952", value);
+
 
     }
 
@@ -81,11 +80,11 @@ public class NumbersTest {
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("15", value);
 
-        /*
-        mapper = new Mapper(lib + pack + ".fromHex(\"3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000\")");
+
+        mapper = new Mapper(lib + pack + ".fromHex(\"FFFFFFFFF\")");
         value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("100000000000000000000000000000000000000000000000000000000000000", value);
-        */
+        assertEquals("68719476735", value);
+
     }
 
     @Test
@@ -99,11 +98,9 @@ public class NumbersTest {
         assertEquals("255", value);
 
 
-        /* TODO support more than 32 bit number
-        mapper = new Mapper(lib + pack + ".fromRadixNumber(\"3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000\", 16)");
+        mapper = new Mapper(lib + pack + ".fromRadixNumber(\"FFFFFFFFF\", 16)");
         value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("100000000000000000000000000000000000000000000000000000000000000", value);
-        */
+        assertEquals("68719476735", value);
     }
 
     @Test
@@ -124,11 +121,11 @@ public class NumbersTest {
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("10", value);
 
-        /*
-        mapper = new Mapper(lib + pack + ".toBinary(100000000000000000000000000000000000000000000000000000000000000)");
+
+        mapper = new Mapper(lib + pack + ".toBinary(5294967295)");
         value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("11111000111010111010110100101011100001001110000011010101100010111101001011100000100010011000011101100101101001111101111010110010010100110010100100000000000000000000000000000000000000000000000000000000000000", value);
-         */
+        assertEquals("100111011100110101100100111111111", value);
+
     }
 
     @Test
@@ -149,11 +146,11 @@ public class NumbersTest {
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("f", value);
 
-        /*
-        mapper = new Mapper(lib + pack + ".toHex(100000000000000000000000000000000000000000000000000000000000000)");
+
+        mapper = new Mapper(lib + pack + ".toHex(68719476735)");
         value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000", value);
-         */
+        assertEquals("FFFFFFFFF".toLowerCase(), value);
+
     }
 
     @Test
@@ -166,11 +163,11 @@ public class NumbersTest {
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("ff", value);
 
-        /*
-        mapper = new Mapper(lib + pack + ".toRadixNumber(100000000000000000000000000000000000000000000000000000000000000, 16)");
+
+        mapper = new Mapper(lib + pack + ".toRadixNumber(68719476735, 16)");
         value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("3e3aeb4ae1383562f4b82261d969f7ac94ca4000000000000000", value);
-         */
+        assertEquals("fffffffff", value);
+
     }
 
 
