@@ -398,7 +398,7 @@ object DS extends Library {
                 source.mkString
               }
               catch {
-                case ex: NullPointerException => "null"
+                case _: NullPointerException => "null"
               }
             Materializer.reverse(ujsonUtils.parse(out));
           case _ =>
@@ -542,32 +542,32 @@ object DS extends Library {
     },
 
     // funcs below taken from Std
-    builtin("isString", "v") { (ev, fs, v: Val) =>
+    builtin("isString", "v") { (_, _, v: Val) =>
       v.isInstanceOf[Val.Str]
     },
 
-    builtin("isBoolean", "v") { (ev, fs, v: Val) =>
+    builtin("isBoolean", "v") { (_, _, v: Val) =>
       v == Val.True || v == Val.False
     },
 
-    builtin("isNumber", "v") { (ev, fs, v: Val) =>
+    builtin("isNumber", "v") { (_, _, v: Val) =>
       v.isInstanceOf[Val.Num]
     },
 
-    builtin("isObject", "v") { (ev, fs, v: Val) =>
+    builtin("isObject", "v") { (_, _, v: Val) =>
       v.isInstanceOf[Val.Obj]
     },
 
-    builtin("isArray", "v") { (ev, fs, v: Val) =>
+    builtin("isArray", "v") { (_, _, v: Val) =>
       v.isInstanceOf[Val.Arr]
     },
 
-    builtin("isFunction", "v") { (ev, fs, v: Val) =>
+    builtin("isFunction", "v") { (_, _, v: Val) =>
       v.isInstanceOf[Val.Func]
     },
 
     // moved array to first position
-    builtin("foldLeft", "arr", "func", "init") { (ev, fs, arr: Val.Arr, func: Applyer, init: Val) =>
+    builtin("foldLeft", "arr", "func", "init") { (_, _, arr: Val.Arr, func: Applyer, init: Val) =>
       var current = init
       for (item <- arr.value) {
         val c = current
@@ -577,7 +577,7 @@ object DS extends Library {
     },
 
     // moved array to first position
-    builtin("foldRight", "arr", "func", "init") { (ev, fs, arr: Val.Arr, func: Applyer, init: Val) =>
+    builtin("foldRight", "arr", "func", "init") { (_, _, arr: Val.Arr, func: Applyer, init: Val) =>
       var current = init
       for (item <- arr.value.reverse) {
         val c = current
@@ -586,20 +586,20 @@ object DS extends Library {
       current
     },
 
-    builtin("parseInt", "str") { (ev, fs, str: String) =>
+    builtin("parseInt", "str") { (_, _, str: String) =>
       str.toInt
     },
 
-    builtin("parseOctal", "str") { (ev, fs, str: String) =>
+    builtin("parseOctal", "str") { (_, _, str: String) =>
       Integer.parseInt(str, 8)
     },
 
-    builtin("parseHex", "str") { (ev, fs, str: String) =>
+    builtin("parseHex", "str") { (_, _, str: String) =>
       Integer.parseInt(str, 16)
     },
 
     // migrated from util.libsonnet
-    builtin("parseDouble", "str") { (ev, fs, str: String) =>
+    builtin("parseDouble", "str") { (_, _, str: String) =>
       str.toDouble
     },
 
@@ -741,9 +741,9 @@ object DS extends Library {
 
   override def modules(dataFormats: DataFormatService): Map[String, Val.Obj] = Map(
     "datetime" -> moduleFrom(
-      builtin0("now") { (vals, ev, fs) => Instant.now().toString() },
+      builtin0("now") { (vals, ev, fs) => Instant.now.toString },
 
-      builtin("offset", "datetime", "period") { (ev, fs, v1: String, v2: String) =>
+      builtin("offset", "datetime", "period") { (_, _, v1: String, v2: String) =>
         // NOTE: DEMO ONLY (in particular, missing proper error handling)
         val datetime = java.time.ZonedDateTime.parse(v1, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         val period = Period.parse(v2)
@@ -751,7 +751,7 @@ object DS extends Library {
       },
 
       builtin("format", "datetime", "inputFormat", "outputFormat") {
-        (ev, fs, datetime: String, inputFormat: String, outputFormat: String) =>
+        (_, _, datetime: String, inputFormat: String, outputFormat: String) =>
           val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
           datetimeObj.format(DateTimeFormatter.ofPattern(outputFormat))
       },
@@ -770,26 +770,26 @@ object DS extends Library {
       },
 
       builtin("changeTimeZone", "datetime", "format", "timezone") {
-        (ev, fs, datetime: String, format: String, timezone: String) =>
+        (_, _, datetime: String, format: String, timezone: String) =>
           val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
           val zoneId = ZoneId.of(timezone)
           val newDateTimeObj = datetimeObj.withZoneSameInstant(zoneId)
           newDateTimeObj.format(DateTimeFormatter.ofPattern(format))
       },
 
-      builtin("toLocalDate", "datetime", "format") { (ev, fs, datetime: String, format: String) =>
+      builtin("toLocalDate", "datetime", "format") { (_, _, datetime: String, format: String) =>
         val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
-        datetimeObj.toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE)
+        datetimeObj.toLocalDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
       },
 
-      builtin("toLocalTime", "datetime", "format") { (ev, fs, datetime: String, format: String) =>
+      builtin("toLocalTime", "datetime", "format") { (_, _, datetime: String, format: String) =>
         val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
-        datetimeObj.toLocalTime().format(DateTimeFormatter.ISO_LOCAL_TIME)
+        datetimeObj.toLocalTime.format(DateTimeFormatter.ISO_LOCAL_TIME)
       },
 
-      builtin("toLocalDateTime", "datetime", "format") { (ev, fs, datetime: String, format: String) =>
+      builtin("toLocalDateTime", "datetime", "format") { (_, _, datetime: String, format: String) =>
         val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
-        datetimeObj.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        datetimeObj.toLocalDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
       },
 
       // newly added
@@ -817,7 +817,7 @@ object DS extends Library {
         datetimeObj.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
       },
 
-      builtin("offset", "datetime", "period") { (ev, fs, v1: String, v2: String) =>
+      builtin("offset", "datetime", "period") { (_, _, v1: String, v2: String) =>
         // NOTE: DEMO ONLY (in particular, missing proper error handling)
         val datetime = java.time.LocalDateTime.parse(v1, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
         val period = Period.parse(v2)
@@ -825,7 +825,7 @@ object DS extends Library {
       },
 
       builtin("format", "datetime", "inputFormat", "outputFormat") {
-        (ev, fs, datetime: String, inputFormat: String, outputFormat: String) =>
+        (_, _, datetime: String, inputFormat: String, outputFormat: String) =>
           val datetimeObj = java.time.LocalDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
           datetimeObj.format(DateTimeFormatter.ofPattern(outputFormat))
       },
@@ -846,46 +846,46 @@ object DS extends Library {
 
     "crypto" -> moduleFrom(
       builtin("hash", "value", "algorithm") {
-        (ev, fs, value: String, algorithm: String) =>
+        (_, _, value: String, algorithm: String) =>
           Crypto.hash(value, algorithm)
       },
 
       builtin("hmac", "value", "secret", "algorithm") {
-        (ev, fs, value: String, secret: String, algorithm: String) =>
+        (_, _, value: String, secret: String, algorithm: String) =>
           datasonnet.Crypto.hmac(value, secret, algorithm)
       }
     ),
 
     "jsonpath" -> moduleFrom(
       builtin("select", "json", "path") {
-        (ev, fs, json: Val, path: String) =>
+        (ev, _, json: Val, path: String) =>
           Materializer.reverse(ujson.read(JsonPath.select(ujson.write(Materializer.apply(json)(ev)), path)))
       }
     ),
 
     "regex" -> moduleFrom(
       builtin("regexFullMatch", "expr", "str") {
-        (ev, fs, expr: String, str: String) =>
+        (_, _, expr: String, str: String) =>
           Materializer.reverse(Regex.regexFullMatch(expr, str))
       },
 
       builtin("regexPartialMatch", "expr", "str") {
-        (ev, fs, expr: String, str: String) =>
+        (_, _, expr: String, str: String) =>
           Materializer.reverse(Regex.regexPartialMatch(expr, str))
       },
 
       builtin("regexScan", "expr", "str") {
-        (ev, fs, expr: String, str: String) =>
+        (_, _, expr: String, str: String) =>
           Materializer.reverse(Regex.regexScan(expr, str))
       },
 
       builtin("regexQuoteMeta", "str") {
-        (ev, fs, str: String) =>
+        (_, _, str: String) =>
           Regex.regexQuoteMeta(str)
       },
 
       builtin("regexReplace", "str", "pattern", "replace") {
-        (ev, fs, str: String, pattern: String, replace: String) =>
+        (_, _, str: String, pattern: String, replace: String) =>
           Regex.regexReplace(str, pattern, replace)
       },
 
@@ -896,7 +896,7 @@ object DS extends Library {
 
         replace match {
           case replaceStr: Val.Str => Regex.regexGlobalReplace(str, pattern, replaceStr.value)
-          case replaceF: Val.Func => {
+          case replaceF: Val.Func =>
             val func = new Function[Value, String] {
               override def apply(t: Value): String = {
                 val v = Materializer.reverse(t)
@@ -907,7 +907,6 @@ object DS extends Library {
               }
             }
             Regex.regexGlobalReplace(str, pattern, func)
-          }
 
           case _ => throw Error.Delegate("'replace' parameter must be either String or Function")
         }
@@ -1013,43 +1012,43 @@ object DS extends Library {
       },
 
       // funcs below taken from Std but using Java's Math
-      builtin("clamp", "x", "minVal", "maxVal") { (ev, fs, x: Double, minVal: Double, maxVal: Double) =>
+      builtin("clamp", "x", "minVal", "maxVal") { (_, _, x: Double, minVal: Double, maxVal: Double) =>
         Math.max(minVal, Math.min(x, maxVal))
       },
 
-      builtin("pow", "x", "n") { (ev, fs, x: Double, n: Double) =>
+      builtin("pow", "x", "n") { (_, _, x: Double, n: Double) =>
         Math.pow(x, n)
       },
 
-      builtin("sin", "x") { (ev, fs, x: Double) =>
+      builtin("sin", "x") { (_, _, x: Double) =>
         Math.sin(x)
       },
 
-      builtin("cos", "x") { (ev, fs, x: Double) =>
+      builtin("cos", "x") { (_, _, x: Double) =>
         Math.cos(x)
       },
 
-      builtin("tan", "x") { (ev, fs, x: Double) =>
+      builtin("tan", "x") { (_, _, x: Double) =>
         Math.tan(x)
       },
 
-      builtin("asin", "x") { (ev, fs, x: Double) =>
+      builtin("asin", "x") { (_, _, x: Double) =>
         Math.asin(x)
       },
 
-      builtin("acos", "x") { (ev, fs, x: Double) =>
+      builtin("acos", "x") { (_, _, x: Double) =>
         Math.acos(x)
       },
 
-      builtin("atan", "x") { (ev, fs, x: Double) =>
+      builtin("atan", "x") { (_, _, x: Double) =>
         Math.atan(x)
       },
 
-      builtin("log", "x") { (ev, fs, x: Double) =>
+      builtin("log", "x") { (_, _, x: Double) =>
         Math.log(x)
       },
 
-      builtin("exp", "x") { (ev, fs, x: Double) =>
+      builtin("exp", "x") { (_, _, x: Double) =>
         Math.exp(x)
       },
 
@@ -1353,7 +1352,6 @@ object DS extends Library {
       }
     ),
 
-    // TODO currently limited to 32 bit value
     "numbers" -> moduleFrom(
       builtin("fromBinary", "value") {
         (_, _, value: Val) =>
