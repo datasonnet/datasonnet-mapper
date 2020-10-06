@@ -155,17 +155,6 @@ object DS extends Library {
         }
     },
 
-    /*builtin("groupByTest", "container", "funct") {
-      (ev, fs, container: Val, funct: Applyer) =>
-        container match {
-          case Val.Arr(s) =>
-            groupByTest(s, funct)
-          case obj: Val.Obj =>
-            groupBy(obj, funct, ev, fs)
-          case Val.Null => Val.Lazy(Val.Null).force
-          case i => throw Error.Delegate("Expected Array or Object, got: " + i.prettyName)
-        }
-    },*/
 
     builtin("isBlank", "value") {
       (_, _, value: Val) =>
@@ -2056,9 +2045,21 @@ object DS extends Library {
     val args = funct.f.params.allIndices.size
     Val.Arr(
       if (args == 2) {
-        array.view.zipWithIndex.filter({
+        //The three options are below, classic index for loop seems to be the fastest
+        /*array.view.zipWithIndex.filter({
           case (item, index) => funct.apply(item, Val.Lazy(Val.Num(index))) == Val.True
-        }).map(_._1).toSeq
+        }).map(_._1).toSeq*/
+        val out = collection.mutable.Buffer.empty[Val.Lazy]
+        for(index <- array.indices){
+          val item = array(index)
+          if (funct.apply(array(index), Val.Lazy(Val.Num(index))) == Val.True){
+            out.append(item)
+          }
+        }
+        out.toSeq
+        /*array.indices.collect({
+          case index if funct.apply(array(index), Val.Lazy(Val.Num(index))) == Val.True => array(index)
+        })*/
       } else if (args == 1)
         array.filter(lazyItem => funct.apply(lazyItem).equals(Val.True))
       else {
@@ -2098,24 +2099,23 @@ object DS extends Library {
     val args = funct.f.params.allIndices.size
     val out = collection.mutable.Buffer.empty[Val.Lazy]
     if (args == 2) { // 2 args
-      for (v <- array) {
-        v.force match {
+      array.foreach(
+        _.force match {
           case Val.Arr(inner) =>
-            out.appendAll(inner.zipWithIndex.map({
-              case (it, ind) => Val.Lazy(funct.apply(it, Val.Lazy(Val.Num(ind))))
-            }))
+            for(ind <- inner.indices){
+              out.append(Val.Lazy(funct.apply(inner(ind), Val.Lazy(Val.Num(ind)))))
+            }
           case i => throw Error.Delegate("Expected Array of Arrays, got: Array of " + i.prettyName)
         }
-      }
+      )
     }
     else if (args == 1) { //  1 arg
-      for (v <- array) {
-        v.force match {
-          case Val.Arr(inner) =>
-            out.appendAll(inner.map(it => Val.Lazy(funct.apply(it))))
+      array.foreach(
+        _.force match {
+          case Val.Arr(inner) => out.appendAll(inner.map(it => Val.Lazy(funct.apply(it))))
           case i => throw Error.Delegate("Expected Array of Arrays, got: Array of " + i.prettyName)
         }
-      }
+      )
     }
     else {
       throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
@@ -2127,11 +2127,11 @@ object DS extends Library {
     val args = funct.f.params.allIndices.size
     val out = mutable.Map[String, mutable.IndexedBuffer[Val.Lazy]]()
     if (args == 2) {
-      s.iterator.zipWithIndex.foreach({
-        case (item,index) =>
-          val key = funct.apply(item, Val.Lazy(Val.Num(index))).cast[Val.Str]
-          out.getOrElseUpdate(key.value, mutable.IndexedBuffer[Val.Lazy]()).addOne(item)
-      })
+      for( index <- s.indices){
+        val item = s(index)
+        val key = funct.apply(item, Val.Lazy(Val.Num(index))).cast[Val.Str]
+        out.getOrElseUpdate(key.value, mutable.IndexedBuffer[Val.Lazy]()).addOne(item)
+      }
     } else if (args == 1) {
       s.foreach({ item =>
         val key = funct.apply(item).cast[Val.Str]
@@ -2156,7 +2156,6 @@ object DS extends Library {
           scala.collection.mutable.Map(
             s.groupBy( item => funct.apply(item).cast[Val.Str].value)
               .map(item => item._1 ->  Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Arr(item._2)).force)).toSeq: _*)
-              //.collect(key => key._1.value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Arr(key._2)).force)).toSeq: _*)
       }
       else {
         throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
