@@ -16,6 +16,11 @@ package com.datasonnet.document;
  * limitations under the License.
  */
 
+/***
+ * The DefaultDocument class
+ *
+ * @param <T> the content
+ */
 public class DefaultDocument<T> implements Document<T> {
     private final T content;
     private final MediaType mediaType;

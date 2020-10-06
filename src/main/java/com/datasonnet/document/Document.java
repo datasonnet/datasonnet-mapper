@@ -16,6 +16,11 @@ package com.datasonnet.document;
  * limitations under the License.
  */
 
+/***
+ * The document interface represents the document used by the mapper.
+ *
+ * @param <T> the content
+ */
 public interface Document<T> {
     T getContent();
 

@@ -2,374 +2,10 @@
 :toc:
 :toclevels: 1
 
-## Crypto
+## core
 
-### `hash(string value, string algorithm)`
-Calculates hash of a String value using one of the supported algorithms. The `algorithm` must be one of `MD2`, `MD5`, `SHA-1`, `SHA-256`, `SHA-384`, `SHA-512`
-The response is a string containing the hash bytes.
-
-*Example:*
-
-------------------------
-{
-    hashValue: DS.Crypto.hash("HelloWorld", "MD5")
-}
-------------------------
-.Result
-------------------------
-{
-    "hashValue": "68e109f0f40ca72a15e05cc22786f8e6"
-}
-------------------------
-### `hmac(string value, string secret, string algorithm)`
-Generates hash-based message autentication code using provided secret and a hash function algorithm. The `algoritm` must be one of `HmacSHA1`, `HmacSHA256` or `HmacSHA512`.
-
-*Example:*
-
-------------------------
-{
-    hmacValue: DS.Crypto.hmac("HelloWorld", "DataSonnet rules!", "HmacSHA256")
-}
-------------------------
-.Result
-------------------------
-{
-    "hmacValue": "7854220ef827b07529509f68f391a80bf87fff328dbda140ed582520a1372dc1"
-}
-------------------------
-
-### `encrypt(string value, string key)`
-Encrypts the string using the key and the Blowfish algorithm. The result is Base64-encoded encrypted string.
-
-*Example:*
-
-------------------------
-{
-    passwd: DS.Crypto.encrypt("HelloWorld", "DataSonnet123")
-}
-------------------------
-.Result
-------------------------
-{
-    "passwd": "HdK8opktKiK3ero0RJiYbA=="
-}
-------------------------
-
-### `decrypt(string value, string key)`
-Decrypts the string using the key and the Blowfish algorithm.
-
-*Example:*
-
-------------------------
-{
-    passwd: DS.Crypto.decrypt(payload.encryptedPassword, "MySecretKey")
-}
-------------------------
-
-## ZonedDateTime
-
-### `now()`
-Returns the current date/time from the system UTC clock in ISO-8601 format.
-
-*Example*
-
-------------------------
-{
-    currentZuluTime: DS.ZonedDateTime.now()
-}
-------------------------
-
-.Result:
-------------------------
-{
-    "currentZuluTime": "2019-08-19T18:58:38.313Z"
-}
-------------------------
-
-### `offset(string datetime, string period)`
-Returns a copy of this datetime with the specified amount added. The `datetime` parameter is in the ISO-8601 format.
-The `period` is a string in the ISO-8601 period format.
-
-*Example*
-
-------------------------
-DS.ZonedDateTime.offset("2019-07-22T21:00:00Z", "P1Y1D")
-------------------------
-.Result:
-------------------------
-2020-07-23T21:00:00Z
-------------------------
-
-### `format(string datetime, string inputFormat, string outputFormat)`
-Reformats a zoned date-time string.
-
-*Example*
-
-------------------------
-DS.ZonedDateTime.format("2019-07-04T21:00:00Z", "yyyy-MM-dd'T'HH:mm:ssVV", "d MMM uuuu")
-------------------------
-.Result:
-------------------------
-4 Jul 2019
-------------------------
-
-### `compare(string datetime1, string format1, string datetime2, string format2)`
-Returns 1 if datetime1 > datetime2, -1 if datetime1 < datetime2, 0 if datetime1 == datetime2.
-
-### `changeTimeZone(string datetime, string format, string timezone)`
-Changes the date timezone, retaining the instant. This normally results in a change to the local date-time.
-The response is formatted using the same format as an input.
-
-*Example*
-
-------------------------
-DS.ZonedDateTime.changeTimeZone("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ", "America/Los_Angeles")
-------------------------
-.Result:
-------------------------
-2019-07-04T19:00:00-0700
-------------------------
-
-### `toLocalDate(string datetime, string format)`
-Returns only local date part of the `datetime` parameter in the ISO-8601 format without the offset.
-
-*Example*
-
-------------------------
-DS.ZonedDateTime.toLocalDate("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
-------------------------
-.Result:
-------------------------
-2019-07-04
-------------------------
-
-### `toLocalTime(string datetime, string format)`
-Returns only local time part of the `datetime` parameter in the ISO-8601 format without the offset.
-
-*Example*
-
-------------------------
-DS.ZonedDateTime.toLocalTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
-------------------------
-.Result:
-------------------------
-21:00:00
-------------------------
-
-### `toLocalDateTime(string datetime, string format)`
-Returns local datetime part of the `datetime` parameter in the ISO-8601 format without the offset.
-
-*Example*
-
-------------------------
-DS.ZonedDateTime.toLocalDateTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
-------------------------
-.Result:
-------------------------
-2019-07-04T21:00:00
-------------------------
-
-## LocalDateTime
-
-### `now()`
-Returns the current date/time from the system UTC clock in ISO-8601 format without a time zone.
-
-*Example*
-
-------------------------
-{
-    currentLocalTime: DS.LocalDateTime.now()
-}
-------------------------
-
-.Result:
-------------------------
-{
-    "currentLocalTime": "2019-08-19T18:58:38.313"
-}
-------------------------
-
-### `offset(string datetime, string period)`
-Returns a copy of this datetime with the specified amount added. The `datetime` parameter is in the ISO-8601 format without an offset.
-The `period` is a string in the ISO-8601 period format.
-
-*Example*
-
-------------------------
-DS.LocalDateTime.offset("2019-07-22T21:00:00", "P1Y1D")
-------------------------
-.Result:
-------------------------
-2020-07-23T21:00:00
-------------------------
-
-### `format(string datetime, string inputFormat, string outputFormat)`
-Reformats a local date-time string.
-
-*Example*
-
-------------------------
-DS.LocalDateTime.format("2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss", "d MMM uuuu")
-------------------------
-.Result:
-------------------------
-4 Jul 2019
-------------------------
-
-### `compare(string datetime1, string format1, string datetime2, string format2)`
-Returns `1` if `datetime1 > datetime2`, `-1` if `datetime1 < datetime2`, and `0` if `datetime1 == datetime2`.
-The `format1` and `format2` parameters must not have an offset or time zone.
-
-*Example*
-
-------------------------
-DS.LocalDateTime.compare("2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss", "2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss")
-------------------------
-.Result:
-------------------------
-0
-------------------------
-
-## JsonPath
-
-### `select(object json, string path)`
-
-Evaluates JsonPath expression and returns the resulting JSON object.
-It uses the https://github.com/json-path/JsonPath[Jayway JsonPath implementation] and fully supports https://goessner.net/articles/JsonPath/[JsonPath specification].
-
-*Example*
-
-.Payload
-------------------------
-{
-  "store": {
-    "book": [
-      {
-        "category": "reference",
-        "author": "Nigel Rees",
-        "title": "Sayings of the Century",
-        "price": 8.95
-      },
-      {
-        "category": "fiction",
-        "author": "Evelyn Waugh",
-        "title": "Sword of Honour",
-        "price": 12.99
-      },
-      {
-        "category": "fiction",
-        "author": "Herman Melville",
-        "title": "Moby Dick",
-        "isbn": "0-553-21311-3",
-        "price": 8.99
-      },
-      {
-        "category": "fiction",
-        "author": "J. R. R. Tolkien",
-        "title": "The Lord of the Rings",
-        "isbn": "0-395-19395-8",
-        "price": 22.99
-      }
-    ]
-  }
-}
-------------------------
-.DataSonnet map:
-------------------------
-{
-    author: DS.JsonPath.select(payload, "$..book[-2:]..author")[0]
-}
-------------------------
-.Result
-------------------------
-{
-    "author": "Herman Melville"
-}
-------------------------
-
-## Util
-
-### `select(object obj, string path)`
-
-Returns a value inside the object by given path separated by dot ('.').
-
-*Example*
-
-.Payload
-----------
-{
-  "name": "Foo",
-  "language": {
-      "name": "Java",
-      "version": "1.8"
-  }
-}
-----------
-.DataSonnet map:
-------------------------
-{
-  language: DS.Util.select(payload, 'language.name')
-}
-------------------------
-.Result
-------------------------
-{
-   "language": "Java"
-}
-------------------------
-
-### `filterEx(array objects, string key, string value, function filter_func=function(value1, value2) value1 == value2)`
-
-Filters array of objects by given condition.
-
-*Example*
-
-.Payload
-----------
-{
-   "languages": [
-     {
-       "name": "Foo",
-       "language": "Java"
-     },
-     {
-       "name": "Bar",
-       "language": "Scala"
-     },
-     {
-       "name": "FooBar",
-       "language": "Java"
-     },
-     {
-       "name": "FooBar",
-       "language": "C++"
-     }
-   ]
- }
-----------
-.DataSonnet map:
-------------------------
-{
-  nonJavaLanguages: DS.Util.filterEx(payload.languages, 'language', 'Java', function(x, y) x != y)
-}
-------------------------
-.Result
-------------------------
-[
- {
-   "name": "Bar",
-   "language": "Scala"
- },
- {
-   "name": "FooBar",
-   "language": "C++"
- }
-]
-------------------------
-
-### `groupBy(array arr, string keyName)`
-Partitions an array into a Object that contains Arrays, according to the discriminator key you define.
-The discriminator can be a path inside the objects to group, e.g. 'language.name'
+### `groupBy(array|object items, function discriminator)`
+Groups the provided items into an object based on the function discriminator.
 
 *Example*
 
@@ -404,7 +40,7 @@ The discriminator can be a path inside the objects to group, e.g. 'language.name
 .DataSonnet map:
 ------------------------
 {
-  languageGroups: DS.Util.groupBy(payload.languages, 'language.name')
+  languageGroups: ds.groupBy(payload.languages, function(item,index) item.language.name)
 }
 ------------------------
 .Result
@@ -459,7 +95,7 @@ Removes a property with given name from the object and returns the remaining obj
 ----------
 .DataSonnet map:
 ------------------------
-DS.Util.remove(payload, 'availableSeats')
+ds.remove(payload, 'availableSeats')
 ------------------------
 .Result
 ------------------------
@@ -471,82 +107,6 @@ DS.Util.remove(payload, 'availableSeats')
    "origin": "PHX",
    "destination": "SEA"
  }
-------------------------
-
-### `removeAll(object obj, array keyNames)`
-Removes all properties with names from a provided list of strings from the object and returns the remaining object
-
-*Example*
-
-.Payload
-----------
-{
-   "availableSeats": 45,
-   "airlineName": "Delta",
-   "aircraftBrand": "Boeing",
-   "aircraftType": "717",
-   "departureDate": "01/20/2019",
-   "origin": "PHX",
-   "destination": "SEA"
- }
-----------
-.DataSonnet map:
-------------------------
-DS.Util.removeAll(payload, ['availableSeats', 'aircraftType', 'aircraftBrand'])
-------------------------
-.Result
-------------------------
-{
-   "airlineName": "Delta",
-   "departureDate": "01/20/2019",
-   "origin": "PHX",
-   "destination": "SEA"
- }
-------------------------
-
-### `deepFlattenArrays(array arr)`
-Flattens multiple nested arrays into a single array.
-
-*Example*
-
-.Payload
-----------
-[
-    1,
-    2,
-    [
-      3
-    ],
-    [
-      4,
-      [
-        5,
-        6,
-        7
-      ],
-      {
-        "x": "y"
-      }
-    ]
-]
-----------
-.DataSonnet map:
-------------------------
-DS.Util.flattenArrays(payload)
-------------------------
-.Result
-------------------------
-[
-     1,
-     2,
-     4,
-     5,
-     6,
-     7,
-     {
-        "x": "y"
-     }
-]
 ------------------------
 
 ### `reverse(array arr)`
@@ -565,7 +125,7 @@ Returns an array with elements in reverse order.
 ----------
 .DataSonnet map:
 ------------------------
-DS.Util.reverse(payload)
+ds.reverse(payload)
 ------------------------
 .Result
 ------------------------
@@ -593,7 +153,7 @@ Parses a string which contains a double number and returns its numeric represent
 .DataSonnet map:
 ------------------------
 {
-    num: DS.Util.parseDouble(payload.numberAsString)
+    num: ds.parseDouble(payload.numberAsString)
 }
 ------------------------
 .Result
@@ -603,49 +163,250 @@ Parses a string which contains a double number and returns its numeric represent
 }
 ------------------------
 
-### `duplicates(array arr, function keyF=id, boolean set=true)`
-Returns an array containing duplicate elements from input array. An optional key function returns a value which will be used as a comparison key. If `set` parameter is set to true, only the first duplicate value will be included.
+## crypto
+
+### `hash(string value, string algorithm)`
+Calculates hash of a String value using one of the supported algorithms. The `algorithm` must be one of `MD2`, `MD5`, `SHA-1`, `SHA-256`, `SHA-384`, `SHA-512`
+The response is a string containing the hash bytes.
+
+*Example:*
+
+------------------------
+{
+    hashValue: ds.crypto.hash("HelloWorld", "MD5")
+}
+------------------------
+.Result
+------------------------
+{
+    "hashValue": "68e109f0f40ca72a15e05cc22786f8e6"
+}
+------------------------
+### `hmac(string value, string secret, string algorithm)`
+Generates hash-based message autentication code using provided secret and a hash function algorithm. The `algoritm` must be one of `HmacSHA1`, `HmacSHA256` or `HmacSHA512`.
+
+*Example:*
+
+------------------------
+{
+    hmacValue: ds.crypto.hmac("HelloWorld", "DataSonnet rules!", "HmacSHA256")
+}
+------------------------
+.Result
+------------------------
+{
+    "hmacValue": "7854220ef827b07529509f68f391a80bf87fff328dbda140ed582520a1372dc1"
+}
+------------------------
+
+## datetime
+
+### `now()`
+Returns the current date/time from the system UTC clock in ISO-8601 format.
+
+*Example*
+
+------------------------
+{
+    currentZuluTime: ds.datetime.now()
+}
+------------------------
+
+.Result:
+------------------------
+{
+    "currentZuluTime": "2019-08-19T18:58:38.313Z"
+}
+------------------------
+
+### `format(string datetime, string inputFormat, string outputFormat)`
+Reformats a zoned date-time string.
+
+*Example*
+
+------------------------
+ds.datetime.format("2019-07-04T21:00:00Z", "yyyy-MM-dd'T'HH:mm:ssVV", "d MMM uuuu")
+------------------------
+.Result:
+------------------------
+4 Jul 2019
+------------------------
+
+### `compare(string datetime1, string format1, string datetime2, string format2)`
+Returns 1 if datetime1 > datetime2, -1 if datetime1 < datetime2, 0 if datetime1 == datetime2.
+
+### `changeTimeZone(string datetime, string format, string timezone)`
+Changes the date timezone, retaining the instant. This normally results in a change to the local date-time.
+The response is formatted using the same format as an input.
+
+*Example*
+
+------------------------
+ds.datetime.changeTimeZone("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ", "America/Los_Angeles")
+------------------------
+.Result:
+------------------------
+2019-07-04T19:00:00-0700
+------------------------
+
+### `toLocalDate(string datetime, string format)`
+Returns only local date part of the `datetime` parameter in the ISO-8601 format without the offset.
+
+*Example*
+
+------------------------
+ds.datetime.toLocalDate("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
+------------------------
+.Result:
+------------------------
+2019-07-04
+------------------------
+
+### `toLocalTime(string datetime, string format)`
+Returns only local time part of the `datetime` parameter in the ISO-8601 format without the offset.
+
+*Example*
+
+------------------------
+ds.datetime.toLocalTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
+------------------------
+.Result:
+------------------------
+21:00:00
+------------------------
+
+### `toLocalDateTime(string datetime, string format)`
+Returns local datetime part of the `datetime` parameter in the ISO-8601 format without the offset.
+
+*Example*
+
+------------------------
+ds.datetime.toLocalDateTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
+------------------------
+.Result:
+------------------------
+2019-07-04T21:00:00
+------------------------
+
+## localdatetime
+
+### `now()`
+Returns the current date/time from the system UTC clock in ISO-8601 format without a time zone.
+
+*Example*
+
+------------------------
+{
+    currentLocalTime: ds.localdatetime.now()
+}
+------------------------
+
+.Result:
+------------------------
+{
+    "currentLocalTime": "2019-08-19T18:58:38.313"
+}
+------------------------
+
+### `offset(string datetime, string period)`
+Returns a copy of this datetime with the specified amount added. The `datetime` parameter is in the ISO-8601 format without an offset.
+The `period` is a string in the ISO-8601 period format.
+
+*Example*
+
+------------------------
+ds.localdatetime.offset("2019-07-22T21:00:00", "P1Y1D")
+------------------------
+.Result:
+------------------------
+2020-07-23T21:00:00
+------------------------
+
+### `format(string datetime, string inputFormat, string outputFormat)`
+Reformats a local date-time string.
+
+*Example*
+
+------------------------
+ds.localdatetime.format("2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss", "d MMM uuuu")
+------------------------
+.Result:
+------------------------
+4 Jul 2019
+------------------------
+
+### `compare(string datetime1, string format1, string datetime2, string format2)`
+Returns `1` if `datetime1 > datetime2`, `-1` if `datetime1 < datetime2`, and `0` if `datetime1 == datetime2`.
+The `format1` and `format2` parameters must not have an offset or time zone.
+
+*Example*
+
+------------------------
+ds.localdatetime.compare("2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss", "2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss")
+------------------------
+.Result:
+------------------------
+0
+------------------------
+
+## jsonpath
+
+### `select(object json, string path)`
+
+Evaluates JsonPath expression and returns the resulting JSON object.
+It uses the https://github.com/json-path/JsonPath[Jayway JsonPath implementation] and fully supports https://goessner.net/articles/JsonPath/[JsonPath specification].
 
 *Example*
 
 .Payload
-----------
-[
-    {
-      "language": {
-        "name": "Java8",
-        "version": "1.8"
+------------------------
+{
+  "store": {
+    "book": [
+      {
+        "category": "reference",
+        "author": "Nigel Rees",
+        "title": "Sayings of the Century",
+        "price": 8.95
+      },
+      {
+        "category": "fiction",
+        "author": "Evelyn Waugh",
+        "title": "Sword of Honour",
+        "price": 12.99
+      },
+      {
+        "category": "fiction",
+        "author": "Herman Melville",
+        "title": "Moby Dick",
+        "isbn": "0-553-21311-3",
+        "price": 8.99
+      },
+      {
+        "category": "fiction",
+        "author": "J. R. R. Tolkien",
+        "title": "The Lord of the Rings",
+        "isbn": "0-395-19395-8",
+        "price": 22.99
       }
-    },
-    {
-      "language": {
-        "name": "Java8",
-        "version": "1.8.0"
-      }
-    },
-    {
-      "language": {
-        "name": "Scala",
-        "version": "2.13.0"
-      }
-    }
-]
-----------
+    ]
+  }
+}
+------------------------
 .DataSonnet map:
 ------------------------
-DS.Util.duplicates(payload, function(x) x.language.name)
+{
+    author: ds.jsonpath.select(payload, "$..book[-2:]..author")[0]
+}
 ------------------------
 .Result
 ------------------------
-[
-  {
-    "language": {
-      "name": "Java8",
-      "version":"1.8.0"
-    }
-  }
-]
+{
+    "author": "Herman Melville"
+}
 ------------------------
+
+## math
 
 ### `sum(array arr)`
 Returns sum of all elements in the array.
@@ -658,7 +419,7 @@ Returns sum of all elements in the array.
 ----------
 .DataSonnet map:
 ------------------------
-DS.Util.sum(payload)
+ds.math.sum(payload)
 ------------------------
 .Result
 ------------------------
@@ -678,111 +439,14 @@ Rounds a double to the number of digits after the decimal point
 ----------
 .DataSonnet map:
 ------------------------
-DS.Util.round(payload.num, 6)
+ds.math.round(payload.num, 6)
 ------------------------
 .Result
 ------------------------
 123.562568
 ------------------------
 
-### `counts(array arr, function keyF=id)`
-Returns an object where keys are the results of calling keyF on the values, and the values are the counts of values that produced the corresponding key.
-
-*Example*
-
-.Payload
-----------
-[
-    {
-      "name": "Foo",
-      "language": {
-        "name": "Java",
-        "version": "1.8"
-      }
-    },
-    {
-      "name": "Bar",
-      "language": {
-        "name": "Scala",
-        "version": "1.0"
-      }
-    },
-    {
-      "name": "FooBar",
-      "language": {
-        "name": "Java",
-        "version": "1.7"
-      }
-    }
-  ]
-----------
-.DataSonnet map:
-------------------------
-DS.Util.counts(payload, function(x) x.language.name);
-------------------------
-.Result
-------------------------
-{
-    "Java": 2,
-    "Scala": 1
-}
-------------------------
-
-### `mapToObject(arr, keyF, valueF=id)`
-Maps an array into an object, where the keys are the result of calling keyF on each value (which becomes the value at the key). If valueF is provided it gets run on the value. Duplicate keys are removed.
-
-*Example*
-
-.Payload
-----------
-[
-    {
-      "name": "Foo",
-      "language": {
-        "name": "Java",
-        "version": "1.8"
-      }
-    },
-    {
-      "name": "Bar",
-      "language": {
-        "name": "Scala",
-        "version": "1.0"
-      }
-    },
-    {
-      "name": "FooBar",
-      "language": {
-        "name": "C++",
-        "version": "n/a"
-      }
-    }
-  ]
-
-----------
-.DataSonnet map:
-------------------------
-DS.Util.mapToObject(payload, function(x) x.language.name, function(v) v.language);
-------------------------
-.Result
-------------------------
-{
- "Java": {
-   "name": "Java",
-   "version": "1.8"
- },
- "C++": {
-   "name": "C++",
-   "version": "n/a"
- },
- "Scala": {
-   "name": "Scala",
-   "version": "1.0"
- }
-};
-------------------------
-
-## Regex
+## regex
 
 ### `regexFullMatch(string pattern, string input)`
 Matches the entire input against the pattern (anchored start and end). If there's no match, returns `null`. If there's a match, returns a JSON object which has the following structure:
@@ -795,18 +459,18 @@ Matches the entire input against the pattern (anchored start and end). If there'
 
 .DataSonnet map:
 ------------------------
-DS.Regex.regexFullMatch(@'h(?P<mid>.*)o', 'hello');
+ds.regex.regexFullMatch(@'h(?P<mid>.*)o', 'hello')
 ------------------------
 .Result
 ------------------------
 {
+  "string": "hello",
   "captures": [
     "ell"
   ],
   "namedCaptures": {
     "mid": "ell"
-  },
-  "string": "hello"
+  }
 }
 ------------------------
 
@@ -821,18 +485,18 @@ Matches the input against the pattern (unanchored). If there's no match, returns
 
 .DataSonnet map:
 ------------------------
-DS.Regex.regexPartialMatch(@'e(?P<mid>.*)o', 'hello')
+ds.regex.regexPartialMatch(@'e(?P<mid>.*)o', 'hello')
 ------------------------
 .Result
 ------------------------
 {
+  "string": "ello",
   "captures": [
     "ll"
   ],
   "namedCaptures": {
     "mid": "ll"
-  },
-  "string": "ello"
+  }
 }
 ------------------------
 
@@ -847,33 +511,33 @@ Finds all matches of the input against the pattern. If there are any matches, re
 
 .DataSonnet map:
 ------------------------
-DS.Regex.regexScan(@'(?P<user>[a-z]*)@(?P<domain>[a-z]*).org', 'modus@datasonnet.org,box@datasonnet.org')
+ds.regex.regexScan(@'(?P<user>[a-z]*)@(?P<domain>[a-z]*).org', 'modus@datasonnet.org,box@datasonnet.org')
 ------------------------
 .Result
 ------------------------
 [
-    {
-        "captures": [
-            "modus",
-            "datasonnet"
-        ],
-        "namedCaptures": {
-            "domain": "datasonnet",
-            "user": "modus"
-        },
-        "string": "modus@datasonnet.org"
-    },
-    {
-        "captures": [
-            "box",
-            "datasonnet"
-        ],
-        "namedCaptures": {
-            "domain": "datasonnet",
-            "user": "box"
-        },
-        "string": "box@datasonnet.org"
+  {
+    "string": "modus@datasonnet.org",
+    "captures": [
+      "modus",
+      "datasonnet"
+    ],
+    "namedCaptures": {
+      "domain": "datasonnet",
+      "user": "modus"
     }
+  },
+  {
+    "string": "box@datasonnet.org",
+    "captures": [
+      "box",
+      "datasonnet"
+    ],
+    "namedCaptures": {
+      "domain": "datasonnet",
+      "user": "box"
+    }
+  }
 ]
 ------------------------
 
@@ -884,7 +548,7 @@ Returns a literal pattern string for the specified string.
 
 .DataSonnet map:
 ------------------------
-DS.Regex.regexQuoteMeta(@'1.5-2.0?')
+ds.regex.regexQuoteMeta(@'1.5-2.0?')
 ------------------------
 .Result
 ------------------------
@@ -898,7 +562,7 @@ Returns the input with the first match replaced by `replacement` string.
 
 .DataSonnet map:
 ------------------------
-DS.Regex.regexReplace('wishyfishyisishy', @'ish', 'and')
+ds.regex.regexReplace('wishyfishyisishy', @'ish', 'and')
 ------------------------
 .Result
 ------------------------
@@ -912,34 +576,14 @@ Returns the input with all matches replaced by `replacement` string.
 
 .DataSonnet map:
 ------------------------
-DS.Regex.regexGlobalReplace('wishyfishyisishy', @'ish', 'and')
+ds.regex.regexGlobalReplace('wishyfishyisishy', @'ish', 'and')
 ------------------------
 .Result
 ------------------------
 "wandyfandyisandy"
 ------------------------
 
-### `regexGlobalReplace(string str, string pattern, function replacement)`
-Returns the input with all matches replaced by the result of the `replacement` function. The function must return string result and take a single object as an argument in the following structure:
-
-- `string` - the matched string;
-- `captures` - array of captured subgroups in the match, if any;
-- `namedCaptures` - map of named subgroups, if any;
-
-*Example*
-
-.DataSonnet map:
-------------------------
-local square(obj) = std.toString(std.pow(std.parseInt(obj.string), 2));
-
-DS.Regex.regexGlobalReplace("xxx2yyy4zzz6aaa", "\\d", square)
-------------------------
-.Result
-------------------------
-"xxx4yyy16zzz36aaa"
-------------------------
-
-## URL
+## url
 
 ### `encode(string data, string encoding="UTF-8")`
 
@@ -949,7 +593,7 @@ Translates a string into `application/x-www-form-urlencoded` format using the su
 
 .DataSonnet map:
 ------------------------
-DS.URL.encode('Hello World')
+ds.url.encode('Hello World')
 ------------------------
 .Result
 ------------------------
@@ -964,7 +608,7 @@ Decodes a application/x-www-form-urlencoded string using a specific encoding sch
 
 .DataSonnet map:
 ------------------------
-DS.URL.decode('Hello+World')
+ds.url.decode('Hello+World')
 ------------------------
 .Result
 ------------------------
