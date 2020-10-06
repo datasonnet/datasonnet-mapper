@@ -4,8 +4,348 @@
 
 ## core
 
+### `append(array arr, any value)`
+Given an array and a value, appends the value to the end of the array.
+
+*Example*
+
+.Payload
+----------
+[
+    2,
+    3,
+    5,
+    7
+]
+----------
+.DataSonnet map:
+------------------------
+ds.append(payload, 11)
+------------------------
+.Result
+------------------------
+[
+  2,
+  3,
+  5,
+  7,
+  11
+]
+------------------------
+
+### `combine(any first, any second)`
+Combines the two values given. Some values will auto-coerce, e.g. the number 5 will auto coerce to the string "5."
+
+*Example*
+
+.Payload
+----------
+[
+    {
+        "name": "Java"
+    },
+    {
+        "version": "1.8"
+    }
+]
+----------
+.DataSonnet map:
+------------------------
+{
+    "language": ds.combine(payload[0], payload[1])
+}
+------------------------
+.Result
+------------------------
+{
+  "language": {
+    "name": "Java",
+    "version": "1.8"
+  }
+}
+------------------------
+
+### `contains(array|string item, any value)`
+Returns true if the array contains the given value or if the string contains the value sub string.
+
+*Example*
+
+.Payload
+----------
+[
+    2,
+    3,
+    5,
+    7
+]
+----------
+.DataSonnet map:
+------------------------
+ds.contains(payload, 2)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `distinctBy(array|object item, function discriminator)`
+Returns a new object containing only the items that are a unique result from the provided function.
+
+*Example*
+
+.Payload
+----------
+[
+    1,
+    1,
+    2,
+    2,
+    3,
+    3,
+    4,
+    4,
+    5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.distinctBy(payload, function(item,index) item)
+------------------------
+.Result
+------------------------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+------------------------
+
+### `endsWith(string str, string subStr)`
+Returns true if the given string ends with the substring. Ignores casing.
+
+*Example*
+
+.Payload
+----------
+{
+    "name": "Scala",
+    "version": "1.0"
+}
+----------
+.DataSonnet map:
+------------------------
+ds.endsWith(payload.version, ".0")
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `entriesOf(object obj)`
+Returns an array of objects describing each key value pair.
+
+*Example*
+
+.Payload
+----------
+{
+    "name": "Scala",
+    "version": "1.0"
+}
+----------
+.DataSonnet map:
+------------------------
+ds.entriesOf(payload)
+------------------------
+.Result
+------------------------
+[
+  {
+    "value": "Scala",
+    "key": "name"
+  },
+  {
+    "value": "1.0",
+    "key": "version"
+  }
+]
+------------------------
+
+### `filter(array arr, function provFunc)`
+Filters an array depending on the result of the provided function.
+
+*Example*
+
+.Payload
+----------
+[
+    1,
+    2,
+    3,
+    4
+]
+----------
+.DataSonnet map:
+------------------------
+ds.filter(payload, function(item,index) item < 3)
+------------------------
+.Result
+------------------------
+[
+  1,
+  2
+]
+------------------------
+
+### `filterObject(object obj, function provFunc)`
+Filters an object depending on the result of the provided function.
+
+*Example*
+
+.Payload
+----------
+{
+    "version": 1.7
+}
+----------
+.DataSonnet map:
+------------------------
+ds.filterObject(payload, function(value,key,index) value > 1.5)
+------------------------
+.Result
+------------------------
+{
+  "version": 1.7
+}
+------------------------
+
+### `find(string|array item, any value)`
+Returns an array containing the location where the value occurs.
+
+*Example*
+
+.Payload
+----------
+[
+    2,
+    3,
+    5,
+    7
+]
+----------
+.DataSonnet map:
+------------------------
+ds.find(payload, 2)
+------------------------
+.Result
+------------------------
+[
+  0
+]
+------------------------
+
+### `flatMap(array arr, function provFunction)`
+Given an array of arrays, creates a flat array using the outcome of the provided function.
+
+*Example*
+
+.Payload
+----------
+[
+    [
+        2,
+        3,
+        5,
+        7
+    ],
+    [
+        11,
+        13,
+        17,
+        19
+    ]
+]
+----------
+.DataSonnet map:
+------------------------
+ds.flatMap(payload, function(item,index) item)
+------------------------
+.Result
+------------------------
+[
+  2,
+  3,
+  5,
+  7,
+  11,
+  13,
+  17,
+  19
+]
+------------------------
+
+### `foldLeft(array arr, function func, any initVal)`
+Iterates over an array, applying the function to the previous result.
+
+*Example*
+
+.Payload
+----------
+[
+    1,
+    2,
+    3,
+    4
+]
+----------
+.DataSonnet map:
+------------------------
+ds.foldLeft(payload, function(curr,prev) curr * prev, 1)
+------------------------
+.Result
+------------------------
+24
+/*
+  1 * 1 = 1
+  2 * 1 = 2
+  3 * 2 = 6
+  4 * 6 = 24
+*/
+------------------------
+
+### `foldRight(array arr, function func, any initVal)`
+Iterates backwards over an array, applying the function to the previous result.
+
+*Example*
+
+.Payload
+----------
+[
+    1,
+    2,
+    3,
+    4
+]
+----------
+.DataSonnet map:
+------------------------
+ds.foldRight(payload, function(curr,prev) curr * prev, 1)
+------------------------
+.Result
+------------------------
+24
+/*
+  4 * 1 = 4 // 1 in this case is the initial value
+  3 * 4 = 12
+  2 * 12 = 24
+  1 * 24 = 24
+*/
+------------------------
+
 ### `groupBy(array|object items, function discriminator)`
-Groups the provided items into an object based on the function discriminator.
+Groups the provided items into an object based on the result of the provided function.
 
 *Example*
 
@@ -76,8 +416,385 @@ Groups the provided items into an object based on the function discriminator.
 }
 ------------------------
 
-### `remove(object obj, string keyName)`
-Removes a property with given name from the object and returns the remaining object
+### `isArray(any val)`
+Accepts any given value and checks if it is of type array.
+
+*Example*
+
+.Payload
+----------
+[
+    1,
+    2,
+    3,
+    4
+]
+----------
+.DataSonnet map:
+------------------------
+ds.isArray(payload)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `isBlank(string str)`
+Checks if a string is blank. Also returns true if null.
+
+*Example*
+
+.Payload
+----------
+{
+   "airlineName": ""
+}
+----------
+.DataSonnet map:
+------------------------
+ds.isBlank(payload.airlineName)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `isBoolean(any val)`
+Accepts any given value and checks if it is of type bool.
+
+*Example*
+
+.Payload
+----------
+{
+  "name": "Java",
+  "isObjectOriented": true
+}
+----------
+.DataSonnet map:
+------------------------
+ds.isBoolean(payload.isObjectOriented)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `isDecimal(num numToCheck)`
+Checks that the input number is a decimal number. Trailing zeros do not count
+
+*Example*
+
+.Payload
+----------
+{
+  "name": "Java",
+  "version": 1.8
+}
+----------
+.DataSonnet map:
+------------------------
+ds.isDecimal(payload.version)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `isEmpty(any val)`
+Checks if a given value is empty. Does not ignore white space if string. Returns true if null.
+
+*Example*
+
+.Payload
+----------
+[]
+----------
+.DataSonnet map:
+------------------------
+ds.isEmpty(payload)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `isEven(num numToCheck)`
+Checks that the input number is an even number.
+
+*Example*
+
+.Payload
+----------
+{
+    "version": 2.0
+}
+----------
+.DataSonnet map:
+------------------------
+ds.isEven(payload.version)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `isFunction(any valToCheck)`
+Accepts any given value and checks if it is of type function.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.isFunction(function() "5")
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `isInteger(num numToCheck)`
+Checks that the input number is an integer.
+
+*Example*
+
+.Payload
+----------
+{
+    "version": 2.0
+}
+----------
+.DataSonnet map:
+------------------------
+ds.isInteger(payload.version)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `isNumber(any valToCheck)`
+Accepts any given value and checks if it is of type number.
+
+*Example*
+
+.Payload
+----------
+{
+    "age": 5
+}
+----------
+.DataSonnet map:
+------------------------
+ds.isNumber(payload.age)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `isObject(any valToCheck)`
+Accepts any given value and checks if it is of type object.
+
+*Example*
+
+.Payload
+----------
+{
+    "language": "Java"
+}
+----------
+.DataSonnet map:
+------------------------
+ds.isObject(payload)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `isOdd(num numToCheck)`
+Checks that the input number is an odd number.
+
+*Example*
+
+.Payload
+----------
+{
+    "age": 5
+}
+----------
+.DataSonnet map:
+------------------------
+ds.isOdd(payload.age)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `isString(any valToCheck)`
+Accepts any given value and checks if it is of type string.
+
+*Example*
+
+.Payload
+----------
+{
+    "language":"Java"
+}
+----------
+.DataSonnet map:
+------------------------
+ds.isString(payload.language)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `joinBy(array arr, string separator)`
+Joins an entire array into a string with the provided seperator.
+
+*Example*
+
+.Payload
+----------
+{
+    "versions": [1.0, 1.2, 1.7, 1.8]
+}
+----------
+.DataSonnet map:
+------------------------
+ds.joinBy(payload.versions, ", ")
+------------------------
+.Result
+------------------------
+"1, 1.2, 1.7, 1.8"
+------------------------
+
+### `keysOf(object obj)`
+Returns an array of all the key names in a given object.
+
+*Example*
+
+.Payload
+----------
+{
+   "departureDate": "01/20/2019",
+   "origin": "PHX",
+   "destination": "SEA"
+ }
+----------
+.DataSonnet map:
+------------------------
+ds.keysOf(payload)
+------------------------
+.Result
+------------------------
+[
+  "departureDate",
+  "origin",
+  "destination"
+]
+------------------------
+
+### `lower(string str)`
+Converts a string to all lower case characters.
+
+*Example*
+
+.Payload
+----------
+{
+   "origin": "PHX",
+   "destination": "SEA"
+ }
+----------
+.DataSonnet map:
+------------------------
+ds.lower(payload.origin)
+------------------------
+.Result
+------------------------
+"phx"
+------------------------
+
+### `map(array arrToMap, function func)`
+Loops through all items in a given array, applys the function to each, and returns a new array containing each result. Returns null if array is null.
+
+*Example*
+
+.Payload
+----------
+{
+    "versions": [1.0, 1.2, 1.7, 1.8]
+}
+----------
+.DataSonnet map:
+------------------------
+ds.map(payload.versions, function(item,index) item > 1.2)
+------------------------
+.Result
+------------------------
+[
+  false,
+  false,
+  true,
+  true
+]
+------------------------
+
+### `mapEntries(object obj, function func)`
+Loops through all properties in a given object applying the function to each and returns a new array containing each result.
+
+*Example*
+
+.Payload
+----------
+{
+   "origin": "PHX",
+   "destination": "SEA"
+ }
+----------
+.DataSonnet map:
+------------------------
+ds.mapEntries(payload, function(value,key,index) value)
+------------------------
+.Result
+------------------------
+[
+  "PHX",
+  "SEA"
+]
+------------------------
+
+### `mapObject(object obj, function func)`
+Loops through all properties in a given object applying the function to each and returns a new object containing each result.
+
+*Example*
+
+.Payload
+----------
+{
+   "origin": "PHX",
+   "destination": "SEA"
+}
+----------
+.DataSonnet map:
+------------------------
+ds.mapObject(payload, function(value,key,index) {[key]:value})
+------------------------
+.Result
+------------------------
+{
+  "origin": "PHX",
+  "destination": "SEA"
+}
+------------------------
+
+### `remove(object obj, string propName)`
+Removes a property with the given name from the object and returns the remaining object.
 
 *Example*
 
@@ -233,7 +950,17 @@ ds.datetime.format("2019-07-04T21:00:00Z", "yyyy-MM-dd'T'HH:mm:ssVV", "d MMM uuu
 ------------------------
 
 ### `compare(string datetime1, string format1, string datetime2, string format2)`
-Returns 1 if datetime1 > datetime2, -1 if datetime1 < datetime2, 0 if datetime1 == datetime2.
+Returns `1` if `datetime1 > datetime2`, `-1` if `datetime1 < datetime2`, and `0` if `datetime1 == datetime2`.
+
+*Example*
+
+------------------------
+ds.datetime.compare("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ", "2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
+------------------------
+.Result
+------------------------
+0
+------------------------
 
 ### `changeTimeZone(string datetime, string format, string timezone)`
 Changes the date timezone, retaining the instant. This normally results in a change to the local date-time.
