@@ -4,8 +4,8 @@
 
 ## core
 
-### `append(array arr, any value)`
-Given an array and a value, appends the value to the end of the array.
+### `append(array arr, any val)`
+Given `arr` and `val`, appends `val` to the end of `arr`.
 
 *Example*
 
@@ -34,7 +34,7 @@ ds.append(payload, 11)
 ------------------------
 
 ### `combine(any first, any second)`
-Combines the two values given. Some values will auto-coerce, e.g. the number 5 will auto coerce to the string "5."
+Combines `first` and `second`. Some values will auto-coerce, e.g. the number 5 will auto coerce to the string "5."
 
 *Example*
 
@@ -65,8 +65,10 @@ Combines the two values given. Some values will auto-coerce, e.g. the number 5 w
 }
 ------------------------
 
-### `contains(array|string item, any value)`
-Returns true if the array contains the given value or if the string contains the value sub string.
+### `contains(array|string item, any val)`
+If `item` is an array, returns true if `item` contains `val`.
+
+If `item` is a string, returns true if `item` contains the sub string `val`.
 
 *Example*
 
@@ -89,7 +91,9 @@ true
 ------------------------
 
 ### `distinctBy(array|object item, function discriminator)`
-Returns a new object containing only the items that are a unique result from the provided function.
+Returns a new object containing only the items that are a unique result from `discriminator`.
+
+The function `discriminator` is expected to take the value as the first parameter (required) and the index as the second (optional).
 
 *Example*
 
@@ -109,7 +113,7 @@ Returns a new object containing only the items that are a unique result from the
 ----------
 .DataSonnet map:
 ------------------------
-ds.distinctBy(payload, function(item,index) item)
+ds.distinctBy(payload, function(value, index) value)
 ------------------------
 .Result
 ------------------------
@@ -123,7 +127,7 @@ ds.distinctBy(payload, function(item,index) item)
 ------------------------
 
 ### `endsWith(string str, string subStr)`
-Returns true if the given string ends with the substring. Ignores casing.
+Returns true if `str` ends with `subStr`. Ignores casing.
 
 *Example*
 
@@ -144,7 +148,7 @@ true
 ------------------------
 
 ### `entriesOf(object obj)`
-Returns an array of objects describing each key value pair.
+Returns an array of objects describing each key value pair of `obj`.
 
 *Example*
 
@@ -173,8 +177,10 @@ ds.entriesOf(payload)
 ]
 ------------------------
 
-### `filter(array arr, function provFunc)`
-Filters an array depending on the result of the provided function.
+### `filter(array arr, function func)`
+Filters `arr` depending on the result of `func`.
+
+The function `func` is expected to take the value as the first parameter (required) and the index as the second (optional).
 
 *Example*
 
@@ -189,7 +195,7 @@ Filters an array depending on the result of the provided function.
 ----------
 .DataSonnet map:
 ------------------------
-ds.filter(payload, function(item,index) item < 3)
+ds.filter(payload, function(value, index) value < 3)
 ------------------------
 .Result
 ------------------------
@@ -199,8 +205,10 @@ ds.filter(payload, function(item,index) item < 3)
 ]
 ------------------------
 
-### `filterObject(object obj, function provFunc)`
-Filters an object depending on the result of the provided function.
+### `filterObject(object obj, function func)`
+Filters `obj` depending on the result of `func`.
+
+The function `func` is expected to take the property value as the first parameter (required), the property key as the second (optional) and the index as the third (optional).
 
 *Example*
 
@@ -212,7 +220,7 @@ Filters an object depending on the result of the provided function.
 ----------
 .DataSonnet map:
 ------------------------
-ds.filterObject(payload, function(value,key,index) value > 1.5)
+ds.filterObject(payload, function(value, key, index) value > 1.5)
 ------------------------
 .Result
 ------------------------
@@ -221,8 +229,8 @@ ds.filterObject(payload, function(value,key,index) value > 1.5)
 }
 ------------------------
 
-### `find(string|array item, any value)`
-Returns an array containing the location where the value occurs.
+### `find(string|array item, any val)`
+Returns an array containing the location where `val` occurs in `item`.
 
 *Example*
 
@@ -246,8 +254,10 @@ ds.find(payload, 2)
 ]
 ------------------------
 
-### `flatMap(array arr, function provFunction)`
-Given an array of arrays, creates a flat array using the outcome of the provided function.
+### `flatMap(array arr, function func)`
+Given an array of arrays `arr`, creates a flat array using the outcome of `func`.
+
+The function `func` is expected to take the value as the first parameter (required) and the index as the second (optional).
 
 *Example*
 
@@ -270,7 +280,7 @@ Given an array of arrays, creates a flat array using the outcome of the provided
 ----------
 .DataSonnet map:
 ------------------------
-ds.flatMap(payload, function(item,index) item)
+ds.flatMap(payload, function(value, index) value)
 ------------------------
 .Result
 ------------------------
@@ -287,7 +297,9 @@ ds.flatMap(payload, function(item,index) item)
 ------------------------
 
 ### `foldLeft(array arr, function func, any initVal)`
-Iterates over an array, applying the function to the previous result.
+Iterates over `arr`, applying `func` to the previous result. Starts with the value provided in `initVal`.
+
+The function `func` is expected to take the current value as the first parameter (required) and the previous value as the second parameter (required).
 
 *Example*
 
@@ -302,7 +314,7 @@ Iterates over an array, applying the function to the previous result.
 ----------
 .DataSonnet map:
 ------------------------
-ds.foldLeft(payload, function(curr,prev) curr * prev, 1)
+ds.foldLeft(payload, function(curr, prev) curr * prev, 1)
 ------------------------
 .Result
 ------------------------
@@ -316,7 +328,9 @@ ds.foldLeft(payload, function(curr,prev) curr * prev, 1)
 ------------------------
 
 ### `foldRight(array arr, function func, any initVal)`
-Iterates backwards over an array, applying the function to the previous result.
+Iterates backwards over an array, applying `func` to the previous result. Starts with the value provided in `initVal`.
+
+The function `func` is expected to take the current value as the first parameter (required) and the previous value as the second parameter (required).
 
 *Example*
 
@@ -331,7 +345,7 @@ Iterates backwards over an array, applying the function to the previous result.
 ----------
 .DataSonnet map:
 ------------------------
-ds.foldRight(payload, function(curr,prev) curr * prev, 1)
+ds.foldRight(payload, function(curr, prev) curr * prev, 1)
 ------------------------
 .Result
 ------------------------
@@ -345,7 +359,9 @@ ds.foldRight(payload, function(curr,prev) curr * prev, 1)
 ------------------------
 
 ### `groupBy(array|object items, function discriminator)`
-Groups the provided items into an object based on the result of the provided function.
+Groups the provided `items` into an object based on the result of `discriminator`.
+
+The function `discriminator` is expected to take the value as the first parameter (required) and the index as the second (optional).
 
 *Example*
 
@@ -380,7 +396,7 @@ Groups the provided items into an object based on the result of the provided fun
 .DataSonnet map:
 ------------------------
 {
-  languageGroups: ds.groupBy(payload.languages, function(item,index) item.language.name)
+  languageGroups: ds.groupBy(payload.languages, function(value, index) value.language.name)
 }
 ------------------------
 .Result
@@ -416,8 +432,8 @@ Groups the provided items into an object based on the result of the provided fun
 }
 ------------------------
 
-### `isArray(any val)`
-Accepts any given value and checks if it is of type array.
+### `isArray(any valToCheck)`
+Accepts any given value as `valToCheck` and checks if it is of type array.
 
 *Example*
 
@@ -439,8 +455,8 @@ ds.isArray(payload)
 true
 ------------------------
 
-### `isBlank(string str)`
-Checks if a string is blank. Also returns true if null.
+### `isBlank(string strToCheck)`
+Checks if `strToCheck` is blank. Also returns true if null.
 
 *Example*
 
@@ -459,8 +475,8 @@ ds.isBlank(payload.airlineName)
 true
 ------------------------
 
-### `isBoolean(any val)`
-Accepts any given value and checks if it is of type bool.
+### `isBoolean(any valToCheck)`
+Accepts any given value as `valToCheck` and checks if it is of type bool.
 
 *Example*
 
@@ -481,7 +497,7 @@ true
 ------------------------
 
 ### `isDecimal(num numToCheck)`
-Checks that the input number is a decimal number. Trailing zeros do not count
+Checks that the input number `numToCheck` is a decimal number. Trailing zeros do not count.
 
 *Example*
 
@@ -501,8 +517,8 @@ ds.isDecimal(payload.version)
 true
 ------------------------
 
-### `isEmpty(any val)`
-Checks if a given value is empty. Does not ignore white space if string. Returns true if null.
+### `isEmpty(any valToCheck)`
+Checks if `valToCheck` is empty. Does not ignore white space if string. Returns true if null.
 
 *Example*
 
@@ -520,7 +536,7 @@ true
 ------------------------
 
 ### `isEven(num numToCheck)`
-Checks that the input number is an even number.
+Checks that the input number `numToCheck` is an even number.
 
 *Example*
 
@@ -540,7 +556,7 @@ true
 ------------------------
 
 ### `isFunction(any valToCheck)`
-Accepts any given value and checks if it is of type function.
+Accepts any given value `valToCheck` and checks if it is of type function.
 
 *Example*
 
@@ -554,7 +570,9 @@ true
 ------------------------
 
 ### `isInteger(num numToCheck)`
-Checks that the input number is an integer.
+Checks that the input number `numToCheck` is an integer.
+The number passed drops trailing zeros, so `2.0` would be `true`
+but `2.1` would be `false`.
 
 *Example*
 
@@ -574,7 +592,7 @@ true
 ------------------------
 
 ### `isNumber(any valToCheck)`
-Accepts any given value and checks if it is of type number.
+Accepts any given value `valToCheck` and checks if it is of type number.
 
 *Example*
 
@@ -594,7 +612,7 @@ true
 ------------------------
 
 ### `isObject(any valToCheck)`
-Accepts any given value and checks if it is of type object.
+Accepts any given value `valToCheck` and checks if it is of type object.
 
 *Example*
 
@@ -614,7 +632,7 @@ true
 ------------------------
 
 ### `isOdd(num numToCheck)`
-Checks that the input number is an odd number.
+Checks that `numToCheck` is an odd number.
 
 *Example*
 
@@ -634,7 +652,7 @@ true
 ------------------------
 
 ### `isString(any valToCheck)`
-Accepts any given value and checks if it is of type string.
+Accepts any given value `valToCheck` and checks if it is of type string.
 
 *Example*
 
@@ -654,7 +672,7 @@ true
 ------------------------
 
 ### `joinBy(array arr, string separator)`
-Joins an entire array into a string with the provided seperator.
+Joins `arr` into a string with the provided `separator`.
 
 *Example*
 
@@ -674,7 +692,7 @@ ds.joinBy(payload.versions, ", ")
 ------------------------
 
 ### `keysOf(object obj)`
-Returns an array of all the key names in a given object.
+Returns an array of all the key names in `obj`.
 
 *Example*
 
@@ -700,7 +718,7 @@ ds.keysOf(payload)
 ------------------------
 
 ### `lower(string str)`
-Converts a string to all lower case characters.
+Converts `str` to all lower case characters.
 
 *Example*
 
@@ -720,8 +738,10 @@ ds.lower(payload.origin)
 "phx"
 ------------------------
 
-### `map(array arrToMap, function func)`
-Loops through all items in a given array, applys the function to each, and returns a new array containing each result. Returns null if array is null.
+### `map(array arr, function func)`
+Loops through all items in `arr`, applies `func` to each, and returns a new array containing each result. Returns null if `arr` is null.
+
+The function `func` is expected to take the value as the first parameter (required) and the index as the second (optional).
 
 *Example*
 
@@ -733,7 +753,7 @@ Loops through all items in a given array, applys the function to each, and retur
 ----------
 .DataSonnet map:
 ------------------------
-ds.map(payload.versions, function(item,index) item > 1.2)
+ds.map(payload.versions, function(value, index) value > 1.2)
 ------------------------
 .Result
 ------------------------
@@ -746,7 +766,9 @@ ds.map(payload.versions, function(item,index) item > 1.2)
 ------------------------
 
 ### `mapEntries(object obj, function func)`
-Loops through all properties in a given object applying the function to each and returns a new array containing each result.
+Loops through all properties in `obj`, applies `func` to each, and returns a new array containing each result.
+
+The function `func` is expected to take the property value as the first parameter (required), the property key as the second (optional) and the index as the third (optional).
 
 *Example*
 
@@ -755,11 +777,11 @@ Loops through all properties in a given object applying the function to each and
 {
    "origin": "PHX",
    "destination": "SEA"
- }
+}
 ----------
 .DataSonnet map:
 ------------------------
-ds.mapEntries(payload, function(value,key,index) value)
+ds.mapEntries(payload, function(value, key, index) value)
 ------------------------
 .Result
 ------------------------
@@ -770,7 +792,7 @@ ds.mapEntries(payload, function(value,key,index) value)
 ------------------------
 
 ### `mapObject(object obj, function func)`
-Loops through all properties in a given object applying the function to each and returns a new object containing each result.
+Loops through all properties in `obj`, applies `func` to each, and returns a new object containing each result.
 
 *Example*
 
@@ -783,7 +805,7 @@ Loops through all properties in a given object applying the function to each and
 ----------
 .DataSonnet map:
 ------------------------
-ds.mapObject(payload, function(value,key,index) {[key]:value})
+ds.mapObject(payload, function(value, key, index) {[key]:value})
 ------------------------
 .Result
 ------------------------
@@ -794,7 +816,7 @@ ds.mapObject(payload, function(value,key,index) {[key]:value})
 ------------------------
 
 ### `remove(object obj, string propName)`
-Removes a property with the given name from the object and returns the remaining object.
+Removes property `propName` from `obj` and returns the remaining object.
 
 *Example*
 
@@ -827,7 +849,7 @@ ds.remove(payload, 'availableSeats')
 ------------------------
 
 ### `reverse(array arr)`
-Returns an array with elements in reverse order.
+Returns an array with elements of `arr` in reverse order.
 
 *Example*
 
@@ -856,7 +878,7 @@ ds.reverse(payload)
 
 ### `parseDouble(string str)`
 
-Parses a string which contains a double number and returns its numeric representation
+Parses a string `str` which contains a double number and returns its numeric representation
 
 *Example*
 
@@ -883,7 +905,7 @@ Parses a string which contains a double number and returns its numeric represent
 ## crypto
 
 ### `hash(string value, string algorithm)`
-Calculates hash of a String value using one of the supported algorithms. The `algorithm` must be one of `MD2`, `MD5`, `SHA-1`, `SHA-256`, `SHA-384`, `SHA-512`
+Calculates hash of `value` using one of the supported algorithms. The `algorithm` must be one of `MD2`, `MD5`, `SHA-1`, `SHA-256`, `SHA-384`, `SHA-512`
 The response is a string containing the hash bytes.
 
 *Example:*
@@ -900,7 +922,7 @@ The response is a string containing the hash bytes.
 }
 ------------------------
 ### `hmac(string value, string secret, string algorithm)`
-Generates hash-based message autentication code using provided secret and a hash function algorithm. The `algoritm` must be one of `HmacSHA1`, `HmacSHA256` or `HmacSHA512`.
+Generates hash-based message authentication code using provided `value`, `secret`, and a hash function `algorithm`. The `algorithm` must be one of `HmacSHA1`, `HmacSHA256` or `HmacSHA512`.
 
 *Example:*
 
@@ -1036,7 +1058,7 @@ Returns the current date/time from the system UTC clock in ISO-8601 format witho
 ------------------------
 
 ### `offset(string datetime, string period)`
-Returns a copy of this datetime with the specified amount added. The `datetime` parameter is in the ISO-8601 format without an offset.
+Returns a copy of `datetime` with the specified amount added. The `datetime` parameter is in the ISO-8601 format without an offset.
 The `period` is a string in the ISO-8601 period format.
 
 *Example*
@@ -1136,7 +1158,7 @@ It uses the https://github.com/json-path/JsonPath[Jayway JsonPath implementation
 ## math
 
 ### `sum(array arr)`
-Returns sum of all elements in the array.
+Returns sum of all elements in `arr`.
 
 *Example*
 
@@ -1154,7 +1176,7 @@ ds.math.sum(payload)
 ------------------------
 
 ### `round(double num, int precision)`
-Rounds a double to the number of digits after the decimal point
+Rounds a double `num` to the number of digits after the decimal point.
 
 *Example*
 
