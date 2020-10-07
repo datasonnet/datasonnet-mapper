@@ -794,6 +794,8 @@ ds.mapEntries(payload, function(value, key, index) value)
 ### `mapObject(object obj, function func)`
 Loops through all properties in `obj`, applies `func` to each, and returns a new object containing each result.
 
+The function `func` is expected to take the property value as the first parameter (required), the property key as the second (optional) and the index as the third (optional).
+
 *Example*
 
 .Payload
@@ -813,6 +815,185 @@ ds.mapObject(payload, function(value, key, index) {[key]:value})
   "origin": "PHX",
   "destination": "SEA"
 }
+------------------------
+
+### `match(string str, string regex)`
+Executes the regex expression `regex` against `str` and returns an array with the match groups.
+
+*Example*
+
+.Payload
+----------
+{
+    "email": "test@server.com"
+}
+----------
+.DataSonnet map:
+------------------------
+ds.match(payload.email, "(.*)@(.*)(.com)")
+------------------------
+.Result
+------------------------
+[
+  "test@server.com",
+  "test",
+  "server",
+  ".com"
+]
+------------------------
+
+### `matches(string str, string regex)`
+Executes the regex expression `regex` against `str` and returns `true` or `false` if the expression matches the input.
+
+*Example*
+
+.Payload
+----------
+{
+    "email": "test@server.com"
+}
+----------
+.DataSonnet map:
+------------------------
+ds.matches(payload.email, "(.*)@(.*)(.com)")
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `max(array arr)`
+Returns the max value in `arr`.
+
+*Example*
+
+.Payload
+----------
+[
+    5,
+    2,
+    7,
+    3
+]
+----------
+.DataSonnet map:
+------------------------
+ds.max(payload)
+------------------------
+.Result
+------------------------
+7
+------------------------
+
+### `maxBy(array arr, function func)`
+Returns the max result of `func` in `arr`.
+
+The function `func` is expected to take the value as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+[
+    {"age": 5},
+    {"age": 7},
+    {"age": 3}
+]
+----------
+.DataSonnet map:
+------------------------
+ds.maxBy(payload, function(value) value.age)
+------------------------
+.Result
+------------------------
+{
+  "age": 7
+}
+------------------------
+
+### `min(array arr)`
+Returns the min value in `arr`.
+
+*Example*
+
+.Payload
+----------
+[
+    5,
+    2,
+    7,
+    3
+]
+----------
+.DataSonnet map:
+------------------------
+ds.min(payload)
+------------------------
+.Result
+------------------------
+2
+------------------------
+
+### `minBy(array arr, function func)`
+Returns the max result of `func` in `arr`.
+
+The function `func` is expected to take the value as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+[
+    {"age": 5},
+    {"age": 7},
+    {"age": 3}
+]
+----------
+.DataSonnet map:
+------------------------
+ds.minBy(payload, function(value) value.age)
+------------------------
+.Result
+------------------------
+{
+  "age": 3
+}
+------------------------
+
+### `orderBy(array|object arr, function func)`
+Reorders the array `arr` by the result of `func`.
+
+If `arr` is an array: the function `func` is expected to take the value as the first parameter (required).
+
+If `arr` is an object: the function `func` is expected to take the value as the first parameter (required) and the key as the second parameter (optional).
+
+*Example*
+
+.Payload
+----------
+[
+    {"age": 5},
+    {"age": 7},
+    {"age": 3}
+]
+----------
+.DataSonnet map:
+------------------------
+ds.orderBy(payload, function(value) value.age)
+------------------------
+.Result
+------------------------
+[
+  {
+    "age": 3
+  },
+  {
+    "age": 5
+  },
+  {
+    "age": 7
+  }
+]
 ------------------------
 
 ### `remove(object obj, string propName)`
