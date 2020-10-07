@@ -958,13 +958,21 @@ ds.minBy(payload, function(value) value.age)
 }
 ------------------------
 
+<<<<<<< HEAD
 ### `orderBy(array|object items, function func)`
 Reorders the array `items` by the result of `func`.
 
 If `items` is an array: the function `func` is expected to take the value as the first parameter (required).
 
 If `items` is an object: the function `func` is expected to take the value as the first parameter (required) and the key as the second parameter (optional).
->>>>>>> Add more core functions
+=======
+### `orderBy(array|object arr, function func)`
+Reorders the array `arr` by the result of `func`.
+
+If `arr` is an array: the function `func` is expected to take the value as the first parameter (required).
+
+If `arr` is an object: the function `func` is expected to take the value as the first parameter (required) and the key as the second parameter (optional).
+>>>>>>> main
 
 *Example*
 
@@ -995,6 +1003,7 @@ ds.orderBy(payload, function(value) value.age)
 ]
 ------------------------
 
+<<<<<<< HEAD
 ### `parseDouble(string str)`
 Parses a string `str` containing a number and returns its decimal value. Trailing zeros are ignored.
 
@@ -1128,7 +1137,8 @@ ds.range(payload.start, payload.end)
 ]
 ------------------------
 
->>>>>>> Add more core functions
+=======
+>>>>>>> main
 ### `remove(object obj, string propName)`
 Removes property `propName` from `obj` and returns the remaining object.
 
