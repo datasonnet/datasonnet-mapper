@@ -70,8 +70,6 @@ public class CoreTest {
         mapper = new Mapper(lib + ".contains(\"Hello World\" , \"[e-g]\")", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("true", value);
-        /* TODO
-         */
     }
 
     @Test
@@ -223,6 +221,11 @@ public class CoreTest {
         mapper = new Mapper(lib + ".groupBy({ \"a\" : \"b\", \"c\" : \"d\", \"e\": \"b\"}, function(value,key) key)\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("{a:{a:b},c:{c:d},e:{e:b}}", value);
+
+        //string cast validation
+        mapper = new Mapper(lib + ".groupBy({ \"a\":1, \"c\" :2, \"e\":3}, function(value) value)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{1:{a:1},2:{c:2},3:{e:3}}", value);
 
     }
 
@@ -561,24 +564,22 @@ public class CoreTest {
         assertEquals("Hello World!", value);
     }
 
-    @Disabled
     @Test
     void test_foldLeft() {
 
-
-        Mapper mapper = new Mapper(lib + ".foldLeft([2,3], function(it,acc) it+acc, 0)\n", new ArrayList<>(), new HashMap<>(), true);
+        Mapper mapper = new Mapper(lib + ".foldLeft([2,3], function(acc,it) it+acc, 0)\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("5", value);
 
-        mapper = new Mapper(lib + ".foldLeft([1,2,3,4], function(it,acc) acc+it, 0)\n", new ArrayList<>(), new HashMap<>(), true);
+        mapper = new Mapper(lib + ".foldLeft([1,2,3,4], function(acc,it) acc+it, 0)\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("10", value);
 
-        mapper = new Mapper(lib + ".foldLeft([1,2,3,4], function(it,acc) acc+\"\"+it,\"\")\n", new ArrayList<>(), new HashMap<>(), true);
+        mapper = new Mapper(lib + ".foldLeft([1,2,3,4], function(acc,it) acc+\"\"+it,\"\")\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("1234", value);
 
-        mapper = new Mapper(lib + ".foldLeft([], function(it,acc) acc+it, null)\n", new ArrayList<>(), new HashMap<>(), true);
+        mapper = new Mapper(lib + ".foldLeft([], function(acc,it) acc+it, null)\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("null", value);
     }
@@ -610,6 +611,17 @@ public class CoreTest {
         Mapper mapper = new Mapper(lib + ".scan(\"anypt@mulesoft.com,max@mulesoft.com\", \"([a-z]*)@([a-z]*).com\")\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[[anypt@mulesoft.com,anypt,mulesoft],[max@mulesoft.com,max,mulesoft]]", value);
+    }
+
+    @Test
+    void test_select() {
+        Mapper mapper = new Mapper(lib + ".select({a:{b:{c:10}}}, \"a.b.c\")\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("10", value);
+
+        mapper = new Mapper(lib + ".select({a:{b:{c:10}}}, \"a.b.d\")\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("null", value);
     }
 
     @Test
@@ -788,6 +800,10 @@ public class CoreTest {
         assertEquals("[2]", value);
 
         mapper = new Mapper(lib + ".remove({a:1,b:2},\"a\")\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{b:2}", value);
+
+        mapper = new Mapper(lib + ".remove({a:1,b:2,c:3},[\"a\",\"c\"])\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("{b:2}", value);
     }

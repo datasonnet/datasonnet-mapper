@@ -72,6 +72,13 @@ public class ArraysTest {
     }
 
     @Test
+    void testArrays_duplicates() {
+        Mapper mapper = new Mapper(lib + pack + ".duplicates([1,2,3,4,5,3,2,1])\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[1,2,3]", value);
+    }
+
+    @Test
     void testArrays_every() {
         Mapper mapper = new Mapper(lib + pack + ".every([1,1,1], function(item) item == 1)\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
@@ -95,6 +102,13 @@ public class ArraysTest {
         mapper = new Mapper(lib + pack + ".firstWith([1,2,3], function(item) (item % 10) == 0)\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("null", value);
+    }
+
+    @Test
+    void testArrays_deepFlatten() {
+        Mapper mapper = new Mapper(lib + pack + ".deepFlatten([[1,2,3,[1,2]], [null,\"a\"]])\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[1,2,3,1,2,null,a]", value);
     }
 
     @Test
@@ -132,6 +146,14 @@ public class ArraysTest {
         Mapper mapper = new Mapper(lib + pack + ".leftJoin([{\"id\":1,\"v\":\"a\"},{\"id\":1,\"v\":\"b\"},{\"id\":2,\"v\":\"d\"}],[{\"id\":1,\"v\":\"c\"},{\"id\":3,\"v\":\"e\"}], function(item) item.id,function(item) item.id)\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[{r:{id:1,v:c},l:{id:1,v:a}},{r:{id:1,v:c},l:{id:1,v:b}},{l:{id:2,v:d}}]", value);
+
+    }
+
+    @Test
+    void testArrays_occurrences() {
+        Mapper mapper = new Mapper(lib + pack + ".occurrences([1,2,3,4,3,2,1,6], function(item) item)\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{1:2,2:2,3:2,4:1,6:1}", value);
 
     }
 

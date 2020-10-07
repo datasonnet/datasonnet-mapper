@@ -418,6 +418,11 @@ object DS extends Library {
         )
     },
 
+    builtin("select", "obj", "path") {
+      (ev, fs, obj: Val.Obj, path: String) =>
+        select(obj,path,ev,fs)
+    },
+
     builtin("sizeOf", "value") {
       (_, _, value: Val) =>
         value match {
@@ -667,15 +672,22 @@ object DS extends Library {
               case arrValue if arrValue.force != value => arrValue
             }))
           case obj: Val.Obj =>
+            new Val.Obj(
             value match {
               case Val.Str(str) =>
-                new Val.Obj(scala.collection.mutable.Map(
+                scala.collection.mutable.Map(
                   obj.getVisibleKeys().keySet.toSeq.collect({
                     case key if key != str =>
                       key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
-                  }): _*), _ => (), None)
-              case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
-            }
+                  }): _*)
+              case Val.Arr(arr) =>
+                scala.collection.mutable.Map(
+                  obj.getVisibleKeys().keySet.toSeq.collect({
+                    case key if !arr.exists(item => item.force.cast[Val.Str] == Val.Str(key)) =>
+                      key -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(key, -1)(fs, ev))
+                  }): _*)
+              case i => throw Error.Delegate("Expected String or Array, got: " + i.prettyName)
+            }, _ => (), None)
           case i => throw Error.Delegate("Expected Array or Object, got: " + i.prettyName)
         }
     },
@@ -1088,6 +1100,16 @@ object DS extends Library {
           Val.Arr(arr.value.dropWhile(funct.apply(_) == Val.True))
       },
 
+      builtin("duplicates", "array") {
+        (_, _, array: Val.Arr) =>
+          val out = mutable.Buffer.empty[Val.Lazy]
+          array.value.collect({
+            case item if array.value.count(_.force == item.force)>=2 &&
+                           !out.exists(_.force == item.force) => out.append(item)
+          })
+          Val.Arr(out.toSeq)
+      },
+
       builtin("every", "value", "funct") {
         (_, _, value: Val, funct: Applyer) =>
           value match {
@@ -1107,6 +1129,11 @@ object DS extends Library {
           else {
             throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
           }
+      },
+
+      builtin("deepFlatten", "arr") {
+        (_, _, arr: Val.Arr) =>
+          Val.Arr(deepFlatten(arr.value))
       },
 
       builtin("indexOf", "array", "value") {
@@ -1182,6 +1209,16 @@ object DS extends Library {
                 _ => (), None))
           ))
           Val.Arr(out.toSeq)
+      },
+
+      builtin("occurrences", "arr", "funct") {
+        (_, _, array: Val.Arr, funct: Applyer) =>
+          new Val.Obj(
+            scala.collection.mutable.Map(
+              array.value
+                .groupBy(item => convertToString(funct.apply(item)))
+                .map(item => item._1 -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Num(item._2.size)).force)).toSeq:
+              _*),_ => (), None)
       },
 
       builtin0("outerJoin", "arrL", "arryR", "functL", "functR") {
@@ -2128,13 +2165,13 @@ object DS extends Library {
     if (args == 2) {
       for( index <- s.indices){
         val item = s(index)
-        val key = funct.apply(item, Val.Lazy(Val.Num(index))).cast[Val.Str]
-        out.getOrElseUpdate(key.value, mutable.IndexedBuffer[Val.Lazy]()).addOne(item)
+        val key = convertToString(funct.apply(item, Val.Lazy(Val.Num(index))))
+        out.getOrElseUpdate(key, mutable.IndexedBuffer[Val.Lazy]()).addOne(item)
       }
     } else if (args == 1) {
       s.foreach({ item =>
-        val key = funct.apply(item).cast[Val.Str]
-        out.getOrElseUpdate(key.value, mutable.IndexedBuffer[Val.Lazy]()).addOne(item)
+        val key = convertToString(funct.apply(item))
+        out.getOrElseUpdate(key, mutable.IndexedBuffer[Val.Lazy]()).addOne(item)
       })
     }
     else {
@@ -2169,15 +2206,15 @@ object DS extends Library {
     if (args == 2) {
       obj.foreachVisibleKey((key,_) =>{
         val item = obj.value(key, -1)(fs, ev)
-        val functKey = funct.apply(Val.Lazy(item), Val.Lazy(Val.Str(key))).cast[Val.Str]
-        out.getOrElseUpdate(functKey.value, mutable.LinkedHashMap[String, Val.Obj.Member]()).addOne(key, Library.memberOf(item))
+        val functKey = convertToString(funct.apply(Val.Lazy(item), Val.Lazy(Val.Str(key))))
+        out.getOrElseUpdate(functKey, mutable.LinkedHashMap[String, Val.Obj.Member]()).addOne(key, Library.memberOf(item))
       })
     }
     else if (args == 1) {
       obj.foreachVisibleKey((key,_)=>{
         val item = obj.value(key, -1)(fs, ev)
-        val functKey = funct.apply(Val.Lazy(item)).cast[Val.Str]
-        out.getOrElseUpdate(functKey.value, mutable.LinkedHashMap[String, Val.Obj.Member]()).addOne(key, Library.memberOf(item))
+        val functKey = convertToString(funct.apply(Val.Lazy(item)))
+        out.getOrElseUpdate(functKey, mutable.LinkedHashMap[String, Val.Obj.Member]()).addOne(key, Library.memberOf(item))
       })
     }
     else {
@@ -2320,4 +2357,47 @@ object DS extends Library {
     Val.Arr(out.toSeq)
   }
 
+  private def deepFlatten(array: Seq[Val.Lazy]): Seq[Val.Lazy] = {
+    array.foldLeft(mutable.Buffer.empty[Val.Lazy])((agg, curr) =>{
+      curr.force match {
+        case Val.Arr(inner) => agg.appendAll(deepFlatten(inner))
+        case _ => agg.append(curr)
+      }
+    }).toSeq
+  }
+
+  private def select(obj: Val.Obj, path: String, ev: EvalScope, fs: FileScope): Val = {
+    val arr = path.split("\\.", 2)
+    try {
+      val objVal = obj.value(arr(0), -1)(fs, ev)
+      if (arr.length > 1) {
+        objVal match {
+          case x: Val.Obj => select(x, arr(1), ev, fs)
+          case _ =>  Val.Lazy(Val.Null).force
+        }
+      }
+      else {
+        objVal
+      }
+    } catch {
+      case _: Error =>
+        Val.Lazy(Val.Null).force
+    }
+  }
+
+  private def convertToString(value: Val): String = {
+    value match {
+      case x: Val.Num =>
+        val tmp = x.value
+        if(tmp.ceil == tmp.floor) tmp.longValue.toString
+        else tmp.toString
+      case x: Val.Str => x.value
+      case Val.Null => "null"
+      case Val.True => "true"
+      case Val.False => "false"
+      case x: Val.Obj => x.toString
+      case x: Val.Arr => x.value.toString()
+      case x: Val.Func => x.toString
+    }
+  }
 }
