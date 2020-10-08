@@ -445,6 +445,11 @@ object DS extends Library {
         str1.toUpperCase().startsWith(str2.toUpperCase());
     },
 
+    builtin("toString", "value") {
+      (_, _, value: Val) =>
+        convertToString(value)
+    },
+
     builtin("trim", "str") {
       (_, _, str: String) =>
         str.trim()
@@ -990,7 +995,7 @@ object DS extends Library {
           (0.0 + (1.0 - 0.0) * Random.nextDouble()).doubleValue()
       },
 
-      builtin("randomint", "num") {
+      builtin("randomInt", "num") {
         (_, _, num: Int) =>
           (Random.nextInt((num - 0) + 1) + 0).intValue()
       },
@@ -2303,29 +2308,23 @@ object DS extends Library {
 
   private def orderBy(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val = {
     val args = funct.f.params.allIndices.size
-    var out = scala.collection.mutable.Map.empty[String, Val.Obj.Member]
+    var out = scala.collection.mutable.LinkedHashMap.empty[String, Val.Obj.Member]
     for ((item, _) <- obj.getVisibleKeys()) {
       out += (item -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => obj.value(item, -1)(fs, ev)))
     }
     if (args == 2) {
       new Val.Obj(
-        scala.collection.mutable.Map(
-          out.toSeq.sortWith {
-            case ((it1, _), (it2, _)) =>
-              funct.apply(Val.Lazy(Val.Str(it1)), Val.Lazy(obj.value(it1, -1)(fs, ev))).toString >
-                funct.apply(Val.Lazy(Val.Str(it2)), Val.Lazy(obj.value(it2, -1)(fs, ev))).toString
-          }: _*),
-        _ => (), None)
+        scala.collection.mutable.LinkedHashMap(
+          out.toSeq.sortBy(
+            item => convertToString(funct.apply(Val.Lazy(obj.value(item._1,-1)(fs,ev)), Val.Lazy(Val.Str(item._1))))
+          ): _*), _ => (), None)
     }
     else if (args == 1) {
       new Val.Obj(
-        scala.collection.mutable.Map(
-          out.toSeq.sortWith {
-            case ((it1, _), (it2, _)) =>
-              funct.apply(Val.Lazy(Val.Str(it1))).toString >
-                funct.apply(Val.Lazy(Val.Str(it2))).toString
-          }: _*),
-        _ => (), None)
+        scala.collection.mutable.LinkedHashMap(
+          out.toSeq.sortBy(
+            item => convertToString(funct.apply(Val.Lazy(obj.value(item._1,-1)(fs,ev))))
+          ): _*), _ => (), None)
     }
     else {
       throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
@@ -2395,9 +2394,6 @@ object DS extends Library {
       case Val.Null => "null"
       case Val.True => "true"
       case Val.False => "false"
-      case x: Val.Obj => x.toString
-      case x: Val.Arr => x.value.toString()
-      case x: Val.Func => x.toString
     }
   }
 }

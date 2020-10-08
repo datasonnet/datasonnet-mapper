@@ -500,13 +500,17 @@ public class CoreTest {
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[{letter:e},{letter:d}]", value);
 
-        mapper = new Mapper(lib + ".orderBy({d: \"d\", a: \"a\", e: \"e\", z: \"z\", c: \"c\"}, function(value,key) key)\n", new ArrayList<>(), new HashMap<>(), true);
+        mapper = new Mapper(lib + ".orderBy({d:3,a:5,e:2,z:1,c:4}, function(value,key) key)\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("{a:a,c:c,d:d,e:e,z:z}", value);
+        assertEquals("{a:5,c:4,d:3,e:2,z:1}", value);
 
-        mapper = new Mapper(lib + ".orderBy({d: \"d\", a: \"a\", e: \"e\", z: \"z\", c: \"c\"}, function(value) value)\n", new ArrayList<>(), new HashMap<>(), true);
+        mapper = new Mapper(lib + ".orderBy({d:3,a:5,e:2,z:1,c:4}, function(value) value)\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("{a:a,c:c,d:d,e:e,z:z}", value);
+        assertEquals("{z:1,e:2,d:3,c:4,a:5}", value);
+
+        mapper = new Mapper(lib + ".orderBy({d:3,a:5,e:2,z:1,c:4}, function(value,key) value)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("{z:1,e:2,d:3,c:4,a:5}", value);
 
     }
 
@@ -538,8 +542,8 @@ public class CoreTest {
     }
 
     @Test
-    void test_randomint() {
-        Mapper mapper = new Mapper(lib + mathPack + ".randomint(10)\n", new ArrayList<>(), new HashMap<>(), true);
+    void test_randomInt() {
+        Mapper mapper = new Mapper(lib + mathPack + ".randomInt(10)\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         double dblVal = Double.parseDouble(value);
         assertTrue(dblVal >= 0 && dblVal <= 10);
@@ -696,6 +700,21 @@ public class CoreTest {
         Mapper mapper = new Mapper(lib + ".range(0, 3)\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[0,1,2,3]", value);
+    }
+
+    @Test
+    void test_toString() {
+        Mapper mapper = new Mapper(lib + ".toString(5)\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("5", value);
+
+        mapper = new Mapper(lib + ".toString(true)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("true", value);
+
+        mapper = new Mapper(lib + ".toString(null)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("null", value);
     }
 
     @Test
