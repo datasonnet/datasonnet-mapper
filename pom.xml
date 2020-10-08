@@ -63,7 +63,7 @@
 
     <scm>
         <connection>scm:git:https://github.com/MS3Inc/datasonnet-mapper.git</connection>
-        <developerConnection>scm:git:git@github.com:MS3Inc/datasonnet-mapper.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/MS3Inc/datasonnet-mapper.git</developerConnection>
         <url>https://github.com/MS3Inc/datasonnet-mapper</url>
     </scm>
 
