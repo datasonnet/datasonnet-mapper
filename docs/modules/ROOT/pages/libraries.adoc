@@ -38,29 +38,33 @@ Combines `first` and `second`. Some values will auto-coerce, e.g. the number 5 w
 
 *Example*
 
-.Payload
-----------
-[
-    {
-        "name": "Java"
-    },
-    {
-        "version": "1.8"
-    }
-]
-----------
 .DataSonnet map:
 ------------------------
 {
-    "language": ds.combine(payload[0], payload[1])
+    string: ds.combine("Hello ", "World"),
+    number: ds.combine(5, 7),
+    auto1: ds.combine("Hello ", 5),
+    auto2: ds.combine(5, "10"),
+    array: ds.combine([1,2], [3,4]),
+    obj: ds.combine({a:1}, {b:2})
 }
 ------------------------
 .Result
 ------------------------
 {
-  "language": {
-    "name": "Java",
-    "version": "1.8"
+  "string": "Hello World",
+  "number": "57",
+  "auto1": "Hello 5",
+  "auto2": "510",
+  "array": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "obj": {
+    "a": 1,
+    "b": 2
   }
 }
 ------------------------
@@ -99,7 +103,8 @@ The function `discriminator` is expected to take the value as the first paramete
 
 .Payload
 ----------
-[
+{
+  "array": [
     1,
     1,
     2,
@@ -109,21 +114,36 @@ The function `discriminator` is expected to take the value as the first paramete
     4,
     4,
     5
-]
+  ],
+  "obj": {
+    "a": 1,
+    "b": 2,
+    "c": 1
+  }
+}
 ----------
 .DataSonnet map:
 ------------------------
-ds.distinctBy(payload, function(value, index) value)
+{
+    array: ds.distinctBy(payload.array, function(item,index) item),
+    obj: ds.distinctBy(payload.obj, function(value,key) value)
+}
 ------------------------
 .Result
 ------------------------
-[
-  1,
-  2,
-  3,
-  4,
-  5
-]
+{
+  "array": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "obj": {
+    "a": 1,
+    "b": 2
+  }
+}
 ------------------------
 
 ### `endsWith(string str, string subStr)`
@@ -236,22 +256,24 @@ Returns an array containing the location where `val` occurs in `item`.
 
 .Payload
 ----------
-[
-    2,
-    3,
-    5,
-    7
-]
+{
+    "string": "Hello World",
+    "array": [1,2,3,4]
+}
 ----------
 .DataSonnet map:
 ------------------------
-ds.find(payload, 2)
+{
+    string: ds.find(payload.string, "World"),
+    array: ds.find(payload.array, 3)
+}
 ------------------------
 .Result
 ------------------------
-[
-  0
-]
+{
+  "string": [6],
+  "array": [2]
+}
 ------------------------
 
 ### `flatMap(array arr, function func)`
@@ -368,67 +390,46 @@ The function `discriminator` is expected to take the value as the first paramete
 .Payload
 ----------
 {
-  "languages": [
-    {
-      "name": "Foo",
-      "language": {
-          "name": "Java",
-          "version": "1.8"
-      }
-    },
-    {
-      "name": "Bar",
-      "language": {
-          "name": "Scala",
-          "version": "1.0"
-      }
-    },
-    {
-      "name": "FooBar",
-      "language": {
-          "name": "Java",
-          "version": "1.7"
-      }
+    "array": [
+        "a",
+        "b",
+        "a"
+    ],
+    "obj": {
+        "a":"Alpha",
+        "b":"Bravo",
+        "c": "Alpha"
     }
-  ]
 }
 ----------
 .DataSonnet map:
 ------------------------
 {
-  languageGroups: ds.groupBy(payload.languages, function(value, index) value.language.name)
+    array: ds.groupBy(payload.array, function(item,index) item ),
+    obj: ds.groupBy(payload.obj, function(value,key) value)
 }
 ------------------------
 .Result
 ------------------------
 {
-    "languageGroups": {
-       "Java": [
-          {
-             "language": {
-                "name": "Java",
-                "version": "1.8"
-             },
-             "name": "Foo"
-          },
-          {
-             "language": {
-                "name": "Java",
-                "version": "1.7"
-             },
-             "name": "FooBar"
-          }
-       ],
-       "Scala": [
-          {
-             "language": {
-                "name": "Scala",
-                "version": "1.0"
-             },
-             "name": "Bar"
-          }
-       ]
+  "array": {
+    "a": [
+      "a",
+      "a"
+    ],
+    "b": [
+      "b"
+    ]
+  },
+  "obj": {
+    "Alpha": {
+      "a": "Alpha",
+      "c": "Alpha"
+    },
+    "Bravo": {
+      "b": "Bravo"
     }
+  }
 }
 ------------------------
 
@@ -460,19 +461,21 @@ Checks if `strToCheck` is blank. Also returns true if null.
 
 *Example*
 
-.Payload
-----------
-{
-   "airlineName": ""
-}
-----------
 .DataSonnet map:
 ------------------------
-ds.isBlank(payload.airlineName)
+{
+    str1: ds.isBlank("     "),
+    str2: ds.isBlank(""),
+    'null': ds.isBlank(null)
+}
 ------------------------
 .Result
 ------------------------
-true
+{
+  "str1": true,
+  "str2": true,
+  "null": true
+}
 ------------------------
 
 ### `isBoolean(any valToCheck)`
@@ -501,20 +504,21 @@ Checks that the input number `numToCheck` is a decimal number. Trailing zeros ar
 
 *Example*
 
-.Payload
-----------
-{
-  "name": "Java",
-  "version": 1.8
-}
-----------
 .DataSonnet map:
 ------------------------
-ds.isDecimal(payload.version)
+{
+    a: ds.isDecimal(2),
+    b: ds.isDecimal(2.0),
+    c: ds.isDecimal(2.1),
+}
 ------------------------
 .Result
 ------------------------
-true
+{
+  "a": false,
+  "b": false,
+  "c": true
+}
 ------------------------
 
 ### `isEmpty(any valToCheck)`
@@ -522,17 +526,23 @@ Checks if `valToCheck` is empty. Does not ignore white space if string. Returns 
 
 *Example*
 
-.Payload
-----------
-[]
-----------
 .DataSonnet map:
 ------------------------
-ds.isEmpty(payload)
+{
+    "null": ds.isEmpty(null),
+    str: ds.isEmpty("    "),
+    array: ds.isEmpty([]),
+    obj: ds.isEmpty({})
+}
 ------------------------
 .Result
 ------------------------
-true
+{
+  "null": true,
+  "str": false,
+  "array": true,
+  "obj": true
+}
 ------------------------
 
 ### `isEven(num numToCheck)`
@@ -1128,7 +1138,7 @@ ds.range(payload.start, payload.end)
 ------------------------
 
 ### `read(string data, string mimeType, object params)`
-Reads a string value as the given mimetype.
+Reads a string `data` as the given `mimetype`.
 
 *Example*
 
@@ -1167,37 +1177,45 @@ ds.readUrl("http://httpbin.org/get")
 }
 ------------------------
 
-### `remove(object obj, string propName)`
-Removes property `propName` from `obj` and returns the remaining object.
+### `remove(array|object item, string|array value)`
+Removes `value` from `item` and returns the remaining array or object.
 
 *Example*
 
 .Payload
 ----------
 {
-   "availableSeats": 45,
-   "airlineName": "Delta",
-   "aircraftBrand": "Boeing",
-   "aircraftType": "717",
-   "departureDate": "01/20/2019",
-   "origin": "PHX",
-   "destination": "SEA"
- }
+    "array": [
+        1,
+        2,
+        3,
+        4
+    ],
+    "obj": {
+        "a": 1,
+        "b": 2
+    }
+}
 ----------
 .DataSonnet map:
 ------------------------
-ds.remove(payload, 'availableSeats')
+{
+  array: ds.remove(payload.array, 3),
+  obj: ds.remove(payload.obj, "b")
+}
 ------------------------
 .Result
 ------------------------
 {
-   "airlineName": "Delta",
-   "aircraftBrand": "Boeing",
-   "aircraftType": "717",
-   "departureDate": "01/20/2019",
-   "origin": "PHX",
-   "destination": "SEA"
- }
+  "array": [
+    1,
+    2,
+    4
+  ],
+  "obj": {
+    "a": 1
+  }
+}
 ------------------------
 
 ### `removeMatch(array|object items, any val`
@@ -1294,6 +1312,351 @@ Given an array or object as `items`, reverses the order of the elements.
     "a": 1
   }
 }
+------------------------
+
+### `scan(string str, string regex)`
+Executes the regex expression `regex` against `str` and returns an array with each match as an array.
+
+*Example*
+
+.Payload
+----------
+{
+    "email": "test@server.com"
+}
+----------
+.DataSonnet map:
+------------------------
+ds.scan(payload.email, "(.*)@(.*)(.com)")
+------------------------
+.Result
+------------------------
+[
+  [
+    "test@server.com",
+    "test",
+    "server",
+    ".com"
+  ]
+]
+------------------------
+
+### `select(object obj, string path`
+Returns a value inside `obj` by the provided `path`. For nested objects, the path is separated by a dot ('.').
+
+*Example*
+
+.Payload
+----------
+{
+  "language": {
+      "name": "Java",
+      "version": "1.8"
+  }
+}
+----------
+.DataSonnet map:
+------------------------
+{
+  language: ds.select(payload, 'language.name')
+}
+------------------------
+.Result
+------------------------
+{
+  "language": "Java"
+}
+------------------------
+
+### `sizeOf(any val)`
+Returns the size of `val`.
+
+*Example*
+
+.Payload
+----------
+{
+    "array": [1, 2],
+    "obj": {"prop": 2},
+    "string": "x"
+}
+----------
+.DataSonnet map:
+------------------------
+{
+    array: ds.sizeOf(payload.array),
+    object: ds.sizeOf(payload.obj),
+    'null': ds.sizeOf(null),
+    'function': ds.sizeOf(function(a,b,c) 1),
+    string: ds.sizeOf(payload.string)
+}
+------------------------
+.Result
+------------------------
+{
+  "array": 2,
+  "object": 1,
+  "null": 0,
+  "function": 3,
+  "string": 1
+}
+------------------------
+
+### `splitBy(string strToSplit, string regex)`
+Splits `strToSplit` into an array based on the matching `regex`.
+
+*Example*
+
+.Payload
+----------
+{
+    "string": "Hello World"
+}
+----------
+.DataSonnet map:
+------------------------
+ds.splitBy(payload.string, " ")
+------------------------
+.Result
+------------------------
+[
+  "Hello",
+  "World"
+]
+------------------------
+
+### `startsWith(string str, string subStr)`
+Checks if `str` starts with `subStr`. Ignores casing.
+
+*Example*
+
+.Payload
+----------
+{
+    "string": "Hello World"
+}
+----------
+.DataSonnet map:
+------------------------
+ds.startsWith(payload.string, "hello")
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `toString(any val)`
+Returns `val` to a string.
+
+*Example*
+
+.Payload
+----------
+{
+    "num": 5
+}
+----------
+.DataSonnet map:
+------------------------
+ds.toString(payload.num)
+------------------------
+.Result
+------------------------
+"5"
+------------------------
+
+### `trim(string str)`
+Removes leading and trailing spaces in `str`.
+
+*Example*
+
+.Payload
+----------
+{
+    "string": "      Hello World       "
+}
+----------
+.DataSonnet map:
+------------------------
+ds.trim(payload.string)
+------------------------
+.Result
+------------------------
+"Hello World"
+------------------------
+
+### `typeOf(any val)`
+Returns a string describing the type of object `val` is.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+{
+    string: ds.typeOf(""),
+    bool: ds.typeOf(true),
+    "null": ds.typeOf(null),
+    number: ds.typeOf(0),
+    "function": ds.typeOf(function() 1),
+    array: ds.typeOf([]),
+    object: ds.typeOf({})
+}
+------------------------
+.Result
+------------------------
+{
+  "string": "string",
+  "bool": "boolean",
+  "null": "null",
+  "number": "number",
+  "function": "function",
+  "array": "array",
+  "object": "object"
+}
+------------------------
+
+### `unzip(array arr)`
+Unzips an array of arrays `arr` and creates a new array of arrays based on their index in `arr`.
+
+*Example*
+
+.Payload
+----------
+[
+  [
+    1,
+    2
+  ],
+  [
+    1,
+    2
+  ]
+]
+----------
+.DataSonnet map:
+------------------------
+ds.unzip(payload)
+------------------------
+.Result
+------------------------
+[
+  [
+    1,
+    1
+  ],
+  [
+    2,
+    2
+  ]
+]
+------------------------
+
+### `upper(string str)`
+Converts a string to all uppercase characters.
+
+*Example*
+
+.Payload
+----------
+{
+    "string": "HeLlO wOrLd"
+}
+----------
+.DataSonnet map:
+------------------------
+ds.upper(payload.string)
+------------------------
+.Result
+------------------------
+"HELLO WORLD"
+------------------------
+
+### `uuid`
+Generates random alphanumeric uuid.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.uuid
+------------------------
+.Result
+------------------------
+"cj36alpm-8mlt-fm43-8vth-mbd961259lqh"
+------------------------
+
+### `valuesOf(object obj)`
+Given an object `obj`, returns an array of the values inside `obj`.
+
+*Example*
+
+.Payload
+----------
+{
+   "origin": "PHX",
+   "destination": "SEA"
+}
+----------
+.DataSonnet map:
+------------------------
+ds.valuesOf(payload)
+------------------------
+.Result
+------------------------
+[
+  "PHX",
+  "SEA"
+]
+------------------------
+
+### `write(array|object item, string mimeType, object params)`
+Converts `item` to a string.
+
+*Example*
+
+.Payload
+----------
+{
+    "price": 8.95
+}
+----------
+.DataSonnet map:
+------------------------
+ds.write(payload, "application/json", {})
+------------------------
+.Result
+------------------------
+"{\"price\":8.95}"
+------------------------
+
+### `zip(array array1, array array2)`
+Accepts `array1` and `array2` and combines them into one using elements with matching indexes.
+
+*Example*
+
+.Payload
+----------
+{
+    "firstNames": ["Evelyn", "Herman"],
+    "lastNames": ["Waugh" , "Melville", "Tolkien"]
+}
+----------
+.DataSonnet map:
+------------------------
+ds.zip(payload.firstNames, payload.lastNames)
+------------------------
+.Result
+------------------------
+[
+  [
+    "Evelyn",
+    "Waugh"
+  ],
+  [
+    "Herman",
+    "Melville"
+  ]
+]
 ------------------------
 
 ## crypto
