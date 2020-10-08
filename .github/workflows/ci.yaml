@@ -8,6 +8,8 @@ on:
       - main
 jobs:
   build:
+    # skip releases
+    if: startsWith(github.ref, '[maven-release-plugin] prepare release') != true
     runs-on: ubuntu-latest
     strategy:
       matrix:

@@ -21,14 +21,19 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: mvn clean release
+      - name: setup git
+        run: |
+          git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config --global user.name "${GITHUB_ACTOR}"
+      - name: mvn clean release:prepare
+        run: "./mvnw -V --no-transfer-progress --batch-mode --settings .settings.xml clean \
+        -DreleaseVersion='${{ github.event.inputs.release_ver }}' \
+        -DdevelopmentVersion='${{ github.event.inputs.snapshot_ver }}' \
+        release:prepare"
+      - name: mvn release:perform
         env:
           REPO_USER: ${{ secrets.REPO_USER }}
           REPO_PASSWORD: ${{ secrets.REPO_PASSWORD }}
-        run:
-          - git config --global user.name ${GITHUB_ACTOR}
-          - git config --global user.email ${GITHUB_ACTOR}@users.noreply.github.com
-          - "./mvnw -V --no-transfer-progress --batch-mode --settings .settings.xml clean \
-          -DreleaseVersion='${{ github.event.inputs.release_ver }}' \
-          -DdevelopmentVersion='${{ github.event.inputs.snapshot_ver }}' \
-          -Dusername=${{ secrets.GITHUB_TOKEN }} release:prepare"
+        run: "./mvnw -V --no-transfer-progress --batch-mode --settings .settings.xml \
+        -Darguments='--settings .settings.xml -Dlicense.skip=true -DskipTests -Dmaven.install.skip=true' \
+        release:perform"
