@@ -2185,26 +2185,6 @@ object DS extends Library {
     new Val.Obj(out.map(keyVal => (keyVal._1, Library.memberOf(Val.Arr(keyVal._2.toIndexedSeq)))), _ => (), None)
   }
 
-/*  private def groupByTest(s: Seq[Val.Lazy], funct: Applyer): Val = {
-    val args = funct.f.params.allIndices.size
-    new Val.Obj(
-      if (args == 2) {
-        scala.collection.mutable.Map(
-          s.zipWithIndex.groupBy( item => funct.apply(item._1, Val.Lazy(Val.Num(item._2))).cast[Val.Str]).map( x => (x._1, x._2.map(_._1)))
-            .collect(key => key._1.value -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Arr(key._2)).force)).toSeq: _*)
-      }
-      else if (args == 1) {
-          scala.collection.mutable.Map(
-            s.groupBy( item => funct.apply(item).cast[Val.Str].value)
-              .map(item => item._1 ->  Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Lazy(Val.Arr(item._2)).force)).toSeq: _*)
-      }
-      else {
-        throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
-      },
-    _ => (), None)
-  }
- */
-
   private def groupBy(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val = {
     val args = funct.f.params.allIndices.size
     val out = mutable.Map[String, mutable.LinkedHashMap[String, Val.Obj.Member]]()
@@ -2290,22 +2270,24 @@ object DS extends Library {
     }
   }
 
+  // TODO: change zipWithIndex to indexed for loop
   private def orderBy(array: Seq[Val.Lazy], funct: Applyer): Val = {
     val args = funct.f.params.allIndices.size
     if (args == 2) {
       Val.Arr(
         array.zipWithIndex.sortBy(
-          it => funct.apply(it._1, Val.Lazy(Val.Num(it._2))).toString
-        ).map(_._1))
+          it => funct.apply(it._1, Val.Lazy(Val.Num(it._2)))
+        )(ord = ValOrdering).map(_._1))
     }
     else if (args == 1) {
-      Val.Arr(array.sortBy(it => funct.apply(it).toString))
+      Val.Arr(array.sortBy(it => funct.apply(it))(ord = ValOrdering))
     }
     else {
       throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
     }
   }
 
+  // TODO: we're traversing the object twice, needed?
   private def orderBy(obj: Val.Obj, funct: Applyer, ev: EvalScope, fs: FileScope): Val = {
     val args = funct.f.params.allIndices.size
     var out = scala.collection.mutable.LinkedHashMap.empty[String, Val.Obj.Member]
@@ -2316,15 +2298,15 @@ object DS extends Library {
       new Val.Obj(
         scala.collection.mutable.LinkedHashMap(
           out.toSeq.sortBy(
-            item => convertToString(funct.apply(Val.Lazy(obj.value(item._1,-1)(fs,ev)), Val.Lazy(Val.Str(item._1))))
-          ): _*), _ => (), None)
+            item => funct.apply(Val.Lazy(obj.value(item._1, -1)(fs, ev)), Val.Lazy(Val.Str(item._1)))
+          )(ord = ValOrdering): _*), _ => (), None)
     }
     else if (args == 1) {
       new Val.Obj(
         scala.collection.mutable.LinkedHashMap(
           out.toSeq.sortBy(
-            item => convertToString(funct.apply(Val.Lazy(obj.value(item._1,-1)(fs,ev))))
-          ): _*), _ => (), None)
+            item => funct.apply(Val.Lazy(obj.value(item._1, -1)(fs, ev)))
+          )(ord = ValOrdering): _*), _ => (), None)
     }
     else {
       throw Error.Delegate("Expected embedded function to have 1 or 2 parameters, received: " + args)
@@ -2395,5 +2377,17 @@ object DS extends Library {
       case Val.True => "true"
       case Val.False => "false"
     }
+  }
+}
+
+// this assumes that we're comparing same Vals of the same type
+object ValOrdering extends Ordering[Val] {
+  def compare(x: Val, y: Val): Int =
+    x match {
+      case Val.Num(value) => Ordering.Double.TotalOrdering.compare(value, y.asInstanceOf[Val.Num].value)
+      case Val.Str(value) => Ordering.String.compare(value, y.asInstanceOf[Val.Str].value)
+      // TODO: need to convert the Val.Bool to an actual boolean
+      case bool: Val.Bool => Ordering.Boolean.compare(x.asInstanceOf, y.asInstanceOf)
+      case unsupported: Val => throw Error.Delegate("Expected embedded function to return a String, Number, or Boolean, received: " + unsupported.prettyName)
   }
 }

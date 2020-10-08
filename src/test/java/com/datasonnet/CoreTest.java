@@ -504,13 +504,13 @@ public class CoreTest {
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("{a:5,c:4,d:3,e:2,z:1}", value);
 
-        mapper = new Mapper(lib + ".orderBy({d:3,a:5,e:2,z:1,c:4}, function(value) value)\n", new ArrayList<>(), new HashMap<>(), true);
+        mapper = new Mapper(lib + ".orderBy({d:3,a:5,e:20,z:1,c:4}, function(value) value)\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("{z:1,e:2,d:3,c:4,a:5}", value);
+        assertEquals("{z:1,d:3,c:4,a:5,e:20}", value);
 
-        mapper = new Mapper(lib + ".orderBy({d:3,a:5,e:2,z:1,c:4}, function(value,key) value)\n", new ArrayList<>(), new HashMap<>(), true);
+        mapper = new Mapper(lib + ".orderBy({d:3,a:5,e:20,z:1,c:4}, function(value,key) value)\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
-        assertEquals("{z:1,e:2,d:3,c:4,a:5}", value);
+        assertEquals("{z:1,d:3,c:4,a:5,e:20}", value);
 
     }
 
