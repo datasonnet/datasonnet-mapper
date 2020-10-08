@@ -21,7 +21,7 @@
 
     <groupId>com.datasonnet</groupId>
     <artifactId>datasonnet-mapper</artifactId>
-    <version>0.4.6-MS3-SNAPSHOT</version>
+    <version>0.4.7-MS3-SNAPSHOT</version>
     <inceptionYear>2019</inceptionYear>
 
     <licenses>
