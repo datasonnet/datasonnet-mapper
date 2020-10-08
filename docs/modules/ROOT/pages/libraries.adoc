@@ -964,7 +964,6 @@ Reorders the array `items` by the result of `func`.
 If `items` is an array: the function `func` is expected to take the value as the first parameter (required).
 
 If `items` is an object: the function `func` is expected to take the value as the first parameter (required) and the key as the second parameter (optional).
->>>>>>> Add more core functions
 
 *Example*
 
@@ -1128,6 +1127,46 @@ ds.range(payload.start, payload.end)
 ]
 ------------------------
 
+### `read(string data, string mimeType, object params)`
+Reads a string value as the given mimetype.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.read("{\"price\": 8.95}", "application/json", {})
+------------------------
+.Result
+------------------------
+{
+  "price": 8.95
+}
+------------------------
+
+### `readUrl(string url)`
+Reads `url` and returns the content of the url, if it's JSON.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.readUrl("http://httpbin.org/get")
+------------------------
+.Result
+------------------------
+{
+  "args": {},
+  "headers": {
+    "Accept": "text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2",
+    "Host": "httpbin.org",
+    "User-Agent": "Java/14.0.1",
+    "X-Amzn-Trace-Id": "Root=1-5f7f568d-481e623471c21cc2686e53e8"
+  },
+  "origin": "69.250.49.68",
+  "url": "http://httpbin.org/get"
+}
+------------------------
+
 ### `remove(object obj, string propName)`
 Removes property `propName` from `obj` and returns the remaining object.
 
@@ -1161,57 +1200,99 @@ ds.remove(payload, 'availableSeats')
  }
 ------------------------
 
-### `reverse(array arr)`
-Returns an array with elements of `arr` in reverse order.
-
-*Example*
-
-.Payload
-----------
-[
-    "a",
-    "b",
-    "c",
-    "d"
-]
-----------
-.DataSonnet map:
-------------------------
-ds.reverse(payload)
-------------------------
-.Result
-------------------------
-[
-    "d",
-    "c",
-    "b",
-    "a",
-]
-------------------------
-
-### `parseDouble(string str)`
-
-Parses a string `str` which contains a double number and returns its numeric representation
+### `removeMatch(array|object items, any val`
+Given an array or an object `items` and `val` of the same type, will remove the matching values. If an object is used, both key and value must match.
 
 *Example*
 
 .Payload
 ----------
 {
-    "numberAsString": "123.45679"
+    "array": [1,2,3,4],
+    "obj": {"a":1,"b":2}
 }
-
 ----------
 .DataSonnet map:
 ------------------------
 {
-    num: ds.parseDouble(payload.numberAsString)
+  array: ds.removeMatch(payload.array, [1,4]),
+  obj: ds.removeMatch(payload.obj, {a:1,b:3})
 }
 ------------------------
 .Result
 ------------------------
 {
-    "num": 123.45679
+  "array": [
+    2,
+    3
+  ],
+  "obj": {
+    "b": 2
+  }
+}
+------------------------
+
+### `replace(string phrase, string regex, string replacement)`
+Replaces the matching `regex` with the `replacement` in the `phrase`.
+
+*Example*
+
+.Payload
+----------
+{
+    "regex": "Hello",
+    "replacement": "Goodbye"
+}
+----------
+.DataSonnet map:
+------------------------
+ds.replace("Hello World", payload.regex, payload.replacement)
+------------------------
+.Result
+------------------------
+"Goodbye World"
+------------------------
+
+### `reverse(array|object items)`
+Given an array or object as `items`, reverses the order of the elements.
+
+*Example*
+
+.Payload
+----------
+{
+    "array": [
+        1,
+        2,
+        3,
+        4
+    ],
+    "obj": {
+        "a":1,
+        "b":2
+    }
+}
+----------
+.DataSonnet map:
+------------------------
+{
+  array: ds.reverse(payload.array),
+  obj: ds.reverse(payload.obj)
+}
+------------------------
+.Result
+------------------------
+{
+  "array": [
+    4,
+    3,
+    2,
+    1
+  ],
+  "obj": {
+    "b": 2,
+    "a": 1
+  }
 }
 ------------------------
 
