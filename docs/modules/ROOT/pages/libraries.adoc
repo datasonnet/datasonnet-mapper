@@ -1128,7 +1128,6 @@ ds.range(payload.start, payload.end)
 ]
 ------------------------
 
->>>>>>> Add more core functions
 ### `remove(object obj, string propName)`
 Removes property `propName` from `obj` and returns the remaining object.
 
