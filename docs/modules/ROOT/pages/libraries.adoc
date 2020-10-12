@@ -2523,7 +2523,7 @@ Reads `value` with the specified encoding `encoding`.
 
 .DataSonnet map:
 ------------------------
-ds.binaries.readLinesWith("Hello World","UTF-8")
+ds.binaries.readLinesWith("Hello World", "UTF-8")
 ------------------------
 .Result
 ------------------------
@@ -2565,7 +2565,7 @@ Writes `value` with the specified encoding `encoding`.
 
 .DataSonnet map:
 ------------------------
-ds.binaries.writeLinesWith(["Hello World"],"UTF-8")
+ds.binaries.writeLinesWith(["Hello World"], "UTF-8")
 ------------------------
 .Result
 ------------------------
@@ -3143,6 +3143,92 @@ ds.math.tan(1)
 .Result
 ------------------------
 1.5574077246549023
+------------------------
+
+## numbers
+
+### `fromBinary(number value)`
+Converts `value` from binary to decimal.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.numbers.fromBinary(1100100)
+------------------------
+.Result
+------------------------
+100
+------------------------
+
+### `fromHex(number value)`
+Converts `value` from hex to decimal.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.numbers.fromHex(64)
+------------------------
+.Result
+------------------------
+100
+------------------------
+
+### `fromRadixNumber(number value, number baseAsBinary)`
+Converts `value` to a decimal with the base `baseAsBinary`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.numbers.fromRadixNumber(1101000, 2)
+------------------------
+.Result
+------------------------
+104
+------------------------
+
+### `toBinary(number value)`
+Converts `value` from decimal to binary.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.numbers.toBinary(100)
+------------------------
+.Result
+------------------------
+"1100100"
+------------------------
+
+### `toHex(number value)`
+Converts `value` from decimal to hex.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.numbers.toHex(100)
+------------------------
+.Result
+------------------------
+"64"
+------------------------
+
+### `toRadixNumber(number value, number baseAsDecimal)`
+Converts `value` to a number with the base `baseAsDecimal`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.numbers.toRadixNumber(104, 2)
+------------------------
+.Result
+------------------------
+"1101000"
 ------------------------
 
 ## regex
