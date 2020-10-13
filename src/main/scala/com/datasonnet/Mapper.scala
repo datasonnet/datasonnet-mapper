@@ -182,19 +182,19 @@ class Mapper(var script: String,
       header.combineOutputParams(output)
     } else {
       val fromHeader = header.getOutput
-      if (!fromHeader.equalsTypeAndSubtype(MediaTypes.ANY)) header.combineOutputParams(fromHeader)
+      if (fromHeader != null && !fromHeader.equalsTypeAndSubtype(MediaTypes.ANY)) header.combineOutputParams(fromHeader)
       else header.combineOutputParams(MediaTypes.APPLICATION_JSON)
     }
   }
 
   // If the input type is UNKNOWN then look in the header, default to JAVA
-  private def effectiveInput[T](name: String, input: Document[_]): Document[_] = {
+  private def effectiveInput[T](name: String, input: Document[T]): Document[T] = {
     if (!input.getMediaType.equalsTypeAndSubtype(MediaTypes.UNKNOWN)){
       header.combineInputParams(name, input)
     } else {
       val fromHeader = header.getNamedInputs.get(name)
-      if (fromHeader != null) header.combineInputParams(name, input.asInstanceOf[DefaultDocument[_]].withMediaType(fromHeader))
-      else header.combineInputParams(name, input.asInstanceOf[DefaultDocument[_]].withMediaType(MediaTypes.APPLICATION_JAVA))
+      if (fromHeader != null) header.combineInputParams(name, input.asInstanceOf[DefaultDocument[T]].withMediaType(fromHeader))
+      else header.combineInputParams(name, input.asInstanceOf[DefaultDocument[T]].withMediaType(MediaTypes.APPLICATION_JAVA))
     }
   }
 
