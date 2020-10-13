@@ -21,7 +21,7 @@
 
     <groupId>com.datasonnet</groupId>
     <artifactId>datasonnet-mapper</artifactId>
-    <version>0.4.7-MS3</version>
+    <version>0.4.8-MS3-SNAPSHOT</version>
     <inceptionYear>2019</inceptionYear>
 
     <licenses>
@@ -63,7 +63,7 @@
         <connection>scm:git:https://github.com/MS3Inc/datasonnet-mapper.git</connection>
         <developerConnection>scm:git:https://github.com/MS3Inc/datasonnet-mapper.git</developerConnection>
         <url>https://github.com/MS3Inc/datasonnet-mapper</url>
-      <tag>0.4.7-MS3</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <distributionManagement>
