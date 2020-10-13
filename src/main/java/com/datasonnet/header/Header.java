@@ -58,8 +58,8 @@ public class Header {
         this.dataFormats = dataFormats;
     }
 
-    private static final Header EMPTY =
-            new Header("1.0", true, Collections.emptyMap(), MediaTypes.ALL, Collections.emptyMap(), Collections.emptyMap());
+    public static final Header EMPTY =
+            new Header("1.0", true, Collections.emptyMap(), MediaTypes.ANY, Collections.emptyMap(), Collections.emptyMap());
 
     public static Header parseHeader(String script) throws HeaderParseException {
         if (!script.trim().startsWith(DATASONNET_HEADER)) {
@@ -122,6 +122,10 @@ public class Header {
 
     public MediaType getOutput() {
         return output;
+    }
+
+    public MediaType getPayload() {
+        return namedInputs.get("payload");
     }
 
     public Collection<MediaType> getAllInputs() {

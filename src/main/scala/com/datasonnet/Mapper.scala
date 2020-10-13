@@ -176,12 +176,34 @@ class Mapper(var script: String,
     }
   } yield verified).get
 
+  // If the requested type is ANY then look in the header, default to JSON
+  private def effectiveOutput(output: MediaType): MediaType = {
+    if (!output.equalsTypeAndSubtype(MediaTypes.ANY)) {
+      header.combineOutputParams(output)
+    } else {
+      val fromHeader = header.getOutput
+      if (!fromHeader.equalsTypeAndSubtype(MediaTypes.ANY)) header.combineOutputParams(fromHeader)
+      else header.combineOutputParams(MediaTypes.APPLICATION_JSON)
+    }
+  }
+
+  // If the input type is UNKNOWN then look in the header, default to JAVA
+  private def effectiveInput[T](name: String, input: Document[_]): Document[_] = {
+    if (!input.getMediaType.equalsTypeAndSubtype(MediaTypes.UNKNOWN)){
+      header.combineInputParams(name, input)
+    } else {
+      val fromHeader = header.getNamedInputs.get(name)
+      if (fromHeader != null) header.combineInputParams(name, input.asInstanceOf[DefaultDocument[_]].withMediaType(fromHeader))
+      else header.combineInputParams(name, input.asInstanceOf[DefaultDocument[_]].withMediaType(MediaTypes.APPLICATION_JAVA))
+    }
+  }
+
   def transform(payload: String): String = {
     transform(new DefaultDocument[String](payload)).getContent
   }
 
   def transform(payload: Document[_]): Document[String] = {
-    transform(payload, Collections.emptyMap(), MediaTypes.APPLICATION_JSON, classOf[String])
+    transform(payload, Collections.emptyMap(), MediaTypes.ANY, classOf[String])
   }
 
   def transform(payload: Document[_],
@@ -200,9 +222,9 @@ class Mapper(var script: String,
         .read(doc)
     }
 
-    val payloadExpr: Expr = Materializer.toExpr(valueFrom(header.combineInputParams("payload", payload)))
+    val payloadExpr: Expr = Materializer.toExpr(valueFrom(effectiveInput("payload", payload)))
     val inputExprs: Map[String, Expr] = inputs.asScala.view.toMap[String, Document[_]].map {
-      case (name, input) => (name, Materializer.toExpr(valueFrom(header.combineInputParams(name, input))))
+      case (name, input) => (name, Materializer.toExpr(valueFrom(effectiveInput(name, input))))
     }
 
     val payloadArg +: inputArgs = function.params.args
@@ -225,10 +247,9 @@ class Mapper(var script: String,
         throw new IllegalArgumentException("Problem executing script: " + Mapper.expandErrorLineNumber(s.toString, lineOffset).replace("\t", "    "))
     }
 
-    val mixedOutput = header.combineOutputParams(output)
-
-    dataFormats.thatProduces(mixedOutput, target)
-      .orElseThrow(() => new IllegalArgumentException("The output mime type " + output + " is not supported"))
-      .write(materialized, mixedOutput, target)
+    val effectiveOut = effectiveOutput(output)
+    dataFormats.thatProduces(effectiveOut, target)
+      .orElseThrow(() => new IllegalArgumentException("The output mime type " + effectiveOut + " is not supported"))
+      .write(materialized, effectiveOut, target)
   }
 }

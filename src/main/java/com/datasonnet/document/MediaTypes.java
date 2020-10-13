@@ -42,6 +42,7 @@ import java.util.Optional;
  * Spring Framework v5.3.0-M1. Modifications made to the original work include:
  * <li>Collected declared MimeTypes and MediaTypes</li>
  * <li>Added CSV and Java MediaType</li>
+ * <li>Rename ALL as ANY</li>
  * </p>
  *
  * @author Arjen Poutsma (2002-2020)
@@ -57,12 +58,12 @@ public class MediaTypes {
     /**
      * Public constant media type that includes all media ranges (i.e. "&#42;/&#42;").
      */
-    public static final MediaType ALL;
+    public static final MediaType ANY;
 
     /**
-     * A String equivalent of {@link MediaTypes#ALL}.
+     * A String equivalent of {@link MediaTypes#ANY}.
      */
-    public static final String ALL_VALUE = "*/*";
+    public static final String ANY_VALUE = "*/*";
 
     /**
      * Public constant media type for {@code application/atom+xml}.
@@ -347,6 +348,15 @@ public class MediaTypes {
 
     public static final String APPLICATION_CSV_VALUE = "application/csv";
 
+    // See Null Object pattern
+    /**
+     * Public constant media type for representing an unknown content type. This is meant to used to signal to Datasonnet
+     * that the content type of a given input is unknown at design time. Datasonnet may, for example, look in the header
+     * or default to a particular MediaType. Using this MediaType should be avoided outside of interactions with Datasonnet
+     */
+    public static final MediaType UNKNOWN;
+
+    public static final String UNKNOWN_VALUE = "/";
 
     public static final String PARAM_CHARSET = "charset";
 
@@ -354,7 +364,7 @@ public class MediaTypes {
 
     static {
         // Not using "valueOf' to avoid static init cost
-        ALL = new MediaType("*", "*");
+        ANY = new MediaType("*", "*");
         APPLICATION_ATOM_XML = new MediaType("application", "atom+xml");
         APPLICATION_CBOR = new MediaType("application", "cbor");
         APPLICATION_FORM_URLENCODED = new MediaType("application", "x-www-form-urlencoded");
@@ -380,6 +390,7 @@ public class MediaTypes {
         TEXT_XML = new MediaType("text", "xml");
         APPLICATION_JAVA = new MediaType("application", "x-java-object");
         APPLICATION_CSV = new MediaType("application", "csv");
+        UNKNOWN = new MediaType("application", "x-unknown");
     }
 
     // TODO: 8/11/20 add explicit file extension support to MediaType class
