@@ -39,7 +39,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <junit.jupiter.version>5.5.2</junit.jupiter.version>
         <jackson.version>2.10.0</jackson.version>
         <jaxb.version>2.3.2</jaxb.version>
