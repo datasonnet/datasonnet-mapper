@@ -2375,6 +2375,8 @@ ds.arrays.splitAt(payload, 3)
 ### `splitWhere(array arr, function func)`
 Splits `arr` into a left and right array based on the first index that returns true for `func`.
 
+The function `func` is expected to take the item as the first parameter (required).
+
 *Example*
 
 .Payload
@@ -2628,8 +2630,25 @@ Returns the current date/time from the system UTC clock in ISO-8601 format.
 }
 ------------------------
 
+### `daysBetween(string datetime1, string datetime2)`
+Returns the number of days between `datetime1` and `datetime2`. Dates are in "yyyy-MM-dd'T'HH:mm:ss.SSSVV" format.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+local date1 = "2019-09-20T18:53:41.425Z";
+local date2 = "2019-09-14T18:53:41.425Z";
+
+ds.datetime.daysBetween(date1, date2)
+------------------------
+.Result
+------------------------
+6
+------------------------
+
 ### `format(string datetime, string inputFormat, string outputFormat)`
-Reformats a zoned date-time string.
+Reformats `datetime` using `inputFormat` and `outputFormat`.
 
 *Example*
 
@@ -2639,6 +2658,20 @@ ds.datetime.format("2019-07-04T21:00:00Z", "yyyy-MM-dd'T'HH:mm:ssVV", "d MMM uuu
 .Result:
 ------------------------
 4 Jul 2019
+------------------------
+
+### `isLeapYear(string datetime)`
+Returns a boolean indicating if `datetime` is a leap year. Dates are in "yyyy-MM-dd'T'HH:mm:ss.SSSVV" format.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.datetime.isLeapYear("2019-09-14T18:53:41.425Z")
+------------------------
+.Result
+------------------------
+false
 ------------------------
 
 ### `compare(string datetime1, string format1, string datetime2, string format2)`
@@ -2705,6 +2738,20 @@ ds.datetime.toLocalDateTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ"
 .Result:
 ------------------------
 2019-07-04T21:00:00
+------------------------
+
+### `offset(string datetime, string period)`
+Returns the local datetime part of the `datetime` parameter in the ISO-8601 format without the offset.
+The `period` is a string in the ISO-8601 period format.
+
+*Example*
+
+------------------------
+ds.datetime.offset("2019-07-22T21:00:00Z", "P1Y1D")
+------------------------
+.Result:
+------------------------
+2020-07-23T21:00:00Z
 ------------------------
 
 ## localdatetime
@@ -3943,21 +3990,6 @@ ds.strings.wrapWith(" World ","Hello")
 
 ## url
 
-### `encode(string data, string encoding="UTF-8")`
-
-Translates a string into `application/x-www-form-urlencoded` format using the supplied encoding scheme to obtain the bytes for unsafe characters. The default encoding is `UTF-8`.
-
-*Example*
-
-.DataSonnet map:
-------------------------
-ds.url.encode('Hello World')
-------------------------
-.Result
-------------------------
-"Hello+World"
-------------------------
-
 ### `decode(string data, string encoding="UTF-8")`
 
 Decodes a application/x-www-form-urlencoded string using a specific encoding scheme. The supplied encoding is used to determine what characters are represented by any consecutive sequences of the form "%xy".
@@ -3971,4 +4003,19 @@ ds.url.decode('Hello+World')
 .Result
 ------------------------
 "Hello World"
+------------------------
+
+### `encode(string data, string encoding="UTF-8")`
+
+Translates a string into `application/x-www-form-urlencoded` format using the supplied encoding scheme to obtain the bytes for unsafe characters. The default encoding is `UTF-8`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.url.encode('Hello World')
+------------------------
+.Result
+------------------------
+"Hello+World"
 ------------------------
