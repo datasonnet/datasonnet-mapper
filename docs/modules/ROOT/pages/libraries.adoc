@@ -1880,6 +1880,8 @@ ds.arrays.duplicates(payload)
 ### `every(array arr, function func)`
 Returns true if every value `arr` returns true in `func`.
 
+The function `func` is expected to take the item as the first parameter (required).
+
 *Example*
 
 .Payload
@@ -2317,6 +2319,8 @@ ds.arrays.slice(payload, 2, 4)
 ### `some(array arr, function func)`
 Returns true if at least one item in `arr` passes the condition in `func`.
 
+The function `func` is expected to take the item as the first parameter (required).
+
 *Example*
 
 .Payload
@@ -2410,6 +2414,8 @@ ds.arrays.splitWhere(payload, function(item) item > 3)
 
 ### `sumBy(array arr, function func)`
 Calculates the sum of `arr` by the function provided value.
+
+The function `func` is expected to take the item as the first parameter (required).
 
 *Example*
 
@@ -3312,6 +3318,8 @@ ds.objects.divideBy(payload, 2)
 
 ### `everyEntry(object obj, function func)`
 Returns a boolean depending on if all key-value pairs of `obj` pass the `func`.
+
+The function `func` is expected to take the value as the first parameter (required) and the key as the second parameter (optional).
 
 *Example*
 
