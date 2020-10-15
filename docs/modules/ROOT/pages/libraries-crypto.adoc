@@ -1,0 +1,35 @@
+## crypto
+
+### `hash(string value, string algorithm)`
+Calculates hash of `value` using one of the supported algorithms. The `algorithm` must be one of `MD2`, `MD5`, `SHA-1`, `SHA-256`, `SHA-384`, `SHA-512`
+The response is a string containing the hash bytes.
+
+*Example:*
+
+------------------------
+{
+    hashValue: ds.crypto.hash("HelloWorld", "MD5")
+}
+------------------------
+.Result
+------------------------
+{
+    "hashValue": "68e109f0f40ca72a15e05cc22786f8e6"
+}
+------------------------
+### `hmac(string value, string secret, string algorithm)`
+Generates hash-based message authentication code using provided `value`, `secret`, and a hash function `algorithm`. The `algorithm` must be one of `HmacSHA1`, `HmacSHA256` or `HmacSHA512`.
+
+*Example:*
+
+------------------------
+{
+    hmacValue: ds.crypto.hmac("HelloWorld", "DataSonnet rules!", "HmacSHA256")
+}
+------------------------
+.Result
+------------------------
+{
+    "hmacValue": "7854220ef827b07529509f68f391a80bf87fff328dbda140ed582520a1372dc1"
+}
+------------------------

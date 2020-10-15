@@ -1,0 +1,60 @@
+## localdatetime
+
+### `now()`
+Returns the current date/time from the system UTC clock in ISO-8601 format without a time zone.
+
+*Example*
+
+------------------------
+{
+    currentLocalTime: ds.localdatetime.now()
+}
+------------------------
+
+.Result:
+------------------------
+{
+    "currentLocalTime": "2019-08-19T18:58:38.313"
+}
+------------------------
+
+### `offset(string datetime, string period)`
+Returns a copy of `datetime` with the specified amount added. The `datetime` parameter is in the ISO-8601 format without an offset.
+The `period` is a string in the ISO-8601 period format.
+
+*Example*
+
+------------------------
+ds.localdatetime.offset("2019-07-22T21:00:00", "P1Y1D")
+------------------------
+.Result:
+------------------------
+2020-07-23T21:00:00
+------------------------
+
+### `format(string datetime, string inputFormat, string outputFormat)`
+Reformats a local date-time string.
+
+*Example*
+
+------------------------
+ds.localdatetime.format("2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss", "d MMM uuuu")
+------------------------
+.Result:
+------------------------
+4 Jul 2019
+------------------------
+
+### `compare(string datetime1, string format1, string datetime2, string format2)`
+Returns `1` if `datetime1 > datetime2`, `-1` if `datetime1 < datetime2`, and `0` if `datetime1 == datetime2`.
+The `format1` and `format2` parameters must not have an offset or time zone.
+
+*Example*
+
+------------------------
+ds.localdatetime.compare("2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss", "2019-07-04T21:00:00", "yyyy-MM-dd'T'HH:mm:ss")
+------------------------
+.Result:
+------------------------
+0
+------------------------

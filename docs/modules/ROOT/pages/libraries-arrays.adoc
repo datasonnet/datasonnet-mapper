@@ -1,0 +1,799 @@
+## arrays
+
+### `countBy(array arr, function func)`
+Returns the number of items in `arr` that passes the condition of `func`.
+
+The function `func` is expected to take the value as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+[
+    1,
+    2,
+    3,
+    4,
+    5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.countBy(payload, function(item) item > 2)
+------------------------
+.Result
+------------------------
+3
+------------------------
+
+### `deepFlatten(array arr)`
+Given `arr`, which contains one level and multi level arrays, returns a flat array.
+
+*Example*
+
+.Payload
+----------
+[
+  [
+    1,
+    2
+  ],
+  [
+    3,
+    4,
+    [
+      5,
+      6
+    ]
+  ]
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.deepFlatten(payload)
+------------------------
+.Result
+------------------------
+[
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+]
+------------------------
+
+### `divideBy(array arr, number size)`
+Divides a single array `arr` into multiple arrays, limiting each one to `size`.
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.divideBy(payload, 2)
+------------------------
+.Result
+------------------------
+[
+  [
+    1,
+    2
+  ],
+  [
+    3,
+    4
+  ],
+  [
+    5
+  ]
+]
+------------------------
+
+### `drop(array arr, number index)`
+Removes every item in `arr` until the specified `index` is reached.
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.drop(payload, 3)
+------------------------
+.Result
+------------------------
+[
+  4,
+  5
+]
+------------------------
+
+### `dropWhile(array arr, function func)`
+Removes every item in `arr` until `func` returns a false result, then stops.
+
+The function `func` is expected to take the item as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.dropWhile(payload, function(item) item < 3)
+------------------------
+.Result
+------------------------
+[
+  3,
+  4,
+  5
+]
+------------------------
+
+### `duplicates(array arr)`
+Returns the values that exist more than once in `arr`.
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  1,
+  2
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.duplicates(payload)
+------------------------
+.Result
+------------------------
+[
+  1
+]
+------------------------
+
+### `every(array arr, function func)`
+Returns true if every value `arr` returns true in `func`.
+
+The function `func` is expected to take the item as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.every(payload, function(item) item > 0)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `firstWith(array arr, function func)`
+Returns the first value that passes the condition of `func` then stops.
+
+The function `func` is expected to take the value as the first parameter (required) and the index as the second (optional).
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.firstWith(payload, function(item,index) item == index + 1)
+------------------------
+.Result
+------------------------
+1
+------------------------
+
+### `indexOf(array arr, any value)`
+Returns the current index of the matching `value` in `arr`.
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.indexOf(payload, 3)
+------------------------
+.Result
+------------------------
+2
+------------------------
+
+### `indexWhere(array arr, function func)`
+Returns the first index where the condition of `func` passes.
+
+The function `func` is expected to take the item as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.indexWhere(payload, function(item) item == 3)
+------------------------
+.Result
+------------------------
+2
+------------------------
+
+### `join(array arrL, array arrR, function funcL, function funcR)`
+Joins two arrays together, returns the items of `arrL` with the items that match from `arrR`.
+
+Both functions `funcL` and `funcR` are expected to take the item as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+{
+    "countries": [
+      {
+        "id": 1,
+        "name":"Spain"
+      },
+      {
+        "id": 2,
+        "name":"France"
+      },
+      {
+        "id": 3,
+        "name":"Germany"
+      }
+    ],
+    "languages": [
+      {
+        "countryId": 1,
+        "name":"Spanish"
+      },
+      {
+        "countryId": 2,
+        "name":"French"
+      },
+      {
+        "countryId": 4,
+        "name":"Danish"
+      }
+    ]
+}
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.join(
+    payload.countries,
+    payload.languages,
+    function(item) item.id,
+    function(item) item.countryId
+)
+------------------------
+.Result
+------------------------
+[
+  {
+    "r": {
+      "countryId": 1,
+      "name": "Spanish"
+    },
+    "l": {
+      "id": 1,
+      "name": "Spain"
+    }
+  },
+  {
+    "r": {
+      "countryId": 2,
+      "name": "French"
+    },
+    "l": {
+      "id": 2,
+      "name": "France"
+    }
+  }
+]
+------------------------
+
+### `leftJoin(array arrL, array arrR, function funcL, function funcR)`
+Joins two arrays together, returns all of the items of `arrL`, with the items that match from `arrR`.
+
+Both functions `funcL` and `funcR` are expected to take the item as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+{
+    "countries": [
+      {
+        "id": 1,
+        "name":"Spain"
+      },
+      {
+        "id": 2,
+        "name":"France"
+      },
+      {
+        "id": 3,
+        "name":"Germany"
+      }
+    ],
+    "languages": [
+      {
+        "countryId": 1,
+        "name":"Spanish"
+      },
+      {
+        "countryId": 2,
+        "name":"French"
+      },
+      {
+        "countryId": 4,
+        "name":"Danish"
+      }
+    ]
+}
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.leftJoin(
+    payload.countries,
+    payload.languages,
+    function(item) item.id,
+    function(item) item.countryId
+)
+------------------------
+.Result
+------------------------
+[
+  {
+    "r": {
+      "countryId": 1,
+      "name": "Spanish"
+    },
+    "l": {
+      "id": 1,
+      "name": "Spain"
+    }
+  },
+  {
+    "r": {
+      "countryId": 2,
+      "name": "French"
+    },
+    "l": {
+      "id": 2,
+      "name": "France"
+    }
+  },
+  {
+    "l": {
+      "id": 3,
+      "name": "Germany"
+    }
+  }
+]
+------------------------
+
+### `outerJoin(array arrL, array arrR, function funcL, function funcR)`
+Joins two arrays together, returns the items of `arrL` with the items that match from `arrR`, the items from `arrL` that don't have matches, and items from `arrR` that don't have matches.
+
+Both functions `funcL` and `funcR` are expected to take the item as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+{
+    "countries": [
+      {
+        "id": 1,
+        "name":"Spain"
+      },
+      {
+        "id": 2,
+        "name":"France"
+      },
+      {
+        "id": 3,
+        "name":"Germany"
+      }
+    ],
+    "languages": [
+      {
+        "countryId": 1,
+        "name":"Spanish"
+      },
+      {
+        "countryId": 2,
+        "name":"French"
+      },
+      {
+        "countryId": 4,
+        "name":"Danish"
+      }
+    ]
+}
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.outerJoin(
+    payload.countries,
+    payload.languages,
+    function(item) item.id,
+    function(item) item.countryId
+)
+------------------------
+.Result
+------------------------
+[
+  {
+    "r": {
+      "countryId": 1,
+      "name": "Spanish"
+    },
+    "l": {
+      "id": 1,
+      "name": "Spain"
+    }
+  },
+  {
+    "r": {
+      "countryId": 2,
+      "name": "French"
+    },
+    "l": {
+      "id": 2,
+      "name": "France"
+    }
+  },
+  {
+    "l": {
+      "id": 3,
+      "name": "Germany"
+    }
+  },
+  {
+    "r": {
+      "countryId": 4,
+      "name": "Danish"
+    }
+  }
+]
+------------------------
+
+### `occurrences(array arr, function func)`
+Returns an object where the keys of the object are the result of `func` and the values of the object indicate how many times the key occurs in `arr`.
+
+The function `func` is expected to take the value as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+[
+  "a",
+  "a",
+  "b",
+  "b",
+  "b",
+  "c"
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.occurrences(payload, function(item) item)
+------------------------
+.Result
+------------------------
+{
+  "a": 2,
+  "b": 3,
+  "c": 1
+}
+------------------------
+
+### `partition(array arr, function func)`
+Splits `arr` into two arrays of successes and failures from the results of `func`.
+
+The function `func` is expected to take the value as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.partition(payload, function(item) item > 3)
+------------------------
+.Result
+------------------------
+{
+  "success": [
+    4,
+    5
+  ],
+  "failure": [
+    1,
+    2,
+    3
+  ]
+}
+------------------------
+
+### `slice(array arr, number start, number end)`
+Returns a subset of `arr` between the indexes of `start` and `end`.
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.slice(payload, 2, 4)
+------------------------
+.Result
+------------------------
+[
+  3,
+  4
+]
+------------------------
+
+### `some(array arr, function func)`
+Returns true if at least one item in `arr` passes the condition in `func`.
+
+The function `func` is expected to take the item as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.some(payload, function(item) item > 2)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `splitAt(array arr, number index)`
+Splits `arr` into a left and right array based on the `index`.
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.splitAt(payload, 3)
+------------------------
+.Result
+------------------------
+{
+  "r": [
+    4,
+    5
+  ],
+  "l": [
+    1,
+    2,
+    3
+  ]
+}
+------------------------
+
+### `splitWhere(array arr, function func)`
+Splits `arr` into a left and right array based on the first index that returns true for `func`.
+
+The function `func` is expected to take the item as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.splitWhere(payload, function(item) item > 3)
+------------------------
+.Result
+------------------------
+{
+  "r": [
+    4,
+    5
+  ],
+  "l": [
+    1,
+    2,
+    3
+  ]
+}
+------------------------
+
+### `sumBy(array arr, function func)`
+Calculates the sum of `arr` by the function provided value.
+
+The function `func` is expected to take the item as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.sumBy(payload, function(item) item)
+------------------------
+.Result
+------------------------
+15
+------------------------
+
+### `take(array arr, number index)`
+Returns all values from `arr` up to the `index`.
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.take(payload, 3)
+------------------------
+.Result
+------------------------
+[
+  1,
+  2,
+  3
+]
+------------------------
+
+### `takeWhile(array arr, function func)`
+Takes all items from the array while `func` is true. Stops at the first false value.
+
+The function `func` is expected to take the value as the first parameter (required).
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  3,
+  4,
+  5
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.takeWhile(payload, function(item) item < 3)
+------------------------
+.Result
+------------------------
+[
+  1,
+  2
+]
+------------------------

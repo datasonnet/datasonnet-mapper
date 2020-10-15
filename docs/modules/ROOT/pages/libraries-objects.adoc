@@ -1,0 +1,133 @@
+## objects
+
+### `divideBy(object obj, number num)`
+Creates an array of objects where each nested object has the specified number `num` of key-value pairs.
+
+*Example*
+
+.Payload
+----------
+{
+  "a":1,
+  "b":2,
+  "c":3
+}
+----------
+.DataSonnet map:
+------------------------
+ds.objects.divideBy(payload, 2)
+------------------------
+.Result
+------------------------
+[
+  {
+    "a": 1,
+    "b": 2
+  },
+  {
+    "c": 3
+  }
+]
+------------------------
+
+### `everyEntry(object obj, function func)`
+Returns a boolean depending on if all key-value pairs of `obj` pass the `func`.
+
+The function `func` is expected to take the value as the first parameter (required) and the key as the second parameter (optional).
+
+*Example*
+
+.Payload
+----------
+{
+  "a":1,
+  "b":2,
+  "c":1
+}
+----------
+.DataSonnet map:
+------------------------
+ds.objects.everyEntry(payload,function(value,key) value < 2)
+------------------------
+.Result
+------------------------
+false
+------------------------
+
+### `mergeWith(object obj1, object obj2)`
+Combines `obj1` and `obj2`.
+
+*Example*
+
+.Payload
+----------
+{
+  "obj1": {
+    "a":1
+  },
+  "obj2":{
+    "b":2
+  }
+}
+----------
+.DataSonnet map:
+------------------------
+ds.objects.mergeWith(payload.obj1,payload.obj2)
+------------------------
+.Result
+------------------------
+{
+  "a": 1,
+  "b": 2
+}
+------------------------
+
+### `someEntry(object obj, function func)`
+Returns a boolean depending on if at least one key-value pair passes the function `func`.
+
+The function `func` is expected to take the property value as the first parameter (required) and  the property key as the second (required).
+
+*Example*
+
+.Payload
+----------
+{
+  "a":1,
+  "b":2,
+  "c":1
+}
+----------
+.DataSonnet map:
+------------------------
+ds.objects.someEntry(payload, function(value, key) value < 2)
+------------------------
+.Result
+------------------------
+true
+------------------------
+
+### `takeWhile(object obj, function func)`
+Takes all key value pairs that result in true from the function. Stops on the first value that fails.
+
+The function `func` is expected to take the property value as the first parameter (required) and  the property key as the second (required).
+
+*Example*
+
+.Payload
+----------
+{
+  "a":1,
+  "b":2,
+  "c":1
+}
+----------
+.DataSonnet map:
+------------------------
+ds.objects.takeWhile(payload, function(value,key) value < 2)
+------------------------
+.Result
+------------------------
+{
+  "a": 1
+}
+------------------------

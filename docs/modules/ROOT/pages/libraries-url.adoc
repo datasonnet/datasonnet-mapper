@@ -1,0 +1,31 @@
+## url
+
+### `decode(string data, string encoding="UTF-8")`
+
+Decodes a application/x-www-form-urlencoded string using a specific encoding scheme. The supplied encoding is used to determine what characters are represented by any consecutive sequences of the form "%xy".
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.url.decode('Hello+World')
+------------------------
+.Result
+------------------------
+"Hello World"
+------------------------
+
+### `encode(string data, string encoding="UTF-8")`
+
+Translates a string into `application/x-www-form-urlencoded` format using the supplied encoding scheme to obtain the bytes for unsafe characters. The default encoding is `UTF-8`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.url.encode('Hello World')
+------------------------
+.Result
+------------------------
+"Hello+World"
+------------------------
