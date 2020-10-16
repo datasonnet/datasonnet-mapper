@@ -1,13 +1,11 @@
 # DataSonnet Header
 
 The header is an optional comment section in the mapping document which must start with `/\** DataSonnet` followed by a new line character and end with a line `*/` and contains a set of configuration properties.
-The properties are hierarchical, with sections separated by the `.` (dot) character, e.g.:
+The properties are hierarchical, with sections separated by the ` ` (space) character, e.g.:
 
 ------------
-input.payload.application/xml.NamespaceSeparator=:
-input.payload.application/xml.TextValueKey=__text
-input.myVar.application/csv.Quote="
-input.myVar.application/csv.Separator=|
+input payload application/xml;namespace-separator=":"
+input myVar application/csv;quote="""
 ------------
 
 The header must be the first comment before any other line of code, in the following format:
@@ -35,7 +33,7 @@ The header is optional; if omitted, all default settings will be used. The defau
 ## Data Format Properties
 
 The data format properties control the data format plugins behavior. The property names must start with one of `input|output|\*`.
-The input properties format must be `input.<INPUT_NAME>|*.<MIME_TYPE>.<MIME_TYPE_SPECIFIC_PARAMETER>`, where:
+The input properties format must be `input <INPUT_NAME>|* <MIME_TYPE>;<MIME_TYPE_SPECIFIC_PARAMETER>`, where:
 
     - `<INPUT_NAME>` is a name of input variable or payload;
     - `<MIME_TYPE>` is a mime type supported by DataSonnet;
@@ -43,36 +41,32 @@ The input properties format must be `input.<INPUT_NAME>|*.<MIME_TYPE>.<MIME_TYPE
 
 If a property is not recognized, an error will be raised.
 
-IMPORTANT: if the mime type contains the dot (`.`) character, it must be escaped with a backslash (`\`). For example, `dataformat.application/vnd\.ms-excel.payload.param=xyz`.
-
-Keys may not contain double backslashes (`\\`), though values may.
-
 The wildcard `*` can be used to set the same parameter value for all inputs and output of the given format, instead of defining it explicitly. For example:
 
 ------------
-*.application/csv.Separator=|
+* application/csv;separator="|"
 ------------
 
 is an equivalent of:
 
 ------------
-input.payload.application/csv.Separator=|
-input.myVar.application/csv.Separator=|
-output.application/csv.Separator=|
+input payload application/csv;separator="|"
+input myVar application/csv;separator="|"
+output application/csv;separator="|"
 ------------
 
 The wildcard may be used for inputs only, e.g.
 
 ------------
-input.*.application/csv.Separator=|
-output.application/csv.Separator=,
+input * application/csv;separator="|"
+output application/csv;separator=","
 ------------
 
 An explicit setting will override the wildcard setting for a specific input or output. For example, if there are multiple CSV inputs that have separator `|` except one that has separator `,`, the following configuration can be used:
 
 ------------
-dataformat.application/csv.*.Separator=|
-dataformat.application/csv.commaSeparatedVar.Separator=,
+dataformat application/csv;*.separator="|"
+dataformat application/csv;commaSeparatedVar.separator=","
 ------------
 
 For the list of the supported data formats and their configurable properties, see the xref:dataformats.adoc[Data Formats] section.
@@ -91,7 +85,7 @@ For the list of the supported data formats and their configurable properties, se
 | no
 | `1.0`
 
-|`output.preserveOrder`
+|`preserveOrder`
 |Controls whether order of fields as they appear in the mapping will be preserved in the resulting JSON.
 | no
 |`true`
