@@ -33,7 +33,7 @@ public class Header {
     public static final String DATASONNET_VERSION = "version";
     public static final String DATASONNET_INPUT = "input";
     public static final String DATASONNET_OUTPUT = "output";
-    public static final String DATASONNET_PRESERVE_ORDER = "preseveOrder";
+    public static final String DATASONNET_PRESERVE_ORDER = "preserveOrder";
     public static final String DATAFORMAT_PREFIX = "dataformat";
     public static final String DATAFORMAT_DEFAULT = "*";
     private final String version;
