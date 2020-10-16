@@ -4,7 +4,7 @@ The header is an optional comment section in the mapping document which must sta
 The properties are hierarchical, with sections separated by the ` ` (space) character, e.g.:
 
 ------------
-input payload application/xml;namespace-separator=":"
+input payload application/xml;namespace-separator=":";text-value-key=__text
 input myVar application/csv;quote="""
 ------------
 
@@ -39,33 +39,35 @@ The input properties format must be `input <INPUT_NAME>|* <MIME_TYPE>;<MIME_TYPE
     - `<MIME_TYPE>` is a mime type supported by DataSonnet;
     - `<MIME_TYPE_SPECIFIC_PARAMETER>` is one of the parameters supported by the plugin for this mime type.
 
+Additional `<MIME_TYPE_SPECIFIC_PARAMETER>`s can be added with a `;` (semicolon). The values that should be escaped with quotes are `;` (semicolon), `:` (colon),  `"` (quote) and `,` (comma).
+
 If a property is not recognized, an error will be raised.
 
 The wildcard `*` can be used to set the same parameter value for all inputs and output of the given format, instead of defining it explicitly. For example:
 
 ------------
-* application/csv;separator="|"
+* application/csv;separator=|
 ------------
 
 is an equivalent of:
 
 ------------
-input payload application/csv;separator="|"
-input myVar application/csv;separator="|"
-output application/csv;separator="|"
+input payload application/csv;separator=|
+input myVar application/csv;separator=|
+output application/csv;separator=|
 ------------
 
 The wildcard may be used for inputs only, e.g.
 
 ------------
-input * application/csv;separator="|"
+input * application/csv;separator=|
 output application/csv;separator=","
 ------------
 
 An explicit setting will override the wildcard setting for a specific input or output. For example, if there are multiple CSV inputs that have separator `|` except one that has separator `,`, the following configuration can be used:
 
 ------------
-dataformat application/csv;*.separator="|"
+dataformat application/csv;*.separator=|
 dataformat application/csv;commaSeparatedVar.separator=","
 ------------
 
