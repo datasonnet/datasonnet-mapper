@@ -346,7 +346,7 @@ ds.flatMap(payload, function(value, index) value)
 ]
 ------------------------
 
-### `foldLeft(array arr, function func, any initVal)`
+### `foldLeft(array arr, any initVal, function func)`
 Iterates over `arr`, applying `func` to the previous result. Starts with the value provided in `initVal`.
 
 The function `func` is expected to take the current value as the first parameter (required) and the previous value as the second parameter (required).
@@ -364,7 +364,7 @@ The function `func` is expected to take the current value as the first parameter
 ----------
 .DataSonnet map:
 ------------------------
-ds.foldLeft(payload, function(curr, prev) curr * prev, 1)
+ds.foldLeft(payload, 1, function(curr, prev) curr * prev)
 ------------------------
 .Result
 ------------------------
@@ -377,7 +377,7 @@ ds.foldLeft(payload, function(curr, prev) curr * prev, 1)
 */
 ------------------------
 
-### `foldRight(array arr, function func, any initVal)`
+### `foldRight(array arr, any initVal, function func)`
 Iterates backwards over an array, applying `func` to the previous result. Starts with the value provided in `initVal`.
 
 The function `func` is expected to take the current value as the first parameter (required) and the previous value as the second parameter (required).
@@ -395,7 +395,7 @@ The function `func` is expected to take the current value as the first parameter
 ----------
 .DataSonnet map:
 ------------------------
-ds.foldRight(payload, function(curr, prev) curr * prev, 1)
+ds.foldRight(payload, 1, function(curr, prev) curr * prev)
 ------------------------
 .Result
 ------------------------
