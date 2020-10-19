@@ -571,19 +571,19 @@ public class CoreTest {
     @Test
     void test_foldLeft() {
 
-        Mapper mapper = new Mapper(lib + ".foldLeft([2,3], function(acc,it) it+acc, 0)\n", new ArrayList<>(), new HashMap<>(), true);
+        Mapper mapper = new Mapper(lib + ".foldLeft([2,3], 0, function(acc,it) it+acc)\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("5", value);
 
-        mapper = new Mapper(lib + ".foldLeft([1,2,3,4], function(acc,it) acc+it, 0)\n", new ArrayList<>(), new HashMap<>(), true);
+        mapper = new Mapper(lib + ".foldLeft([1,2,3,4], 0, function(acc,it) acc+it)\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("10", value);
 
-        mapper = new Mapper(lib + ".foldLeft([1,2,3,4], function(acc,it) acc+\"\"+it,\"\")\n", new ArrayList<>(), new HashMap<>(), true);
+        mapper = new Mapper(lib + ".foldLeft([1,2,3,4],\"\", function(acc,it) acc+\"\"+it)\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("1234", value);
 
-        mapper = new Mapper(lib + ".foldLeft([], function(acc,it) acc+it, null)\n", new ArrayList<>(), new HashMap<>(), true);
+        mapper = new Mapper(lib + ".foldLeft([], null, function(acc,it) acc+it)\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("null", value);
     }

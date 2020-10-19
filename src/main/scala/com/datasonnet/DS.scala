@@ -577,7 +577,7 @@ object DS extends Library {
     },
 
     // moved array to first position
-    builtin("foldLeft", "arr", "func", "init") { (_, _, arr: Val.Arr, func: Applyer, init: Val) =>
+    builtin("foldLeft", "arr", "init", "func") { (_, _, arr: Val.Arr, init: Val, func: Applyer) =>
       var current = init
       for (item <- arr.value) {
         val c = current
@@ -587,7 +587,8 @@ object DS extends Library {
     },
 
     // moved array to first position
-    builtin("foldRight", "arr", "func", "init") { (_, _, arr: Val.Arr, func: Applyer, init: Val) =>
+    // TODO: can we do this without reverse? has to traverse the collection twice
+    builtin("foldRight", "arr", "init", "func") { (_, _, arr: Val.Arr, init: Val, func: Applyer) =>
       var current = init
       for (item <- arr.value.reverse) {
         val c = current
