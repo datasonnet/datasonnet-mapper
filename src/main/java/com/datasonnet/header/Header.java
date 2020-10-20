@@ -65,24 +65,24 @@ public class Header {
             return EMPTY;
         }
 
-        try {
-            int terminus = script.indexOf("*/");
-            if(terminus == -1) {
-                throw new HeaderParseException("Unterminated header. Headers must end with */");
-            }
+        int terminus = script.indexOf("*/");
+        if(terminus == -1) {
+            throw new HeaderParseException("Unterminated header. Headers must end with */");
+        }
 
-            String headerSection = script
-                    .substring(0, terminus)
-                    .replace(DATASONNET_HEADER, "");
+        String headerSection = script
+                .substring(0, terminus)
+                .replace(DATASONNET_HEADER, "");
 
-            AtomicReference<String> version = new AtomicReference<>("1.0");
-            boolean preserve = true;
-            AtomicReference<MediaType> output = new AtomicReference<>();
-            Map<String, MediaType> inputs = new HashMap<>(4);
-            Map<Integer, MediaType> allInputs = new HashMap<>(4);
-            Map<Integer, MediaType> dataformat = new HashMap<>(4);
+        AtomicReference<String> version = new AtomicReference<>("1.0");
+        boolean preserve = true;
+        AtomicReference<MediaType> output = new AtomicReference<>();
+        Map<String, MediaType> inputs = new HashMap<>(4);
+        Map<Integer, MediaType> allInputs = new HashMap<>(4);
+        Map<Integer, MediaType> dataformat = new HashMap<>(4);
 
-            for (String line : headerSection.split(System.lineSeparator())) {
+        for (String line : headerSection.split(System.lineSeparator())) {
+            try {
                 if (line.startsWith(DATASONNET_VERSION)) {
                     String[] tokens = line.split("=", 2);
                     version.set(tokens[1]);
@@ -111,13 +111,14 @@ public class Header {
                 } else {
                     throw new HeaderParseException("Unable to parse header line: " + line);
                 }
+            } catch (InvalidMediaTypeException exc) {
+                throw new HeaderParseException("Could not parse media type from header in line " + line, exc);
+            } catch(ArrayIndexOutOfBoundsException exc) {
+                throw new HeaderParseException("Problem with header formatting in line " + line);
             }
-
-            return new Header(version.get(), preserve, inputs, output.get(), allInputs, dataformat);
-        } catch (InvalidMediaTypeException exc) {
-            // TODO: 8/3/20 capture the header line
-            throw new HeaderParseException("Could not parse media type from header", exc);
         }
+
+        return new Header(version.get(), preserve, inputs, output.get(), allInputs, dataformat);
     }
 
     public String getVersion() {
