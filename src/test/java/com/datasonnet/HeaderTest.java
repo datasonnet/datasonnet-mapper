@@ -18,6 +18,7 @@ package com.datasonnet;
 
 import com.datasonnet.header.Header;
 import org.junit.jupiter.api.BeforeAll;
+import com.datasonnet.header.HeaderParseException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
@@ -26,6 +27,8 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class HeaderTest {
@@ -33,7 +36,7 @@ public class HeaderTest {
     Header header;
 
     String headerStr = "/** DataSonnet\n" +
-            "version=1.2\n" +
+            "version=2.0\n" +
             "preserveOrder=false\n" +
             "input payload application/xml;namespace-separator=\":\";text-value-key=__text\n" +
             "input * application/xml;text-value-key=__text\n" +
@@ -57,7 +60,7 @@ public class HeaderTest {
 
     @Test
     void testHeaderVersion() {
-        assertEquals(header.getVersion(), "1.2");
+        assertEquals(header.getVersion(), "2.0");
     }
 
     @Test
@@ -97,5 +100,21 @@ public class HeaderTest {
         assertTrue(keys.contains("ds.csv.quote"));
     }
 
+    @Test
+    void testUnknownHeaderFails() {
+        assertThrows(HeaderParseException.class,  ()  -> {
+           Header.parseHeader("/** DataSonnet\n" +
+                   "version=1.0\n" +
+                   "nonsense\n" +
+                   "*/");
+        });
+    }
 
+    @Test
+    void testUnterminatedHeaderFailsNicely() {
+        assertThrows(HeaderParseException.class,  ()  -> {
+            Header.parseHeader("/** DataSonnet\n" +
+                    "version=1.0\n");
+        });
+    }
 }

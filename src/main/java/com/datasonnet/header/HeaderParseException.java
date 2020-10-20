@@ -21,4 +21,6 @@ public class HeaderParseException extends Exception {
     public HeaderParseException(String message, Throwable e) {
         super(message, e);
     }
+
+    public HeaderParseException(String message) { super(message); }
 }

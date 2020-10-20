@@ -66,9 +66,14 @@ public class Header {
         }
 
         try {
+            int terminus = script.indexOf("*/");
+            if(terminus == -1) {
+                throw new HeaderParseException("Unterminated header. Headers must end with */");
+            }
+
             String headerSection = script
-                    .substring(0, script.indexOf("*/"))
-                    .replace(DATASONNET_HEADER, "").replace("*/", "");
+                    .substring(0, terminus)
+                    .replace(DATASONNET_HEADER, "");
 
             AtomicReference<String> version = new AtomicReference<>("1.0");
             boolean preserve = true;
@@ -101,6 +106,10 @@ public class Header {
                     MediaType toAdd = MediaType.valueOf(tokens[1]);
                     dataformat.put(toAdd.getType().hashCode() + toAdd.getSubtype().hashCode(),
                             toAdd);
+                } else if (line.trim().isEmpty()) {
+                    // this is allowed, and we pass
+                } else {
+                    throw new HeaderParseException("Unable to parse header line: " + line);
                 }
             }
 
