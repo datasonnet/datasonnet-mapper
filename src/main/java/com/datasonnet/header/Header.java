@@ -81,7 +81,7 @@ public class Header {
         Map<Integer, MediaType> allInputs = new HashMap<>(4);
         Map<Integer, MediaType> dataformat = new HashMap<>(4);
 
-        for (String line : headerSection.split(System.lineSeparator())) {
+        for (String line : headerSection.split("\\r?\\n")) {
             try {
                 if (line.startsWith(DATASONNET_VERSION)) {
                     String[] tokens = line.split("=", 2);
