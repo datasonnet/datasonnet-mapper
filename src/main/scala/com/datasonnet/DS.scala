@@ -21,7 +21,7 @@ import java.net.URL
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.time.{Instant, Period, ZoneId, ZoneOffset}
+import java.time.{Duration, Instant, Period, ZoneId, ZoneOffset}
 import java.util.function.Function
 import java.util.{Base64, Scanner}
 
@@ -858,6 +858,7 @@ object DS extends Library {
             .minusNanos(date.getNano)
             .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
       },
+
       builtin("atBeginningOfWeek", "datetime"){
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
@@ -883,6 +884,116 @@ object DS extends Library {
             .minusSeconds(date.getSecond)
             .minusNanos(date.getNano)
             .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+      },
+
+      builtin("date", "obj") {
+        (ev,fs,obj: Val.Obj) =>
+          //year, month, dayOfMonth, hour, minute, second, nanoSecond, zoneId
+          val out = mutable.Map[String, Val]()
+          obj.foreachVisibleKey( (key,_) => out.addOne(key, obj.value(key,-1)(fs,ev)))
+          java.time.ZonedDateTime.of(
+            out.getOrElse("year",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toInt,
+            out.getOrElse("month",Val.Lazy(Val.Num(1)).force).cast[Val.Num].value.toInt,
+            out.getOrElse("day",Val.Lazy(Val.Num(1)).force).cast[Val.Num].value.toInt,
+            out.getOrElse("hour",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toInt,
+            out.getOrElse("minute",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toInt,
+            out.getOrElse("second",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toInt,
+            0, //out.getOrElse("nanosecond",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toInt TODO?
+            ZoneId.of(out.getOrElse("timezone",Val.Lazy(Val.Str("Z")).force).cast[Val.Str].value)
+          ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+      },
+
+      builtin0("today") {
+        (_,_,_) =>
+          val date = java.time.ZonedDateTime.now()
+          date.minusHours(date.getHour)
+            .minusMinutes(date.getMinute)
+            .minusSeconds(date.getSecond)
+            .minusNanos(date.getNano).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+      },
+
+      builtin0("tomorrow") {
+        (_,_,_) =>
+          val date = java.time.ZonedDateTime.now()
+          date.plusDays(1)
+            .minusHours(date.getHour)
+            .minusMinutes(date.getMinute)
+            .minusSeconds(date.getSecond)
+            .minusNanos(date.getNano).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+      },
+
+      builtin0("yesterday") {
+        (_,_,_) =>
+          val date = java.time.ZonedDateTime.now()
+          date.minusDays(1)
+            .minusHours(date.getHour)
+            .minusMinutes(date.getMinute)
+            .minusSeconds(date.getSecond)
+            .minusNanos(date.getNano).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+      },
+
+    ),
+
+    "period" -> moduleFrom(
+      builtin("between", "datetimeone", "datetimetwo") {
+        (_,_, datetimeone: String , datetimetwo: String) =>
+          Period.between(
+            java.time.ZonedDateTime.parse(datetimeone, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV")).toLocalDate,
+            java.time.ZonedDateTime.parse(datetimetwo, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV")).toLocalDate
+          ).toString
+      },
+
+      builtin("days", "num") {
+        (_,_, num: Int ) =>
+          Period.ofDays(num).toString
+      },
+
+      builtin("duration", "obj") {
+        (ev,fs, obj: Val.Obj ) =>
+          val out = mutable.Map[String, Val]()
+          obj.foreachVisibleKey( (key,_) => out.addOne(key, obj.value(key,-1)(fs,ev)))
+          Duration.ZERO
+            .plusDays(out.getOrElse("days",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toLong)
+            .plusHours(out.getOrElse("hours",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toLong)
+            .plusMinutes(out.getOrElse("minutes",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toLong)
+            .plusSeconds(out.getOrElse("seconds",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toLong)
+            .toString
+      },
+
+      builtin("hours", "num") {
+        (_,_, num: Int ) =>
+          Duration.ofHours(num).toString
+      },
+
+      builtin("minutes", "num") {
+        (_,_, num: Int ) =>
+          Duration.ofMinutes(num).toString
+      },
+
+      builtin("months", "num") {
+        (_,_, num: Int ) =>
+          Period.ofMonths(num).toString
+      },
+
+      builtin("period", "obj") {
+        (ev,fs, obj: Val.Obj ) =>
+          val out = mutable.Map[String, Val]()
+          obj.foreachVisibleKey( (key,_) => out.addOne(key, obj.value(key,-1)(fs,ev)))
+          Period.ZERO
+            .plusYears(out.getOrElse("years",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toLong)
+            .plusMonths(out.getOrElse("months",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toLong)
+            .plusDays(out.getOrElse("days",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toLong)
+            .toString
+      },
+
+      builtin("seconds", "num") {
+        (_,_, num: Int ) =>
+          Duration.ofSeconds(num).toString
+      },
+
+      builtin("years", "num") {
+        (_,_, num: Int ) =>
+          Period.ofYears(num).toString
       },
     ),
 

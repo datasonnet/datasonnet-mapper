@@ -125,4 +125,40 @@ public class ZonedDateTimeTest {
         String newDate = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("2020-01-01T00:00:00.000Z", newDate );
     }
+
+    @Test
+    void testDateTime_date(){
+        Mapper mapper = new Mapper("ds.datetime.date({\"year\":2020})");
+        String newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2020-01-01T00:00:00.000Z", newDate );
+
+        mapper = new Mapper("ds.datetime.date({\"month\":12})");
+        newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("0001-12-01T00:00:00.000Z", newDate );
+
+        mapper = new Mapper("ds.datetime.date({\"day\":20})");
+        newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("0001-01-20T00:00:00.000Z", newDate );
+
+        mapper = new Mapper("ds.datetime.date({\"hour\":23})");
+        newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("0001-01-01T23:00:00.000Z", newDate );
+
+        mapper = new Mapper("ds.datetime.date({\"minute\":23})");
+        newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("0001-01-01T00:23:00.000Z", newDate );
+
+        mapper = new Mapper("ds.datetime.date({\"second\":23})");
+        newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("0001-01-01T00:00:23.000Z", newDate );
+
+        /*
+        mapper = new Mapper("ds.datetime.date({\"nanosecond\":1, \"second\": 1})");
+        newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("0001-01-01T00:00:00.555Z", newDate );*/
+
+        mapper = new Mapper("ds.datetime.date({\"timezone\":\"UTC\"})");
+        newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("0001-01-01T00:00:00.000UTC", newDate );
+    }
 }
