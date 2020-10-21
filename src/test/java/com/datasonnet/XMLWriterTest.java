@@ -37,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class XMLWriterTest {
 
-    @Disabled
     @Test
     void testOverrideNamespaces() throws Exception {
         String json = "{\"b:a\":{\"@xmlns\":{\"b\":\"http://example.com/1\",\"b1\":\"http://example.com/2\"},\"b1:b\":{}}}";
@@ -61,7 +60,6 @@ public class XMLWriterTest {
         assertThat(mapped, containsString("xmlns=\"http://example.com/2\""));
     }
 
-    @Disabled
     @Test
     void testNamespaceBump() throws Exception {
         String json = "{\"b:a\":{\"@xmlns\":{\"b\":\"http://example.com/1\",\"b1\":\"http://example.com/2\"},\"b1:b\":{}}}";
