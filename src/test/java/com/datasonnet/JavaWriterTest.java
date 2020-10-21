@@ -28,10 +28,14 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+<<<<<<< HEAD
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+=======
+import java.util.*;
+>>>>>>> Added TimeZone support to Java de/serializer (#45)
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -49,7 +53,6 @@ public class JavaWriterTest {
         Document<String> data = new DefaultDocument<>(json, MediaTypes.APPLICATION_JSON);
 
         Mapper mapper = new Mapper(mapping);
-
 
         Document<Gizmo> mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, Gizmo.class);
 
