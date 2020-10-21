@@ -26,7 +26,6 @@ import java.util.TimeZone;
 public class JavaFormatPlugin implements DataFormatPlugin<Object> {
     public static String OUTPUT_CLASS = "OutputClass";
     public static String DATE_FORMAT = "DateFormat";
-    public static String TIMEZONE = "TimeZone";
     public static String FAIL_ON_EMPTY_BEANS = "FailOnEmptyBeans";
 
     public static String DEFAULT_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
@@ -41,7 +40,7 @@ public class JavaFormatPlugin implements DataFormatPlugin<Object> {
         module.addSerializer(JAXBElement.class, new JAXBElementSerializer());
         mapper.registerModule(module);
         DateFormat df = new SimpleDateFormat(params.containsKey(DATE_FORMAT) ? (String)params.get(DATE_FORMAT) : DEFAULT_DATE_FORMAT);
-        df.setTimeZone(TimeZone.getTimeZone(params.containsKey(TIMEZONE) ? (String) params.get(TIMEZONE) : DEFAULT_TIMEZONE));
+        df.setTimeZone(TimeZone.getTimeZone(DEFAULT_TIMEZONE));
         mapper.setDateFormat(df);
 
         if (params.containsKey(FAIL_ON_EMPTY_BEANS)) {
@@ -64,7 +63,7 @@ public class JavaFormatPlugin implements DataFormatPlugin<Object> {
             ObjectMapper mapper = new ObjectMapper();
             mapper.addMixIn(JAXBElement.class, JAXBElementMixIn.class);
             DateFormat df = new SimpleDateFormat(params.containsKey(DATE_FORMAT) ? (String) params.get(DATE_FORMAT) : DEFAULT_DATE_FORMAT);
-            df.setTimeZone(TimeZone.getTimeZone(params.containsKey(TIMEZONE) ? (String) params.get(TIMEZONE) : DEFAULT_TIMEZONE));
+            df.setTimeZone(TimeZone.getTimeZone(DEFAULT_TIMEZONE));
             mapper.setDateFormat(df);
 
             final JsonNode node = mapper.readTree(jsonString);
@@ -102,7 +101,6 @@ public class JavaFormatPlugin implements DataFormatPlugin<Object> {
     public Map<String, String> getReadParameters() {
         Map<String, String> readParams = new HashMap<>();
         readParams.put(DATE_FORMAT, "Controls the date format for serializing/deserializing");
-        readParams.put(TIMEZONE, "Controls the date timezone for serializing/deserializing");
         readParams.put(FAIL_ON_EMPTY_BEANS, "Controls whether exception is thrown if no serializer is found for a type");
         return readParams;
     }
@@ -112,7 +110,6 @@ public class JavaFormatPlugin implements DataFormatPlugin<Object> {
         Map<String, String> writeParams = new HashMap<>();
         writeParams.put(OUTPUT_CLASS, "Fully qualified class name of the output");
         writeParams.put(DATE_FORMAT, "Controls the date format for serializing/deserializing");
-        writeParams.put(TIMEZONE, "Controls the date timezone for serializing/deserializing");
         return writeParams;
     }
 
