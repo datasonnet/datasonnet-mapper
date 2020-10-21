@@ -824,8 +824,66 @@ object DS extends Library {
           java.time.ZonedDateTime
             .parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
             .toLocalDate.isLeapYear;
-      }
+      },
 
+      builtin("atBeginningOfDay", "datetime"){
+        (_,_,datetime: String) =>
+          val date = java.time.ZonedDateTime
+            .parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+          date.minusHours(date.getHour)
+              .minusMinutes(date.getMinute)
+              .minusSeconds(date.getSecond)
+              .minusNanos(date.getNano)
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+      },
+
+      builtin("atBeginningOfHour", "datetime"){
+        (_,_,datetime: String) =>
+          val date = java.time.ZonedDateTime
+            .parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+          date.minusMinutes(date.getMinute)
+            .minusSeconds(date.getSecond)
+            .minusNanos(date.getNano)
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+      },
+
+      builtin("atBeginningOfMonth", "datetime"){
+        (_,_,datetime: String) =>
+          val date = java.time.ZonedDateTime
+            .parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+          date.minusDays(date.getDayOfMonth-1)
+            .minusHours(date.getHour)
+            .minusMinutes(date.getMinute)
+            .minusSeconds(date.getSecond)
+            .minusNanos(date.getNano)
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+      },
+      builtin("atBeginningOfWeek", "datetime"){
+        (_,_,datetime: String) =>
+          val date = java.time.ZonedDateTime
+            .parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+          System.out.println(date.getDayOfWeek.getValue)
+
+          date.minusDays( if(date.getDayOfWeek.getValue == 7) 0 else date.getDayOfWeek.getValue  )
+            .minusHours(date.getHour)
+            .minusMinutes(date.getMinute)
+            .minusSeconds(date.getSecond)
+            .minusNanos(date.getNano)
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+      },
+
+      builtin("atBeginningOfYear", "datetime"){
+        (_,_,datetime: String) =>
+          val date = java.time.ZonedDateTime
+            .parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+          date.minusMonths(date.getMonthValue-1)
+            .minusDays(date.getDayOfMonth-1)
+            .minusHours(date.getHour)
+            .minusMinutes(date.getMinute)
+            .minusSeconds(date.getSecond)
+            .minusNanos(date.getNano)
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+      },
     ),
 
     "localdatetime" -> moduleFrom(
@@ -1141,9 +1199,14 @@ object DS extends Library {
           Val.Arr(deepFlatten(arr.value))
       },
 
-      builtin("indexOf", "array", "value") {
-        (_, _, array: Val.Arr, value: Val) =>
-          array.value.indexWhere(_.force == value)
+      builtin("indexOf", "container", "value") {
+        (_, _, container: Val, value: Val) =>
+          container match {
+            case Val.Str(str) => Val.Lazy(Val.Num(str.indexOf(value.cast[Val.Str].value))).force
+            case Val.Arr(array) => Val.Lazy(Val.Num(array.indexWhere(_.force == value))).force
+            case Val.Null => Val.Lazy(Val.Num(-1)).force
+            case i => throw Error.Delegate("Expected String or Array, got: " + i.prettyName)
+          }
       },
 
       builtin("indexWhere", "arr", "funct") {
@@ -1175,6 +1238,16 @@ object DS extends Library {
               }))
           })
           Val.Arr(out.toSeq)
+      },
+
+      builtin("lastIndexOf", "container", "value") {
+        (_, _, container: Val, value: Val) =>
+          container match {
+            case Val.Str(str) => Val.Lazy(Val.Num(str.lastIndexOf(value.cast[Val.Str].value))).force
+            case Val.Arr(array) => Val.Lazy(Val.Num(array.lastIndexWhere(_.force == value))).force
+            case Val.Null => Val.Lazy(Val.Num(-1)).force
+            case i => throw Error.Delegate("Expected String or Array, got: " + i.prettyName)
+          }
       },
 
       builtin0("leftJoin", "arrL", "arryR", "functL", "functR") {

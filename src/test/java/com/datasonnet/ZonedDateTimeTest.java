@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ZonedDateTimeTest {
@@ -80,5 +81,48 @@ public class ZonedDateTimeTest {
         String newTime = mapper.transform("{}").replaceAll("\"", "");
         assertTrue("21:00:00".equals(newTime));
 
+    }
+
+    @Test
+    void testDateTime_atBeginningOfDay(){
+        Mapper mapper = new Mapper("ds.datetime.atBeginningOfDay(\"2020-10-21T16:08:07.131Z\")");
+        String newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2020-10-21T00:00:00.000Z", newDate );
+    }
+
+    @Test
+    void testDateTime_atBeginningOfHour(){
+        Mapper mapper = new Mapper("ds.datetime.atBeginningOfHour(\"2020-10-21T16:08:07.131Z\")");
+        String newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2020-10-21T16:00:00.000Z", newDate );
+    }
+
+    @Test
+    void testDateTime_atBeginningOfMonth(){
+        Mapper mapper = new Mapper("ds.datetime.atBeginningOfMonth(\"2020-10-21T16:08:07.131Z\")");
+        String newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2020-10-01T00:00:00.000Z", newDate );
+
+        mapper = new Mapper("ds.datetime.atBeginningOfMonth(\"2020-10-01T16:08:07.131Z\")");
+        newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2020-10-01T00:00:00.000Z", newDate );
+    }
+
+    @Test
+    void testDateTime_atBeginningOfWeek(){
+        Mapper mapper = new Mapper("ds.datetime.atBeginningOfWeek(\"2020-10-21T16:08:07.131Z\")");
+        String newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2020-10-18T00:00:00.000Z", newDate );
+
+        mapper = new Mapper("ds.datetime.atBeginningOfWeek(\"2020-10-18T16:08:07.131Z\")");
+        newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2020-10-18T00:00:00.000Z", newDate );
+    }
+
+    @Test
+    void testDateTime_atBeginningOfYear(){
+        Mapper mapper = new Mapper("ds.datetime.atBeginningOfYear(\"2020-10-21T16:08:07.131Z\")");
+        String newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2020-01-01T00:00:00.000Z", newDate );
     }
 }
