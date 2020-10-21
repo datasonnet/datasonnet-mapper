@@ -15,10 +15,7 @@ import javax.xml.bind.Marshaller;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,8 +33,6 @@ public class JavaWriterTest {
         Document data = new StringDocument(json, "application/json");
 
         Mapper mapper = new Mapper(mapping);
-
-
         Document mapped = mapper.transform(data, new HashMap<>(), "application/java");
 
         Object result = mapped.getContentsAsObject();
@@ -52,14 +47,13 @@ public class JavaWriterTest {
         assertEquals("ACME123", gizmo.getManufacturer().getManufacturerCode());
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
         assertEquals("2020-01-06", df.format(gizmo.getDate()));
 
         //Test with default output, i.e. java.util.HashMap
         mapping = mapping.substring(mapping.lastIndexOf("*/") + 2);
 
         mapper = new Mapper(mapping);
-
-
         mapped = mapper.transform(data, new HashMap<>(), "application/java");
 
         result = mapped.getContentsAsObject();
@@ -68,8 +62,6 @@ public class JavaWriterTest {
         Map gizmoMap = (Map)result;
         assertTrue(gizmoMap.get("colors") instanceof java.util.ArrayList);
         assertTrue(gizmoMap.get("manufacturer") instanceof java.util.HashMap);
-
-
     }
 
     @Test
