@@ -169,7 +169,7 @@
 //        assertEquals("{\"z\":\"z\",\"a\":\"a\",\"v2\":\"v2value\",\"v1\":\"v1value\",\"y\":\"y\",\"t\":\"t\"}", mapped.trim());
 //
 //        datasonnet = "/** DataSonnet\n" +
-//                     "version=1.0\n" +
+//                     "version=2.0\n" +
 //                     "output.preserveOrder=false\n*/\n" + datasonnet;
 //
 //        mapper = new Mapper(datasonnet, variables.keySet(), true);

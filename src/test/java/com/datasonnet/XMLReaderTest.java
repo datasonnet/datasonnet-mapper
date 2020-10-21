@@ -43,7 +43,7 @@ public class XMLReaderTest {
         // note how b is bound to the default namespace, which means the 'b' above needs to be auto-rebound
 
         String jsonnet = "/** DataSonnet\n" +
-                "version=1.0\n" +
+                "version=2.0\n" +
                 "input payload application/xml;NamespaceDeclarations.b=\"http://example.com/1\"\n" +
                 "*/\n" +
                 "payload";

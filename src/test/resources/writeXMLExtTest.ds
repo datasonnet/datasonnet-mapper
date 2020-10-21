@@ -1,5 +1,5 @@
 /** DataSonnet
-version=1.0
+version=2.0
 output application/xml;NamespaceSeparator=%; TextValueKey=__text; AttributeCharacter=*; XmlVersion=1.0
 */
 payload

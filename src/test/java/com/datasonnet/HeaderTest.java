@@ -104,7 +104,7 @@ public class HeaderTest {
     void testUnknownHeaderFails() {
         assertThrows(HeaderParseException.class,  ()  -> {
            Header.parseHeader("/** DataSonnet\n" +
-                   "version=1.0\n" +
+                   "version=2.0\n" +
                    "nonsense\n" +
                    "*/");
         });
@@ -114,7 +114,7 @@ public class HeaderTest {
     void testUnterminatedHeaderFailsNicely() {
         assertThrows(HeaderParseException.class,  ()  -> {
             Header.parseHeader("/** DataSonnet\n" +
-                    "version=1.0\n");
+                    "version=2.0\n");
         });
     }
 }
