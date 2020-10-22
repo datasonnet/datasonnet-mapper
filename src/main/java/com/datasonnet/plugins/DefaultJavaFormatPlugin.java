@@ -24,10 +24,12 @@ import com.datasonnet.plugins.jackson.JAXBElementMixIn;
 import com.datasonnet.plugins.jackson.JAXBElementSerializer;
 import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.ujsonUtils;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.jetbrains.annotations.Nullable;
 import ujson.Value;
 
 import javax.xml.bind.JAXBElement;
@@ -39,6 +41,8 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
     private static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper();
     public static final String DEFAULT_DS_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
     public static final String DS_PARAM_DATE_FORMAT = "dateformat";
+    public static final String DS_PARAM_TYPE = "type";  // aligns with existing java object mimetypes
+    public static final String DS_PARAM_OUTPUT_CLASS = "outputclass";  // supports legacy
 
     private static final Map<Integer, ObjectMapper> MAPPER_CACHE = new HashMap<>(4);
 
@@ -52,11 +56,13 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         DEFAULT_OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
     }
 
-    public DefaultJavaFormatPlugin() {
+    public DefaultJavaFormatPlugin() throws PluginException {
         supportedTypes.add(MediaTypes.APPLICATION_JAVA);
 
         readerParams.add(DS_PARAM_DATE_FORMAT);
-        writerParams.add(DS_PARAM_DATE_FORMAT);
+        readerParams.add(DS_PARAM_TYPE);
+        readerParams.add(DS_PARAM_OUTPUT_CLASS);
+        writerParams.addAll(readerParams);
     }
 
     @Override
@@ -75,14 +81,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
             return ujson.Null$.MODULE$;
         }
 
-        ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
-
-        if (doc.getMediaType().getParameters().containsKey(DS_PARAM_DATE_FORMAT)) {
-            String dateFormat = doc.getMediaType().getParameter(DS_PARAM_DATE_FORMAT);
-            int cacheKey = dateFormat.hashCode();
-            mapper = MAPPER_CACHE.computeIfAbsent(cacheKey,
-                    integer -> new ObjectMapper().setDateFormat(new SimpleDateFormat(dateFormat)));
-        }
+        ObjectMapper mapper = getObjectMapper(doc.getMediaType());
 
         JsonNode inputAsNode = mapper.valueToTree(doc.getContent());
         return ujsonFrom(inputAsNode);
@@ -91,6 +90,45 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
     @SuppressWarnings("unchecked")
     @Override
     public <T> Document<T> write(Value input, MediaType mediaType, Class<T> targetType) throws PluginException {
+        T converted = writeValue(input, mediaType, targetType);
+        return new DefaultDocument<>(converted);
+    }
+
+    @Nullable
+    private <T> T writeValue(Value input, MediaType mediaType, Class<T> targetType) throws PluginException {
+        ObjectMapper mapper = getObjectMapper(mediaType);
+
+        try {
+            Object inputAsJava = ujsonUtils.javaObjectFrom(input);
+            if(mediaType.getParameters().containsKey(DS_PARAM_TYPE) || mediaType.getParameters().containsKey(DS_PARAM_OUTPUT_CLASS)) {
+                String typeName = getJavaType(mediaType);
+                if (!"".equals(typeName)) {  // make it possible to opt out with a media type that blanks the param
+                    JavaType javaType = mapper.getTypeFactory().constructFromCanonical(typeName);
+                    // provide a requested subtype, if it's compatible with the type requested
+                    if (javaType.isTypeOrSubTypeOf(targetType)) {
+                        // we already have something that works
+                        if(javaType.isTypeOrSuperTypeOf(inputAsJava.getClass())) {
+                            return (T) inputAsJava;
+                        } else {
+                            return mapper.convertValue(inputAsJava, javaType);
+                        }
+                    }  // otherwise fall through to default behavior
+                }
+            }
+
+            // fancier version of the Object.equals optimization
+            if(targetType.isAssignableFrom(inputAsJava.getClass())) {
+                return (T) inputAsJava;
+            } else {
+                return mapper.convertValue(inputAsJava, targetType);
+            }
+
+        } catch (IllegalArgumentException e) {
+            throw new PluginException("Unable to convert to target type", e);
+        }
+    }
+
+    private ObjectMapper getObjectMapper(MediaType mediaType) {
         ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
 
         if (mediaType.getParameters().containsKey(DS_PARAM_DATE_FORMAT)) {
@@ -99,20 +137,14 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
             mapper = MAPPER_CACHE.computeIfAbsent(cacheKey,
                     integer -> new ObjectMapper().setDateFormat(new SimpleDateFormat(dateFormat)));
         }
+        return mapper;
+    }
 
-        try {
-            Object inputAsJava = ujsonUtils.javaObjectFrom(input);
-            T converted;
-
-            if (Object.class.equals(targetType)) {
-                converted = (T) inputAsJava;
-            } else {
-                converted = mapper.convertValue(inputAsJava, targetType);
-            }
-
-            return new DefaultDocument<>(converted);
-        } catch (IllegalArgumentException e) {
-            throw new PluginException("Unable to convert to target type", e);
+    private String getJavaType(MediaType mediaType) {
+        if(mediaType.getParameters().containsKey(DS_PARAM_TYPE)) {
+            return mediaType.getParameter(DS_PARAM_TYPE);
+        } else {
+            return mediaType.getParameter(DS_PARAM_OUTPUT_CLASS);
         }
     }
 }
