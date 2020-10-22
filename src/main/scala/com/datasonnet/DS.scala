@@ -21,7 +21,7 @@ import java.net.URL
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.time.{Duration, Instant, Period, ZoneId, ZoneOffset}
+import java.time.{Duration, Period, ZoneId, ZonedDateTime}
 import java.util.function.Function
 import java.util.{Base64, Scanner}
 
@@ -758,54 +758,56 @@ object DS extends Library {
 
   override def modules(dataFormats: DataFormatService): Map[String, Val.Obj] = Map(
     "datetime" -> moduleFrom(
-      builtin0("now") { (vals, ev, fs) => Instant.now.toString },
+      builtin0("now") { (vals, ev, fs) => ZonedDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME) },
 
-      builtin("offset", "datetime", "period") { (_, _, v1: String, v2: String) =>
-        // NOTE: DEMO ONLY (in particular, missing proper error handling)
-        val datetime = java.time.ZonedDateTime.parse(v1, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-        val period = Period.parse(v2)
-        datetime.plus(period).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+      builtin("parse", "datetime", "inputFormat") { (_, _, datetime: String, inputFormat: String) =>
+        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
+        datetimeObj.format(DateTimeFormatter.ISO_DATE_TIME)
       },
 
-      builtin("format", "datetime", "inputFormat", "outputFormat") {
-        (_, _, datetime: String, inputFormat: String, outputFormat: String) =>
-          val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
-          datetimeObj.format(DateTimeFormatter.ofPattern(outputFormat))
+      builtin("format", "datetime", "outputFormat") { (_, _, datetime: String, outputFormat: String) =>
+        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
+        datetimeObj.format(DateTimeFormatter.ofPattern(outputFormat))
       },
 
-      builtin0("compare", "datetime1", "format1", "datetime2", "format2") {
-        (vals, ev, fs) =>
-          val strValSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead, StringRead))
-          val datetime1 = strValSeq(0).asInstanceOf[String]
-          val format1 = strValSeq(1).asInstanceOf[String]
-          val datetime2 = strValSeq(2).asInstanceOf[String]
-          val format2 = strValSeq(3).asInstanceOf[String]
+      builtin("plus", "datetime", "period") { (_, _, date: String, period: String) =>
+        val datetime = java.time.ZonedDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME)
+        val periodObj = Period.parse(period)
+        datetime.plus(periodObj).format(DateTimeFormatter.ISO_DATE_TIME)
+      },
 
-          val datetimeObj1 = java.time.ZonedDateTime.parse(datetime1, DateTimeFormatter.ofPattern(format1))
-          val datetimeObj2 = java.time.ZonedDateTime.parse(datetime2, DateTimeFormatter.ofPattern(format2))
+      builtin("minus", "datetime", "period") { (_, _, date: String, period: String) =>
+        val datetime = java.time.ZonedDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME)
+        val periodObj = Period.parse(period)
+        datetime.minus(periodObj).format(DateTimeFormatter.ISO_DATE_TIME)
+      },
+
+        builtin("daysBetween", "datetime1", "datetime2") { (_, _, datetime1: String, datetime2: String) =>
+          val datetimeObj1 = java.time.ZonedDateTime.parse(datetime1, DateTimeFormatter.ISO_DATE_TIME)
+          val datetimeObj2 = java.time.ZonedDateTime.parse(datetime2, DateTimeFormatter.ISO_DATE_TIME)
           datetimeObj1.compareTo(datetimeObj2)
       },
 
-      builtin("changeTimeZone", "datetime", "format", "timezone") {
-        (_, _, datetime: String, format: String, timezone: String) =>
-          val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
+      builtin("changeTimeZone", "datetime", "timezone") {
+        (_, _, datetime: String, timezone: String) =>
+          val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
           val zoneId = ZoneId.of(timezone)
           val newDateTimeObj = datetimeObj.withZoneSameInstant(zoneId)
-          newDateTimeObj.format(DateTimeFormatter.ofPattern(format))
+          newDateTimeObj.format(DateTimeFormatter.ISO_DATE_TIME)
       },
 
-      builtin("toLocalDate", "datetime", "format") { (_, _, datetime: String, format: String) =>
-        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
+      builtin("toLocalDate", "datetime") { (_, _, datetime: String) =>
+        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
         datetimeObj.toLocalDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
       },
 
-      builtin("toLocalTime", "datetime", "format") { (_, _, datetime: String, format: String) =>
-        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
+      builtin("toLocalTime", "datetime") { (_, _, datetime: String) =>
+        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
         datetimeObj.toLocalTime.format(DateTimeFormatter.ISO_LOCAL_TIME)
       },
 
-      builtin("toLocalDateTime", "datetime", "format") { (_, _, datetime: String, format: String) =>
-        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
+      builtin("toLocalDateTime", "datetime") { (_, _, datetime: String) =>
+        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
         datetimeObj.toLocalDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
       },
 
@@ -813,56 +815,56 @@ object DS extends Library {
       builtin("daysBetween", "datetime", "datetwo") {
         (_, _, datetimeone: String, datetimetwo: String) =>
           val dateone = java.time.ZonedDateTime
-            .parse(datetimeone, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .parse(datetimeone, DateTimeFormatter.ISO_DATE_TIME)
           val datetwo = java.time.ZonedDateTime
-            .parse(datetimetwo, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .parse(datetimetwo, DateTimeFormatter.ISO_DATE_TIME)
           ChronoUnit.DAYS.between(dateone, datetwo).abs.toDouble;
       },
 
       builtin("isLeapYear", "datetime") {
         (_, _, datetime: String) =>
           java.time.ZonedDateTime
-            .parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
             .toLocalDate.isLeapYear;
       },
 
       builtin("atBeginningOfDay", "datetime"){
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
-            .parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
           date.minusHours(date.getHour)
               .minusMinutes(date.getMinute)
               .minusSeconds(date.getSecond)
               .minusNanos(date.getNano)
-            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .format(DateTimeFormatter.ISO_DATE_TIME)
       },
 
       builtin("atBeginningOfHour", "datetime"){
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
-            .parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
           date.minusMinutes(date.getMinute)
             .minusSeconds(date.getSecond)
             .minusNanos(date.getNano)
-            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .format(DateTimeFormatter.ISO_DATE_TIME)
       },
 
       builtin("atBeginningOfMonth", "datetime"){
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
-            .parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
           date.minusDays(date.getDayOfMonth-1)
             .minusHours(date.getHour)
             .minusMinutes(date.getMinute)
             .minusSeconds(date.getSecond)
             .minusNanos(date.getNano)
-            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .format(DateTimeFormatter.ISO_DATE_TIME)
       },
 
       builtin("atBeginningOfWeek", "datetime"){
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
-            .parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
           System.out.println(date.getDayOfWeek.getValue)
 
           date.minusDays( if(date.getDayOfWeek.getValue == 7) 0 else date.getDayOfWeek.getValue  )
@@ -870,20 +872,20 @@ object DS extends Library {
             .minusMinutes(date.getMinute)
             .minusSeconds(date.getSecond)
             .minusNanos(date.getNano)
-            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .format(DateTimeFormatter.ISO_DATE_TIME)
       },
 
       builtin("atBeginningOfYear", "datetime"){
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
-            .parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
           date.minusMonths(date.getMonthValue-1)
             .minusDays(date.getDayOfMonth-1)
             .minusHours(date.getHour)
             .minusMinutes(date.getMinute)
             .minusSeconds(date.getSecond)
             .minusNanos(date.getNano)
-            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .format(DateTimeFormatter.ISO_DATE_TIME)
       },
 
       builtin("date", "obj") {
@@ -900,7 +902,7 @@ object DS extends Library {
             out.getOrElse("second",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toInt,
             0, //out.getOrElse("nanosecond",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toInt TODO?
             ZoneId.of(out.getOrElse("timezone",Val.Lazy(Val.Str("Z")).force).cast[Val.Str].value)
-          ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+          ).format(DateTimeFormatter.ISO_DATE_TIME)
       },
 
       builtin0("today") {
@@ -909,7 +911,7 @@ object DS extends Library {
           date.minusHours(date.getHour)
             .minusMinutes(date.getMinute)
             .minusSeconds(date.getSecond)
-            .minusNanos(date.getNano).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .minusNanos(date.getNano).format(DateTimeFormatter.ISO_DATE_TIME)
       },
 
       builtin0("tomorrow") {
@@ -919,7 +921,7 @@ object DS extends Library {
             .minusHours(date.getHour)
             .minusMinutes(date.getMinute)
             .minusSeconds(date.getSecond)
-            .minusNanos(date.getNano).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .minusNanos(date.getNano).format(DateTimeFormatter.ISO_DATE_TIME)
       },
 
       builtin0("yesterday") {
@@ -929,7 +931,7 @@ object DS extends Library {
             .minusHours(date.getHour)
             .minusMinutes(date.getMinute)
             .minusSeconds(date.getSecond)
-            .minusNanos(date.getNano).format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV"))
+            .minusNanos(date.getNano).format(DateTimeFormatter.ISO_DATE_TIME)
       },
 
     ),
@@ -938,8 +940,8 @@ object DS extends Library {
       builtin("between", "datetimeone", "datetimetwo") {
         (_,_, datetimeone: String , datetimetwo: String) =>
           Period.between(
-            java.time.ZonedDateTime.parse(datetimeone, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV")).toLocalDate,
-            java.time.ZonedDateTime.parse(datetimetwo, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSVV")).toLocalDate
+            java.time.ZonedDateTime.parse(datetimeone, DateTimeFormatter.ISO_DATE_TIME).toLocalDate,
+            java.time.ZonedDateTime.parse(datetimetwo, DateTimeFormatter.ISO_DATE_TIME).toLocalDate
           ).toString
       },
 
@@ -995,39 +997,6 @@ object DS extends Library {
         (_,_, num: Int ) =>
           Period.ofYears(num).toString
       },
-    ),
-
-    "localdatetime" -> moduleFrom(
-      builtin0("now") { (vs, extVars, wd) =>
-        val datetimeObj = java.time.LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
-        datetimeObj.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-      },
-
-      builtin("offset", "datetime", "period") { (_, _, v1: String, v2: String) =>
-        // NOTE: DEMO ONLY (in particular, missing proper error handling)
-        val datetime = java.time.LocalDateTime.parse(v1, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-        val period = Period.parse(v2)
-        datetime.plus(period).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-      },
-
-      builtin("format", "datetime", "inputFormat", "outputFormat") {
-        (_, _, datetime: String, inputFormat: String, outputFormat: String) =>
-          val datetimeObj = java.time.LocalDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
-          datetimeObj.format(DateTimeFormatter.ofPattern(outputFormat))
-      },
-
-      builtin0("compare", "datetime1", "format1", "datetime2", "format2") {
-        (vals, ev, fs) =>
-          val strValSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead, StringRead))
-          val datetime1 = strValSeq(0).asInstanceOf[String]
-          val format1 = strValSeq(1).asInstanceOf[String]
-          val datetime2 = strValSeq(2).asInstanceOf[String]
-          val format2 = strValSeq(3).asInstanceOf[String]
-
-          val datetimeObj1 = java.time.LocalDateTime.parse(datetime1, DateTimeFormatter.ofPattern(format1))
-          val datetimeObj2 = java.time.LocalDateTime.parse(datetime2, DateTimeFormatter.ofPattern(format2))
-          datetimeObj1.compareTo(datetimeObj2)
-      }
     ),
 
     "crypto" -> moduleFrom(

@@ -27,7 +27,7 @@ public class ZonedDateTimeTest {
 
     @Test
     void testOffset() {
-        Mapper mapper = new Mapper("ds.datetime.offset(\"2019-07-22T21:00:00Z\", \"P1Y1D\")");
+        Mapper mapper = new Mapper("ds.datetime.plus(\"2019-07-22T21:00:00Z\", \"P1Y1D\")");
         String offsetDate = mapper.transform("{}").replaceAll("\"", "");
         assertTrue("2020-07-23T21:00:00Z".equals(offsetDate));
 //        System.out.println("Offset date is " + offsetDate);
