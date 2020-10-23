@@ -100,6 +100,7 @@ public class XMLReaderTest {
 
 
         String mappedJson = mapper.transform(new DefaultDocument<>(xmlData, MediaTypes.APPLICATION_XML), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
+
         JSONAssert.assertEquals(expectedJson, mappedJson, false);
     }
 

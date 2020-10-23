@@ -29,7 +29,7 @@ trait XMLLoader {
   /* Override this to use a different SAXParser. */
   def parser: SAXParser = {
     val factory = SAXParserFactory.newInstance
-    factory.setNamespaceAware(false)
+    factory.setNamespaceAware(true)
 
     // Safer parsing settings to avoid certain class of XML attacks
     // See https://github.com/scala/scala-xml/issues/17
