@@ -45,6 +45,6 @@ object XML extends XMLLoader {
   def writeXML(sb: java.io.Writer, root: (String, ujson.Obj), effParams: EffectiveParams): Unit = {
     // TODO: get charset from params
     if (!effParams.omitDeclaration) sb.append("<?xml version='" + effParams.version + "' encoding='" + Charset.defaultCharset().displayName() + "'?>")
-    BadgerFishWriter.serialize(root, sb, effParams).toString
+    new BadgerFishWriter(effParams).serialize(root, sb).toString
   }
 }

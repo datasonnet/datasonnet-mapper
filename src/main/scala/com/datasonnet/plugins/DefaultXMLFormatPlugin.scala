@@ -160,6 +160,7 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
       val declarations: Map[String, String] = mediaType.getParameters.asScala.toList
         .filter(entryVal => entryVal._1.matches(DS_NAMESPACE_DECLARATIONS))
         .map(entryVal => (entryVal._2, entryVal._1.substring(DS_NAMESPACE_DECLARATIONS.length - 3)))
+        .map(entry => if (entry._2 == "$") (entry._1, "") else entry)
         .toMap
 
       EffectiveParams(nsSep, txtPref, cdataPref, attrPref, omitDecl, ver, xmlns, nullEmpty, autoEmpty, Map.from(declarations))

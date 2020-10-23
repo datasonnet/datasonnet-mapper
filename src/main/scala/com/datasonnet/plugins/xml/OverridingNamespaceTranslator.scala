@@ -55,6 +55,9 @@ class OverridingNamespaceTranslator(private val fixed: Map[String, String]) exte
   override def getPrefix(uri: String): String = writeTranslated.getPrefix(uri)
   override def getPrefixes(uri: String): util.Enumeration[String] = writeTranslated.getPrefixes(uri)
 
+  // we need this for root namespace detection to work properly
+  override def getURI(prefix: String): String = writeTranslated.getURI(prefix)
+
   override def processName(qName: String, parts: Array[String], isAttribute: Boolean): Array[String] = {
     val result = super.processName(qName, parts, isAttribute)  // modifies parts, returns it or null
     if (!"".equals(parts(0))) { // namespace present
