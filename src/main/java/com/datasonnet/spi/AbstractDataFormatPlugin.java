@@ -54,7 +54,6 @@ public abstract class AbstractDataFormatPlugin implements DataFormatPlugin {
                 return true;
             }
         }
-
         return false;
     }
 
