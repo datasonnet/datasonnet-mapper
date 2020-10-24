@@ -31,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -64,6 +65,12 @@ public class JavaWriterTest {
         assertEquals("ACME123", gizmo.getManufacturer().getManufacturerCode());
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        // what's going on here is, a java Date is a moment in time, and when not provided with locale info
+        // -- such as if it is just a play yyyy-MM-dd -- it uses the locale of the local time zone, which is bad.
+        // The best way to solve this would be using a more appropriate class, specifically a LocalDate,
+        // but absent that it's necessary to make sure that the time zone things go in in is the time zone they
+        // come out. We've forced UTC internally, here, pending a more complete datetime overhaul.
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
         assertEquals("2020-01-06", df.format(gizmo.getDate()));
 
         //Test with default output, i.e. java.util.HashMap

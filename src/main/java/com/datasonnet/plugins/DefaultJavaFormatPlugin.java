@@ -29,13 +29,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ujson.Value;
 
 import javax.xml.bind.JAXBElement;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
+
 
 public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
     private static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper();
@@ -51,9 +55,16 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         module.addSerializer(JAXBElement.class, new JAXBElementSerializer());
         DEFAULT_OBJECT_MAPPER.registerModule(module);
         DEFAULT_OBJECT_MAPPER.addMixIn(JAXBElement.class, JAXBElementMixIn.class);
-        DEFAULT_OBJECT_MAPPER.setDateFormat(new SimpleDateFormat(DEFAULT_DS_DATE_FORMAT));
         // TODO: 9/8/20 add test for empty beans
         DEFAULT_OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        DEFAULT_OBJECT_MAPPER.setDateFormat(makeDateFormat(DEFAULT_DS_DATE_FORMAT));
+    }
+
+    @NotNull
+    private static DateFormat makeDateFormat(String defaultDsDateFormat) {
+        DateFormat format = new SimpleDateFormat(defaultDsDateFormat);
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return format;
     }
 
     public DefaultJavaFormatPlugin() throws PluginException {
@@ -135,7 +146,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
             String dateFormat = mediaType.getParameter(DS_PARAM_DATE_FORMAT);
             int cacheKey = dateFormat.hashCode();
             mapper = MAPPER_CACHE.computeIfAbsent(cacheKey,
-                    integer -> new ObjectMapper().setDateFormat(new SimpleDateFormat(dateFormat)));
+                    integer -> new ObjectMapper().setDateFormat(makeDateFormat(dateFormat)));
         }
         return mapper;
     }
