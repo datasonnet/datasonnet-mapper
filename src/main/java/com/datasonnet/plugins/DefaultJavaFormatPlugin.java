@@ -16,6 +16,7 @@ package com.datasonnet.plugins;
  * limitations under the License.
  */
 
+import com.datasonnet.RecentsMap;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaType;
@@ -36,7 +37,6 @@ import ujson.Value;
 import javax.xml.bind.JAXBElement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -48,7 +48,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
     public static final String DS_PARAM_TYPE = "type";  // aligns with existing java object mimetypes
     public static final String DS_PARAM_OUTPUT_CLASS = "outputclass";  // supports legacy
 
-    private static final Map<Integer, ObjectMapper> MAPPER_CACHE = new HashMap<>(4);
+    private static final Map<Integer, ObjectMapper> MAPPER_CACHE = new RecentsMap<>(64);
 
     static {
         SimpleModule module = new SimpleModule();
