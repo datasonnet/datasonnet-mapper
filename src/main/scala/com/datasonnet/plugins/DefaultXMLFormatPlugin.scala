@@ -22,6 +22,7 @@ import java.nio.charset.Charset
 
 import com.datasonnet.document
 import com.datasonnet.document.{DefaultDocument, MediaType, MediaTypes}
+import com.datasonnet.header.Header
 import com.datasonnet.plugins.xml.XML
 import com.datasonnet.spi.{AbstractDataFormatPlugin, PluginException}
 import ujson.Value
@@ -140,7 +141,7 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
     }
   }
 
-  case class EffectiveParams(nsSeparator: String, textKeyPrefix: String,
+  case class EffectiveParams(dsVersion:String, nsSeparator: String, textKeyPrefix: String,
                              cdataKeyPrefix: String, attrKeyPrefix: String,
                              omitDeclaration: Boolean, version: String,
                              xmlnsKey: String, nullAsEmpty: Boolean,
@@ -163,7 +164,7 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
         .map(entry => if (entry._2 == "$") (entry._1, "") else entry)
         .toMap
 
-      EffectiveParams(nsSep, txtPref, cdataPref, attrPref, omitDecl, ver, xmlns, nullEmpty, autoEmpty, Map.from(declarations))
+      EffectiveParams(mediaType.getParameter(Header.MediaTypeParameters.VERSION), nsSep, txtPref, cdataPref, attrPref, omitDecl, ver, xmlns, nullEmpty, autoEmpty, declarations)
     }
   }
 

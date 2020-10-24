@@ -93,14 +93,22 @@ public class XMLWriterTest {
 
         Mapper mapper = new Mapper(datasonnet);
 
+        String mappedXml = mapper.transform(new DefaultDocument<>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
+
+        assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
+    }
+
+    @Test
+    void testNoDoubleWrite() throws Exception {
+        String jsonData = TestResourceReader.readFileAsString("writeXMLExtDouble.json");
+        String datasonnet = TestResourceReader.readFileAsString("writeXMLExtTest.ds");
+        String expectedXml = TestResourceReader.readFileAsString("readXMLExtTest.xml");
+
+        Mapper mapper = new Mapper(datasonnet);
 
         String mappedXml = mapper.transform(new DefaultDocument<>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
 
-        Map<String, String> namespaces = new HashMap<>();
-        namespaces.put("test", "http://www.modusbox.com");
-        namespaces.put("datasonnet", "http://www.modusbox.com");
-
-        assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).withNamespaceContext(namespaces).ignoreWhitespace());
+        assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
     }
 
     @Test
@@ -121,7 +129,7 @@ public class XMLWriterTest {
 
     @Test
     void testNonAscii() throws Exception {
-        String jsonData = TestResourceReader.readFileAsString("xmlNonAscii.json");
+        String jsonData = TestResourceReader.readFileAsString("writerXmlNonAscii.json");
         String expectedXml = TestResourceReader.readFileAsString("xmlNonAscii.xml");
         String datasonnet = TestResourceReader.readFileAsString("xmlNonAscii.ds");
 

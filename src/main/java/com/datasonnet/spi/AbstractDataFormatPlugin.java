@@ -19,6 +19,7 @@ package com.datasonnet.spi;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
+import com.datasonnet.header.Header;
 import ujson.Value;
 
 import java.util.LinkedHashSet;
@@ -90,8 +91,8 @@ public abstract class AbstractDataFormatPlugin implements DataFormatPlugin {
 
     private boolean parametersAreSupported(MediaType requestedType, Set<String> supported) {
         for (String param : requestedType.getParameters().keySet()) {
-            if (!(MediaTypes.PARAM_QUALITY_FACTOR.equals(param) || MediaTypes.PARAM_CHARSET.equals(param))) {
-                // if it's not known params q or charset, and it's not supported param, we fail
+            if (!(param.startsWith(Header.MediaTypeParameters.PREFIX) || MediaTypes.PARAM_QUALITY_FACTOR.equals(param) || MediaTypes.PARAM_CHARSET.equals(param))) {
+                // if it's not known params q or charset, or a general prefix, and it's not supported param, we fail
                 boolean matched = false;
                 for (String supportedParam : supported) {
                     if (param.matches(supportedParam)) {

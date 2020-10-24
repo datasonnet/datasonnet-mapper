@@ -59,7 +59,7 @@ public class JavaReaderTest {
         String mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JSON).getContent();
 
         String expectedJson = TestResourceReader.readFileAsString("javaTest.json");
-        JSONAssert.assertEquals(expectedJson, mapped, false);
+        JSONAssert.assertEquals(expectedJson, mapped, true);
     }
 
     @Test

@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
 
 public class Header {
     public static final String DATASONNET_HEADER = "/** DataSonnet";
-    public static final Pattern VERSION_LINE = Pattern.compile("^version *= *(?<version>[a-zA-Z0-9.+-]+) *\\r?\\n");
+    public static final Pattern VERSION_LINE = Pattern.compile("^version *= *(?<version>[a-zA-Z0-9.+-]+) *(\\r?\\n|$)");
     public static final String DATASONNET_INPUT = "input";
     public static final String DATASONNET_OUTPUT = "output";
     public static final String DATASONNET_PRESERVE_ORDER = "preserveOrder";
@@ -294,11 +294,7 @@ public class Header {
     }
 
     public <T> Document<T> combineInputParams(String inputName, Document<T> doc) {
-        if (EMPTY == this) {
-            return doc;
-        }
-
-        Map<String, String> params = new HashMap<>(4);
+        Map<String, String> params = baseParams();
         MediaType mediaType = doc.getMediaType();
         Integer key = calculateIndex(mediaType);
 
@@ -327,12 +323,14 @@ public class Header {
         return doc.withMediaType(new MediaType(mediaType, params));
     }
 
-    public MediaType combineOutputParams(MediaType mediaType) {
-        if (EMPTY == this) {
-            return mediaType;
-        }
-
+    private Map<String, String> baseParams() {
         Map<String, String> params = new HashMap<>(4);
+        params.put(MediaTypeParameters.VERSION, getVersion());
+        return params;
+    }
+
+    public MediaType combineOutputParams(MediaType mediaType) {
+        Map<String, String> params = baseParams();
         Integer key = calculateIndex(mediaType);
 
         if (dataFormats.containsKey(key)) {
@@ -346,5 +344,10 @@ public class Header {
         params.putAll(mediaType.getParameters());
 
         return new MediaType(mediaType, params);
+    }
+
+    public static class MediaTypeParameters {
+        public static final String PREFIX = "ds_";
+        public static final String VERSION = "ds_version";
     }
 }

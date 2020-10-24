@@ -33,7 +33,7 @@ public class XMLReaderTest {
 
     @Test
     void testNonAscii() throws Exception {
-        mapAndAssert("xmlNonAscii.xml", "xmlNonAscii.json");
+        mapAndAssert20("xmlNonAscii.xml", "xmlNonAscii.json");
     }
 
     @Disabled
@@ -74,34 +74,43 @@ public class XMLReaderTest {
 
         String mappedJson = mapper.transform(new DefaultDocument<>(xmlData, MediaTypes.APPLICATION_XML), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
 
-        JSONAssert.assertEquals(expectedJson, mappedJson, false);
+        JSONAssert.assertEquals(expectedJson, mappedJson, true);
     }
 
     @Test
     void testMixedContent() throws Exception {
-        mapAndAssert("xmlMixedContent.xml", "xmlMixedContent.json");
+        mapAndAssert20("xmlMixedContent.xml", "xmlMixedContent.json");
     }
 
     @Test
     void testCDATA() throws Exception {
-        mapAndAssert("xmlCDATA.xml", "xmlCDATA.json");
+        mapAndAssert20("xmlCDATA.xml", "xmlCDATA.json");
     }
 
     @Test
     void testMultipleCDATA() throws Exception {
-        mapAndAssert("xmlMultipleCDATA.xml", "xmlMultipleCDATA.json");
+        mapAndAssert20("xmlMultipleCDATA.xml", "xmlMultipleCDATA.json");
+        mapAndAssert10("xmlMultipleCDATA.xml", "xmlMultipleCDATA10.json");
     }
 
-    private void mapAndAssert(String inputFileName, String expectedFileName) throws Exception {
+    private void mapAndAssert20(String inputFileName, String expectedFileName) throws Exception {
         String xmlData = TestResourceReader.readFileAsString(inputFileName);
         String expectedJson = TestResourceReader.readFileAsString(expectedFileName);
 
         Mapper mapper = new Mapper("payload");
 
+        String mappedJson = mapper.transform(new DefaultDocument<>(xmlData, MediaTypes.APPLICATION_XML), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
+        JSONAssert.assertEquals(expectedJson, mappedJson, true);
+    }
+
+    private void mapAndAssert10(String inputFileName, String expectedFileName) throws Exception {
+        String xmlData = TestResourceReader.readFileAsString(inputFileName);
+        String expectedJson = TestResourceReader.readFileAsString(expectedFileName);
+
+        Mapper mapper = new Mapper("/** DataSonnet\nversion=1.0\n*/\npayload");
 
         String mappedJson = mapper.transform(new DefaultDocument<>(xmlData, MediaTypes.APPLICATION_XML), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
-
-        JSONAssert.assertEquals(expectedJson, mappedJson, false);
+        JSONAssert.assertEquals(expectedJson, mappedJson, true);
     }
 
 }

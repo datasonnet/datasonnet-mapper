@@ -103,19 +103,30 @@ class BadgerFishWriter(val params: EffectiveParams) {
 
       children.foreach {
         child =>
-          if (child._1.equals(params.xmlnsKey)) {
+          val (key, value) = child
+          if (key.equals(params.xmlnsKey)) {
             // no op
-          } else if (child._1.startsWith(params.textKeyPrefix)) {
-            escapeText(child._2.str, sb)
-          } else if (child._1.startsWith(params.cdataKeyPrefix)) {
+          } else if (key.startsWith(params.textKeyPrefix)) {
+            if (key == params.textKeyPrefix) {
+              // if we encounter a bare $, it either represents all the text, so it should be written,
+              // or there are _also_ $1 or #1 (and maybe more) elements with the contents, and then only those should
+              // be written.
+              if (!children.contains(params.textKeyPrefix + "1") && !children.contains(params.cdataKeyPrefix + "1")) {
+                sb append value.str
+              }
+            } else {
+              // not a bare $, always output it
+              sb append value.str
+            }
+          } else if (key.startsWith(params.cdataKeyPrefix)) {
             // taken from scala.xml.PCData
-            sb append "<![CDATA[%s]]>".format(child._2.str.replaceAll("]]>", "]]]]><![CDATA[>"))
-          } else child._2 match {
-            case obj: ujson.Obj => serialize((child._1, obj), sb)
-            case ujson.Arr(arr) => arr.foreach(arrItm => serialize((child._1, arrItm.obj), sb))
-            case ujson.Null => if (params.nullAsEmpty) serialize((child._1, ujson.Obj((params.textKeyPrefix, ""))), sb)
-            case num: ujson.Num => serialize((child._1, ujson.Obj((params.textKeyPrefix, String.valueOf(num)))), sb)
-            case any: ujson.Value => serialize((child._1, ujson.Obj((params.textKeyPrefix, String.valueOf(any.value)))), sb)
+            sb append "<![CDATA[%s]]>".format(value.str.replaceAll("]]>", "]]]]><![CDATA[>"))
+          } else value match {
+            case obj: ujson.Obj => serialize((key, obj), sb)
+            case ujson.Arr(arr) => arr.foreach(arrItm => serialize((key, arrItm.obj), sb))
+            case ujson.Null => if (params.nullAsEmpty) serialize((key, ujson.Obj((params.textKeyPrefix, ""))), sb)
+            case num: ujson.Num => serialize((key, ujson.Obj((params.textKeyPrefix, String.valueOf(num)))), sb)
+            case any: ujson.Value => serialize((key, ujson.Obj((params.textKeyPrefix, String.valueOf(any.value)))), sb)
           }
       }
 
