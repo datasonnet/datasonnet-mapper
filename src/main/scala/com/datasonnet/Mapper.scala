@@ -91,7 +91,8 @@ class Mapper(var script: String,
              imports: java.util.Map[String, String] = Collections.emptyMap(),
              asFunction: Boolean = true,
              additionalLibs: java.util.Collection[Library] = Collections.emptyList(),
-             dataFormats: DataFormatService = DataFormatService.DEFAULT) {
+             dataFormats: DataFormatService = DataFormatService.DEFAULT,
+             defaultOutput: MediaType = MediaTypes.APPLICATION_JSON) {
 
   private val header = Header.parseHeader(script)
 
@@ -183,7 +184,7 @@ class Mapper(var script: String,
     } else {
       val fromHeader = header.getOutput
       if (fromHeader != null && !fromHeader.equalsTypeAndSubtype(MediaTypes.ANY)) header.combineOutputParams(fromHeader)
-      else header.combineOutputParams(MediaTypes.APPLICATION_JSON)
+      else header.combineOutputParams(defaultOutput)
     }
   }
 

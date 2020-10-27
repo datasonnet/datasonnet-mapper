@@ -35,7 +35,7 @@ public class DefaultDocument<T> implements Document<T> {
         if (mediaType != null) {
             this.mediaType = mediaType;
         } else {
-            this.mediaType = MediaTypes.APPLICATION_JAVA;
+            this.mediaType = MediaTypes.UNKNOWN;
         }
     }
 

@@ -16,6 +16,8 @@ package com.datasonnet;
  * limitations under the License.
  */
 
+import com.datasonnet.document.MediaType;
+import com.datasonnet.document.MediaTypes;
 import com.datasonnet.spi.DataFormatPlugin;
 import com.datasonnet.spi.DataFormatService;
 import com.datasonnet.spi.Library;
@@ -35,6 +37,7 @@ public class MapperBuilder {
     private List<Library> libs = Collections.emptyList();
     private DataFormatService service = DataFormatService.DEFAULT;
     private boolean asFunction = true;
+    private MediaType defaultOutput = MediaTypes.APPLICATION_JSON;
 
     public MapperBuilder(String script) {
         this.script = script;
@@ -89,7 +92,12 @@ public class MapperBuilder {
         return this;
     }
 
+    public MapperBuilder withDefaultOutput(MediaType output) {
+        this.defaultOutput = output;
+        return this;
+    }
+
     public Mapper build() {
-        return new Mapper(script, inputNames, imports, asFunction, libs, service);
+        return new Mapper(script, inputNames, imports, asFunction, libs, service, defaultOutput);
     }
 }
