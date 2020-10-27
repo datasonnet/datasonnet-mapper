@@ -18,11 +18,10 @@ package com.datasonnet.commands;
 
 
 import com.datasonnet.Mapper;
-import com.datasonnet.spi.DataFormatService;
+import com.datasonnet.MapperBuilder;
 import picocli.CommandLine;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(
@@ -43,12 +42,9 @@ public class Validate implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        Mapper mapper = new Mapper(Main.readFile(datasonnet),
-                Collections.emptyList(), // inputs
-                Collections.emptyMap(),  // imports
-                !includesFunction,       // should wrap as func
-                Collections.emptyList(),  // additional libs
-                DataFormatService.DEFAULT); // default service
+        Mapper mapper = new MapperBuilder(Main.readFile(datasonnet))
+                .wrapAsFunction(!includesFunction)
+                .build();
         System.out.println("Validates!");
         return null;
     }
