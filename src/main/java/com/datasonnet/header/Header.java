@@ -16,7 +16,6 @@ package com.datasonnet.header;
  * limitations under the License.
  */
 
-import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.InvalidMediaTypeException;
 import com.datasonnet.document.MediaType;
@@ -166,7 +165,7 @@ public class Header {
 
         params.putAll(mediaType.getParameters());
 
-        return ((DefaultDocument<T>) doc).withMediaType(new MediaType(mediaType, params));
+        return doc.withMediaType(new MediaType(mediaType, params));
     }
 
     public MediaType combineOutputParams(MediaType mediaType) {

@@ -39,7 +39,8 @@ public class DefaultDocument<T> implements Document<T> {
         }
     }
 
-    public DefaultDocument<T> withMediaType(MediaType mediaType) {
+    @Override
+    public Document<T> withMediaType(MediaType mediaType) {
         return new DefaultDocument<>(this.getContent(), mediaType);
     }
 

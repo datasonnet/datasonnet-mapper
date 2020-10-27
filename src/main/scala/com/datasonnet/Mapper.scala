@@ -24,9 +24,9 @@ import com.datasonnet.header.Header
 import com.datasonnet.spi.{DataFormatService, Library}
 import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
 import fastparse.Parsed
+import sjsonnet.{Evaluator, Error, Expr, FileScope, Materializer, Parser, Path, Std, Val}
 import sjsonnet.Expr.Params
 import sjsonnet.Val.{Func, Lazy, Obj}
-import sjsonnet._
 import ujson.Value
 
 import scala.jdk.CollectionConverters.{IterableHasAsScala, MapHasAsScala}
@@ -193,8 +193,8 @@ class Mapper(var script: String,
       header.combineInputParams(name, input)
     } else {
       val fromHeader = header.getNamedInputs.get(name)
-      if (fromHeader != null) header.combineInputParams(name, input.asInstanceOf[DefaultDocument[T]].withMediaType(fromHeader))
-      else header.combineInputParams(name, input.asInstanceOf[DefaultDocument[T]].withMediaType(MediaTypes.APPLICATION_JAVA))
+      if (fromHeader != null) header.combineInputParams(name, input.withMediaType(fromHeader))
+      else header.combineInputParams(name, input.withMediaType(MediaTypes.APPLICATION_JAVA))
     }
   }
 

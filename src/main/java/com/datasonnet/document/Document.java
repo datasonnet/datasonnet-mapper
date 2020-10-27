@@ -26,4 +26,6 @@ public interface Document<T> {
 
     MediaType getMediaType();
 
+    Document<T> withMediaType(MediaType mediaType);
+
 }
