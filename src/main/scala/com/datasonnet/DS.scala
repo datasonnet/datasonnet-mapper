@@ -759,56 +759,65 @@ object DS extends Library {
 
   override def modules(dataFormats: DataFormatService): Map[String, Val.Obj] = Map(
     "datetime" -> moduleFrom(
-      builtin0("now") { (vals, ev, fs) => ZonedDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME) },
+      builtin0("now") { (vals, ev, fs) => ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) },
 
       builtin("parse", "datetime", "inputFormat") { (_, _, datetime: String, inputFormat: String) =>
         val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
-        datetimeObj.format(DateTimeFormatter.ISO_DATE_TIME)
+        datetimeObj.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
       builtin("format", "datetime", "outputFormat") { (_, _, datetime: String, outputFormat: String) =>
-        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
+        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         datetimeObj.format(DateTimeFormatter.ofPattern(outputFormat))
       },
 
+      builtin("compare", "datetime", "datetwo") { (_, _, datetimeone: String, datetimetwo: String) =>
+          val datetimeObj1 = java.time.ZonedDateTime
+            .parse(datetimeone, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+          val datetimeObj2 = java.time.ZonedDateTime
+            .parse(datetimetwo, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+
+          datetimeObj1.compareTo(datetimeObj2)
+      },
+
       builtin("plus", "datetime", "period") { (_, _, date: String, period: String) =>
-        val datetime = java.time.ZonedDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME)
+        val datetime = java.time.ZonedDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         val periodObj = Period.parse(period)
-        datetime.plus(periodObj).format(DateTimeFormatter.ISO_DATE_TIME)
+        datetime.plus(periodObj).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
       builtin("minus", "datetime", "period") { (_, _, date: String, period: String) =>
-        val datetime = java.time.ZonedDateTime.parse(date, DateTimeFormatter.ISO_DATE_TIME)
+        val datetime = java.time.ZonedDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         val periodObj = Period.parse(period)
-        datetime.minus(periodObj).format(DateTimeFormatter.ISO_DATE_TIME)
+        datetime.minus(periodObj).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
-        builtin("daysBetween", "datetime1", "datetime2") { (_, _, datetime1: String, datetime2: String) =>
-          val datetimeObj1 = java.time.ZonedDateTime.parse(datetime1, DateTimeFormatter.ISO_DATE_TIME)
-          val datetimeObj2 = java.time.ZonedDateTime.parse(datetime2, DateTimeFormatter.ISO_DATE_TIME)
+      builtin("daysBetween", "datetime1", "datetime2") { (_, _, datetime1: String, datetime2: String) =>
+          val datetimeObj1 = java.time.ZonedDateTime.parse(datetime1, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+          val datetimeObj2 = java.time.ZonedDateTime.parse(datetime2, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
           datetimeObj1.compareTo(datetimeObj2)
       },
 
       builtin("changeTimeZone", "datetime", "timezone") {
         (_, _, datetime: String, timezone: String) =>
-          val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
+          val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
           val zoneId = ZoneId.of(timezone)
           val newDateTimeObj = datetimeObj.withZoneSameInstant(zoneId)
-          newDateTimeObj.format(DateTimeFormatter.ISO_DATE_TIME)
+          newDateTimeObj.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
       builtin("toLocalDate", "datetime") { (_, _, datetime: String) =>
-        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
+        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         datetimeObj.toLocalDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
       },
 
       builtin("toLocalTime", "datetime") { (_, _, datetime: String) =>
-        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
+        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         datetimeObj.toLocalTime.format(DateTimeFormatter.ISO_LOCAL_TIME)
       },
 
       builtin("toLocalDateTime", "datetime") { (_, _, datetime: String) =>
-        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
+        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         datetimeObj.toLocalDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
       },
 
@@ -816,56 +825,56 @@ object DS extends Library {
       builtin("daysBetween", "datetime", "datetwo") {
         (_, _, datetimeone: String, datetimetwo: String) =>
           val dateone = java.time.ZonedDateTime
-            .parse(datetimeone, DateTimeFormatter.ISO_DATE_TIME)
+            .parse(datetimeone, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
           val datetwo = java.time.ZonedDateTime
-            .parse(datetimetwo, DateTimeFormatter.ISO_DATE_TIME)
+            .parse(datetimetwo, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
           ChronoUnit.DAYS.between(dateone, datetwo).abs.toDouble;
       },
 
       builtin("isLeapYear", "datetime") {
         (_, _, datetime: String) =>
           java.time.ZonedDateTime
-            .parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
+            .parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
             .toLocalDate.isLeapYear;
       },
 
       builtin("atBeginningOfDay", "datetime"){
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
-            .parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
+            .parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
           date.minusHours(date.getHour)
               .minusMinutes(date.getMinute)
               .minusSeconds(date.getSecond)
               .minusNanos(date.getNano)
-            .format(DateTimeFormatter.ISO_DATE_TIME)
+            .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
       builtin("atBeginningOfHour", "datetime"){
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
-            .parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
+            .parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
           date.minusMinutes(date.getMinute)
             .minusSeconds(date.getSecond)
             .minusNanos(date.getNano)
-            .format(DateTimeFormatter.ISO_DATE_TIME)
+            .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
       builtin("atBeginningOfMonth", "datetime"){
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
-            .parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
+            .parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
           date.minusDays(date.getDayOfMonth-1)
             .minusHours(date.getHour)
             .minusMinutes(date.getMinute)
             .minusSeconds(date.getSecond)
             .minusNanos(date.getNano)
-            .format(DateTimeFormatter.ISO_DATE_TIME)
+            .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
       builtin("atBeginningOfWeek", "datetime"){
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
-            .parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
+            .parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
           System.out.println(date.getDayOfWeek.getValue)
 
           date.minusDays( if(date.getDayOfWeek.getValue == 7) 0 else date.getDayOfWeek.getValue  )
@@ -873,20 +882,20 @@ object DS extends Library {
             .minusMinutes(date.getMinute)
             .minusSeconds(date.getSecond)
             .minusNanos(date.getNano)
-            .format(DateTimeFormatter.ISO_DATE_TIME)
+            .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
       builtin("atBeginningOfYear", "datetime"){
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
-            .parse(datetime, DateTimeFormatter.ISO_DATE_TIME)
+            .parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
           date.minusMonths(date.getMonthValue-1)
             .minusDays(date.getDayOfMonth-1)
             .minusHours(date.getHour)
             .minusMinutes(date.getMinute)
             .minusSeconds(date.getSecond)
             .minusNanos(date.getNano)
-            .format(DateTimeFormatter.ISO_DATE_TIME)
+            .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
       builtin("date", "obj") {
@@ -903,7 +912,7 @@ object DS extends Library {
             out.getOrElse("second",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toInt,
             0, //out.getOrElse("nanosecond",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toInt TODO?
             ZoneId.of(out.getOrElse("timezone",Val.Lazy(Val.Str("Z")).force).cast[Val.Str].value)
-          ).format(DateTimeFormatter.ISO_DATE_TIME)
+          ).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
       builtin0("today") {
@@ -912,7 +921,7 @@ object DS extends Library {
           date.minusHours(date.getHour)
             .minusMinutes(date.getMinute)
             .minusSeconds(date.getSecond)
-            .minusNanos(date.getNano).format(DateTimeFormatter.ISO_DATE_TIME)
+            .minusNanos(date.getNano).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
       builtin0("tomorrow") {
@@ -922,7 +931,7 @@ object DS extends Library {
             .minusHours(date.getHour)
             .minusMinutes(date.getMinute)
             .minusSeconds(date.getSecond)
-            .minusNanos(date.getNano).format(DateTimeFormatter.ISO_DATE_TIME)
+            .minusNanos(date.getNano).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
       builtin0("yesterday") {
@@ -932,7 +941,7 @@ object DS extends Library {
             .minusHours(date.getHour)
             .minusMinutes(date.getMinute)
             .minusSeconds(date.getSecond)
-            .minusNanos(date.getNano).format(DateTimeFormatter.ISO_DATE_TIME)
+            .minusNanos(date.getNano).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
     ),
@@ -941,8 +950,8 @@ object DS extends Library {
       builtin("between", "datetimeone", "datetimetwo") {
         (_,_, datetimeone: String , datetimetwo: String) =>
           Period.between(
-            java.time.ZonedDateTime.parse(datetimeone, DateTimeFormatter.ISO_DATE_TIME).toLocalDate,
-            java.time.ZonedDateTime.parse(datetimetwo, DateTimeFormatter.ISO_DATE_TIME).toLocalDate
+            java.time.ZonedDateTime.parse(datetimeone, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toLocalDate,
+            java.time.ZonedDateTime.parse(datetimetwo, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toLocalDate
           ).toString
       },
 
