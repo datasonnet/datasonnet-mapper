@@ -120,6 +120,30 @@ public class ArraysTest {
         mapper = new Mapper(lib + pack + ".indexOf([\"Mariano\", \"Leandro\", \"Julian\", \"Julian\"], \"Julian\")\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("2", value);
+
+        mapper = new Mapper(lib + pack + ".indexOf(null, 10)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("-1", value);
+
+        mapper = new Mapper(lib + pack + ".indexOf([1,2,3], 2)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("1", value);
+
+        mapper = new Mapper(lib + pack + ".indexOf([1,2,3], 5)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("-1", value);
+
+        mapper = new Mapper(lib + pack + ".indexOf([1,2,3,2], 2)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("1", value);
+
+        mapper = new Mapper(lib + pack + ".indexOf(\"Hello\", \"l\")\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2", value);
+
+        mapper = new Mapper(lib + pack + ".indexOf(\"Hello\", \"x\")\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("-1", value);
     }
 
     @Test
@@ -139,6 +163,33 @@ public class ArraysTest {
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[{r:{id:1,v:c},l:{id:1,v:a}},{r:{id:1,v:c},l:{id:1,v:b}}]", value);
 
+    }
+
+    @Test
+    void testArrays_lastIndexOf() {
+        Mapper mapper = new Mapper(lib + pack + ".lastIndexOf(null, 10)\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("-1", value);
+
+        mapper = new Mapper(lib + pack + ".lastIndexOf([1,2,3], 2)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("1", value);
+
+        mapper = new Mapper(lib + pack + ".lastIndexOf([1,2,3], 5)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("-1", value);
+
+        mapper = new Mapper(lib + pack + ".lastIndexOf([1,2,3,2], 2)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("3", value);
+
+        mapper = new Mapper(lib + pack + ".lastIndexOf(\"Hello\", \"l\")\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("3", value);
+
+        mapper = new Mapper(lib + pack + ".lastIndexOf(\"Hello\", \"x\")\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("-1", value);
     }
 
     @Test
