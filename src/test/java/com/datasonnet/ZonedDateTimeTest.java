@@ -34,13 +34,15 @@ public class ZonedDateTimeTest {
     }
 
     @Test
-    void testNow() {
+    void testNow() throws Exception {
         ZonedDateTime before = ZonedDateTime.now();
+        Thread.sleep(100);
 
         Mapper mapper = new Mapper("ds.datetime.now()");
         // getting rid of quotes so the Instant parser works
         ZonedDateTime mapped = ZonedDateTime.parse(mapper.transform("{}").replaceAll("\"", ""));
 
+        Thread.sleep(100);
         ZonedDateTime after = ZonedDateTime.now();
 
         assertTrue(before.compareTo(mapped) <= 0);
