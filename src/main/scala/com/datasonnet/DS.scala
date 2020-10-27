@@ -782,14 +782,20 @@ object DS extends Library {
 
       builtin("plus", "datetime", "period") { (_, _, date: String, period: String) =>
         val datetime = java.time.ZonedDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-        val periodObj = Period.parse(period)
-        datetime.plus(periodObj).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        if (period.contains("T")) {
+          datetime.plus(Duration.parse(period)).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        } else {
+          datetime.plus(Period.parse(period)).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        }
       },
 
       builtin("minus", "datetime", "period") { (_, _, date: String, period: String) =>
         val datetime = java.time.ZonedDateTime.parse(date, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-        val periodObj = Period.parse(period)
-        datetime.minus(periodObj).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        if (period.contains("T")) {
+          datetime.minus(Duration.parse(period)).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        } else {
+          datetime.minus(Period.parse(period)).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+        }
       },
 
       builtin("daysBetween", "datetime1", "datetime2") { (_, _, datetime1: String, datetime2: String) =>
