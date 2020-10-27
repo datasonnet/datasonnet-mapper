@@ -22,6 +22,26 @@ import com.datasonnet.plugins.DefaultXMLFormatPlugin.EffectiveParams
 
 // See {@link scala.xml.Utility.serialize}
 object BadgerFishWriter {
+  // TODO: write docs and notice and coverage
+  // taken from scala.xml.Utility
+  object Escapes {
+    /**
+     * For reasons unclear escape and unescape are a long ways from
+     * being logical inverses.
+     */
+    val pairs = Map(
+      "lt" -> '<',
+      "gt" -> '>',
+      "amp" -> '&',
+      "quot" -> '"',
+      "apos"  -> '\''
+    )
+    val escMap = (pairs - "apos") map { case (s, c) => c -> ("&%s;" format s) }
+    val unescMap = pairs
+  }
+
+  import Escapes.escMap
+
   def serialize(root: (String, ujson.Obj), sb: Writer = new StringWriter(),
                 params: EffectiveParams): Writer = {
     sb.append('<')
@@ -58,11 +78,10 @@ object BadgerFishWriter {
           if (child._1.equals(params.xmlnsKey)) {
             // no op
           } else if (child._1.startsWith(params.textKeyPrefix)) {
-            sb append child._2.str
+            escapeText(child._2.str, sb)
           } else if (child._1.startsWith(params.cdataKeyPrefix)) {
-            sb append "<![CDATA["
-            sb append child._2.str
-            sb append "]]>"
+            // taken from scala.xml.PCData
+            sb append "<![CDATA[%s]]>".format(child._2.str.replaceAll("]]>", "]]]]><![CDATA[>"))
           } else child._2 match {
             case obj: ujson.Obj => serialize((child._1, obj), sb, params)
             case ujson.Arr(arr) => arr.foreach(arrItm => serialize((child._1, arrItm.obj), sb, params))
@@ -83,5 +102,34 @@ object BadgerFishWriter {
   def appendQuoted(s: String, sb: Writer): Writer = {
     val ch = if (s contains '"') '\'' else '"'
     sb.append(ch).append(s).append(ch)
+  }
+
+  /**
+   * Appends escaped string to `s`.
+   */
+  final def escape(text: String, s: Writer): Writer = {
+    // Implemented per XML spec:
+    // http://www.w3.org/International/questions/qa-controls
+    text.iterator.foldLeft(s) { (s, c) =>
+      escMap.get(c) match {
+        case Some(str)                             => s append str
+        case _ if c >= ' ' || "\n\r\t".contains(c) => s append c
+        case _ => s // noop
+      }
+    }
+  }
+
+  /**
+   * Appends escaped string to `s`, but not &quot;.
+   */
+  final def escapeText(text: String, s: Writer): Writer = {
+    val escTextMap = escMap - '"' // Remove quotes from escMap
+    text.iterator.foldLeft(s) { (s, c) =>
+      escTextMap.get(c) match {
+        case Some(str)                             => s append str
+        case _ if c >= ' ' || "\n\r\t".contains(c) => s append c
+        case _ => s // noop
+      }
+    }
   }
 }

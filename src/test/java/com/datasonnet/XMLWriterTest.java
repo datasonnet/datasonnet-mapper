@@ -105,6 +105,22 @@ public class XMLWriterTest {
     }
 
     @Test
+    void testXMLEscaped() throws Exception {
+        String datasonnet =
+                "{ root: {" +
+                "  '@name': 'QueryText'," +
+                "   '$1': 'dDocTitle <substring> foo <and> dDocCreatedDate >= bar'" +
+                " } " +
+                "}";
+        String expectedXml = TestResourceReader.readFileAsString("writeXMLEscapedTest.xml");
+
+        Mapper mapper = new Mapper(datasonnet);
+        String mappedXml = mapper.transform(new DefaultDocument<>(null), Collections.emptyMap(), MediaTypes.APPLICATION_XML, String.class).getContent();
+
+        assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
+    }
+
+    @Test
     void testNonAscii() throws Exception {
         String jsonData = TestResourceReader.readFileAsString("xmlNonAscii.json");
         String expectedXml = TestResourceReader.readFileAsString("xmlNonAscii.xml");
