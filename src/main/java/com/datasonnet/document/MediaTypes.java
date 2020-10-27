@@ -356,7 +356,7 @@ public class MediaTypes {
      */
     public static final MediaType UNKNOWN;
 
-    public static final String UNKNOWN_VALUE = "/";
+    public static final String UNKNOWN_VALUE = "unknown/unknown";
 
     public static final String PARAM_CHARSET = "charset";
 
@@ -390,7 +390,7 @@ public class MediaTypes {
         TEXT_XML = new MediaType("text", "xml");
         APPLICATION_JAVA = new MediaType("application", "x-java-object");
         APPLICATION_CSV = new MediaType("application", "csv");
-        UNKNOWN = new MediaType("application", "x-unknown");
+        UNKNOWN = new MediaType("unknown", "unknown");
     }
 
     // TODO: 8/11/20 add explicit file extension support to MediaType class
