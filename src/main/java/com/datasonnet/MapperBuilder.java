@@ -56,6 +56,11 @@ public class MapperBuilder {
         return this;
     }
 
+    public MapperBuilder withInputNamesFrom(Map<String, String> imports) {
+        this.inputNames = imports.keySet();
+        return this;
+    }
+
     public MapperBuilder withImports(Map<String, String> imports) {
         Objects.requireNonNull(imports);
 
