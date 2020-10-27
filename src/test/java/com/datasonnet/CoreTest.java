@@ -858,6 +858,14 @@ public class CoreTest {
         Mapper mapper = new Mapper(lib + ".reverse({first: '1', second: '2'})\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("{second:2,first:1}", value);
+
+        mapper = new Mapper(lib + ".reverse([1,2,3,4])\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("[4,3,2,1]", value);
+
+        mapper = new Mapper(lib + ".reverse(\"Hello\")\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("olleH", value);
     }
 
     @Test

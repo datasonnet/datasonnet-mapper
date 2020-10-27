@@ -736,6 +736,7 @@ object DS extends Library {
     builtin("reverse", "collection") {
       (ev, fs, collection: Val) =>
         collection match {
+          case Val.Str(str) => Val.Lazy(Val.Str(str.reverse)).force
           case Val.Arr(arr) => Val.Arr(arr.reverse)
           case obj: Val.Obj =>
             var result: Seq[(String, Val.Obj.Member)] = Seq()
