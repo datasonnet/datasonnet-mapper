@@ -3,6 +3,7 @@ package com.datasonnet;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaTypes;
+
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.Test;
 
@@ -31,6 +32,7 @@ public class IHUB780Test {
         datasonnet = datasonnet.replaceAll("DisableQuotes=false", "DisableQuotes=true");
         mapper = new Mapper(datasonnet);
         mapped = mapper.transform(data, Collections.emptyMap(), MediaTypes.APPLICATION_CSV).getContent();
+
         assertEquals(expected.trim(), mapped.trim());
     }
 }
