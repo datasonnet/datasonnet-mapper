@@ -83,7 +83,7 @@ public class HeaderTest {
 
     @Test
     void testHeaderNamedInputCommaSeparated() {
-        Map<String, String> parameters = header.getNamedInputs().values().iterator().next().getParameters();
+        Map<String, String> parameters = header.getDefaultNamedInput("payload").getParameters();
         assertTrue(parameters.containsKey("namespace-separator"));
         assertTrue(parameters.containsKey("text-value-key"));
     }
@@ -96,7 +96,7 @@ public class HeaderTest {
 
     @Test
     void testHeaderOutput() {
-        Set<String> keys = header.getOutput().getParameters().keySet();
+        Set<String> keys = header.getDefaultOutput().getParameters().keySet();
         assertTrue(keys.contains("ds.csv.quote"));
     }
 

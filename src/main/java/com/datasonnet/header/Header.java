@@ -19,7 +19,6 @@ package com.datasonnet.header;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.InvalidMediaTypeException;
 import com.datasonnet.document.MediaType;
-import com.datasonnet.document.MediaTypes;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -42,11 +41,16 @@ import java.util.regex.Pattern;
 public class Header {
     public static final String DATASONNET_HEADER = "/** DataSonnet";
     public static final Pattern VERSION_LINE = Pattern.compile("^version *= *(?<version>[a-zA-Z0-9.+-]+) *(\\r?\\n|$)");
+    public static final String DATASONNET_DEFAULT_PREFIX = "default ";
     public static final String DATASONNET_INPUT = "input";
+    public static final String DATASONNET_DEFAULT_INPUT = DATASONNET_DEFAULT_PREFIX + DATASONNET_INPUT;
+    public static final Pattern INPUT_LINE = Pattern.compile("^(?:(?<default>default )?input (?<name>\\w+)|input (?<all>\\*)) (?<mediatype>\\S.*)$");
     public static final String DATASONNET_OUTPUT = "output";
+    public static final String DATASONNET_DEFAULT_OUTPUT = DATASONNET_DEFAULT_PREFIX + DATASONNET_OUTPUT;
+    public static final Pattern OUTPUT_LINE = Pattern.compile("^(?<default>default )?output (?<mediatype>\\S.*)$");
     public static final String DATASONNET_PRESERVE_ORDER = "preserveOrder";
     public static final String DATAFORMAT_PREFIX = "dataformat";
-    public static final String DATAFORMAT_DEFAULT = "*";
+    public static final String DATAFORMAT_ALL = "*";
     public static final String VERSION_2_0 = "2.0";
     public static final String VERSION_1_0 = "1.0";
     private final String version;
@@ -56,20 +60,39 @@ public class Header {
     // using maps to facilitate only one per super/sub type
     private final Map<Integer, MediaType> allInputs;
     private final Map<Integer, MediaType> dataFormats;
+    private final HashMap<String, MediaType> defaultInputs;
+    private final MediaType defaultOutput;
 
     public Header(String version,
                   boolean preserveOrder,
-                  Map<String, Iterable<MediaType>> namedInputs,
-                  Iterable<MediaType> output,
+                  Map<String, Collection<MediaType>> namedInputs,
+                  Map<String, MediaType> defaultInputs,
+                  Collection<MediaType> output,
+                  MediaType defaultOutput,
                   Iterable<MediaType> allInputs,
                   Iterable<MediaType> dataFormats) {
         this.version = version;
         this.preserveOrder = preserveOrder;
+        this.defaultInputs = new HashMap<>(defaultInputs);
         this.namedInputs = new HashMap<>();
-        for(Map.Entry<String, Iterable<MediaType>> entry : namedInputs.entrySet()) {
+        for(Map.Entry<String, Collection<MediaType>> entry : namedInputs.entrySet()) {
             this.namedInputs.put(entry.getKey(), indexMediaTypes(entry.getValue()));
+            if(!this.defaultInputs.containsKey(entry.getKey())) {
+                if(entry.getValue().size() == 1) {
+                    this.defaultInputs.put(entry.getKey(), entry.getValue().iterator().next());
+                }
+            }
         }
         this.output = indexMediaTypes(output);
+        if(defaultOutput == null) {
+            if(output.size() == 1) {
+                this.defaultOutput = output.iterator().next();
+            } else {
+                this.defaultOutput = null;
+            }
+        } else {
+            this.defaultOutput = defaultOutput;
+        }
         this.allInputs = indexMediaTypes(allInputs);
         this.dataFormats = indexMediaTypes(dataFormats);
     }
@@ -88,7 +111,7 @@ public class Header {
 
 
     private static final Header EMPTY =
-            new Header(VERSION_2_0, true, Collections.emptyMap(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+            new Header(VERSION_2_0, true, Collections.emptyMap(), Collections.emptyMap(), Collections.emptyList(), null, Collections.emptyList(), Collections.emptyList());
 
     public static Header parseHeader(String script) throws HeaderParseException {
         if (!script.trim().startsWith(DATASONNET_HEADER)) {
@@ -164,24 +187,25 @@ public class Header {
             props.load(new StringReader(headerSection));
             Map propsMap = mapper.readPropertiesAs(props, schema, Map.class);
 
-
             Map<String, Map<String, Map<String, String>>> originalInputs = getOrEmpty(propsMap, "input");
-            Map<String, Iterable<MediaType>> inputs = new HashMap<>();
+            Map<String, Collection<MediaType>> inputs = new HashMap<>();
             for(Map.Entry<String, Map<String, Map<String, String>>> entry : originalInputs.entrySet()) {
                 if(!entry.getKey().equals("*")) {
                     List<MediaType> mediaTypes = extractMediaTypes(entry.getValue());
                     inputs.put(entry.getKey(), mediaTypes);
                 }
             }
-            Iterable<MediaType> allInputs = extractMediaTypes(getOrEmpty(originalInputs, "*"));
-            Iterable<MediaType> output = extractMediaTypes(getOrEmpty(propsMap, "output"));
-            Iterable<MediaType> dataFormat = extractMediaTypes(getOrEmpty(propsMap, "dataformat"));
+            List<MediaType> allInputs = extractMediaTypes(getOrEmpty(originalInputs, "*"));
+            List<MediaType> output = extractMediaTypes(getOrEmpty(propsMap, "output"));
+            List<MediaType> dataFormat = extractMediaTypes(getOrEmpty(propsMap, "dataformat"));
 
 
             return new Header(VERSION_1_0,
                     getBoolean(propsMap,DATASONNET_PRESERVE_ORDER, true),
                     inputs,
+                    Collections.emptyMap(),
                     output,
+                    null,
                     allInputs,
                     dataFormat);
         } catch (IOException|IllegalArgumentException exc) {
@@ -219,7 +243,9 @@ public class Header {
     private static Header parseHeader20(String headerSection) throws HeaderParseException {
         boolean preserve = true;
         List<MediaType> output = new ArrayList<>(4);
+        MediaType defaultOutput = null;
         Map<String, List<MediaType>> inputs = new HashMap<>(4);
+        Map<String, MediaType> defaultInputs = new HashMap<>(4);
         List<MediaType> allInputs = new ArrayList<>(4);
         List<MediaType> dataformat = new ArrayList<>(4);
 
@@ -228,20 +254,40 @@ public class Header {
                 if (line.startsWith(DATASONNET_PRESERVE_ORDER)) {
                     String[] tokens = line.split("=", 2);
                     preserve = Boolean.parseBoolean(tokens[1]);
-                } else if (line.startsWith(DATASONNET_INPUT)) {
-                    String[] tokens = line.split(" ", 3);
-                    if (DATAFORMAT_DEFAULT.equals(tokens[1])) {
-                        MediaType toAdd = MediaType.valueOf(tokens[2]);
-                        allInputs.add(toAdd);
-                    } else {
-                        if(!inputs.containsKey(tokens[1])) {
-                            inputs.put(tokens[1], new ArrayList<>());
-                        }
-                        inputs.get(tokens[1]).add(MediaType.valueOf(tokens[2]));
+                } else if (line.startsWith(DATASONNET_INPUT) || line.startsWith(DATASONNET_DEFAULT_INPUT)) {
+                    Matcher matcher = INPUT_LINE.matcher(line);
+                    if(!matcher.matches()) {
+                        throw new HeaderParseException("Unable to parse header line " + line + ", it must follow the input line format");
                     }
-                } else if (line.startsWith(DATASONNET_OUTPUT)) {
-                    String[] tokens = line.split(" ", 2);
-                    output.add(MediaType.valueOf(tokens[1]));
+                    String name = matcher.group("name");
+                    MediaType mediaType = MediaType.valueOf(matcher.group("mediatype"));
+                    if (matcher.group("all") != null) {  // there's a *. This also means it can't be a default.
+                        allInputs.add(mediaType);
+                    } else {
+                        if(!inputs.containsKey(name)) {
+                            inputs.put(name, new ArrayList<>());
+                        }
+                        inputs.get(name).add(mediaType);
+                    }
+                    if(matcher.group("default") != null) {
+                        if(defaultInputs.containsKey(name)) {
+                            throw new HeaderParseException("There cannot be two default media types for the input " + name);
+                        }
+                        defaultInputs.put(name, mediaType);
+                    }
+                } else if (line.startsWith(DATASONNET_OUTPUT) || line.startsWith(DATASONNET_DEFAULT_OUTPUT)) {
+                    Matcher matcher = OUTPUT_LINE.matcher(line);
+                    if(!matcher.matches()) {
+                        throw new HeaderParseException("Unable to parse header line " + line + ", it must follow the output line format");
+                    }
+                    MediaType mediaType = MediaType.valueOf(matcher.group("mediatype"));
+                    output.add(mediaType);
+                    if(matcher.group("default") != null) {
+                        if(defaultOutput != null) {
+                            throw new HeaderParseException("There cannot be two default output media types");
+                        }
+                        defaultOutput = mediaType;
+                    }
                 } else if (line.startsWith(DATAFORMAT_PREFIX)) {
                     String[] tokens = line.split(" ", 2);
                     MediaType toAdd = MediaType.valueOf(tokens[1]);
@@ -258,7 +304,7 @@ public class Header {
             }
         }
 
-        return new Header(VERSION_2_0, preserve, Collections.unmodifiableMap(inputs), output, allInputs, dataformat);
+        return new Header(VERSION_2_0, preserve, Collections.unmodifiableMap(inputs), Collections.emptyMap(), output, null, allInputs, dataformat);
     }
 
     public String getVersion() {
@@ -273,8 +319,16 @@ public class Header {
         return Collections.unmodifiableMap(namedInputs);
     }
 
+    public MediaType getDefaultNamedInput(String name) {
+        return defaultInputs.get(name);
+    }
+
     public Collection<MediaType> getOutput() {
         return Collections.unmodifiableCollection(output.values());
+    }
+
+    public MediaType getDefaultOutput() {
+        return defaultOutput;
     }
 
     public Collection<MediaType> getPayload() {
