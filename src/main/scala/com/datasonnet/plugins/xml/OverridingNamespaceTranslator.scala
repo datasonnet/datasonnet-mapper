@@ -53,7 +53,7 @@ class OverridingNamespaceTranslator(private val fixed: Map[String, String]) exte
 
   // always get by uri from translation
   override def getPrefix(uri: String): String = writeTranslated.getPrefix(uri)
-  override def getPrefixes(uri: String): util.Enumeration[String] = writeTranslated.getPrefixes(uri)
+  override def getPrefixes(uri: String) = writeTranslated.getPrefixes(uri)
 
   // we need this for root namespace detection to work properly
   override def getURI(prefix: String): String = writeTranslated.getURI(prefix)
