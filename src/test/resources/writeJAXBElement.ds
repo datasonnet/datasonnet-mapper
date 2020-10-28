@@ -1,6 +1,6 @@
 /** DataSonnet
 version=2.0
-output application/java; OutputClass=com.datasonnet.javatest.WsdlGeneratedObj
+output application/x-java-object; OutputClass=com.datasonnet.javatest.WsdlGeneratedObj
 */
 {
     "testField": {

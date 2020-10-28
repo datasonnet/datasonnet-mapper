@@ -33,6 +33,8 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class JavaReaderTest {
 
     @Test
@@ -80,10 +82,9 @@ public class JavaReaderTest {
 
     @Test
     void testNullJavaObject() throws Exception {
-        Document nullObj = new JavaObjectDocument(null);
+        Document<Gizmo> nullObj = new DefaultDocument<>(null);
         Mapper mapper = new Mapper("payload == null");
-        Document mapped = mapper.transform(nullObj, new HashMap<>(), "application/java");
-        Boolean result = mapped.canGetContentsAs(Boolean.class);
-        assertTrue(result);
+        Document<Boolean> mapped = mapper.transform(nullObj, new HashMap<>(), MediaTypes.APPLICATION_JAVA, Boolean.class);
+        assertTrue(mapped.getContent());
     }
 }

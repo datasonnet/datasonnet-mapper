@@ -76,6 +76,7 @@ class BadgerFishWriter(val params: EffectiveParams) {
         sb append ' '
         sb append translated
         sb append '='
+        // TODO this is likely improperly escaped, but verify with a test
         appendQuoted(attr._2.str, sb)
     }
 
@@ -112,11 +113,11 @@ class BadgerFishWriter(val params: EffectiveParams) {
               // or there are _also_ $1 or #1 (and maybe more) elements with the contents, and then only those should
               // be written.
               if (!children.contains(params.textKeyPrefix + "1") && !children.contains(params.cdataKeyPrefix + "1")) {
-                sb append value.str
+                escapeText(value.str, sb)
               }
             } else {
               // not a bare $, always output it
-              sb append value.str
+              escapeText(value.str, sb)
             }
           } else if (key.startsWith(params.cdataKeyPrefix)) {
             // taken from scala.xml.PCData

@@ -28,14 +28,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-<<<<<<< HEAD
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
-=======
-import java.util.*;
->>>>>>> Added TimeZone support to Java de/serializer (#45)
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
