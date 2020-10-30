@@ -219,15 +219,9 @@ class Mapper(var script: String,
                    inputs: java.util.Map[String, Document[_]],
                    output: MediaType,
                    target: Class[T]): Document[T] = {
-    def valueFrom(doc: Document[_]): Value = {
-      dataFormats.thatAccepts(doc)
-        .orElseThrow(() => new IllegalArgumentException("The input mime type " + payload.getMediaType + " is not supported"))
-        .read(doc)
-    }
-
-    val payloadExpr: Expr = Materializer.toExpr(valueFrom(effectiveInput("payload", payload)))
+    val payloadExpr: Expr = Materializer.toExpr(dataFormats.mandatoryRead(effectiveInput("payload", payload)))
     val inputExprs: Map[String, Expr] = inputs.asScala.view.toMap[String, Document[_]].map {
-      case (name, input) => (name, Materializer.toExpr(valueFrom(effectiveInput(name, input))))
+      case (name, input) => (name, Materializer.toExpr(dataFormats.mandatoryRead(effectiveInput(name, input))))
     }
 
     val payloadArg +: inputArgs = function.params.args
@@ -251,8 +245,6 @@ class Mapper(var script: String,
     }
 
     val effectiveOut = effectiveOutput(output)
-    dataFormats.thatProduces(effectiveOut, target)
-      .orElseThrow(() => new IllegalArgumentException("The output mime type " + effectiveOut + " is not supported"))
-      .write(materialized, effectiveOut, target)
+    dataFormats.mandatoryWrite(materialized, effectiveOut, target)
   }
 }

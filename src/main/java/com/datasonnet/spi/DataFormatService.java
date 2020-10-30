@@ -23,6 +23,7 @@ import com.datasonnet.plugins.DefaultJSONFormatPlugin;
 import com.datasonnet.plugins.DefaultJavaFormatPlugin;
 import com.datasonnet.plugins.DefaultPlainTextFormatPlugin;
 import com.datasonnet.plugins.DefaultXMLFormatPlugin$;
+import ujson.Value;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -63,5 +64,17 @@ public class DataFormatService {
             }
         }
         return Optional.empty();
+    }
+
+    public <T> Document<T> mandatoryWrite(Value input, MediaType mediaType, Class<T> targetType) throws PluginException {
+        return thatProduces(mediaType, targetType)
+                .orElseThrow(() -> new IllegalArgumentException("The output MediaType " + mediaType + " is not supported for class" + targetType))
+                .write(input, mediaType, targetType);
+    }
+
+    public ujson.Value mandatoryRead(Document<?> doc) throws PluginException {
+        return thatAccepts(doc)
+                .orElseThrow(() -> new IllegalArgumentException("The input MediaType " + doc.getMediaType() + " is not supported for class" + doc.getContent().getClass()))
+                .read(doc);
     }
 }
