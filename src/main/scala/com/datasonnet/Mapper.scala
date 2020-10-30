@@ -1,32 +1,45 @@
 package com.datasonnet
 
+/*-
+ * Copyright 2019-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import java.io.{PrintWriter, StringWriter}
-import java.util
 import java.util.Collections
 
-import com.datasonnet.document.{AbstractBaseDocument, Document, StringDocument}
+import com.datasonnet.document.{DefaultDocument, Document, MediaType, MediaTypes}
 import com.datasonnet.header.Header
-import com.datasonnet.spi.{DataFormatPlugin, DataFormatService}
+import com.datasonnet.spi.{DataFormatService, Library}
 import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
-import fastparse.{IndexedParserInput, Parsed}
-import sjsonnet.Expr.Member.Visibility
+import fastparse.Parsed
+import sjsonnet.{Evaluator, Error, Expr, FileScope, Materializer, Parser, Path, Std, Val}
 import sjsonnet.Expr.Params
-import sjsonnet.Val._
-import sjsonnet._
+import sjsonnet.Val.{Func, Lazy, Obj}
+import ujson.Value
 
-import scala.collection.JavaConverters._
-import scala.collection.mutable
-import scala.io.Source
+import scala.jdk.CollectionConverters.{IterableHasAsScala, MapHasAsScala}
 import scala.util.{Failure, Success, Try}
 
 object Mapper {
-  def wrap(jsonnet: String, argumentNames: Iterable[String])=
-    (Seq("payload") ++ argumentNames).mkString("function(", ",", ")\n") + jsonnet
+  private def asFunction(script: String, argumentNames: Iterable[String]) =
+    (Seq("payload") ++ argumentNames).mkString("function(", ",", ")\n") + script
 
-  val location = raw"\.\(([a-zA-Z-_\.]*):(\d+):(\d+)\)|([a-zA-Z-]+):(\d+):(\d+)".r
+  private val ERROR_LINE_REGEX = raw"\.\(([a-zA-Z-_\.]*):(\d+):(\d+)\)|([a-zA-Z-]+):(\d+):(\d+)".r
 
-  def expandErrorLineNumber(error: String, lineOffset: Int) = location.replaceAllIn(error, _ match {
-    case location(filename, frow, fcolumn, token, trow, tcolumn) => {
+  private def expandErrorLineNumber(error: String, lineOffset: Int) = ERROR_LINE_REGEX.replaceAllIn(error, _ match {
+    case ERROR_LINE_REGEX(filename, frow, fcolumn, token, trow, tcolumn) => {
       if (token != null) {
         s"$token at line ${trow.toInt - lineOffset} column $tcolumn"
       } else if (filename.length > 0) {
@@ -37,11 +50,10 @@ object Mapper {
     }
   })
 
-  def evaluate(evaluator: Evaluator, cache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]], jsonnet: String, libraries: Map[String, Val], lineOffset: Int): Try[Val] = {
-
+  def evaluate(script: String, evaluator: Evaluator, cache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]], libraries: Map[String, Val], lineOffset: Int): Try[Val] = {
     for {
-      fullParse <- cache.getOrElseUpdate(jsonnet, fastparse.parse(jsonnet, Parser.document(_))) match {
-        case f @ Parsed.Failure(l, i, e) => Failure(new IllegalArgumentException("Problem parsing: " + expandErrorLineNumber(f.trace().msg, lineOffset)))
+      fullParse <- cache.getOrElseUpdate(script, fastparse.parse(script, Parser.document(_))) match {
+        case f@Parsed.Failure(l, i, e) => Failure(new IllegalArgumentException("Problem parsing: " + expandErrorLineNumber(f.trace().msg, lineOffset)))
         case Parsed.Success(r, index) => Success(r)
       }
 
@@ -52,17 +64,18 @@ object Mapper {
           Mapper.scope(indices, libraries),
           new FileScope(DataSonnetPath("."), indices)
         ))
-        catch { case e: Throwable =>
-          val s = new StringWriter()
-          val p = new PrintWriter(s)
-          e.printStackTrace(p)
-          p.close()
-          Failure(new IllegalArgumentException("Please contact the developers with this error! Problem compiling: " + s.toString.replace("\t", "    ")))
+        catch {
+          case e: Throwable =>
+            val s = new StringWriter()
+            val p = new PrintWriter(s)
+            e.printStackTrace(p)
+            p.close()
+            Failure(new IllegalArgumentException("Please contact the developers with this error! Problem compiling: " + s.toString.replace("\t", "    ")))
         }
     } yield evaluated
   }
 
-  def scope(indices: Map[String, Int], roots: Map[String, Val]) = Std.scope(indices.size + 1).extend(
+  private def scope(indices: Map[String, Int], roots: Map[String, Val]) = Std.scope(indices.size + 1).extend(
     roots flatMap {
       case (key, value) =>
         if (indices.contains(key))
@@ -71,106 +84,53 @@ object Mapper {
           Seq()
     }
   )
-
-  def objectify(objects: Map[String, Val]) = new Val.Obj(
-    mutable.LinkedHashMap() ++ objects.map{
-      case (key, value) =>
-        (key, Val.Obj.Member(false, Visibility.Hidden, (self: Val.Obj, sup: Option[Val.Obj], _, _) => value))
-    },
-    _ => (),
-    None
-  )
-
-  def library(evaluator: Evaluator, name: String, cache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]): (String, Val) = {
-    val jsonnetLibrarySource = Source.fromURL(getClass.getResource(s"/$name.libsonnet")).mkString
-    val jsonnetLibrary = Mapper.evaluate(evaluator, cache, jsonnetLibrarySource, Map(), 0).get  // libraries are never wrapped
-    (name -> jsonnetLibrary)
-  }
-
-  def pluginAccepts(plugin: DataFormatPlugin[_]) = List(classOf[String], classOf[Object]).find((klass) => try {
-    plugin.getClass.getMethod("read", klass, classOf[util.Map[String, Object]])
-    true
-  } catch {
-    case _ => false
-  }).getOrElse(throw new UnsupportedOperationException("Illegal Data Format Plugin: Must Only Take String or Object"))
-
-  def input(dataFormats: DataFormatService, name: String, data: Document, header: Header): Expr = {
-    val plugin = dataFormats.getPluginFor(data.getMimeType)
-    if (plugin != null) {
-      val params = header.getInputParameters(name, data.getMimeType)
-      checkParams(params, plugin.getReadParameters(), plugin.getPluginId)
-
-      val accepts = pluginAccepts(plugin);
-      val contents = if (data.canGetContentsAs(accepts)) {
-        data.getContentsAs(accepts)
-      } else {
-        throw new IllegalArgumentException("The data format plugin for " + data.getMimeType +
-          " does not support any of the data forms compatible with this type")
-      }
-
-      val json = accepts match {
-        case k if k == classOf[String] =>
-          plugin.asInstanceOf[DataFormatPlugin[String]].read(contents.asInstanceOf[String], params)
-        case k if k == classOf[Object] =>
-          plugin.asInstanceOf[DataFormatPlugin[Object]].read(contents, params)  // already Object
-        case _ => ???  // not possible, we check above for possibilities
-      }
-
-      Materializer.toExpr(json.asInstanceOf[ujson.Value])
-    } else {
-      throw new IllegalArgumentException("The input mime type " + data.getMimeType + " is not supported")
-    }
-  }
-
-  def output(dataFormats: DataFormatService, output: ujson.Value, mimeType: String, header: Header): Document = {
-    val plugin = dataFormats.getPluginFor(mimeType)
-    if (plugin != null) {
-      val params = header.getOutputParameters(mimeType)
-      checkParams(params, plugin.getWriteParameters(), plugin.getPluginId)
-//      val str = plugin.write(output, params.asInstanceOf[util.Map[String, AnyRef]])
-//      new StringDocument(str, mimeType)
-      plugin.write(output, params.asInstanceOf[util.Map[String, AnyRef]], mimeType)
-    } else {
-      throw new IllegalArgumentException("The output mime type " + mimeType + " is not supported")
-    }
-  }
-
-  def checkParams(params: util.Map[_, _], supportedParams: util.Map[_, _], pluginId: String) = {
-    for (paramName <- params.keySet().toArray) {
-      if (!supportedParams.containsKey(paramName)) {
-        throw new IllegalArgumentException("The parameter '" + paramName + "' not supported by plugin " + pluginId)
-      }
-    }
-  }
 }
 
-class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imports: java.util.Map[String, String], needsWrapper: Boolean, autoRegisterDataFormats: Boolean) {
+class Mapper(var script: String,
+             inputNames: java.lang.Iterable[String] = Collections.emptySet(),
+             imports: java.util.Map[String, String] = Collections.emptyMap(),
+             asFunction: Boolean = true,
+             additionalLibs: java.util.Collection[Library] = Collections.emptyList(),
+             dataFormats: DataFormatService = DataFormatService.DEFAULT,
+             defaultOutput: MediaType = MediaTypes.APPLICATION_JSON) {
 
-  var header = Header.parseHeader(jsonnet);
+  private val header = Header.parseHeader(script)
 
-  if(needsWrapper) {
-    jsonnet = Mapper.wrap(jsonnet, argumentNames.asScala)
+  if (asFunction) {
+    script = Mapper.asFunction(script, inputNames.asScala)
   }
 
-  def lineOffset = if (needsWrapper) 1 else 0
+  private val lineOffset = if (asFunction) 1 else 0
 
-  def this(jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean, autoRegisterDataFormats: Boolean) {
-    this(jsonnet, argumentNames, Collections.emptyMap(), needsWrapper, autoRegisterDataFormats)
+  def this(script: String,
+           inputNames: java.lang.Iterable[String],
+           imports: java.util.Map[String, String],
+           asFunction: Boolean,
+           additionalLibs: java.util.Collection[Library]) = {
+    this(script, inputNames, imports, asFunction, additionalLibs, DataFormatService.DEFAULT)
   }
 
-  def this(jsonnet: String, argumentNames: java.lang.Iterable[String], needsWrapper: Boolean) {
-    this(jsonnet, argumentNames, Collections.emptyMap(), needsWrapper, true)
+  def this(script: String,
+           inputNames: java.lang.Iterable[String],
+           imports: java.util.Map[String, String],
+           asFunction: Boolean) = {
+    this(script, inputNames, imports, asFunction, Collections.emptyList())
   }
 
-  def this(jsonnet: String, argumentNames: java.lang.Iterable[String]) {
-    this(jsonnet, argumentNames, Collections.emptyMap(), true, true)
+  def this(script: String,
+           inputNames: java.lang.Iterable[String],
+           imports: java.util.Map[String, String]) = {
+    this(script, inputNames, imports, true, Collections.emptyList())
   }
 
-  def this(jsonnet: String, argumentNames: java.lang.Iterable[String], imports: java.util.Map[String, String]) {
-    this(jsonnet, argumentNames, imports, true, true)
+  def this(script: String,
+           inputNames: java.lang.Iterable[String]) = {
+    this(script, inputNames, Collections.emptyMap())
   }
 
-  def this(jsonnet: String) = this(jsonnet, Collections.emptyList(), Collections.emptyMap(), true, true)
+  def this(script: String) = {
+    this(script, Collections.emptySet())
+  }
 
   private def importer(parent: Path, path: String): Option[(Path, String)] = for {
     resolved <- parent match {
@@ -186,40 +146,16 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
     combined = (DataSonnetPath(resolved) -> contents)
   } yield combined
 
-
   private val parseCache = collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]()
+  private val evaluator = new NoFileEvaluator(script, DataSonnetPath("."), parseCache, importer, header.isPreserveOrder)
 
-  val evaluator = new NoFileEvaluator(jsonnet, DataSonnetPath("."), parseCache, importer, header.isPreserveOrder)
-
-  val dataFormats = new DataFormatService()
-
-  if (autoRegisterDataFormats) {
-    dataFormats.findAndRegisterPlugins()
+  private val libraries = additionalLibs.asScala.foldLeft(DS.makeLib(dataFormats, evaluator, parseCache)) {
+    (acc, lib) => acc concat lib.makeLib(dataFormats, evaluator, parseCache)
   }
-
-  def registerPlugin(plugin: DataFormatPlugin[_]) = dataFormats.registerPlugin(plugin)
-
-  def registerPluginFor(identifier: String, plugin: DataFormatPlugin[_]) =
-    dataFormats.registerPluginFor(identifier, plugin)
-
-  def registerPlugins(plugins: java.lang.Iterable[DataFormatPlugin[_]]) =
-    dataFormats.registerPlugins(plugins)
-
-  def getPluginFor(identifier: String) = dataFormats.getPluginFor(identifier)
-
-  def findPlugins = dataFormats.findPlugins()
-
-  def findAndRegisterPlugins() = dataFormats.findAndRegisterPlugins()
-
-  private val libraries = Map(
-    "DS" -> Mapper.objectify(
-      DS.libraries(dataFormats) + Mapper.library(evaluator, "Util", parseCache)
-    )
-  )
 
   imports.forEach((name, lib) => {
     if (name.endsWith(".libsonnet") || name.endsWith(".ds")) {
-      val evaluated = Mapper.evaluate(evaluator, parseCache, lib, libraries, 0)
+      val evaluated = Mapper.evaluate(lib, evaluator, parseCache, libraries, 0)
       evaluated match {
         case Success(value) =>
         case Failure(f) => throw new IllegalArgumentException("Unable to parse library: " + name, f)
@@ -228,7 +164,7 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
   })
 
   private val function = (for {
-    evaluated <- Mapper.evaluate(evaluator, parseCache, jsonnet, libraries, lineOffset)
+    evaluated <- Mapper.evaluate(script, evaluator, parseCache, libraries, lineOffset)
     verified <- evaluated match {
       case f: Func => {
         val topLevelF = f.asInstanceOf[Func]
@@ -241,53 +177,80 @@ class Mapper(var jsonnet: String, argumentNames: java.lang.Iterable[String], imp
     }
   } yield verified).get
 
-  private val mapIndex = new IndexedParserInput(jsonnet);
+  // If the requested type is ANY then look in the header, default to JSON
+  private def effectiveOutput(output: MediaType): MediaType = {
+    if (output.equalsTypeAndSubtype(MediaTypes.ANY)) {
+      val fromHeader = header.getDefaultOutput
+      if (fromHeader != null && !fromHeader.equalsTypeAndSubtype(MediaTypes.ANY)) header.combineOutputParams(fromHeader)
+      else header.combineOutputParams(defaultOutput)
+    } else {
+      header.combineOutputParams(output)
+    }
+  }
+
+  // If the input type is UNKNOWN then look in the header, default to JAVA
+  private def effectiveInput[T](name: String, input: Document[T]): Document[T] = {
+    if (input.getMediaType.equalsTypeAndSubtype(MediaTypes.UNKNOWN)){
+      val fromHeader = header.getDefaultNamedInput(name)
+      if (fromHeader != null) header.combineInputParams(name, input.withMediaType(fromHeader))
+      else header.combineInputParams(name, input.withMediaType(MediaTypes.APPLICATION_JAVA))
+    } else {
+      header.combineInputParams(name, input)
+    }
+  }
 
   def transform(payload: String): String = {
-    transform(
-      new StringDocument(payload, "application/json"),
-      new java.util.HashMap(),
-      "application/json"
-    ).getContentsAsString()
+    transform(new DefaultDocument[String](payload)).getContent
   }
 
-  def transform(payload: Document, arguments: java.util.Map[String, Document]): Document = {
-    transform(payload, arguments,"application/json")
+  def transform(payload: Document[_]): Document[String] = {
+    transform(payload, Collections.emptyMap(), MediaTypes.ANY, classOf[String])
   }
 
-  def transform(payload: Document, arguments: java.util.Map[String, Document], outputMimeType: String): Document = {
+  def transform(payload: Document[_],
+                inputs: java.util.Map[String, Document[_]],
+                output: MediaType): Document[String] = {
+    transform(payload, inputs, output, classOf[String])
+  }
 
-    // okay, okay, so at this point we: 1) figure out if we can get an object or a string
-    // then 2) we see if the converter we get for the mime type is compatible...
-    // hrmmm, any reason we can't filter by type? Whatevfer, that's internal, don't worry about it
-    val data = Mapper.input(dataFormats, "payload", payload, header)
-
-    //val parsedArguments = arguments.asScala.view.mapValues { Mapper.input(_, header) }
-    val parsedArguments = arguments.asScala.view.toMap[String, Document].map {
-      case (name, data) => (name, Mapper.input(dataFormats, name, data, header))
+  def transform[T](payload: Document[_],
+                   inputs: java.util.Map[String, Document[_]],
+                   output: MediaType,
+                   target: Class[T]): Document[T] = {
+    def valueFrom(doc: Document[_]): Value = {
+      dataFormats.thatAccepts(doc)
+        .orElseThrow(() => new IllegalArgumentException("The input mime type " + payload.getMediaType + " is not supported"))
+        .read(doc)
     }
 
-    val first +: rest = function.params.args
+    val payloadExpr: Expr = Materializer.toExpr(valueFrom(effectiveInput("payload", payload)))
+    val inputExprs: Map[String, Expr] = inputs.asScala.view.toMap[String, Document[_]].map {
+      case (name, input) => (name, Materializer.toExpr(valueFrom(effectiveInput(name, input))))
+    }
 
-    val firstMaterialized = first.copy(_2 = Some(data))
+    val payloadArg +: inputArgs = function.params.args
 
-    val values = rest.map { case (name, default, i) =>
-      val argument: Option[Expr] = parsedArguments.get(name).orElse(default)
+    val materialPayload = payloadArg.copy(_2 = Some(payloadExpr))
+    val materialInputs = inputArgs.map { case (name, default, i) =>
+      val argument: Option[Expr] = inputExprs.get(name).orElse(default)
       (name, argument, i)
     }.toVector
 
-    val materialized = try Materializer.apply(function.copy(params = Params(firstMaterialized +: values)))(evaluator)
+    val materialized = try Materializer.apply(function.copy(params = Params(materialPayload +: materialInputs)))(evaluator)
     catch {
       // if there's a parse error it must be in an import, so the offset is 0
-      case Error(msg, stack, underlying) if msg.contains("had Parse error") => throw new IllegalArgumentException("Problem executing map: " + Mapper.expandErrorLineNumber(msg, 0))
+      case Error(msg, stack, underlying) if msg.contains("had Parse error") => throw new IllegalArgumentException("Problem executing script: " + Mapper.expandErrorLineNumber(msg, 0))
       case e: Throwable =>
         val s = new StringWriter()
         val p = new PrintWriter(s)
         e.printStackTrace(p)
         p.close()
-        throw new IllegalArgumentException("Problem executing map: " + Mapper.expandErrorLineNumber(s.toString, lineOffset).replace("\t", "    "))
+        throw new IllegalArgumentException("Problem executing script: " + Mapper.expandErrorLineNumber(s.toString, lineOffset).replace("\t", "    "))
     }
 
-    Mapper.output(dataFormats, materialized, outputMimeType, header)
+    val effectiveOut = effectiveOutput(output)
+    dataFormats.thatProduces(effectiveOut, target)
+      .orElseThrow(() => new IllegalArgumentException("The output mime type " + effectiveOut + " is not supported"))
+      .write(materialized, effectiveOut, target)
   }
 }

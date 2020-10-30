@@ -1,0 +1,7 @@
+DataSonnet
+Copyright 2019-2020 ModusBox, Inc.
+          2020      Mountain State Software Solutions, Inc.
+
+The MediaType classes in src/main/java/com/datasonnet/document are derived from MediaType, and MimeType classes of the
+Spring Framework project (https://spring.io/projects/spring-framework).
+Copyright 2002 - 2020 Pivotal, Inc. All Rights Reserved.

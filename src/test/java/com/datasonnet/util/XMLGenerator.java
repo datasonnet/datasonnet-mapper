@@ -1,3 +1,27 @@
+package com.datasonnet.util;
+
+/*-
+ * The original work for this file is available under the terms of the
+ * BSD 2-Clause "Simplified" License. The derived work is made available
+ * under the terms of the Apache License, Version 2.0
+ */
+
+/*-
+ * Copyright 2019-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /*
  * Copyright (c) 2017-2018 The Regents of the University of California
  *
@@ -26,12 +50,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.datasonnet.util;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 
 import com.pholser.junit.quickcheck.generator.GenerationStatus;
 import com.pholser.junit.quickcheck.generator.Generator;
@@ -44,33 +62,45 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+
 /**
  * A generator for XML documents.
  *
  * @author Rohan Padhye
  */
+// TODO: 9/23/20 state modifications
 public class XMLGenerator extends Generator<Document> {
 
-    private static DocumentBuilderFactory documentBuilderFactory =
+    private static final DocumentBuilderFactory documentBuilderFactory =
             DocumentBuilderFactory.newInstance();
 
-    private static GeometricDistribution geometricDistribution =
+    private static final GeometricDistribution geometricDistribution =
             new GeometricDistribution();
 
-    /** Mean number of child nodes for each XML element. */
+    /**
+     * Mean number of child nodes for each XML element.
+     */
     private static final double MEAN_NUM_CHILDREN = 4;
 
-    /** Mean number of attributes for each XML element. */
+    /**
+     * Mean number of attributes for each XML element.
+     */
     private static final double MEAN_NUM_ATTRIBUTES = 2;
 
     /**
      * Minimum size of XML tree.
+     *
      * @see {@link #configure(Size)}
      */
     private int minDepth = 0;
 
     /**
      * Maximum size of XML tree.
+     *
      * @see {@link #configure(Size)}
      */
     private int maxDepth = 4;
@@ -83,7 +113,7 @@ public class XMLGenerator extends Generator<Document> {
 
     /**
      * Configures the minimum/maximum size of the XML document.
-     *
+     * <p>
      * This method is not usually invoked directly. Instead, use
      * the `@Size` annotation on fuzzed parameters to configure
      * automatically.
@@ -111,6 +141,7 @@ public class XMLGenerator extends Generator<Document> {
 
     /**
      * Generators a random XML document.
+     *
      * @param random a source of pseudo-random values
      * @param status generation state
      * @return a randomly-generated XML document
@@ -151,16 +182,16 @@ public class XMLGenerator extends Generator<Document> {
 
     private void populateElement(Document document, Element elem, SourceOfRandomness random, GenerationStatus status, int depth) {
         // Add attributes
-        int numAttributes = Math.max(0, geometricDistribution.sampleWithMean(MEAN_NUM_ATTRIBUTES, random)-1);
+        int numAttributes = Math.max(0, geometricDistribution.sampleWithMean(MEAN_NUM_ATTRIBUTES, random) - 1);
         for (int i = 0; i < numAttributes; i++) {
             elem.setAttribute(makeString(random, status), makeString(random, status));
         }
         // Make children
         if (depth < minDepth || (depth < maxDepth && random.nextBoolean())) {
-            int numChildren = Math.max(0, geometricDistribution.sampleWithMean(MEAN_NUM_CHILDREN, random)-1);
+            int numChildren = Math.max(0, geometricDistribution.sampleWithMean(MEAN_NUM_CHILDREN, random) - 1);
             for (int i = 0; i < numChildren; i++) {
                 Element child = document.createElement(makeString(random, status));
-                populateElement(document, child, random, status, depth+1);
+                populateElement(document, child, random, status, depth + 1);
                 elem.appendChild(child);
             }
         } else if (random.nextBoolean()) {

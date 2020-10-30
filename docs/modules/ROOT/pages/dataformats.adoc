@@ -22,7 +22,7 @@ Reads input data in the specified mime type and accepts additional parameters wh
 
 *Example*
 ------------------------
-DS.Formats.read(payload.embeddedXMLValue, "application/xml")
+ds.read(payload.embeddedXMLValue, "application/xml")
 ------------------------
 *Example*
 ------------------------
@@ -35,7 +35,7 @@ local params = {
     "AttributeCharacter": "*"
 };
 
-DS.Formats.read(payload.embeddedXMLValue, "application/xml", params);
+ds.read(payload.embeddedXMLValue, "application/xml", params);
 ------------------------
 
 ### `write(string output, string outputMimeType, object params={})`
@@ -44,7 +44,7 @@ Outputs the data into specified data format and accepts additional parameters wh
 
 *Example*
 ------------------------
-DS.Formats.write(payload.embeddedXMLValue, "application/xml")
+ds.write(payload.embeddedXMLValue, "application/xml")
 ------------------------
 
 *Example*
@@ -60,7 +60,7 @@ local params = {
     "AutoEmptyElements": false
 };
 
-DS.Formats.write(payload.someObj, "application/xml", params);
+ds.write(payload.someObj, "application/xml", params);
 ------------------------
 
 ## XML Format
@@ -96,7 +96,7 @@ Converts input XML string to a JSON object using http://wiki.open311.org/JSON_an
 ------------------------
 .DataSonnet map:
 ------------------------
-DS.Formats.read(payload.embeddedXMLValue, "application/xml")
+ds.read(payload.embeddedXMLValue, "application/xml")
 ------------------------
 .Result
 ------------------------
@@ -174,7 +174,7 @@ local params = {
     "AttributeCharacter": "*"
 };
 
-DS.Formats.read(payload.embeddedXMLValue, "application/xml", params);
+ds.read(payload.embeddedXMLValue, "application/xml", params);
 ------------------------
 .Result
 ------------------------
@@ -251,7 +251,7 @@ The input JSON must have a single key which will be mapped to the root element o
 .DataSonnet map:
 ------------------------
 {
-    embeddedXMLValue: DS.Formats.write(payload, "application/xml")
+    embeddedXMLValue: ds.write(payload, "application/xml")
 }
 ------------------------
 .Result
@@ -320,7 +320,7 @@ local params = {
 };
 
 {
-    embeddedXMLValue: DS.Formats.write(payload, "application/xml")
+    embeddedXMLValue: ds.write(payload, "application/xml")
 }
 ------------------------
 .Result
@@ -351,7 +351,7 @@ Christopher,Marlow,"(987)654-3210"
 .DataSonnet map:
 ------------------------
 {
-    local csvInput = DS.Formats.read(payload.embeddedCSVValue, "application/csv");
+    local csvInput = ds.read(payload.embeddedCSVValue, "application/csv");
 
     {
         name: csvInput[0]["First Name"] + " " + csvInput[0]["Last Name"]
@@ -411,7 +411,7 @@ local params = {
     "NewLine": "\n"
 };
 
-local csvInput = DS.Formats.read(payload.embeddedCSVValue, "application/csv", params);
+local csvInput = ds.read(payload.embeddedCSVValue, "application/csv", params);
 
 {
     name: csvInput[0][0] + " " + csvInput[0][1]
@@ -448,7 +448,7 @@ Creates a CSV out of an array of JSON objects, using default quote, separator, e
 .DataSonnet map:
 ------------------------
 {
-    embeddedCSVValue: DS.Formats.write(payload, "application/csv")
+    embeddedCSVValue: ds.write(payload, "application/csv")
 }
 ------------------------
 .Result
@@ -504,7 +504,7 @@ local params = {
 };
 
 {
-    embeddedCSVValue: DS.Formats.write(payload, "application/csv", params)
+    embeddedCSVValue: ds.write(payload, "application/csv", params)
 }
 ------------------------
 .Result

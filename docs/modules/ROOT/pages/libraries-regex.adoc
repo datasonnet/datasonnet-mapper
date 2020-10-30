@@ -1,0 +1,136 @@
+## regex
+
+### `regexFullMatch(string pattern, string input)`
+Matches the entire input against the pattern (anchored start and end). If there's no match, returns `null`. If there's a match, returns a JSON object which has the following structure:
+
+- `string` - the matched string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.regex.regexFullMatch(@'h(?P<mid>.*)o', 'hello')
+------------------------
+.Result
+------------------------
+{
+  "string": "hello",
+  "captures": [
+    "ell"
+  ],
+  "namedCaptures": {
+    "mid": "ell"
+  }
+}
+------------------------
+
+### `regexPartialMatch(string pattern, string input)`
+Matches the input against the pattern (unanchored). If there's no match, returns `null`. If there's a match, returns a JSON object which has the following structure:
+
+- `string` - the matched string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.regex.regexPartialMatch(@'e(?P<mid>.*)o', 'hello')
+------------------------
+.Result
+------------------------
+{
+  "string": "ello",
+  "captures": [
+    "ll"
+  ],
+  "namedCaptures": {
+    "mid": "ll"
+  }
+}
+------------------------
+
+### `regexScan(string pattern, string input)`
+Finds all matches of the input against the pattern. If there are any matches, returns an array of JSON objects which have the following structure:
+
+- `string` - the matched string;
+- `captures` - array of captured subgroups in the match, if any;
+- `namedCaptures` - map of named subgroups, if any;
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.regex.regexScan(@'(?P<user>[a-z]*)@(?P<domain>[a-z]*).org', 'modus@datasonnet.org,box@datasonnet.org')
+------------------------
+.Result
+------------------------
+[
+  {
+    "string": "modus@datasonnet.org",
+    "captures": [
+      "modus",
+      "datasonnet"
+    ],
+    "namedCaptures": {
+      "domain": "datasonnet",
+      "user": "modus"
+    }
+  },
+  {
+    "string": "box@datasonnet.org",
+    "captures": [
+      "box",
+      "datasonnet"
+    ],
+    "namedCaptures": {
+      "domain": "datasonnet",
+      "user": "box"
+    }
+  }
+]
+------------------------
+
+### `regexQuoteMeta(string str)`
+Returns a literal pattern string for the specified string.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.regex.regexQuoteMeta(@'1.5-2.0?')
+------------------------
+.Result
+------------------------
+"1\\.5-2\\.0\\?"
+------------------------
+
+### `regexReplace(string str, string pattern, string replacement)`
+Returns the input with the first match replaced by `replacement` string.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.regex.regexReplace('wishyfishyisishy', @'ish', 'and')
+------------------------
+.Result
+------------------------
+"wandyfishyisishy"
+------------------------
+
+### `regexGlobalReplace(string str, string pattern, string replacement)`
+Returns the input with all matches replaced by `replacement` string.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.regex.regexGlobalReplace('wishyfishyisishy', @'ish', 'and')
+------------------------
+.Result
+------------------------
+"wandyfandyisandy"
+------------------------

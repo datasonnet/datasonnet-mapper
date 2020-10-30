@@ -1,0 +1,319 @@
+## math
+
+### `abs(number num)`
+Returns the absolute value of `num`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.abs(-1)
+------------------------
+.Result
+------------------------
+1
+------------------------
+
+### `acos(number num)`
+Performs math acos operation on `num`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.acos(1)
+------------------------
+.Result
+------------------------
+0
+------------------------
+
+### `asin(number num)`
+Performs math asin operation on `num`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.asin(1)
+------------------------
+.Result
+------------------------
+1.5707963267948966
+------------------------
+
+### `atan(number num)`
+Performs math atan operation on `num`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.atan(1)
+------------------------
+.Result
+------------------------
+0.7853981633974483
+------------------------
+
+### `avg(array arr)`
+Returns the average value of `arr`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.avg([1,2,3])
+------------------------
+.Result
+------------------------
+2
+------------------------
+
+### `ceil(number num)`
+Rounds `num` up.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.ceil(1.01)
+------------------------
+.Result
+------------------------
+2
+------------------------
+
+### `clamp(number value, number minVal, number maxVal)`
+Limits `value` to the range of `minVal` and `maxVal`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.clamp(100, 0, 10)
+------------------------
+.Result
+------------------------
+10
+------------------------
+
+### `cos(number num)`
+Performs math cos operation on `num`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.cos(0)
+------------------------
+.Result
+------------------------
+1
+------------------------
+
+### `exp(number num)`
+Returns the result of e to the power of `num`, in other words e^`num`^.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.exp(2)
+------------------------
+.Result
+------------------------
+7.38905609893065
+------------------------
+
+### `exponent(number num)`
+Returns the non-decimal portion of a logarithmic operation.
+
+exponent = (log(`num`)/log(2)) + 1
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.exponent(2)
+------------------------
+.Result
+------------------------
+2
+------------------------
+
+### `floor(number num)`
+Rounds `num` down.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.floor(4.99)
+------------------------
+.Result
+------------------------
+4
+------------------------
+
+### `log(number num)`
+Performs math log operation. on `num`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.log(2)
+------------------------
+.Result
+------------------------
+0.6931471805599453
+
+------------------------
+
+### `mantissa(number num)`
+Returns the decimal portion of a logarithmic operation.
+
+exponent = (log(`num`)/log(2)) + 1
+mantissa = `num` * pow(2, -exponent)
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.mantissa(2)
+------------------------
+.Result
+------------------------
+0.5
+------------------------
+
+### `mod(number num1, number num2)`
+Performs modulo operation, returns how many times `num1` can go into `num2`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.mod(2,4)
+------------------------
+.Result
+------------------------
+2
+------------------------
+
+### `pow(number num1, number num2)`
+Returns the value of `num1` to the power of `num2`, in other words `num1`^`num2`^.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.pow(2,2)
+------------------------
+.Result
+------------------------
+4
+------------------------
+
+### `random`
+Returns a random float value between 0 and 1.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.random
+------------------------
+.Result
+------------------------
+0.5963038027787421
+------------------------
+
+### `randomInt(number num)`
+Returns a random integer between 0 and the provided number inclusive.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.randomInt(500)
+------------------------
+.Result
+------------------------
+485
+------------------------
+
+### `round(number num)`
+Rounds `num` to the nearest whole number.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.round(2.5)
+------------------------
+.Result
+------------------------
+3
+------------------------
+
+### `sin(number num)`
+Performs math sin operation on `num`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.sin(1)
+------------------------
+.Result
+------------------------
+0.8414709848078965
+------------------------
+
+### `sqrt(number num)`
+Performs math square root operation on `num`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.sqrt(4)
+------------------------
+.Result
+------------------------
+2
+------------------------
+
+### `sum(array arr)`
+Returns sum of all elements in `arr`.
+
+*Example*
+
+.Payload
+----------
+[ 10, 20, 30 ]
+----------
+.DataSonnet map:
+------------------------
+ds.math.sum(payload)
+------------------------
+.Result
+------------------------
+60
+------------------------
+
+### `tan(number num)`
+Performs math tan operation on `num`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.math.tan(1)
+------------------------
+.Result
+------------------------
+1.5574077246549023
+------------------------

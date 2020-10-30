@@ -1,4 +1,28 @@
-/*
+package com.datasonnet.util;
+
+/*-
+ * The original work for this file is available under the terms of the
+ * BSD 2-Clause "Simplified" License. The derived work is made available
+ * under the terms of the Apache License, Version 2.0
+ */
+
+/*-
+ * Copyright 2019-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*-
  * Copyright (c) 2017-2018 The Regents of the University of California
  *
  * All rights reserved.
@@ -26,7 +50,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.datasonnet.util;
 
 import com.pholser.junit.quickcheck.generator.GenerationStatus;
 import com.pholser.junit.quickcheck.generator.Generator;
@@ -41,14 +64,14 @@ import java.util.List;
 
 import static com.pholser.junit.quickcheck.internal.Lists.shrinksOfOneItem;
 import static com.pholser.junit.quickcheck.internal.Sequences.halving;
-
-import static java.util.stream.Collectors.*;
-import static java.util.stream.StreamSupport.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
 
 
 /**
  * @author Rohan Padhye
  */
+// TODO: 9/23/20 state modifications
 public class AlphaStringGenerator extends Generator<String> {
 
     protected int nextCodePoint(SourceOfRandomness sourceOfRandomness) {
@@ -63,7 +86,8 @@ public class AlphaStringGenerator extends Generator<String> {
         super(String.class);
     }
 
-    @Override public String generate(SourceOfRandomness random, GenerationStatus status) {
+    @Override
+    public String generate(SourceOfRandomness random, GenerationStatus status) {
         int[] codePoints = new int[status.size()];
 
         for (int i = 0; i < codePoints.length; ++i)
@@ -72,11 +96,13 @@ public class AlphaStringGenerator extends Generator<String> {
         return new String(codePoints, 0, codePoints.length);
     }
 
-    @Override public boolean canShrink(Object larger) {
+    @Override
+    public boolean canShrink(Object larger) {
         return super.canShrink(larger) && codePointsInRange((String) larger);
     }
 
-    @Override public List<String> doShrink(SourceOfRandomness random, String larger) {
+    @Override
+    public List<String> doShrink(SourceOfRandomness random, String larger) {
         List<String> shrinks = new ArrayList<>();
 
         List<Integer> codePoints = larger.codePoints().boxed().collect(toList());
@@ -92,7 +118,8 @@ public class AlphaStringGenerator extends Generator<String> {
         return Collections.unmodifiableList(shrinks);
     }
 
-    @Override public BigDecimal magnitude(Object value) {
+    @Override
+    public BigDecimal magnitude(Object value) {
         return BigDecimal.valueOf(narrow(value).length());
     }
 

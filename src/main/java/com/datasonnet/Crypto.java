@@ -1,5 +1,21 @@
 package com.datasonnet;
 
+/*-
+ * Copyright 2019-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.engines.BlowfishEngine;
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
@@ -8,7 +24,6 @@ import org.bouncycastle.util.encoders.Hex;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Base64;
@@ -23,8 +38,8 @@ public class Crypto {
                 new PaddedBufferedBlockCipher(engine);
         KeyParameter key = new KeyParameter(keyString.getBytes());
         cipher.init(true, key);
-        byte in[] = value.getBytes();
-        byte out[] = new byte[cipher.getOutputSize(in.length)];
+        byte[] in = value.getBytes();
+        byte[] out = new byte[cipher.getOutputSize(in.length)];
         int len1 = cipher.processBytes(in, 0, in.length, out, 0);
         try {
             cipher.doFinal(out, len1);
@@ -44,8 +59,8 @@ public class Crypto {
         StringBuffer result = new StringBuffer();
         KeyParameter key = new KeyParameter(keyString.getBytes());
         cipher.init(false, key);
-        byte out[] = Base64.getDecoder().decode(value);
-        byte out2[] = new byte[cipher.getOutputSize(out.length)];
+        byte[] out = Base64.getDecoder().decode(value);
+        byte[] out2 = new byte[cipher.getOutputSize(out.length)];
         int len2 = cipher.processBytes(out, 0, out.length, out2, 0);
         cipher.doFinal(out2, len2);
         String s2 = new String(out2);

@@ -28,5 +28,5 @@ local counts = {
       };
 
 
-counts == DS.Util.counts(languages, function(x) x.language.name)
+counts == ds.util.counts(languages, function(x) x.language.name)
 

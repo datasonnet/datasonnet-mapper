@@ -1,60 +1,67 @@
 package com.datasonnet.spi;
 
-import com.datasonnet.document.Document;
-import com.datasonnet.plugins.JSONFormatPlugin;
-import ujson.Str;
-import ujson.Value;
+/*-
+ * Copyright 2019-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import java.util.*;
+import com.datasonnet.document.Document;
+import com.datasonnet.document.MediaType;
+import com.datasonnet.plugins.DefaultCSVFormatPlugin;
+import com.datasonnet.plugins.DefaultJSONFormatPlugin;
+import com.datasonnet.plugins.DefaultJavaFormatPlugin;
+import com.datasonnet.plugins.DefaultPlainTextFormatPlugin;
+import com.datasonnet.plugins.DefaultXMLFormatPlugin$;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 public class DataFormatService {
+    private final List<DataFormatPlugin> plugins;
+    public static final DataFormatService DEFAULT =
+            new DataFormatService(Arrays.asList(
+                    new DefaultJSONFormatPlugin(),
+                    new DefaultJavaFormatPlugin(),
+                    DefaultXMLFormatPlugin$.MODULE$,
+                    new DefaultCSVFormatPlugin(),
+                    new DefaultPlainTextFormatPlugin()));
 
-    private Map<String, List<DataFormatPlugin>> pluginRegistry = new HashMap<>();
-
-    public DataFormatService() {
-        registerPlugin(new JSONFormatPlugin());
+    public DataFormatService(List<DataFormatPlugin> plugins) {
+        this.plugins = plugins;
     }
 
-    public void registerPlugin(DataFormatPlugin plugin) {
-        for(String identifier : plugin.getSupportedIdentifiers()) {
-            List<DataFormatPlugin> pluginsList = pluginRegistry.getOrDefault(identifier, new ArrayList<>());
-            if (!pluginsList.contains(plugin)) {
-                pluginsList.add(plugin);
+    public List<DataFormatPlugin> getPlugins() {
+        return Collections.unmodifiableList(plugins);
+    }
+
+    public Optional<DataFormatPlugin> thatProduces(MediaType output, Class<?> target) {
+        for (DataFormatPlugin plugin : plugins) {
+            if (plugin.canWrite(output, target)) {
+                return Optional.of(plugin);
             }
-            pluginRegistry.put(identifier, pluginsList);
         }
+        return Optional.empty();
     }
 
-    public void registerPluginFor(String identifier, DataFormatPlugin plugin) {
-        List<DataFormatPlugin> pluginsList = pluginRegistry.getOrDefault(identifier, new ArrayList<>());
-        if (!pluginsList.contains(plugin)) {
-            pluginsList.add(plugin);
-        }
-        pluginRegistry.put(identifier, pluginsList);
-    }
-
-    public void registerPlugins(Iterable<DataFormatPlugin> plugins) {
-        for(DataFormatPlugin plugin : plugins) {
-            registerPlugin(plugin);
-        }
-    }
-
-    public DataFormatPlugin getPluginFor(String identifier) {
-        identifier = identifier.toLowerCase();
-        return pluginRegistry.containsKey(identifier) ? pluginRegistry.get(identifier).get(0) : null;
-    }
-
-    public List<DataFormatPlugin> findPlugins() {
-
-        ServiceLoader<DataFormatPlugin> loader = ServiceLoader.load(DataFormatPlugin.class);
-        return new ArrayList() {{
-            for (DataFormatPlugin plugin : loader) {
-                add(plugin);
+    public Optional<DataFormatPlugin> thatAccepts(Document<?> doc) {
+        for (DataFormatPlugin plugin : plugins) {
+            if (plugin.canRead(doc)) {
+                return Optional.of(plugin);
             }
-        }};
-    }
-
-    public void findAndRegisterPlugins() {
-        registerPlugins(findPlugins());
+        }
+        return Optional.empty();
     }
 }

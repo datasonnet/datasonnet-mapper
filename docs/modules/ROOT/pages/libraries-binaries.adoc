@@ -1,0 +1,85 @@
+## binaries
+
+### `fromBase64(string value)`
+Converts `value` from base64.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.binaries.fromBase64("SGVsbG8gV29ybGQ=")
+------------------------
+.Result
+------------------------
+"Hello World"
+------------------------
+
+### `fromHex(string value)`
+Converts `value` from hexadecimal.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.binaries.fromHex("48656C6C6F20576F726C64")
+------------------------
+.Result
+------------------------
+"Hello World"
+------------------------
+
+### `readLinesWith(string value, string encoding)`
+Reads `value` with the specified encoding `encoding`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.binaries.readLinesWith("Hello World", "UTF-8")
+------------------------
+.Result
+------------------------
+["Hello World"]
+------------------------
+
+### `toBase64(any value)`
+Converts `value` to base 64.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.binaries.toBase64("Hello World")
+------------------------
+.Result
+------------------------
+"SGVsbG8gV29ybGQ="
+------------------------
+
+### `toHex(any value)`
+Converts `value` to hexadecimal.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.binaries.toHex("Hello World")
+------------------------
+.Result
+------------------------
+"48656C6C6F20576F726C64"
+------------------------
+
+### `writeLinesWith(string value, string encoding)`
+Writes `value` with the specified encoding `encoding`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.binaries.writeLinesWith(["Hello World"], "UTF-8")
+------------------------
+.Result
+------------------------
+"Hello World\n"
+------------------------

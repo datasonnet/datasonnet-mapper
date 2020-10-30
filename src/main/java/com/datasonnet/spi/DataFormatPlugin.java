@@ -1,38 +1,36 @@
 package com.datasonnet.spi;
 
+/*-
+ * Copyright 2019-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import com.datasonnet.document.Document;
+import com.datasonnet.document.MediaType;
+import ujson.Value;
 
-import java.util.Map;
+public interface DataFormatPlugin {
 
-public interface DataFormatPlugin<T> {
-    // TODO needs to take a Document on read, but _any_ Document... I think?
-    // Oh this is interesting. Okay, so, we want plugins to be able to choose how they handle things...
-    // but we also need to be able to express partial incompatibilities
-    // Okay, let me see. We need to be able to work with different types and because Java doesn't
-    // allow that sort of dynamic type-based dispatch, that means taking a Document makes the most sense.
-    // Hrmmm, we _don't_ actually care what the fundamental underlying thing in the document is, only
-    // what ways we can get it, really
+    default boolean canRead(Document<?> doc) {
+        return false;
+    }
 
-    // actually, that's also true on output!!!
-    // okay, so let me see...
-    // I think we really want a combo of supportsString/getString for a bunch of types...
+    default boolean canWrite(MediaType mediaType, Class<?> clazz) {
+        return false;
+    }
 
-    // final output is a bit different, though. We need to know more coherently, what is this? Or rather,
-    // what should it be returned as?
+    ujson.Value read(Document<?> doc) throws PluginException;
 
-    // that's also useful on intake, but mostly with the darn Object/not Object boundary.
-    // okay, so I've figured out we need: Object, File, Bytes, String (and the middle two not yet).
-    // That leaves the question, which end governs the connections between those three?
-    // That is, does a converter say "give me a file, no matter what" and we make it a file or throw an error?
-    // or do we sometimes give it a string. I think the former sounds good?
-    // okay, so now we've got java type erasure to deal with
-    ujson.Value read(T input, Map<String, Object> params) throws PluginException;
-    Document write(ujson.Value input, Map<String, Object> params, String mimeType) throws PluginException;
-
-    String[] getSupportedIdentifiers();
-
-    Map<String, String> getReadParameters();
-    Map<String, String> getWriteParameters();
-
-    String getPluginId();
+    <T> Document<T> write(Value input, MediaType mediaType, Class<T> targetType) throws PluginException;
 }

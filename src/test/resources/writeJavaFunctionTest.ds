@@ -1,5 +1,4 @@
 local params = {
-    "OutputClass": "com.datasonnet.javatest.Gizmo",
     "DateFormat": "yyyy-MM-dd"
 };
 
@@ -13,5 +12,5 @@ local obj = {
 };
 
 {
-    test: DS.Formats.write(obj, "application/java", params)
+    test: ds.write(obj, "application/x-java-object", params)
 }

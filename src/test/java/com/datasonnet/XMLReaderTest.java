@@ -1,37 +1,57 @@
 package com.datasonnet;
 
-import com.datasonnet.document.StringDocument;
-import com.datasonnet.spi.DataFormatService;
+/*-
+ * Copyright 2019-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import com.datasonnet.document.DefaultDocument;
+import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.TestResourceReader;
-
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.util.Collections;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 
 public class XMLReaderTest {
 
     @Test
     void testNonAscii() throws Exception {
-        mapAndAssert("xmlNonAscii.xml", "xmlNonAscii.json");
+        mapAndAssert20("xmlNonAscii.xml", "xmlNonAscii.json");
     }
 
+    @Disabled
     @Test
     void testOverrideNamespaces() throws Exception {
         String xml = "<a xmlns='http://example.com/1' xmlns:b='http://example.com/2'><b:b/></a>";
         // note how b is bound to the default namespace, which means the 'b' above needs to be auto-rebound
 
-        String jsonnet = "/** DataSonnet\nversion=1.0\ninput.payload.application/xml.NamespaceDeclarations.b=http://example.com/1\n*/\npayload";
+        String jsonnet = "/** DataSonnet\n" +
+                "version=2.0\n" +
+                "input payload application/xml;NamespaceDeclarations.b=\"http://example.com/1\"\n" +
+                "*/\n" +
+                "payload";
 
         Mapper mapper = new Mapper(jsonnet);
 
 
-        String mapped = mapper.transform(new StringDocument(xml, "application/xml"), Collections.emptyMap(), "application/json").getContentsAsString();
+        String mapped = mapper.transform(new DefaultDocument<>(xml, MediaTypes.APPLICATION_XML), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
 
         // the b namespace must have been remapped
         assertThat(mapped, not(containsString("b:b")));
@@ -52,35 +72,45 @@ public class XMLReaderTest {
         Mapper mapper = new Mapper(jsonnet);
 
 
-        String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), Collections.emptyMap(), "application/json").getContentsAsString();
+        String mappedJson = mapper.transform(new DefaultDocument<>(xmlData, MediaTypes.APPLICATION_XML), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
 
-        JSONAssert.assertEquals(expectedJson, mappedJson, false);
+        JSONAssert.assertEquals(expectedJson, mappedJson, true);
     }
 
     @Test
     void testMixedContent() throws Exception {
-        mapAndAssert("xmlMixedContent.xml", "xmlMixedContent.json");
+        mapAndAssert20("xmlMixedContent.xml", "xmlMixedContent.json");
     }
 
     @Test
     void testCDATA() throws Exception {
-        mapAndAssert("xmlCDATA.xml", "xmlCDATA.json");
+        mapAndAssert20("xmlCDATA.xml", "xmlCDATA.json");
     }
 
     @Test
     void testMultipleCDATA() throws Exception {
-        mapAndAssert("xmlMultipleCDATA.xml", "xmlMultipleCDATA.json");
+        mapAndAssert20("xmlMultipleCDATA.xml", "xmlMultipleCDATA.json");
+        mapAndAssert10("xmlMultipleCDATA.xml", "xmlMultipleCDATA10.json");
     }
 
-    private void mapAndAssert(String inputFileName, String expectedFileName) throws Exception {
+    private void mapAndAssert20(String inputFileName, String expectedFileName) throws Exception {
         String xmlData = TestResourceReader.readFileAsString(inputFileName);
         String expectedJson = TestResourceReader.readFileAsString(expectedFileName);
 
         Mapper mapper = new Mapper("payload");
 
+        String mappedJson = mapper.transform(new DefaultDocument<>(xmlData, MediaTypes.APPLICATION_XML), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
+        JSONAssert.assertEquals(expectedJson, mappedJson, true);
+    }
 
-        String mappedJson = mapper.transform(new StringDocument(xmlData, "application/xml"), Collections.emptyMap(), "application/json").getContentsAsString();
-        JSONAssert.assertEquals(expectedJson, mappedJson, false);
+    private void mapAndAssert10(String inputFileName, String expectedFileName) throws Exception {
+        String xmlData = TestResourceReader.readFileAsString(inputFileName);
+        String expectedJson = TestResourceReader.readFileAsString(expectedFileName);
+
+        Mapper mapper = new Mapper("/** DataSonnet\nversion=1.0\n*/\npayload");
+
+        String mappedJson = mapper.transform(new DefaultDocument<>(xmlData, MediaTypes.APPLICATION_XML), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
+        JSONAssert.assertEquals(expectedJson, mappedJson, true);
     }
 
 }
