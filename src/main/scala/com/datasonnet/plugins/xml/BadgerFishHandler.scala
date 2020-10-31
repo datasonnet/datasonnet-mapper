@@ -16,11 +16,9 @@ package com.datasonnet.plugins.xml
  * limitations under the License.
  */
 
-import com.datasonnet.plugins.DefaultXMLFormatPlugin
-import com.datasonnet.plugins.DefaultXMLFormatPlugin.{DEFAULT_NS_KEY, EffectiveParams}
+import com.datasonnet.plugins.DefaultXMLFormatPlugin.{BadgerFishMode, DEFAULT_NS_KEY, EffectiveParams}
 import org.xml.sax.ext.DefaultHandler2
 import org.xml.sax.{Attributes, SAXParseException}
-import ujson.Value
 
 import scala.collection.mutable
 
@@ -104,14 +102,16 @@ class BadgerFishHandler(params: EffectiveParams) extends DefaultHandler2 {
 
   def hasText(current: BadgerFish): Boolean = current.txtIdx != 1 || current.cdataIdx != 1  // been incremented
 
-  def createCombinedText(current: BadgerFish): String = {
+  def concatAllText(current: BadgerFish): Unit = {
     val sb = new StringBuilder()
-    for((name, value) <- current.obj.value) {
-      if(name.startsWith(params.textKeyPrefix) || name.startsWith(params.cdataKeyPrefix)) {
+    for ((name, value) <- current.obj.value) {
+      if (name.startsWith(params.textKeyPrefix) || name.startsWith(params.cdataKeyPrefix)) {
         sb.append(value.str)
+        current.obj.value.remove(name)
       }
     }
-    sb.toString()
+
+    current.obj.value.addOne(params.textKeyPrefix, ujson.Str(sb.toString()))
   }
 
   override def endElement(uri: String, _localName: String, qname: String): Unit = {
@@ -122,11 +122,11 @@ class BadgerFishHandler(params: EffectiveParams) extends DefaultHandler2 {
     val current = badgerStack.pop
     val parent = badgerStack.top.obj.value
 
-    if(params.dsVersion == "1.0" && hasText(current)) {
+    if (params.mode == BadgerFishMode.simple && hasText(current)) {
       // TODO render XML elements of mixed content inline with this text?
       // would help ease a use case of mixed content; carrying
       // marked up content
-      current.obj.value.addOne(params.textKeyPrefix, ujson.Str(createCombinedText(current)))
+      concatAllText(current)
     }
 
     if (parent.contains(newName)) {

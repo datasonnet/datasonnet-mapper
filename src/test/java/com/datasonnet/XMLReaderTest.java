@@ -17,6 +17,7 @@ package com.datasonnet;
  */
 
 import com.datasonnet.document.DefaultDocument;
+import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.Disabled;
@@ -33,7 +34,7 @@ public class XMLReaderTest {
 
     @Test
     void testNonAscii() throws Exception {
-        mapAndAssert20("xmlNonAscii.xml", "xmlNonAscii.json");
+        mapAndAssertFull("xmlNonAscii.xml", "xmlNonAscii.json");
     }
 
     @Disabled
@@ -72,44 +73,44 @@ public class XMLReaderTest {
         Mapper mapper = new Mapper(jsonnet);
 
 
-        String mappedJson = mapper.transform(new DefaultDocument<>(xmlData, MediaTypes.APPLICATION_XML), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
+        String mappedJson = mapper.transform(new DefaultDocument<>(xmlData, MediaType.valueOf(MediaTypes.APPLICATION_XML_VALUE + "; badgerfish=full")), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
 
         JSONAssert.assertEquals(expectedJson, mappedJson, true);
     }
 
     @Test
     void testMixedContent() throws Exception {
-        mapAndAssert20("xmlMixedContent.xml", "xmlMixedContent.json");
+        mapAndAssertFull("xmlMixedContent.xml", "xmlMixedContent.json");
     }
 
     @Test
     void testCDATA() throws Exception {
-        mapAndAssert20("xmlCDATA.xml", "xmlCDATA.json");
+        mapAndAssertFull("xmlCDATA.xml", "xmlCDATA.json");
     }
 
     @Test
     void testMultipleCDATA() throws Exception {
-        mapAndAssert20("xmlMultipleCDATA.xml", "xmlMultipleCDATA.json");
-        mapAndAssert10("xmlMultipleCDATA.xml", "xmlMultipleCDATA10.json");
+        mapAndAssertFull("xmlMultipleCDATA.xml", "xmlMultipleCDATA.json");
+        mapAndAssertSimple("xmlMultipleCDATA.xml", "xmlMultipleCDATASimple.json");
     }
 
-    private void mapAndAssert20(String inputFileName, String expectedFileName) throws Exception {
+    private void mapAndAssertFull(String inputFileName, String expectedFileName) throws Exception {
         String xmlData = TestResourceReader.readFileAsString(inputFileName);
         String expectedJson = TestResourceReader.readFileAsString(expectedFileName);
 
         Mapper mapper = new Mapper("payload");
 
-        String mappedJson = mapper.transform(new DefaultDocument<>(xmlData, MediaTypes.APPLICATION_XML), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
+        String mappedJson = mapper.transform(new DefaultDocument<>(xmlData, MediaType.valueOf(MediaTypes.APPLICATION_XML_VALUE + "; badgerfish=full")), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
         JSONAssert.assertEquals(expectedJson, mappedJson, true);
     }
 
-    private void mapAndAssert10(String inputFileName, String expectedFileName) throws Exception {
+    private void mapAndAssertSimple(String inputFileName, String expectedFileName) throws Exception {
         String xmlData = TestResourceReader.readFileAsString(inputFileName);
         String expectedJson = TestResourceReader.readFileAsString(expectedFileName);
 
-        Mapper mapper = new Mapper("/** DataSonnet\nversion=1.0\n*/\npayload");
+        Mapper mapper = new Mapper("payload");
 
-        String mappedJson = mapper.transform(new DefaultDocument<>(xmlData, MediaTypes.APPLICATION_XML), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
+        String mappedJson = mapper.transform(new DefaultDocument<>(xmlData, MediaType.valueOf(MediaTypes.APPLICATION_XML_VALUE + "; badgerfish=simple")), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
         JSONAssert.assertEquals(expectedJson, mappedJson, true);
     }
 

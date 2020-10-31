@@ -19,12 +19,6 @@ package com.datasonnet.header;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.InvalidMediaTypeException;
 import com.datasonnet.document.MediaType;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fasterxml.jackson.dataformat.javaprop.JavaPropsMapper;
 import com.fasterxml.jackson.dataformat.javaprop.JavaPropsSchema;
 import com.fasterxml.jackson.dataformat.javaprop.util.JPropNode;
@@ -33,7 +27,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -348,7 +348,7 @@ public class Header {
     }
 
     public <T> Document<T> combineInputParams(String inputName, Document<T> doc) {
-        Map<String, String> params = baseParams();
+        Map<String, String> params = new HashMap<>(4);
         MediaType mediaType = doc.getMediaType();
         Integer key = calculateIndex(mediaType);
 
@@ -377,14 +377,8 @@ public class Header {
         return doc.withMediaType(new MediaType(mediaType, params));
     }
 
-    private Map<String, String> baseParams() {
-        Map<String, String> params = new HashMap<>(4);
-        params.put(MediaTypeParameters.VERSION, getVersion());
-        return params;
-    }
-
     public MediaType combineOutputParams(MediaType mediaType) {
-        Map<String, String> params = baseParams();
+        Map<String, String> params = new HashMap<>(4);
         Integer key = calculateIndex(mediaType);
 
         if (dataFormats.containsKey(key)) {
@@ -398,10 +392,5 @@ public class Header {
         params.putAll(mediaType.getParameters());
 
         return new MediaType(mediaType, params);
-    }
-
-    public static class MediaTypeParameters {
-        public static final String PREFIX = "ds_";
-        public static final String VERSION = "ds_version";
     }
 }
