@@ -27,6 +27,7 @@ import java.util.{Base64, Scanner}
 
 import com.datasonnet
 import com.datasonnet.document.{DefaultDocument, MediaType}
+import com.datasonnet.header.Header
 import com.datasonnet.spi.{DataFormatService, Library, ujsonUtils}
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet.ReadWriter.{ApplyerRead, ArrRead, StringRead}
@@ -43,7 +44,7 @@ object DS extends Library {
 
   override def libsonnets(): Set[String] = Set("util")
 
-  override def functions(dataFormats: DataFormatService): Map[String, Val.Func] = Map(
+  override def functions(dataFormats: DataFormatService, header: Header): Map[String, Val.Func] = Map(
     builtin("contains", "container", "value") {
       (_, _, container: Val, value: Val) =>
         container match {
@@ -758,7 +759,7 @@ object DS extends Library {
     }
   )
 
-  override def modules(dataFormats: DataFormatService): Map[String, Val.Obj] = Map(
+  override def modules(dataFormats: DataFormatService, header: Header): Map[String, Val.Obj] = Map(
     "datetime" -> moduleFrom(
       builtin0("now") { (vals, ev, fs) => ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) },
 

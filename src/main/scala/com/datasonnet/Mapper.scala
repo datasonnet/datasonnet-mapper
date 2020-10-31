@@ -149,8 +149,8 @@ class Mapper(var script: String,
   private val parseCache = collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]()
   private val evaluator = new NoFileEvaluator(script, DataSonnetPath("."), parseCache, importer, header.isPreserveOrder)
 
-  private val libraries = additionalLibs.asScala.foldLeft(DS.makeLib(dataFormats, evaluator, parseCache)) {
-    (acc, lib) => acc concat lib.makeLib(dataFormats, evaluator, parseCache)
+  private val libraries = additionalLibs.asScala.foldLeft(DS.makeLib(dataFormats, header, evaluator, parseCache)) {
+    (acc, lib) => acc concat lib.makeLib(dataFormats, header, evaluator, parseCache)
   }
 
   imports.forEach((name, lib) => {

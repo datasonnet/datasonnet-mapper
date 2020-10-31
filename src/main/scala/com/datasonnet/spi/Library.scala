@@ -17,6 +17,7 @@ package com.datasonnet.spi
  */
 
 import com.datasonnet.Mapper
+import com.datasonnet.header.Header
 import fastparse.Parsed
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet.Val.Obj
@@ -34,9 +35,9 @@ object Library {
 abstract class Library {
   def namespace(): String
 
-  def functions(dataFormats: DataFormatService): Map[String, Val.Func]
+  def functions(dataFormats: DataFormatService, header: Header): Map[String, Val.Func]
 
-  def modules(dataFormats: DataFormatService): Map[String, Val.Obj]
+  def modules(dataFormats: DataFormatService, header: Header): Map[String, Val.Obj]
 
   def libsonnets(): Set[String]
 
@@ -49,13 +50,17 @@ abstract class Library {
     None
   )
 
-  def makeLib(dataFormatService: DataFormatService, evaluator: Evaluator, cache: mutable.Map[String, Parsed[(Expr, Map[String, Int])]]): Map[String, Val.Obj] = Map(
+  def makeLib(dataFormatService: DataFormatService,
+              header: Header,
+              evaluator: Evaluator,
+              cache: mutable.Map[String, Parsed[(Expr, Map[String, Int])]]
+             ): Map[String, Val.Obj] = Map(
     namespace() -> new Val.Obj(
       mutable.LinkedHashMap()
-        ++ functions(dataFormatService).map {
+        ++ functions(dataFormatService, header).map {
         case (key, value) => (key, memberOf(value))
       }
-        ++ modules(dataFormatService).map {
+        ++ modules(dataFormatService, header).map {
         case (key, value) => (key, memberOf(value))
       }
         ++ libsonnets().map {
