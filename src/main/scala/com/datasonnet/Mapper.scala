@@ -24,11 +24,11 @@ import com.datasonnet.header.Header
 import com.datasonnet.spi.{DataFormatService, Library}
 import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
 import fastparse.Parsed
-import sjsonnet.{Evaluator, Error, Expr, FileScope, Materializer, Parser, Path, Std, Val}
 import sjsonnet.Expr.Params
 import sjsonnet.Val.{Func, Lazy, Obj}
-import ujson.Value
+import sjsonnet._
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters.{IterableHasAsScala, MapHasAsScala}
 import scala.util.{Failure, Success, Try}
 
@@ -201,6 +201,29 @@ class Mapper(var script: String,
     }
   }
 
+  // supports a Map[String, Document] to enable a scenario where documents are grouped into a single input
+  private def resolveInput(name: String, input: Document[_]): ujson.Value = {
+    if (!input.getContent.isInstanceOf[java.util.Map[_, _]]) return dataFormats.mandatoryRead(effectiveInput(name, input))
+
+    val entrySet = input.getContent.asInstanceOf[java.util.Map[_, _]].entrySet()
+    if (entrySet.isEmpty) return dataFormats.mandatoryRead(effectiveInput(name, input))
+
+    val it = entrySet.iterator
+    val firstEntry = it.next
+    if (!firstEntry.getKey.isInstanceOf[String] || !firstEntry.getValue.isInstanceOf[Document[_]])
+      return dataFormats.mandatoryRead(effectiveInput(name, input))
+
+    val builder = mutable.LinkedHashMap.newBuilder[String, ujson.Value]
+    val key = firstEntry.getKey.asInstanceOf[String]
+    builder.addOne((key, dataFormats.mandatoryRead(effectiveInput(name + "." + key, firstEntry.getValue.asInstanceOf[Document[_]]))))
+    while (it.hasNext) {
+      val entry = it.next
+      val key1 = entry.getKey.asInstanceOf[String]
+      builder.addOne((key1, dataFormats.mandatoryRead(effectiveInput(name + "." + key1, entry.getValue.asInstanceOf[Document[_]]))))
+    }
+    ujson.Obj(builder.result)
+  }
+
   def transform(payload: String): String = {
     transform(new DefaultDocument[String](payload)).getContent
   }
@@ -221,7 +244,7 @@ class Mapper(var script: String,
                    target: Class[T]): Document[T] = {
     val payloadExpr: Expr = Materializer.toExpr(dataFormats.mandatoryRead(effectiveInput("payload", payload)))
     val inputExprs: Map[String, Expr] = inputs.asScala.view.toMap[String, Document[_]].map {
-      case (name, input) => (name, Materializer.toExpr(dataFormats.mandatoryRead(effectiveInput(name, input))))
+      case (name, input) => (name, Materializer.toExpr(resolveInput(name, input)))
     }
 
     val payloadArg +: inputArgs = function.params.args
