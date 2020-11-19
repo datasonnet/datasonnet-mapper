@@ -58,6 +58,7 @@ public class DefaultCSVFormatPlugin extends BaseJacksonDataFormatPlugin {
 
     public DefaultCSVFormatPlugin() {
         supportedTypes.add(MediaTypes.APPLICATION_CSV);
+        supportedTypes.add(MediaType.parseMediaType("text/csv"));
 
         readerParams.add(DS_PARAM_USE_HEADER);
         readerParams.add(DS_PARAM_QUOTE_CHAR);

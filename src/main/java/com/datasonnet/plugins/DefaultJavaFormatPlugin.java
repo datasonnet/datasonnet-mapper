@@ -69,6 +69,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
 
     public DefaultJavaFormatPlugin() {
         supportedTypes.add(MediaTypes.APPLICATION_JAVA);
+        supportedTypes.add(MediaType.parseMediaType("application/java"));
 
         readerParams.add(DS_PARAM_DATE_FORMAT);
         readerParams.add(DS_PARAM_TYPE);

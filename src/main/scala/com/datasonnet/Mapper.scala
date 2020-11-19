@@ -149,7 +149,9 @@ class Mapper(var script: String,
   private val parseCache = collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]]()
   private val evaluator = new NoFileEvaluator(script, DataSonnetPath("."), parseCache, importer, header.isPreserveOrder)
 
-  private val libraries = additionalLibs.asScala.foldLeft(DS.makeLib(dataFormats, header, evaluator, parseCache)) {
+  // using uppercase DS is deprecated, but will remain supported
+  private val defaultLibraries: Map[String, Obj] = DSLowercase.makeLib(dataFormats, header, evaluator, parseCache) concat DSUppercase.makeLib(dataFormats, header, evaluator, parseCache)
+  private val libraries = additionalLibs.asScala.foldLeft(defaultLibraries) {
     (acc, lib) => acc concat lib.makeLib(dataFormats, header, evaluator, parseCache)
   }
 

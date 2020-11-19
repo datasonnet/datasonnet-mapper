@@ -184,15 +184,23 @@ public class XMLGenerator extends Generator<Document> {
         // Add attributes
         int numAttributes = Math.max(0, geometricDistribution.sampleWithMean(MEAN_NUM_ATTRIBUTES, random) - 1);
         for (int i = 0; i < numAttributes; i++) {
-            elem.setAttribute(makeString(random, status), makeString(random, status));
+            try {
+                elem.setAttribute(makeString(random, status), makeString(random, status));
+            } catch(org.w3c.dom.DOMException e) {
+                // deliberately empty, we just ignore these problems and keep going for now
+            }
         }
         // Make children
         if (depth < minDepth || (depth < maxDepth && random.nextBoolean())) {
             int numChildren = Math.max(0, geometricDistribution.sampleWithMean(MEAN_NUM_CHILDREN, random) - 1);
             for (int i = 0; i < numChildren; i++) {
-                Element child = document.createElement(makeString(random, status));
-                populateElement(document, child, random, status, depth + 1);
-                elem.appendChild(child);
+                try {
+                    Element child = document.createElement(makeString(random, status));
+                    populateElement(document, child, random, status, depth + 1);
+                    elem.appendChild(child);
+                } catch(org.w3c.dom.DOMException e) {
+                    // deliberately empty, we just ignore these problems and keep going for now
+                }
             }
         } else if (random.nextBoolean()) {
             // Add text

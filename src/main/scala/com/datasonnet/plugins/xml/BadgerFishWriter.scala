@@ -20,7 +20,7 @@ import java.io.{StringWriter, Writer}
 
 import com.datasonnet.plugins.DefaultXMLFormatPlugin.EffectiveParams
 import org.xml.sax.helpers.NamespaceSupport
-import ujson.Obj
+import ujson.{Obj, Value}
 
 // See {@link scala.xml.Utility.serialize}
 class BadgerFishWriter(val params: EffectiveParams) {
@@ -48,6 +48,18 @@ class BadgerFishWriter(val params: EffectiveParams) {
 
   val namespaces: NamespaceSupport = new OverridingNamespaceTranslator(params.declarations)
   val namespaceParts = new Array[String](3)  // keep reusing a single array
+
+  def textOrElement(value: Value, sb: Writer) = value match {
+    case ujson.Str(v) => escapeText(v, sb)
+    case ujson.Obj(v) => {
+      val (name, child) = v.head
+      child match {
+        case c: ujson.Obj => serialize((name, c), sb)
+        case _ => throw new IllegalArgumentException("single element objects must contain one key with an element object as the value")
+      }
+    }
+    case _ => throw new IllegalArgumentException("text prefix + index elements must be a single element object or a string")
+  }
 
   def serialize(root: (String, ujson.Obj), sb: Writer = new StringWriter()): Writer = {
 
@@ -117,7 +129,7 @@ class BadgerFishWriter(val params: EffectiveParams) {
               }
             } else {
               // not a bare $, always output it
-              escapeText(value.str, sb)
+              textOrElement(value, sb)
             }
           } else if (key.startsWith(params.cdataKeyPrefix)) {
             // taken from scala.xml.PCData

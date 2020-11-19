@@ -40,7 +40,7 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
   private val DEFAULT_DS_TEXT_KEY_PREFIX = "$"
   private val DEFAULT_DS_VERSION = "1.0"
   private val DEFAULT_DS_CDATA_KEY_PREFIX = "#"
-  private val DEFAULT_DS_BADGERFISH_MODE = "simple"
+  private val DEFAULT_DS_MIXED_CONTENT = "both"
 
   val DS_NS_SEPARATOR = "namespaceseparator"
   val DS_ATTRIBUTE_KEY_PREFIX = "attributecharacter"
@@ -55,7 +55,7 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
   val DS_AUTO_EMPTY = "autoemptyelements"
   val DS_NULL_AS_EMPTY = "nullasemptyelement"
 
-  val DS_BADGERFISH_MODE = "badgerfish"
+  val DS_PRESERVE_ORDER = "preserveorder"
 
   supportedTypes.add(MediaTypes.APPLICATION_XML)
   supportedTypes.add(MediaTypes.TEXT_XML)
@@ -72,14 +72,14 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
   writerParams.add(DS_VERSION)
   writerParams.add(DS_AUTO_EMPTY)
   writerParams.add(DS_NULL_AS_EMPTY)
-  writerParams.add(DS_BADGERFISH_MODE)
+  writerParams.add(DS_PRESERVE_ORDER)
 
   readerParams.add(DS_NS_SEPARATOR)
   readerParams.add(DS_ATTRIBUTE_KEY_PREFIX)
   readerParams.add(DS_TEXT_KEY_PREFIX)
   readerParams.add(DS_CDATA_KEY_PREFIX)
   readerParams.add(DS_NAMESPACE_DECLARATIONS)
-  readerParams.add(DS_BADGERFISH_MODE)
+  readerParams.add(DS_PRESERVE_ORDER)
 
   readerSupportedClasses.add(classOf[String].asInstanceOf[java.lang.Class[_]])
   readerSupportedClasses.add(classOf[java.net.URL].asInstanceOf[java.lang.Class[_]])
@@ -145,17 +145,12 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
     }
   }
 
-
-  object BadgerFishMode extends Enumeration {
-    val simple, full = Value
-  }
-
   case class EffectiveParams(nsSeparator: String, textKeyPrefix: String,
                              cdataKeyPrefix: String, attrKeyPrefix: String,
                              omitDeclaration: Boolean, version: String,
                              xmlnsKey: String, nullAsEmpty: Boolean,
                              autoEmpty: Boolean, declarations: Map[String, String],
-                             mode: BadgerFishMode.Value)
+                             preserveOrder: Boolean)
 
   object EffectiveParams {
     def apply(mediaType: MediaType): EffectiveParams = {
@@ -173,9 +168,9 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
         .map(entryVal => (entryVal._2, entryVal._1.substring(DS_NAMESPACE_DECLARATIONS.length - 3)))
         .map(entry => if (entry._2 == "$") (entry._1, "") else entry)
         .toMap
-      val mode = BadgerFishMode.withName(Option(mediaType.getParameter(DS_BADGERFISH_MODE)).getOrElse(DEFAULT_DS_BADGERFISH_MODE).toLowerCase)
+      val preserveOrder = if (mediaType.getParameter(DS_PRESERVE_ORDER) != null) java.lang.Boolean.parseBoolean(mediaType.getParameter(DS_PRESERVE_ORDER)) else true
 
-      EffectiveParams(nsSep, txtPref, cdataPref, attrPref, omitDecl, ver, xmlns, nullEmpty, autoEmpty, declarations, mode)
+      EffectiveParams(nsSep, txtPref, cdataPref, attrPref, omitDecl, ver, xmlns, nullEmpty, autoEmpty, declarations, preserveOrder)
     }
   }
 }
