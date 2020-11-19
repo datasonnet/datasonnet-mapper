@@ -26,7 +26,7 @@
     <version>2.0.0-SNAPSHOT</version>
     <name>DataSonnet Mapper</name>
     <description>A transformation domain specific language</description>
-    <url>https://github.com/ms3inc/datasonnet-mapper</url>
+    <url>https://github.com/modusbox/datasonnet-mapper</url>
     <inceptionYear>2019</inceptionYear>
     <licenses>
         <license>
@@ -64,9 +64,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/MS3Inc/datasonnet-mapper.git</connection>
-        <developerConnection>scm:git:https://github.com/MS3Inc/datasonnet-mapper.git</developerConnection>
-        <url>https://github.com/MS3Inc/datasonnet-mapper</url>
+        <connection>scm:git:https://github.com/modusbox/datasonnet-mapper.git</connection>
+        <developerConnection>scm:git:https://github.com/modusbox/datasonnet-mapper.git</developerConnection>
+        <url>https://github.com/modusbox/datasonnet-mapper</url>
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>
