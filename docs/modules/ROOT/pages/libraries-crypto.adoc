@@ -1,5 +1,35 @@
 ## crypto
 
+### `decrypt(string value, string secret, string algorithm, string mode, string padding)`
+Decrypts the Base64 value with specified algorithm, mode, and padding using the provided secret.
+Possible algorithms to use are AES, DES, and DESede. The provided secret must be of lengths 16 or 32, 8, and 24 respectively.
+All Algorithms only support NoPadding or PKCS5Padding
+
+*Example:*
+
+------------------------
+ds.crypto.decrypt("Hello World", "DataSonnet123456", "AES", "ECB", "PKCS5Padding")
+------------------------
+.Result
+------------------------
+"HrkF1grBXCtATMLxh1gZVA=="
+------------------------
+
+### `encrypt(string value, string secret, string algorithm, string mode, string padding)`
+Encrypts the value with specified algorithm, mode, and padding using the provided secret. Converts the encryption to a readable format with Base64
+Possible algorithms to use are AES, DES, and DESede. The provided secret must be of lengths 16 or 32, 8, and 24 respectively.
+All Algorithms only support NoPadding or PKCS5Padding
+
+*Example:*
+
+------------------------
+ds.crypto.decrypt("HrkF1grBXCtATMLxh1gZVA==", "DataSonnet123456", "AES", "ECB", "PKCS5Padding")
+------------------------
+.Result
+------------------------
+"Hello World"
+------------------------
+
 ### `hash(string value, string algorithm)`
 Calculates hash of `value` using one of the supported algorithms. The `algorithm` must be one of `MD2`, `MD5`, `SHA-1`, `SHA-256`, `SHA-384`, `SHA-512`
 The response is a string containing the hash bytes.

@@ -1066,7 +1066,25 @@ object DSLowercase extends Library {
       },
 
       /**
-       * Encrypts the value with specified algorithm and mode, then encodes the encryption using Base64 for readability
+       * Encrypts the value with specified algorithm, mode, and padding using the provided secret. Converts the encryption to a readable format with Base64
+       * Possible algorithms to use are AES, DES, and DESede. The provided secret must be of lengths 16 or 32, 8, and 24 respectively.
+       * All Algorithms only support NoPadding or PKCS5Padding
+       *
+       * @builtinParam value The message to be encrypted.
+       *    @types [String]
+       * @builtinParam secret The secret used to encrypt the original messsage.
+       *    @types [String]
+       * @builtinParam algorithm The algorithm used for the encryption.
+       *    @types [String]
+       * @builtinParam mode The encryption mode to be used.
+       *    @types [String]
+       * @builtinParam padding The encryption secret padding to be used
+       *    @types [String]
+       *
+       * @builtinReturn Base64 String value of the encrypted message
+       *    @types [String]
+       *
+       * @changed 0.7.1
        */
       builtin0("encrypt", "value", "secret", "algorithm", "mode", "padding") {
         (vals, ev,fs) =>
@@ -1078,37 +1096,23 @@ object DSLowercase extends Library {
           val padding = valSeq(4).asInstanceOf[String]
           var ivSize: Int = 0
 
-          padding match {
-            case "NoPadding" | "PKCS5Padding" =>
-              if(algorithm.equalsIgnoreCase("RSA"))
-                {throw Error.Delegate("Padding for RSA must be one of: PKCS1Padding, OAEPWithSHA-1AndMGF1Padding, OAEPWithSHA-256AndMGF1Padding, got: "+ padding)}
-            case "PKCS1Padding" | "OAEPWithSHA-1AndMGF1Padding" | "OAEPWithSHA-256AndMGF1Padding" =>
-              if(!algorithm.equalsIgnoreCase("RSA"))
-                {throw Error.Delegate("Padding for " + algorithm + " must be either: NoPadding or PKCS5Padding, got: " + padding)}
+          if(!padding.equalsIgnoreCase("NoPadding") && !padding.equalsIgnoreCase("PKCS5Padding")){
+            {throw Error.Delegate("Padding must be either: NoPadding or PKCS5Padding, got: " + padding)}
           }
-
 
           algorithm.toUpperCase() match {
             case "AES" =>
               ivSize = 16;
-              if(secret.length != 16 && secret.length != 32) {
-                throw Error.Delegate("Secret length must be 16 or 32 bytes, got: " + secret.length)
-              }
+              if(secret.length != 16 && secret.length != 32)
+              {throw Error.Delegate("Secret length must be 16 or 32 bytes, got: " + secret.length)}
             case "DES" =>
               ivSize = 8
               if(secret.length != 8)
-                {throw Error.Delegate("Secret length must be 8 bytes, got: " + secret.length) }
+              {throw Error.Delegate("Secret length must be 8 bytes, got: " + secret.length) }
             case "DESEDE" =>
               ivSize = 8
               if(secret.length != 24)
-                {throw Error.Delegate("Secret length must be 24 bytes, got: " + secret.length) }
-            case "RSA" =>
-              throw Error.Delegate("Currently, RSA is not supported.")
-              ivSize = 16
-              if(secret.length != 16)
-                {throw Error.Delegate("Secret length must be 16 bytes, got: " + secret.length) }
-              else if (mode.toUpperCase == "CBC")
-                {throw Error.Delegate("RSA Does not support CBC mode") }
+              {throw Error.Delegate("Secret length must be 24 bytes, got: " + secret.length) }
             case i => throw Error.Delegate("Expected algorithm to be one of AES, DES, DESede, or RSA. Got: " + i)
           }
 
@@ -1126,6 +1130,27 @@ object DSLowercase extends Library {
           Val.Lazy(Val.Str(Base64.getEncoder.encodeToString(cipher.doFinal(value.getBytes)))).force
       },
 
+      /**
+       * Decrypts the Base64 value with specified algorithm, mode, and padding using the provided secret.
+       * Possible algorithms to use are AES, DES, and DESede. The provided secret must be of lengths 16 or 32, 8, and 24 respectively.
+       * All Algorithms only support NoPadding or PKCS5Padding
+       *
+       * @builtinParam value The encrypted message to be decrypted.
+       *    @types [String]
+       * @builtinParam secret The secret used to encrypt the original messsage.
+       *    @types [String]
+       * @builtinParam algorithm The algorithm used for the encryption.
+       *    @types [String]
+       * @builtinParam mode The encryption mode to be used.
+       *    @types [String]
+       * @builtinParam padding The encryption secret padding to be used
+       *    @types [String]
+       *
+       * @builtinReturn Base64 String value of the encrypted message
+       *    @types [String]
+       *
+       * @changed 0.7.1
+       */
       builtin0("decrypt", "value", "secret", "algorithm", "mode", "padding") {
         (vals, ev,fs) =>
           val valSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead, StringRead, StringRead))
@@ -1136,13 +1161,8 @@ object DSLowercase extends Library {
           val padding = valSeq(4).asInstanceOf[String]
           var ivSize: Int = 0
 
-          padding match {
-            case "NoPadding" | "PKCS5Padding" =>
-              if(algorithm.equalsIgnoreCase("RSA"))
-                {throw Error.Delegate("Padding for RSA must be one of: PKCS1Padding, OAEPWithSHA-1AndMGF1Padding, OAEPWithSHA-256AndMGF1Padding, got: "+ padding)}
-            case "PKCS1Padding" | "OAEPWithSHA-1AndMGF1Padding" | "OAEPWithSHA-256AndMGF1Padding" =>
-              if(!algorithm.equalsIgnoreCase("RSA"))
-                {throw Error.Delegate("Padding for " + algorithm + " must be either: NoPadding or PKCS5Padding, got: " + padding)}
+          if(!padding.equalsIgnoreCase("NoPadding") && !padding.equalsIgnoreCase("PKCS5Padding")){
+            {throw Error.Delegate("Padding must be either: NoPadding or PKCS5Padding, got: " + padding)}
           }
 
           algorithm.toUpperCase() match {
@@ -1158,13 +1178,6 @@ object DSLowercase extends Library {
               ivSize = 8
               if(secret.length != 24)
                 {throw Error.Delegate("Secret length must be 24 bytes, got: " + secret.length) }
-            case "RSA" =>
-              throw Error.Delegate("Currently, RSA is not supported.")
-              ivSize = 16
-              if(secret.length != 16)
-                {throw Error.Delegate("Secret length must be 16 bytes, got: " + secret.length) }
-              else if (mode.toUpperCase == "CBC")
-                {throw Error.Delegate("RSA Does not support CBC mode") }
             case i => throw Error.Delegate("Expected algorithm to be one of AES, DES, DESede, or RSA. Got: " + i)
           }
 
@@ -1179,9 +1192,7 @@ object DSLowercase extends Library {
               cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(secret.getBytes, algorithm.toUpperCase))
             case i => throw Error.Delegate("Expected mode to be either CBC or ECB, got: " + i)
           }
-          Val.Lazy(Val.Str(
-            new String(cipher.doFinal(Base64.getDecoder.decode(value)), Charset.forName("UTF-8"))
-          )).force
+          Val.Lazy(Val.Str(new String(cipher.doFinal(Base64.getDecoder.decode(value)), Charset.forName("UTF-8")))).force
       },
     ),
 
