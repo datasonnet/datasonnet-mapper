@@ -22,8 +22,10 @@ import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.Dictionary;
 import com.datasonnet.util.XMLDocumentUtils;
 import com.datasonnet.util.XMLGenerator;
+import com.datasonnet.util.XMLJsonGenerator;
 import com.pholser.junit.quickcheck.From;
 import com.pholser.junit.quickcheck.Property;
+import com.pholser.junit.quickcheck.When;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
@@ -36,9 +38,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-
-@Ignore
 @RunWith(JUnitQuickcheck.class)
 public class XMLPropertyTest {
 
@@ -46,13 +47,28 @@ public class XMLPropertyTest {
     @Property
     public void reversible(@From(XMLGenerator.class) @Dictionary("xml.dict") Document dom) throws Exception {
         String xml = XMLDocumentUtils.documentToString(dom);
-        Mapper mapper = new Mapper("ds.write(ds.read(payload, \"application/xml\"), \"application/xml\")");
-        String output = mapper.transform(new DefaultDocument<String>(xml, MediaTypes.APPLICATION_XML), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
+        // the round trip is performed by the use of the XML mime types
+        Mapper mapper = new Mapper("payload");
+
+        DefaultDocument<String> payload = new DefaultDocument<>(xml, MediaTypes.APPLICATION_XML);
+        String output = mapper.transform(payload, Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
+
         DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document parsed = db.parse(new ByteArrayInputStream(output.getBytes(StandardCharsets.UTF_8)));
-        assertTrue("For input " + xml + " found output " + output, dom.isEqualNode(parsed));
 
-        // okay, so this doesn't work because of ordering differences... let me see... we could sort both the same?
-        // go ahead and pass on it for now
+        String jsonVersion = mapper.transform(payload, Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
+
+        assertTrue("For input " + xml + " found output " + output + ", and JSON in the middle is " + jsonVersion, dom.isEqualNode(parsed));
     }
+
+    @Property
+    public void jsonSerializes(@From(XMLJsonGenerator.class) @Dictionary("xml.dict") String json) throws Exception {
+        Mapper mapper = new Mapper("payload");
+        try {
+            String xml = mapper.transform(new DefaultDocument<String>(json, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
+        } catch(Throwable t) {
+            fail("Unable to convert to xml: " + json);
+        }
+    }
+
 }

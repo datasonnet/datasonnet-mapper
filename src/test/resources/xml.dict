@@ -139,7 +139,6 @@ updatePolicy
 url
 value
 version
-xmlns
 absolute-ordering
 addAbsoluteOrdering
 addAbsoluteOrderingOthers

@@ -18,6 +18,7 @@ package com.datasonnet;
 
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
+import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.javatest.Gizmo;
 import com.datasonnet.javatest.Manufacturer;
@@ -86,5 +87,12 @@ public class JavaReaderTest {
         Mapper mapper = new Mapper("payload == null");
         Document<Boolean> mapped = mapper.transform(nullObj, new HashMap<>(), MediaTypes.APPLICATION_JAVA, Boolean.class);
         assertTrue(mapped.getContent());
+    }
+
+    @Test
+    void testVaryingMediaType() {
+        Document<Object> object = new DefaultDocument<>("", MediaType.parseMediaType("application/java"));
+        Mapper mapper = new Mapper("payload");
+        Document<Object> mapped = mapper.transform(object, new HashMap<>(), MediaTypes.APPLICATION_JAVA, Object.class);
     }
 }

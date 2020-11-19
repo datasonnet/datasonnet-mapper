@@ -5,7 +5,7 @@
     },
     "datasonnet%datasonnet": {
       "*version":"1.0",
-      "__text1":"Hello World"
+      "__text":"Hello World"
     }
   }
 }

@@ -1,0 +1,10 @@
+{
+  "cdataTest": {
+    "invoice": {
+      "$": "1234567890"
+    },
+    "letter": {
+      "$": "\n        Dear Mr. <name>John Smith</name>.\n        Your order <orderid>1032</orderid>\n        will be shipped on <shipdate>2001-07-13</shipdate>.\n        \n            {\n                \"item\":\"Gizmo\",\n                \"sku\":\"g123\",\n                \"quantity\":1,\n                \"price\":\"$123.45\"\n            }\n        "
+    }
+  }
+}

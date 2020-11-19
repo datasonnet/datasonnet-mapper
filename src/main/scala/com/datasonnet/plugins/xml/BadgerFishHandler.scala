@@ -16,20 +16,20 @@ package com.datasonnet.plugins.xml
  * limitations under the License.
  */
 
-import com.datasonnet.plugins.DefaultXMLFormatPlugin
 import com.datasonnet.plugins.DefaultXMLFormatPlugin.{DEFAULT_NS_KEY, EffectiveParams}
 import org.xml.sax.ext.DefaultHandler2
 import org.xml.sax.{Attributes, SAXParseException}
 import ujson.Value
 
+import scala.collection.immutable.Set
 import scala.collection.mutable
 
 // See {@link scala.xml.parsing.FactoryAdapter}
 class BadgerFishHandler(params: EffectiveParams) extends DefaultHandler2 {
-  def result: ujson.Obj = badgerStack.top.obj
+  def result: ujson.Obj = collateObj(badgerStack.top)
 
   val buffer = new StringBuilder()
-  val badgerStack = new mutable.Stack[BadgerFish]
+  val badgerStack = new mutable.Stack[Element]
   // ignore text until after first element starts
   var capture: Boolean = false
 
@@ -39,7 +39,7 @@ class BadgerFishHandler(params: EffectiveParams) extends DefaultHandler2 {
   private var currentNS: mutable.LinkedHashMap[String, ujson.Str] = mutable.LinkedHashMap()
 
   // root
-  badgerStack.push(BadgerFish(ujson.Obj()))
+  badgerStack.push(Element(ujson.Obj()))
 
   override def startPrefixMapping(prefix: String, uri: String): Unit = {
     if(needNewContext) {
@@ -81,7 +81,7 @@ class BadgerFishHandler(params: EffectiveParams) extends DefaultHandler2 {
       current.value.addAll(attrs.toList)
     }
 
-    badgerStack.push(BadgerFish(current))
+    badgerStack.push(Element(current))
   }
 
   override def characters(ch: Array[Char], offset: Int, length: Int): Unit = {
@@ -94,24 +94,64 @@ class BadgerFishHandler(params: EffectiveParams) extends DefaultHandler2 {
 
   override def endCDATA(): Unit = {
     if (buffer.nonEmpty) {
-      val idx = badgerStack.top.cdataIdx
-      badgerStack.top.obj.value.addOne(params.cdataKeyPrefix + idx, ujson.Str(buffer.toString))
-      badgerStack.top.cdataIdx = idx + 1
+      badgerStack.top.children = badgerStack.top.children :+ CData(buffer.toString)
     }
-
     buffer.clear()
   }
 
-  def hasText(current: BadgerFish): Boolean = current.txtIdx != 1 || current.cdataIdx != 1  // been incremented
-
-  def createCombinedText(current: BadgerFish): String = {
-    val sb = new StringBuilder()
-    for((name, value) <- current.obj.value) {
-      if(name.startsWith(params.textKeyPrefix) || name.startsWith(params.cdataKeyPrefix)) {
-        sb.append(value.str)
+  def examineChildren(children: List[Node]): ChildrenCase.Value = {
+    val classes = children.map(_.getClass).toSet
+    if (classes == Set(classOf[Text])) {
+      ChildrenCase.ALL_SIMPLE_TEXT
+    } else if (classes subsetOf Set(classOf[Text], classOf[CData])) {
+      ChildrenCase.MIXED_TEXT
+    } else if (classes == Set(classOf[Element])) {
+      if(wellOrdered(children.asInstanceOf[List[Element]])) {
+        ChildrenCase.STRUCTURED_CONTENT
+      } else {
+        ChildrenCase.OUT_OF_ORDER_ELEMENTS
       }
+    } else {
+      ChildrenCase.MIXED_CONTENT
     }
-    sb.toString()
+  }
+
+  def wellOrdered(children: List[Element]): Boolean = {
+    val found = mutable.Set[String]()
+    var last = ""
+    children.map(_.name).forall(v => if (last == v || !found.contains(v)) {
+      found.add(v)
+      last = v
+      true
+    } else {
+      false
+    })
+  }
+
+  def mixedNodes(children: List[Node]): IterableOnce[(String, Value)] = children.zipWithIndex.map {
+    case (node, index) =>
+      val index1 = index + 1
+      node match {
+        case Text(value) => (params.textKeyPrefix + index1 -> ujson.Str(value))
+        case CData(value) => (params.cdataKeyPrefix + index1 -> ujson.Str(value))
+        case Element(obj, name, _) => (params.textKeyPrefix + index1 -> ujson.Obj((name, obj)))
+      }
+  }
+
+  def combinedElements(children: List[Element]): IterableOnce[(String, Value)] = {
+    val values = mutable.LinkedHashMap[String, Value]()
+    // note, do not use groupBy as it does not provide the ordering guarantee we need
+    children.foreach(value => {
+      if (values.contains(value.name)) {
+        (values(value.name): @unchecked) match {
+          case ujson.Arr(arr) => arr.addOne(value.obj)
+          case ujson.Obj(existing) => values(value.name) = ujson.Arr(existing, value.obj)
+        }
+      } else {
+        values(value.name) = value.obj
+      }
+    })
+    values
   }
 
   override def endElement(uri: String, _localName: String, qname: String): Unit = {
@@ -120,27 +160,42 @@ class BadgerFishHandler(params: EffectiveParams) extends DefaultHandler2 {
     val translated = processName(qname, false)
     val newName = translated.replaceFirst(":", params.nsSeparator)
     val current = badgerStack.pop
-    val parent = badgerStack.top.obj.value
+    val parent = badgerStack.top
 
-    if(params.dsVersion == "1.0" && hasText(current)) {
-      // TODO render XML elements of mixed content inline with this text?
-      // would help ease a use case of mixed content; carrying
-      // marked up content
-      current.obj.value.addOne(params.textKeyPrefix, ujson.Str(createCombinedText(current)))
-    }
-
-    if (parent.contains(newName)) {
-      (parent(newName): @unchecked) match {
-        // added @unchecked to suppress non-exhaustive match warning, we will only see Arrs or Objs
-        case ujson.Arr(arr) => arr.addOne(current.obj)
-        case ujson.Obj(existing) => parent.addOne(newName, ujson.Arr(existing, current.obj))
-      }
-    } else {
-      parent.addOne(newName, current.obj)
-    }
+    // don't include the current children because we've already handled them
+    parent.children = parent.children :+ Element(collateObj(current), newName)
 
     capture = badgerStack.size != 1 // root level
     namespaces.popContext()
+  }
+
+  private def collateObj(current: Element): ujson.Obj = {
+    val children = current.children
+    val childrenCase = examineChildren(children)
+
+    childrenCase match {
+      case ChildrenCase.ALL_SIMPLE_TEXT => {
+        // they are all text nodes, so just combine them into one and add that
+        val combined = children.asInstanceOf[List[Textual]].map(_.value).mkString("")
+        current.obj.value += (params.textKeyPrefix -> ujson.Str(combined))
+      }
+      case ChildrenCase.MIXED_TEXT => {
+        // all textual nodes, so combine them
+        val combined = children.asInstanceOf[List[Textual]].map(_.value).mkString("")
+        current.obj.value += (params.textKeyPrefix -> ujson.Str(combined))
+
+        // but also preserve them as individual nodes just in case that's of interest
+        current.obj.value ++= mixedNodes(children)
+      }
+      case ChildrenCase.OUT_OF_ORDER_ELEMENTS if !params.preserveOrder => {
+        current.obj.value ++= combinedElements(children.asInstanceOf[List[Element]])
+      }
+      case ChildrenCase.STRUCTURED_CONTENT => {
+        current.obj.value ++= combinedElements(children.asInstanceOf[List[Element]])
+      }
+      case _ => current.obj.value ++= mixedNodes(children)
+    }
+    current.obj
   }
 
   private def processName(qname: String, isAttribute: Boolean) = {
@@ -152,12 +207,10 @@ class BadgerFishHandler(params: EffectiveParams) extends DefaultHandler2 {
 
   def captureText(): Unit = {
     if (capture && buffer.nonEmpty) {
-      val idx = badgerStack.top.txtIdx
       val string = buffer.toString
       // TODO: change to a isNotBlank func
       if (string.trim.nonEmpty) {
-        badgerStack.top.obj.value.addOne(params.textKeyPrefix + idx, buffer.toString)
-        badgerStack.top.txtIdx = idx + 1
+        badgerStack.top.children = badgerStack.top.children :+ Text(string)
       }
     }
 
@@ -178,6 +231,17 @@ class BadgerFishHandler(params: EffectiveParams) extends DefaultHandler2 {
       Console.flush()
     }
 
-  case class BadgerFish(obj: ujson.Obj, var txtIdx: Int = 1, var cdataIdx: Int = 1)
+
 
 }
+
+
+object ChildrenCase extends Enumeration {
+  val ALL_SIMPLE_TEXT, MIXED_TEXT, OUT_OF_ORDER_ELEMENTS, MIXED_CONTENT, STRUCTURED_CONTENT = Value
+}
+
+sealed abstract class Node
+abstract class Textual(val value: String) extends Node
+case class Text(override val value: String) extends Textual(value)
+case class CData(override val value: String) extends Textual(value)
+case class Element(obj: ujson.Obj, name: String = "", var children: List[Node] = List()) extends Node
