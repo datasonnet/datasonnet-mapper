@@ -1,6 +1,6 @@
 <gitVersioning>
     <branch>
-        <pattern>master</pattern>
+        <pattern>main</pattern>
         <versionFormat>${version}</versionFormat>
     </branch>
     <branch>
