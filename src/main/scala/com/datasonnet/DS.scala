@@ -1079,14 +1079,12 @@ object DSLowercase extends Library {
           var ivSize: Int = 0
 
           padding match {
-            case "NOPADDING" | "PKCS5Padding" =>
-              if(algorithm.equalsIgnoreCase("RSA")){
-                throw Error.Delegate("Padding for RSA must be one of: PKCS1Padding, OAEPWithSHA-1AndMGF1Padding, OAEPWithSHA-256AndMGF1Padding, got: "+ padding)
-              }
+            case "NoPadding" | "PKCS5Padding" =>
+              if(algorithm.equalsIgnoreCase("RSA"))
+                {throw Error.Delegate("Padding for RSA must be one of: PKCS1Padding, OAEPWithSHA-1AndMGF1Padding, OAEPWithSHA-256AndMGF1Padding, got: "+ padding)}
             case "PKCS1Padding" | "OAEPWithSHA-1AndMGF1Padding" | "OAEPWithSHA-256AndMGF1Padding" =>
-              if(!algorithm.equalsIgnoreCase("RSA")){
-                throw Error.Delegate("Padding for " + algorithm + " must be either: NOPADDING or PKCS5Padding, got: " + padding)
-              }
+              if(!algorithm.equalsIgnoreCase("RSA"))
+                {throw Error.Delegate("Padding for " + algorithm + " must be either: NoPadding or PKCS5Padding, got: " + padding)}
           }
 
 
@@ -1095,9 +1093,6 @@ object DSLowercase extends Library {
               ivSize = 16;
               if(secret.length != 16 && secret.length != 32) {
                 throw Error.Delegate("Secret length must be 16 or 32 bytes, got: " + secret.length)
-              }
-              if(!padding.equalsIgnoreCase("PKCS5Padding") && !padding.equalsIgnoreCase("NoPadding")){
-                throw Error.Delegate("Padding for AES must be either PKCS5Padding or NoPadding, got: " + padding)
               }
             case "DES" =>
               ivSize = 8
@@ -1142,30 +1137,27 @@ object DSLowercase extends Library {
           var ivSize: Int = 0
 
           padding match {
-            case "NOPADDING" | "PKCS5Padding" =>
-              if(algorithm.equalsIgnoreCase("RSA")){
-                throw Error.Delegate("Padding for RSA must be one of: PKCS1Padding, OAEPWithSHA-1AndMGF1Padding, OAEPWithSHA-256AndMGF1Padding, got: "+ padding)
-              }
+            case "NoPadding" | "PKCS5Padding" =>
+              if(algorithm.equalsIgnoreCase("RSA"))
+                {throw Error.Delegate("Padding for RSA must be one of: PKCS1Padding, OAEPWithSHA-1AndMGF1Padding, OAEPWithSHA-256AndMGF1Padding, got: "+ padding)}
             case "PKCS1Padding" | "OAEPWithSHA-1AndMGF1Padding" | "OAEPWithSHA-256AndMGF1Padding" =>
-              if(!algorithm.equalsIgnoreCase("RSA")){
-                throw Error.Delegate("Padding for " + algorithm + " must be either: NOPADDING or PKCS5Padding, got: " + padding)
-              }
+              if(!algorithm.equalsIgnoreCase("RSA"))
+                {throw Error.Delegate("Padding for " + algorithm + " must be either: NoPadding or PKCS5Padding, got: " + padding)}
           }
 
           algorithm.toUpperCase() match {
             case "AES" =>
               ivSize = 16;
-              if(secret.length != 16 && secret.length != 32) {
-                throw Error.Delegate("Secret length must be 16 or 32 bytes, got: " + secret.length)
-              }
+              if(secret.length != 16 && secret.length != 32)
+                {throw Error.Delegate("Secret length must be 16 or 32 bytes, got: " + secret.length)}
             case "DES" =>
               ivSize = 8
               if(secret.length != 8)
-              {throw Error.Delegate("Secret length must be 8 bytes, got: " + secret.length) }
+                {throw Error.Delegate("Secret length must be 8 bytes, got: " + secret.length) }
             case "DESEDE" =>
               ivSize = 8
               if(secret.length != 24)
-              {throw Error.Delegate("Secret length must be 24 bytes, got: " + secret.length) }
+                {throw Error.Delegate("Secret length must be 24 bytes, got: " + secret.length) }
             case "RSA" =>
               throw Error.Delegate("Currently, RSA is not supported.")
               ivSize = 16

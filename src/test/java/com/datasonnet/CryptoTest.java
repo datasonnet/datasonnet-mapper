@@ -157,10 +157,11 @@ public class CryptoTest {
 
         /*alg ="RSA";
         mode="ECB";
-        mapper = new Mapper("ds.crypto.encrypt(\"Hello World\", \"DataSonnet123456\", \"" + alg + "\", \"" + mode + "\")");
+        padding="PKCS1Padding";
+        mapper = new Mapper("ds.crypto.encrypt(\"Hello World\", \"DataSonnet123456\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
         encrypted = mapper.transform("{}").replaceAll("\"", "");
 
-        mapper = new Mapper("ds.crypto.decrypt(\"" + encrypted + "\", \"DataSonnet123456\", \"" + alg + "\", \"" + mode + "\")");
+        mapper = new Mapper("ds.crypto.decrypt(\"" + encrypted + "\", \"DataSonnet123456\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
         decrypted = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("Hello World", decrypted);*/
 
