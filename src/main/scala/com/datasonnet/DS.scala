@@ -37,14 +37,15 @@ import ujson.Value
 
 import scala.collection.mutable
 import scala.util.Random
+import scala.jdk.CollectionConverters._
 
 object DSLowercase extends Library {
 
   override def namespace() = "ds"
 
-  override def libsonnets(): Set[String] = Set("util")
+  override def libsonnets(): java.util.Set[String] = Set("util").asJava
 
-  override def functions(dataFormats: DataFormatService, header: Header): Map[String, Val.Func] = Map(
+  override def functions(dataFormats: DataFormatService, header: Header): java.util.Map[String, Val.Func] = Map(
     builtin("contains", "container", "value") {
       (_, _, container: Val, value: Val) =>
         container match {
@@ -757,9 +758,9 @@ object DSLowercase extends Library {
           case _ => first
         }
     }
-  )
+  ).asJava
 
-  override def modules(dataFormats: DataFormatService, header: Header): Map[String, Val.Obj] = Map(
+  override def modules(dataFormats: DataFormatService, header: Header): java.util.Map[String, Val.Obj] = Map(
     "datetime" -> moduleFrom(
       builtin0("now") { (vals, ev, fs) => ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) },
 
@@ -2187,7 +2188,7 @@ object DSLowercase extends Library {
           }
       }
     )
-  )
+  ).asJava
 
   def read(dataFormats: DataFormatService, data: String, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {
     val Array(supert, subt) = mimeType.split("/", 2)
@@ -2568,12 +2569,12 @@ object ValOrdering extends Ordering[Val] {
 object DSUppercase extends Library {
   override def namespace() = "DS"
 
-  override def libsonnets(): Set[String] = Set("util")
+  override def libsonnets(): java.util.Set[String] = Set("util").asJava
 
   // no root functions in the old version
-  override def functions(dataFormats: DataFormatService, header: Header): Map[String, Val.Func] = Map()
+  override def functions(dataFormats: DataFormatService, header: Header): java.util.Map[String, Val.Func] = Map().asJava
 
-  override def modules(dataFormats: DataFormatService, header: Header): Map[String, Val.Obj] = Map(
+  override def modules(dataFormats: DataFormatService, header: Header): java.util.Map[String, Val.Obj] = Map(
     "ZonedDateTime" -> moduleFrom(
       builtin0("now") { (vals, ev, fs) => Instant.now().toString() },
 
@@ -2780,5 +2781,5 @@ object DSUppercase extends Library {
         java.net.URLDecoder.decode(data, encoding)
       },
     )
-  )
+  ).asJava
 }
