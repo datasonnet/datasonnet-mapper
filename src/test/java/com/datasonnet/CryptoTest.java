@@ -16,7 +16,6 @@ package com.datasonnet;
  * limitations under the License.
  */
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -86,28 +85,28 @@ public class CryptoTest {
     @Test
     void testEncryptDecrypt() {
         String alg ="AES", mode="CBC", padding="PKCS5Padding";
-        Mapper mapper = new Mapper("ds.crypto.encrypt(\"Hello World\", \"DataSonnet123456\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        Mapper mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
         String encrypted = mapper.transform("{}").replaceAll("\"", "");
 
-        mapper = new Mapper("ds.crypto.decrypt(\"" + encrypted + "\", \"DataSonnet123456\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
         String decrypted = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("Hello World", decrypted);
 
         // 32 bits long
-        mapper = new Mapper("ds.crypto.encrypt(\"Hello World\", \"DataSonnet123456DataSonnet123456\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonnet123456DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
         encrypted = mapper.transform("{}").replaceAll("\"", "");
 
-        mapper = new Mapper("ds.crypto.decrypt(\"" + encrypted + "\", \"DataSonnet123456DataSonnet123456\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'DataSonnet123456DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
         decrypted = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("Hello World", decrypted);
 
         //=============================ECB
 
         mode="ECB";
-        mapper = new Mapper("ds.crypto.encrypt(\"Hello World\", \"DataSonnet123456\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
         encrypted = mapper.transform("{}").replaceAll("\"", "");
 
-        mapper = new Mapper("ds.crypto.decrypt(\"" + encrypted + "\", \"DataSonnet123456\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
         decrypted = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("Hello World", decrypted);
 
@@ -115,20 +114,20 @@ public class CryptoTest {
 
         alg ="DES";
         mode="CBC";
-        mapper = new Mapper("ds.crypto.encrypt(\"Hello World\", \"DataSonn\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonn', '" + alg + "/" + mode + "/" + padding + "')");
         encrypted = mapper.transform("{}").replaceAll("\"", "");
 
-        mapper = new Mapper("ds.crypto.decrypt(\"" + encrypted + "\", \"DataSonn\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'DataSonn', '" + alg + "/" + mode + "/" + padding + "')");
         decrypted = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("Hello World", decrypted);
 
         //=============================ECB
 
         mode="ECB";
-        mapper = new Mapper("ds.crypto.encrypt(\"Hello World\", \"DataSonn\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonn', '" + alg + "/" + mode + "/" + padding + "')");
         encrypted = mapper.transform("{}").replaceAll("\"", "");
 
-        mapper = new Mapper("ds.crypto.decrypt(\"" + encrypted + "\", \"DataSonn\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'DataSonn', '" + alg + "/" + mode + "/" + padding + "')");
         decrypted = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("Hello World", decrypted);
 
@@ -136,20 +135,20 @@ public class CryptoTest {
 
         alg ="DESede";
         mode="CBC";
-        mapper = new Mapper("ds.crypto.encrypt(\"Hello World\", \"Datasonnet123456XDatason\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'Datasonnet123456XDatason', '" + alg + "/" + mode + "/" + padding + "')");
         encrypted = mapper.transform("{}").replaceAll("\"", "");
 
-        mapper = new Mapper("ds.crypto.decrypt(\"" + encrypted + "\", \"Datasonnet123456XDatason\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'Datasonnet123456XDatason', '" + alg + "/" + mode + "/" + padding + "')");
         decrypted = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("Hello World", decrypted);
 
         //=============================ECB
 
         mode="ECB";
-        mapper = new Mapper("ds.crypto.encrypt(\"Hello World\", \"Datasonnet123456XDatason\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'Datasonnet123456XDatason', '" + alg + "/" + mode + "/" + padding + "')");
         encrypted = mapper.transform("{}").replaceAll("\"", "");
 
-        mapper = new Mapper("ds.crypto.decrypt(\"" + encrypted + "\", \"Datasonnet123456XDatason\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'Datasonnet123456XDatason', '" + alg + "/" + mode + "/" + padding + "')");
         decrypted = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("Hello World", decrypted);
 
@@ -158,10 +157,10 @@ public class CryptoTest {
         /*alg ="RSA";
         mode="ECB";
         padding="PKCS1Padding";
-        mapper = new Mapper("ds.crypto.encrypt(\"Hello World\", \"DataSonnet123456\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
         encrypted = mapper.transform("{}").replaceAll("\"", "");
 
-        mapper = new Mapper("ds.crypto.decrypt(\"" + encrypted + "\", \"DataSonnet123456\", \"" + alg + "\", \"" + mode + "\", \"" + padding + "\")");
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
         decrypted = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("Hello World", decrypted);*/
 
