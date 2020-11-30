@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
 
 public class Header {
     public static final String DATASONNET_HEADER = "/** DataSonnet";
+    public static final String COMMENT_PREFIX = "#";
     public static final Pattern VERSION_LINE = Pattern.compile("^version *= *(?<version>[a-zA-Z0-9.+-]+) *(\\r?\\n|$)");
     public static final String DATASONNET_DEFAULT_PREFIX = "default ";
     public static final String DATASONNET_INPUT = "input";
@@ -250,6 +251,7 @@ public class Header {
         List<MediaType> dataformat = new ArrayList<>(4);
 
         for (String line : headerSection.split("\\r?\\n")) {
+            line = line.trim();  // we never care about leading or trailing whitespace
             try {
                 if (line.startsWith(DATASONNET_PRESERVE_ORDER)) {
                     String[] tokens = line.split("=", 2);
@@ -292,8 +294,8 @@ public class Header {
                     String[] tokens = line.split(" ", 2);
                     MediaType toAdd = MediaType.valueOf(tokens[1]);
                     dataformat.add(toAdd);
-                } else if (line.trim().isEmpty()) {
-                    // this is allowed, and we pass
+                } else if (line.isEmpty() || line.startsWith(COMMENT_PREFIX)) {
+                    // deliberately do nothing
                 } else {
                     throw new HeaderParseException("Unable to parse header line: " + line);
                 }
