@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 
 public class Header {
     public static final String DATASONNET_HEADER = "/** DataSonnet";
-    public static final String COMMENT_PREFIX = "#";
+    public static final String COMMENT_PREFIX = "//";
     public static final Pattern VERSION_LINE = Pattern.compile("^version *= *(?<version>[a-zA-Z0-9.+-]+) *(\\r?\\n|$)");
     public static final String DATASONNET_DEFAULT_PREFIX = "default ";
     public static final String DATASONNET_INPUT = "input";

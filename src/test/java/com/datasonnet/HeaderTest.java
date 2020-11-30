@@ -39,7 +39,7 @@ public class HeaderTest {
             "version=2.0\n" +
             "preserveOrder=false\n" +
             "  \n" +
-            "# comment\n" +
+            "// comment\n" +
             "input payload application/xml;namespace-separator=\":\";text-value-key=__text\n" +
             "input * application/xml;text-value-key=__text\n" +
             "input myvar application/csv;separator=|\n" +
