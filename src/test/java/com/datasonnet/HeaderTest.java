@@ -61,8 +61,30 @@ public class HeaderTest {
     }
 
     @Test
-    void testHeaderVersion() {
+    void testHeaderVersion() throws HeaderParseException {
         assertEquals(header.getVersion(), "2.0");
+        assertEquals(Header.parseHeader(
+                "/** DataSonnet\n" +
+                "version=2.1\n" +
+                "*/\n"
+        ).getVersion(), "2.1");
+        assertEquals(Header.parseHeader(
+                "/** DataSonnet\n" +
+                        "version=2.15678.45678\n" +
+                        "*/\n"
+        ).getVersion(), "2.15678.45678");
+        assertThrows(HeaderParseException.class,  ()  -> {
+            Header.parseHeader(
+                    "/** DataSonnet\n" +
+                            "version=1.1\n" +
+                            "*/\n"
+            );});
+        assertThrows(HeaderParseException.class,  ()  -> {
+            Header.parseHeader(
+                    "/** DataSonnet\n" +
+                    "version=3.2\n" +
+                    "*/\n"
+            );});
     }
 
     @Test

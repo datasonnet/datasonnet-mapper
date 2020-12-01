@@ -52,9 +52,9 @@ public class Header {
     public static final String DATASONNET_PRESERVE_ORDER = "preserveOrder";
     public static final String DATAFORMAT_PREFIX = "dataformat";
     public static final String DATAFORMAT_ALL = "*";
-    public static final String VERSION_2_0 = "2.0";
-    public static final String VERSION_1_0 = "1.0";
-    private final String version;
+    public static final String LATEST_RELEASE_VERSION = "2.0"; //update this as required
+    private final String versionMajor;
+    private final String versionMinor;
     private final boolean preserveOrder;
     private final Map<String, Map<Integer, MediaType>> namedInputs;
     private final Map<Integer, MediaType> output;
@@ -72,7 +72,9 @@ public class Header {
                   MediaType defaultOutput,
                   Iterable<MediaType> allInputs,
                   Iterable<MediaType> dataFormats) {
-        this.version = version;
+        String[] versions = version.split("\\.",2); //[0] = major [1] = minor + remainder if exists
+        this.versionMajor = versions[0];
+        this.versionMinor = versions[1];
         this.preserveOrder = preserveOrder;
         this.defaultInputs = new HashMap<>(defaultInputs);
         this.namedInputs = new HashMap<>();
@@ -112,7 +114,7 @@ public class Header {
 
 
     private static final Header EMPTY =
-            new Header(VERSION_2_0, true, Collections.emptyMap(), Collections.emptyMap(), Collections.emptyList(), null, Collections.emptyList(), Collections.emptyList());
+            new Header(LATEST_RELEASE_VERSION, true, Collections.emptyMap(), Collections.emptyMap(), Collections.emptyList(), null, Collections.emptyList(), Collections.emptyList());
 
     public static Header parseHeader(String script) throws HeaderParseException {
         if (!script.trim().startsWith(DATASONNET_HEADER)) {
@@ -128,13 +130,25 @@ public class Header {
 
         String version = versionMatcher.group("version");
         String headerWithoutVersion = headerSection.substring(versionMatcher.end());
+        String[] splitVersion = version.split("\\.",2); //[0] = major [1] = minor + remainder if exists
 
-        if(VERSION_1_0.equals(version)) {
-            return parseHeader10(headerWithoutVersion);
-        } else if(VERSION_2_0.equals(version)) {
-            return parseHeader20(headerWithoutVersion);
-        } else {
-            throw new HeaderParseException("Version must be one of 1.0 or 2.0 but is " + version);
+        switch (splitVersion[0]) {
+            case "1":
+                if ("0".equals(splitVersion[1])) {
+                    return parseHeader10(headerWithoutVersion);
+                }
+                throw new HeaderParseException("Version must be 1.0 but is " + version);
+            case "2":
+                if ("0".equals(splitVersion[1])) {
+                    return parseHeader20(headerWithoutVersion);
+                } else {
+                    //not sure if a print out is a good enough warning or if we want to add loggers
+                    System.err.println("WARNING: You are using a version that is still in development. " +
+                                       "The latest release version is: " + LATEST_RELEASE_VERSION);
+                    return parseHeader20(headerWithoutVersion, version);
+                }
+            default:
+                throw new HeaderParseException("Major version must be one of [1,2] but is " + splitVersion[0]);
         }
     }
 
@@ -201,7 +215,7 @@ public class Header {
             List<MediaType> dataFormat = extractMediaTypes(getOrEmpty(propsMap, "dataformat"));
 
 
-            return new Header(VERSION_1_0,
+            return new Header("1.0",
                     getBoolean(propsMap,DATASONNET_PRESERVE_ORDER, true),
                     inputs,
                     Collections.emptyMap(),
@@ -241,7 +255,7 @@ public class Header {
     }
 
     @NotNull
-    private static Header parseHeader20(String headerSection) throws HeaderParseException {
+    private static Header parseHeader20(String headerSection, String version) throws HeaderParseException {
         boolean preserve = true;
         List<MediaType> output = new ArrayList<>(4);
         MediaType defaultOutput = null;
@@ -306,11 +320,24 @@ public class Header {
             }
         }
 
-        return new Header(VERSION_2_0, preserve, Collections.unmodifiableMap(inputs), Collections.emptyMap(), output, null, allInputs, dataformat);
+        return new Header(version, preserve, Collections.unmodifiableMap(inputs), Collections.emptyMap(), output, null, allInputs, dataformat);
+    }
+
+    @NotNull
+    private static Header parseHeader20(String headerSection) throws HeaderParseException{
+        return parseHeader20(headerSection, "2.0");
     }
 
     public String getVersion() {
-        return version;
+        return versionMajor + "." + versionMinor;
+    }
+
+    public String getVersionMajor(){
+        return versionMajor;
+    }
+
+    public String getVersionMinor(){
+        return versionMinor;
     }
 
     public Map<String, Iterable<MediaType>> getNamedInputs() {
