@@ -142,7 +142,7 @@ public class Header {
                     return parseHeader20(headerWithoutVersion);
                 } else {
                     //not sure if a print out is a good enough warning or if we want to add loggers
-                    System.out.println("WARNING: You are using a version that is still in development. " +
+                    System.err.println("WARNING: You are using a version that is still in development. " +
                                        "The latest release version is: " + LATEST_RELEASE_VERSION);
                     return parseHeader20(headerWithoutVersion, version);
                 }
