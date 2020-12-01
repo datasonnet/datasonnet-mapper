@@ -19,22 +19,15 @@ package com.datasonnet;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.TestResourceReader;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.matchers.CompareMatcher;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class XMLWriterTest {
 
@@ -244,15 +237,5 @@ public class XMLWriterTest {
         } catch (IllegalArgumentException e) {
             fail("This transformation should not fail");
         }
-    }
-
-    void simpleJsonTest() throws Exception {
-        String jsonData = TestResourceReader.readFileAsString("test.json");
-
-        Mapper mapper = new Mapper("ds.write(payload, \"application/xml\")");
-
-        String mappedXml = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
-
-        assertTrue(mappedXml.contains("<?xml"));
     }
 }

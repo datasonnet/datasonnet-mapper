@@ -108,13 +108,29 @@ public class XMLJsonGenerator extends Generator<String> {
 
     private Map makeElement(SourceOfRandomness random, GenerationStatus status) {
         Map element = new HashMap();
+
+        // mostly have ordered elements
+        if(random.nextInt() > 0.1) {
+            // mostly make them numbers
+            if(random.nextInt() > 0.9) {
+                element.put("~", "" + random.nextInt());
+            } else {
+                element.put("~", random.nextInt());
+            }
+        }
         addAttributes(element, random, status);
         if(random.nextBoolean()) {
             addText(element, random, status);
-        } else if(random.nextBoolean()) {
-            addStructuredElements(element, random, status);
+            if(random.nextBoolean()) {
+                addMixedElements(element, random, status);
+            }
         } else {
-            addMixedElements(element, random, status);
+            if(random.nextBoolean()) {
+                addMixedElements(element, random, status);
+            }
+            if(random.nextBoolean()) {
+                addStructuredElements(element, random, status);
+            }
         }
         return element;
     }
@@ -123,9 +139,7 @@ public class XMLJsonGenerator extends Generator<String> {
         int mixed = random.nextInt(5);
         for(int ii = 0; ii < mixed; ii++) {
             if(random.nextBoolean()) {
-                element.put("$" + ii, gen().type(String.class).generate(random, status));
-            } else if(random.nextBoolean()) {
-                element.put("$" + ii, makeRoot(random, status));
+                element.put("$" + random.nextInt(), gen().type(String.class).generate(random, status));
             } else if(random.nextBoolean()) {
                 element.put("#" + ii, gen().type(String.class).generate(random, status));
             }
