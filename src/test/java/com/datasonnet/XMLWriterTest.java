@@ -245,14 +245,4 @@ public class XMLWriterTest {
             fail("This transformation should not fail");
         }
     }
-
-    void simpleJsonTest() throws Exception {
-        String jsonData = TestResourceReader.readFileAsString("test.json");
-
-        Mapper mapper = new Mapper("ds.write(payload, \"application/xml\")");
-
-        String mappedXml = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
-
-        assertTrue(mappedXml.contains("<?xml"));
-    }
 }

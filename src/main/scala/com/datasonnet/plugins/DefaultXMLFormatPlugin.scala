@@ -37,6 +37,7 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
   val DEFAULT_NS_KEY = "$"
   private val DEFAULT_DS_NS_SEPARATOR = ":"
   private val DEFAULT_DS_ATTRIBUTE_KEY_PREFIX = "@"
+  private val DEFAULT_DS_ORDERING_KEY = "~"
   private val DEFAULT_DS_TEXT_KEY_PREFIX = "$"
   private val DEFAULT_DS_VERSION = "1.0"
   private val DEFAULT_DS_CDATA_KEY_PREFIX = "#"
@@ -44,6 +45,7 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
 
   val DS_NS_SEPARATOR = "namespaceseparator"
   val DS_ATTRIBUTE_KEY_PREFIX = "attributecharacter"
+  val DS_ORDERING_KEY = "orderingkey"
   val DS_TEXT_KEY_PREFIX = "textvaluekey"
   val DS_CDATA_KEY_PREFIX = "cdatavaluekey"
   // anything that starts with NamespaceDeclarations.
@@ -66,6 +68,7 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
   writerParams.add(DS_ATTRIBUTE_KEY_PREFIX)
   writerParams.add(DS_TEXT_KEY_PREFIX)
   writerParams.add(DS_CDATA_KEY_PREFIX)
+  writerParams.add(DS_ORDERING_KEY)
   writerParams.add(DS_NAMESPACE_DECLARATIONS)
   writerParams.add(DS_ROOT_ELEMENT)
   writerParams.add(DS_OMIT_DECLARATION)
@@ -78,6 +81,7 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
   readerParams.add(DS_ATTRIBUTE_KEY_PREFIX)
   readerParams.add(DS_TEXT_KEY_PREFIX)
   readerParams.add(DS_CDATA_KEY_PREFIX)
+  readerParams.add(DS_ORDERING_KEY)
   readerParams.add(DS_NAMESPACE_DECLARATIONS)
   readerParams.add(DS_PRESERVE_ORDER)
 
@@ -147,6 +151,7 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
 
   case class EffectiveParams(nsSeparator: String, textKeyPrefix: String,
                              cdataKeyPrefix: String, attrKeyPrefix: String,
+                             orderingKey: String,
                              omitDeclaration: Boolean, version: String,
                              xmlnsKey: String, nullAsEmpty: Boolean,
                              autoEmpty: Boolean, declarations: Map[String, String],
@@ -158,6 +163,7 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
       val txtPref = Option(mediaType.getParameter(DS_TEXT_KEY_PREFIX)).getOrElse(DEFAULT_DS_TEXT_KEY_PREFIX)
       val cdataPref = Option(mediaType.getParameter(DS_CDATA_KEY_PREFIX)).getOrElse(DEFAULT_DS_CDATA_KEY_PREFIX)
       val attrPref = Option(mediaType.getParameter(DS_ATTRIBUTE_KEY_PREFIX)).getOrElse(DEFAULT_DS_ATTRIBUTE_KEY_PREFIX)
+      val orderingKey = Option(mediaType.getParameter(DS_ORDERING_KEY)).getOrElse(DEFAULT_DS_ORDERING_KEY)
       val omitDecl = if (mediaType.getParameter(DS_OMIT_DECLARATION) != null) java.lang.Boolean.parseBoolean(mediaType.getParameter(DS_OMIT_DECLARATION)) else false
       val ver = Option(mediaType.getParameter(DS_VERSION)).getOrElse(DEFAULT_DS_VERSION)
       val xmlns = Option(mediaType.getParameter(DS_ATTRIBUTE_KEY_PREFIX)).getOrElse(DEFAULT_DS_ATTRIBUTE_KEY_PREFIX) + XMLNS_KEY
@@ -170,7 +176,7 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
         .toMap
       val preserveOrder = if (mediaType.getParameter(DS_PRESERVE_ORDER) != null) java.lang.Boolean.parseBoolean(mediaType.getParameter(DS_PRESERVE_ORDER)) else true
 
-      EffectiveParams(nsSep, txtPref, cdataPref, attrPref, omitDecl, ver, xmlns, nullEmpty, autoEmpty, declarations, preserveOrder)
+      EffectiveParams(nsSep, txtPref, cdataPref, attrPref, orderingKey, omitDecl, ver, xmlns, nullEmpty, autoEmpty, declarations, preserveOrder)
     }
   }
 }

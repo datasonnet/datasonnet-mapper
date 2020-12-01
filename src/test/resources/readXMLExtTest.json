@@ -1,9 +1,11 @@
 {
   "datasonnet%root": {
+    "$LOCATION": "1",
     "*xmlns": {
       "datasonnet":"http://www.modusbox.com"
     },
     "datasonnet%datasonnet": {
+      "$LOCATION": "1",
       "*version":"1.0",
       "__text":"Hello World"
     }
