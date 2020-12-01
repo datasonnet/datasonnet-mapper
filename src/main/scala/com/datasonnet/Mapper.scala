@@ -183,7 +183,7 @@ class Mapper(var script: String,
   private def effectiveOutput(output: MediaType): MediaType = {
     if (output.equalsTypeAndSubtype(MediaTypes.ANY)) {
       val fromHeader = header.getDefaultOutput
-      if (fromHeader != null && !fromHeader.equalsTypeAndSubtype(MediaTypes.ANY)) header.combineOutputParams(fromHeader)
+      if (fromHeader.isPresent && !fromHeader.get.equalsTypeAndSubtype(MediaTypes.ANY)) header.combineOutputParams(fromHeader.get)
       else header.combineOutputParams(defaultOutput)
     } else {
       header.combineOutputParams(output)
@@ -194,7 +194,7 @@ class Mapper(var script: String,
   private def effectiveInput[T](name: String, input: Document[T]): Document[T] = {
     if (input.getMediaType.equalsTypeAndSubtype(MediaTypes.UNKNOWN)){
       val fromHeader = header.getDefaultNamedInput(name)
-      if (fromHeader != null) header.combineInputParams(name, input.withMediaType(fromHeader))
+      if (fromHeader.isPresent) header.combineInputParams(name, input.withMediaType(fromHeader.get))
       else header.combineInputParams(name, input.withMediaType(MediaTypes.APPLICATION_JAVA))
     } else {
       header.combineInputParams(name, input)

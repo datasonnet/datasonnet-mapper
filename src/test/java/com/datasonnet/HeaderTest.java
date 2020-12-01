@@ -16,9 +16,10 @@ package com.datasonnet;
  * limitations under the License.
  */
 
+import com.datasonnet.document.MediaTypes;
 import com.datasonnet.header.Header;
-import org.junit.jupiter.api.BeforeAll;
 import com.datasonnet.header.HeaderParseException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
@@ -26,8 +27,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -107,7 +108,7 @@ public class HeaderTest {
 
     @Test
     void testHeaderNamedInputCommaSeparated() {
-        Map<String, String> parameters = header.getDefaultNamedInput("payload").getParameters();
+        Map<String, String> parameters = header.getDefaultNamedInput("payload").orElseThrow(AssertionError::new).getParameters();
         assertTrue(parameters.containsKey("namespace-separator"));
         assertTrue(parameters.containsKey("text-value-key"));
     }
@@ -120,7 +121,7 @@ public class HeaderTest {
 
     @Test
     void testHeaderOutput() {
-        Set<String> keys = header.getDefaultOutput().getParameters().keySet();
+        Set<String> keys = header.getDefaultOutput().orElseThrow(AssertionError::new).getParameters().keySet();
         assertTrue(keys.contains("ds.csv.quote"));
     }
 
@@ -140,5 +141,29 @@ public class HeaderTest {
             Header.parseHeader("/** DataSonnet\n" +
                     "version=2.0\n");
         });
+    }
+
+    @Test
+    public void test_default_output() throws HeaderParseException {
+        Header header1 = Header.parseHeader("/** DataSonnet\n" +
+                "version=2.0\n" +
+                "output application/x-java-object;q=0.9\n" +
+                "output application/json;q=1.0\n" +
+                "*/");
+
+        assertTrue(header1.getDefaultOutput().isPresent());
+        assertTrue(MediaTypes.APPLICATION_JSON.equalsTypeAndSubtype(header1.getDefaultOutput().get()));
+    }
+
+    @Test
+    public void test_default_input() throws HeaderParseException {
+        Header header1 = Header.parseHeader("/** DataSonnet\n" +
+                "version=2.0\n" +
+                "input payload application/json;q=0.9\n" +
+                "input payload application/x-java-object;q=1.0\n" +
+                "*/");
+
+        assertTrue(header1.getDefaultPayload().isPresent());
+        assertTrue(MediaTypes.APPLICATION_JAVA.equalsTypeAndSubtype(header1.getDefaultPayload().get()));
     }
 }

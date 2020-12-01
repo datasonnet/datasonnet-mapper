@@ -19,6 +19,7 @@ package com.datasonnet.header;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.InvalidMediaTypeException;
 import com.datasonnet.document.MediaType;
+import com.datasonnet.document.MediaTypes;
 import com.fasterxml.jackson.dataformat.javaprop.JavaPropsMapper;
 import com.fasterxml.jackson.dataformat.javaprop.JavaPropsSchema;
 import com.fasterxml.jackson.dataformat.javaprop.util.JPropNode;
@@ -33,10 +34,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 public class Header {
     public static final String DATASONNET_HEADER = "/** DataSonnet";
@@ -44,11 +45,9 @@ public class Header {
     public static final Pattern VERSION_LINE = Pattern.compile("^version *= *(?<version>[a-zA-Z0-9.+-]+) *(\\r?\\n|$)");
     public static final String DATASONNET_DEFAULT_PREFIX = "default ";
     public static final String DATASONNET_INPUT = "input";
-    public static final String DATASONNET_DEFAULT_INPUT = DATASONNET_DEFAULT_PREFIX + DATASONNET_INPUT;
-    public static final Pattern INPUT_LINE = Pattern.compile("^(?:(?<default>default )?input (?<name>\\w+)|input (?<all>\\*)) (?<mediatype>\\S.*)$");
+    public static final Pattern INPUT_LINE = Pattern.compile("^(?:input (?<name>\\w+)|input (?<all>\\*)) (?<mediatype>\\S.*)$");
     public static final String DATASONNET_OUTPUT = "output";
-    public static final String DATASONNET_DEFAULT_OUTPUT = DATASONNET_DEFAULT_PREFIX + DATASONNET_OUTPUT;
-    public static final Pattern OUTPUT_LINE = Pattern.compile("^(?<default>default )?output (?<mediatype>\\S.*)$");
+    public static final Pattern OUTPUT_LINE = Pattern.compile("^output (?<mediatype>\\S.*)$");
     public static final String DATASONNET_PRESERVE_ORDER = "preserveOrder";
     public static final String DATAFORMAT_PREFIX = "dataformat";
     public static final String DATAFORMAT_ALL = "*";
@@ -57,7 +56,7 @@ public class Header {
     private final String versionMinor;
     private final boolean preserveOrder;
     private final Map<String, Map<Integer, MediaType>> namedInputs;
-    private final Map<Integer, MediaType> output;
+    private final Map<Integer, MediaType> outputs;
     // using maps to facilitate only one per super/sub type
     private final Map<Integer, MediaType> allInputs;
     private final Map<Integer, MediaType> dataFormats;
@@ -68,7 +67,7 @@ public class Header {
                   boolean preserveOrder,
                   Map<String, Collection<MediaType>> namedInputs,
                   Map<String, MediaType> defaultInputs,
-                  Collection<MediaType> output,
+                  List<MediaType> outputs,
                   MediaType defaultOutput,
                   Iterable<MediaType> allInputs,
                   Iterable<MediaType> dataFormats) {
@@ -78,24 +77,28 @@ public class Header {
         this.preserveOrder = preserveOrder;
         this.defaultInputs = new HashMap<>(defaultInputs);
         this.namedInputs = new HashMap<>();
-        for(Map.Entry<String, Collection<MediaType>> entry : namedInputs.entrySet()) {
-            this.namedInputs.put(entry.getKey(), indexMediaTypes(entry.getValue()));
-            if(!this.defaultInputs.containsKey(entry.getKey())) {
-                if(entry.getValue().size() == 1) {
-                    this.defaultInputs.put(entry.getKey(), entry.getValue().iterator().next());
-                }
+
+        for (Map.Entry<String, Collection<MediaType>> entry : namedInputs.entrySet()) {
+            Collection<MediaType> types = entry.getValue();
+            if (types.size() > 0) {
+                Map<Integer, MediaType> indexed = indexMediaTypes(types);
+                this.namedInputs.put(entry.getKey(), indexed);
+
+                List<MediaType> sorted = new ArrayList<>(indexed.values());
+                MediaType.sortByQualityValue(sorted);
+                this.defaultInputs.put(entry.getKey(), sorted.get(0));
             }
         }
-        this.output = indexMediaTypes(output);
-        if(defaultOutput == null) {
-            if(output.size() == 1) {
-                this.defaultOutput = output.iterator().next();
-            } else {
-                this.defaultOutput = null;
-            }
+
+        this.outputs = indexMediaTypes(outputs);
+        if (defaultOutput == null && outputs.size() > 0) {
+            List<MediaType> sorted = new ArrayList<>(outputs);
+            MediaType.sortByQualityValue(sorted);
+            this.defaultOutput = sorted.get(0);
         } else {
             this.defaultOutput = defaultOutput;
         }
+
         this.allInputs = indexMediaTypes(allInputs);
         this.dataFormats = indexMediaTypes(dataFormats);
     }
@@ -112,9 +115,8 @@ public class Header {
         return mediaType.getType().hashCode() + mediaType.getSubtype().hashCode();
     }
 
-
     private static final Header EMPTY =
-            new Header(LATEST_RELEASE_VERSION, true, Collections.emptyMap(), Collections.emptyMap(), Collections.emptyList(), null, Collections.emptyList(), Collections.emptyList());
+            new Header(LATEST_RELEASE_VERSION, true, Collections.emptyMap(), Collections.emptyMap(), Collections.emptyList(), MediaTypes.ANY, Collections.emptyList(), Collections.emptyList());
 
     public static Header parseHeader(String script) throws HeaderParseException {
         if (!script.trim().startsWith(DATASONNET_HEADER)) {
@@ -242,12 +244,12 @@ public class Header {
         return types;
     }
 
-    private static <T> Map<String, T> getOrEmpty(Map map, String key) {
-        return (Map)map.getOrDefault(key, Collections.emptyMap());
+    private static <T> Map<String, T> getOrEmpty(Map<String, Map<String, T>> map, String key) {
+        return map.getOrDefault(key, Collections.emptyMap());
     }
 
-    private static boolean getBoolean(Map propsMap, String key, boolean defaultTo) {
-        if(propsMap.containsKey(key)) {
+    private static boolean getBoolean(Map<String, ?> propsMap, String key, boolean defaultTo) {
+        if (propsMap.containsKey(key)) {
             return Boolean.parseBoolean(propsMap.get(key).toString());
         } else {
             return defaultTo;
@@ -257,10 +259,8 @@ public class Header {
     @NotNull
     private static Header parseHeader20(String headerSection, String version) throws HeaderParseException {
         boolean preserve = true;
-        List<MediaType> output = new ArrayList<>(4);
-        MediaType defaultOutput = null;
+        List<MediaType> outputs = new ArrayList<>(4);
         Map<String, List<MediaType>> inputs = new HashMap<>(4);
-        Map<String, MediaType> defaultInputs = new HashMap<>(4);
         List<MediaType> allInputs = new ArrayList<>(4);
         List<MediaType> dataformat = new ArrayList<>(4);
 
@@ -270,13 +270,14 @@ public class Header {
                 if (line.startsWith(DATASONNET_PRESERVE_ORDER)) {
                     String[] tokens = line.split("=", 2);
                     preserve = Boolean.parseBoolean(tokens[1]);
-                } else if (line.startsWith(DATASONNET_INPUT) || line.startsWith(DATASONNET_DEFAULT_INPUT)) {
+                } else if (line.startsWith(DATASONNET_INPUT)) {
                     Matcher matcher = INPUT_LINE.matcher(line);
                     if(!matcher.matches()) {
                         throw new HeaderParseException("Unable to parse header line " + line + ", it must follow the input line format");
                     }
                     String name = matcher.group("name");
                     MediaType mediaType = MediaType.valueOf(matcher.group("mediatype"));
+
                     if (matcher.group("all") != null) {  // there's a *. This also means it can't be a default.
                         allInputs.add(mediaType);
                     } else {
@@ -285,25 +286,16 @@ public class Header {
                         }
                         inputs.get(name).add(mediaType);
                     }
-                    if(matcher.group("default") != null) {
-                        if(defaultInputs.containsKey(name)) {
-                            throw new HeaderParseException("There cannot be two default media types for the input " + name);
-                        }
-                        defaultInputs.put(name, mediaType);
-                    }
-                } else if (line.startsWith(DATASONNET_OUTPUT) || line.startsWith(DATASONNET_DEFAULT_OUTPUT)) {
+                } else if (line.startsWith(DATASONNET_OUTPUT)) {
                     Matcher matcher = OUTPUT_LINE.matcher(line);
-                    if(!matcher.matches()) {
+
+                    if (!matcher.matches()) {
                         throw new HeaderParseException("Unable to parse header line " + line + ", it must follow the output line format");
                     }
+
                     MediaType mediaType = MediaType.valueOf(matcher.group("mediatype"));
-                    output.add(mediaType);
-                    if(matcher.group("default") != null) {
-                        if(defaultOutput != null) {
-                            throw new HeaderParseException("There cannot be two default output media types");
-                        }
-                        defaultOutput = mediaType;
-                    }
+                    outputs.add(mediaType);
+
                 } else if (line.startsWith(DATAFORMAT_PREFIX)) {
                     String[] tokens = line.split(" ", 2);
                     MediaType toAdd = MediaType.valueOf(tokens[1]);
@@ -320,7 +312,7 @@ public class Header {
             }
         }
 
-        return new Header(version, preserve, Collections.unmodifiableMap(inputs), Collections.emptyMap(), output, null, allInputs, dataformat);
+        return new Header(version, preserve, Collections.unmodifiableMap(inputs), Collections.emptyMap(), outputs, null, allInputs, dataformat);
     }
 
     @NotNull
@@ -348,20 +340,20 @@ public class Header {
         return Collections.unmodifiableMap(namedInputs);
     }
 
-    public MediaType getDefaultNamedInput(String name) {
-        return defaultInputs.get(name);
+    public Optional<MediaType> getDefaultNamedInput(String name) {
+        return Optional.ofNullable(defaultInputs.get(name));
     }
 
-    public Collection<MediaType> getOutput() {
-        return Collections.unmodifiableCollection(output.values());
+    public Collection<MediaType> getOutputs() {
+        return Collections.unmodifiableCollection(outputs.values());
     }
 
-    public MediaType getDefaultOutput() {
-        return defaultOutput;
+    public Optional<MediaType> getDefaultOutput() {
+        return Optional.ofNullable(defaultOutput);
     }
 
-    public Collection<MediaType> getPayload() {
-        return Collections.unmodifiableCollection(namedInputs.getOrDefault("payload", Collections.emptyMap()).values());
+    public Optional<MediaType> getDefaultPayload() {
+        return Optional.ofNullable(defaultInputs.get("payload"));
     }
 
     public Collection<MediaType> getAllInputs() {
@@ -390,8 +382,8 @@ public class Header {
         }
 
         if (namedInputs.containsKey(inputName)) {
-            Map<Integer, MediaType> inputTypes = namedInputs.getOrDefault(inputName, Collections.emptyMap());
-            if(inputTypes.containsKey(key)) {
+            Map<Integer, MediaType> inputTypes = namedInputs.get(inputName);
+            if (inputTypes != null && inputTypes.containsKey(key)) {
                 params.putAll(inputTypes.get(key).getParameters());
             }
         }
@@ -414,8 +406,8 @@ public class Header {
             params.putAll(dataFormats.get(key).getParameters());
         }
 
-        if (output.containsKey(key)) {
-            params.putAll(output.get(key).getParameters());
+        if (outputs.containsKey(key)) {
+            params.putAll(outputs.get(key).getParameters());
         }
 
         params.putAll(mediaType.getParameters());
