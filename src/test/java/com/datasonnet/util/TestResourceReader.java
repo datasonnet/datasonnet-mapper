@@ -28,11 +28,6 @@ public class TestResourceReader {
     public static String readFileAsString(String filePath) throws URISyntaxException, IOException {
         Path path = Paths.get(TestResourceReader.class.getClassLoader()
                 .getResource(filePath).toURI());
-
-        Stream<String> lines = Files.lines(path);
-        String data = lines.collect(Collectors.joining("\n"));
-        lines.close();
-
-        return data;
+        return new String(Files.readAllBytes(path));
     }
 }
