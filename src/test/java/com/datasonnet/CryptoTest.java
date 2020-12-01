@@ -165,5 +165,25 @@ public class CryptoTest {
         assertEquals("Hello World", decrypted);*/
 
         //========================================================================================
+
+        alg ="DUMMY"; mode="CBC"; padding="PKCS5Padding";
+        try {
+            mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
+            encrypted = mapper.transform("{}").replaceAll("\"", "");
+            fail("This should fail with NoSuchAlgorithmException");
+        } catch (Exception e) {
+            String msg = e.getMessage();
+            assertTrue(msg != null && msg.contains("Caused by: java.security.NoSuchAlgorithmException: Cannot find any provider supporting DUMMY/CBC/PKCS5Padding"));
+        }
+
+        alg ="AES"; mode="CBC"; padding="PKCS5Padding";
+        try {
+            mapper = new Mapper("ds.crypto.encrypt('Hello World', 'not-long-enough', '" + alg + "/" + mode + "/" + padding + "')");
+            encrypted = mapper.transform("{}").replaceAll("\"", "");
+            fail("This should fail with NoSuchAlgorithmException");
+        } catch (Exception e) {
+            String msg = e.getMessage();
+            assertTrue(msg != null && msg.contains("Caused by: java.security.InvalidKeyException: Invalid AES key length"));
+        }
     }
 }
