@@ -38,11 +38,13 @@ public class HeaderTest {
     String headerStr = "/** DataSonnet\n" +
             "version=2.0\n" +
             "preserveOrder=false\n" +
+            "  \n" +
+            "// comment\n" +
             "input payload application/xml;namespace-separator=\":\";text-value-key=__text\n" +
             "input * application/xml;text-value-key=__text\n" +
             "input myvar application/csv;separator=|\n" +
             "dataformat application/vnd.ms-excel;payload.param=xyz\n" +
-            "output application/csv;ds.csv.quote=\"\"\"\n" +
+            "  output application/csv;ds.csv.quote=\"\"\"\n" +
             "*/\n" +
             "[\n" +
             "    {\n" +
