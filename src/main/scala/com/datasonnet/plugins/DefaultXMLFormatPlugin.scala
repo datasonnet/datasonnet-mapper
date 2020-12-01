@@ -57,8 +57,6 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
   val DS_AUTO_EMPTY = "autoemptyelements"
   val DS_NULL_AS_EMPTY = "nullasemptyelement"
 
-  val DS_PRESERVE_ORDER = "preserveorder"
-
   supportedTypes.add(MediaTypes.APPLICATION_XML)
   supportedTypes.add(MediaTypes.TEXT_XML)
   supportedTypes.add(new MediaType("application", "*+xml"))
@@ -75,7 +73,6 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
   writerParams.add(DS_VERSION)
   writerParams.add(DS_AUTO_EMPTY)
   writerParams.add(DS_NULL_AS_EMPTY)
-  writerParams.add(DS_PRESERVE_ORDER)
 
   readerParams.add(DS_NS_SEPARATOR)
   readerParams.add(DS_ATTRIBUTE_KEY_PREFIX)
@@ -83,7 +80,6 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
   readerParams.add(DS_CDATA_KEY_PREFIX)
   readerParams.add(DS_ORDERING_KEY)
   readerParams.add(DS_NAMESPACE_DECLARATIONS)
-  readerParams.add(DS_PRESERVE_ORDER)
 
   readerSupportedClasses.add(classOf[String].asInstanceOf[java.lang.Class[_]])
   readerSupportedClasses.add(classOf[java.net.URL].asInstanceOf[java.lang.Class[_]])
@@ -154,8 +150,7 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
                              orderingKey: String,
                              omitDeclaration: Boolean, version: String,
                              xmlnsKey: String, nullAsEmpty: Boolean,
-                             autoEmpty: Boolean, declarations: Map[String, String],
-                             preserveOrder: Boolean)
+                             autoEmpty: Boolean, declarations: Map[String, String])
 
   object EffectiveParams {
     def apply(mediaType: MediaType): EffectiveParams = {
@@ -174,9 +169,8 @@ object DefaultXMLFormatPlugin extends AbstractDataFormatPlugin {
         .map(entryVal => (entryVal._2, entryVal._1.substring(DS_NAMESPACE_DECLARATIONS.length - 3)))
         .map(entry => if (entry._2 == "$") (entry._1, "") else entry)
         .toMap
-      val preserveOrder = if (mediaType.getParameter(DS_PRESERVE_ORDER) != null) java.lang.Boolean.parseBoolean(mediaType.getParameter(DS_PRESERVE_ORDER)) else true
 
-      EffectiveParams(nsSep, txtPref, cdataPref, attrPref, orderingKey, omitDecl, ver, xmlns, nullEmpty, autoEmpty, declarations, preserveOrder)
+      EffectiveParams(nsSep, txtPref, cdataPref, attrPref, orderingKey, omitDecl, ver, xmlns, nullEmpty, autoEmpty, declarations)
     }
   }
 }
