@@ -374,37 +374,6 @@ object DSLowercase extends Library {
         reg.r.replaceAllIn(str, replacement)
     },
 
-    builtinWithDefaults("flattenXmlContents", "element" -> None, "namespaces" -> Some(Expr.Null(0))) {
-      (args, ev) =>
-        val element = args("element").cast[Val.Obj]
-        val namespaces = if (args("namespaces") == Val.Null) {
-          Library.emptyObj
-        } else {
-          args("namespaces").cast[Val.Obj]
-        }
-
-        val wrapperName = "a"
-        val wrapperStop = s"</$wrapperName>"
-
-        val wrapperProperties = scala.collection.mutable.Map[String, Val.Obj.Member]()
-        wrapperProperties += ("a" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => element))
-        val wrapped = new Val.Obj(wrapperProperties, _ => (), None)
-
-        val xmlProperties = scala.collection.mutable.Map[String, Val.Obj.Member]()
-        xmlProperties += ("OmitXmlDeclaration" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Str("true")))
-        namespaces.foreachVisibleKey((key, _) => {
-          xmlProperties += ("NamespaceDeclarations." + key ->
-            Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) =>
-              namespaces.value(key, -1)(new FileScope(null, Map.empty), ev)))
-        })
-
-        val properties = new Val.Obj(xmlProperties, _ => (), None)
-
-        val written = write(dataFormats, wrapped, "application/xml", properties, ev)
-
-        written.substring(written.indexOf(">") + 1, written.length - wrapperStop.length)
-    },
-
     // moved from dataformats
     builtinWithDefaults("read",
       "data" -> None,
@@ -792,6 +761,38 @@ object DSLowercase extends Library {
   ).asJava
 
   override def modules(dataFormats: DataFormatService, header: Header): java.util.Map[String, Val.Obj] = Map(
+    "xml" -> moduleFrom(
+      builtinWithDefaults("flattenContents", "element" -> None, "namespaces" -> Some(Expr.Null(0))) {
+        (args, ev) =>
+          val element = args("element").cast[Val.Obj]
+          val namespaces = if (args("namespaces") == Val.Null) {
+            Library.emptyObj
+          } else {
+            args("namespaces").cast[Val.Obj]
+          }
+
+          val wrapperName = "a"
+          val wrapperStop = s"</$wrapperName>"
+
+          val wrapperProperties = scala.collection.mutable.Map[String, Val.Obj.Member]()
+          wrapperProperties += ("a" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => element))
+          val wrapped = new Val.Obj(wrapperProperties, _ => (), None)
+
+          val xmlProperties = scala.collection.mutable.Map[String, Val.Obj.Member]()
+          xmlProperties += ("OmitXmlDeclaration" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Str("true")))
+          namespaces.foreachVisibleKey((key, _) => {
+            xmlProperties += ("NamespaceDeclarations." + key ->
+              Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) =>
+                namespaces.value(key, -1)(new FileScope(null, Map.empty), ev)))
+          })
+
+          val properties = new Val.Obj(xmlProperties, _ => (), None)
+
+          val written = write(dataFormats, wrapped, "application/xml", properties, ev)
+
+          written.substring(written.indexOf(">") + 1, written.length - wrapperStop.length)
+      },
+    ),
     "datetime" -> moduleFrom(
       builtin0("now") { (vals, ev, fs) => ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) },
 

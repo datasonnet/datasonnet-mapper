@@ -219,7 +219,7 @@ public class XMLWriterTest {
         String xmlData = TestResourceReader.readFileAsString("xmlMixedContent.xml");
         String expected = TestResourceReader.readFileAsString("xmlMixedContent.txt");
 
-        Mapper mapper = new Mapper("ds.flattenXmlContents(payload.letter)");
+        Mapper mapper = new Mapper("ds.xml.flattenContents(payload.letter)");
 
         String mapped = mapper.transform(new DefaultDocument<>(xmlData, MediaType.valueOf(MediaTypes.APPLICATION_XML_VALUE)), Collections.emptyMap(), MediaTypes.TEXT_PLAIN).getContent();
 
@@ -231,7 +231,7 @@ public class XMLWriterTest {
         String xmlData = TestResourceReader.readFileAsString("xmlMixedContentNamespaces.xml");
         String expected = TestResourceReader.readFileAsString("xmlMixedContent.txt");
 
-        Mapper mapper = new Mapper("ds.flattenXmlContents(payload[\"ns:letter\"], {\"$\": \"https://example.com\"})");
+        Mapper mapper = new Mapper("ds.xml.flattenContents(payload[\"ns:letter\"], {\"$\": \"https://example.com\"})");
 
         String mapped = mapper.transform(new DefaultDocument<>(xmlData, MediaType.valueOf(MediaTypes.APPLICATION_XML_VALUE)), Collections.emptyMap(), MediaTypes.TEXT_PLAIN).getContent();
 
