@@ -138,7 +138,7 @@ class BadgerFishHandler(params: EffectiveParams) extends DefaultHandler2 {
           case CData(value) => values += (params.cdataKeyPrefix + index1 -> ujson.Str(value))
           case Element(obj, name, _) => {
             // TODO parametrize tilde
-            obj.value += (params.orderingKey -> index1.toString)
+            obj.value += (params.orderingKey -> index1)
             if (values.contains(name)) {
               (values(name): @unchecked) match {
                 case ujson.Arr(arr) => arr += obj

@@ -62,7 +62,7 @@ class BadgerFishWriter(val params: EffectiveParams) {
       // if the value is an object and has the ordering key, use the value there
       case ujson.Obj(v) if v.contains(params.orderingKey) => v.get(params.orderingKey) match {
         case Some(ujson.Str(s)) => s.toIntOption
-        case Some(ujson.Num(n)) => Some(n.toInt)
+        case Some(ujson.Num(n)) => Some(n.round.toInt)
         case _ => Some(index)
       }
       // otherwise, use the index, meaning the order the elements come in

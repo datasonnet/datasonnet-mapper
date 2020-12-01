@@ -111,8 +111,8 @@ public class XMLJsonGenerator extends Generator<String> {
 
         // mostly have ordered elements
         if(random.nextInt() > 0.1) {
-            // mostly make them strings
-            if(random.nextInt() > 0.1) {
+            // mostly make them numbers
+            if(random.nextInt() > 0.9) {
                 element.put("~", "" + random.nextInt());
             } else {
                 element.put("~", random.nextInt());
