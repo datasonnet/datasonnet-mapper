@@ -25,9 +25,10 @@ public class DefaultDocument<T> implements Document<T> {
     private final T content;
     private final MediaType mediaType;
 
+    public final static Document<Object> NULL_INSTANCE = new DefaultDocument<>(null, MediaTypes.APPLICATION_JAVA);
+
     public DefaultDocument(T content) {
-        this.content = content;
-        this.mediaType = MediaTypes.APPLICATION_JAVA;
+        this(content, null);
     }
 
     public DefaultDocument(T content, MediaType mediaType) {
