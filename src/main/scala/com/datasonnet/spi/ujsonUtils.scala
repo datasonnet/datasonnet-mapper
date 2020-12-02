@@ -22,7 +22,7 @@ import scala.jdk.CollectionConverters.{MapHasAsJava, SeqHasAsJava}
 import scala.util.control.TailCalls.{TailRec, done, tailcall}
 
 object ujsonUtils {
-  def strOf(str: String): Str = Str(str)
+  def strValueOf(str: String): Str = Str(str)
 
   def stringValueOf(value: ujson.Value): String = String.valueOf(value.value)
 

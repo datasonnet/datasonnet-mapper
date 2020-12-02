@@ -18,6 +18,7 @@ package com.datasonnet
 
 import java.math.{BigDecimal, RoundingMode}
 import java.net.URL
+import java.security.SecureRandom
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -28,7 +29,10 @@ import java.util.{Base64, Scanner}
 import com.datasonnet
 import com.datasonnet.document.{DefaultDocument, MediaType}
 import com.datasonnet.header.Header
+import com.datasonnet.modules.{Crypto, JsonPath, Regex}
 import com.datasonnet.spi.{DataFormatService, Library, ujsonUtils}
+import javax.crypto.Cipher
+import javax.crypto.spec.{IvParameterSpec, SecretKeySpec}
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet.ReadWriter.{ApplyerRead, ArrRead, StringRead}
 import sjsonnet.Std.{builtin, builtinWithDefaults, _}
@@ -382,7 +386,7 @@ object DSLowercase extends Library {
       val data = args("data").cast[Val.Str].value
       val mimeType = args("mimeType").cast[Val.Str].value
       val params = if (args("params") == Val.Null) {
-        Library.emptyObj
+        Library.EmptyObj
       } else {
         args("params").cast[Val.Obj]
       }
@@ -525,7 +529,7 @@ object DSLowercase extends Library {
       val data = args("data")
       val mimeType = args("mimeType").cast[Val.Str].value
       val params = if (args("params") == Val.Null) {
-        Library.emptyObj
+        Library.EmptyObj
       } else {
         args("params").cast[Val.Obj]
       }
@@ -766,7 +770,7 @@ object DSLowercase extends Library {
         (args, ev) =>
           val element = args("element").cast[Val.Obj]
           val namespaces = if (args("namespaces") == Val.Null) {
-            Library.emptyObj
+            Library.EmptyObj
           } else {
             args("namespaces").cast[Val.Obj]
           }
@@ -1058,7 +1062,120 @@ object DSLowercase extends Library {
 
       builtin("hmac", "value", "secret", "algorithm") {
         (_, _, value: String, secret: String, algorithm: String) =>
-          datasonnet.Crypto.hmac(value, secret, algorithm)
+          Crypto.hmac(value, secret, algorithm)
+      },
+
+      /**
+       * Encrypts the value with specified JDK Cipher Transformation and the provided secret. Converts the encryption
+       * to a readable format with Base64
+       *
+       * @builtinParam value The message to be encrypted.
+       *    @types [String]
+       * @builtinParam secret The secret used to encrypt the original messsage.
+       *    @types [String]
+       * @builtinParam transformation The string that describes the operation (or set of operations) to be performed on
+       * the given input, to produce some output. A transformation always includes the name of a cryptographic algorithm
+       * (e.g., AES), and may be followed by a feedback mode and padding scheme. A transformation is of the form:
+       * "algorithm/mode/padding" or "algorithm"
+       *    @types [String]
+       * @builtinReturn Base64 String value of the encrypted message
+       *    @types [String]
+       * @changed 2.0.3
+       */
+      builtin0[Val]("encrypt", "value", "secret", "transformation") {
+        (vals, ev, fs) =>
+          val valSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead))
+          val value = valSeq(0).asInstanceOf[String]
+          val secret = valSeq(1).asInstanceOf[String]
+          val transformation = valSeq(2).asInstanceOf[String]
+
+          val cipher = Cipher.getInstance(transformation)
+          val transformTokens = transformation.split("/")
+
+          // special case for ECB because of java.security.InvalidAlgorithmParameterException: ECB mode cannot use IV
+          if (transformTokens.length >= 2 && "ECB".equals(transformTokens(1))) {
+            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(secret.getBytes, transformTokens(0).toUpperCase))
+            Val.Str(Base64.getEncoder.encodeToString(cipher.doFinal(value.getBytes)))
+
+          } else {
+            // https://stackoverflow.com/a/52571774/4814697
+            val rand: SecureRandom = new SecureRandom()
+            val iv = new Array[Byte](cipher.getBlockSize)
+            rand.nextBytes(iv)
+
+            cipher.init(Cipher.ENCRYPT_MODE,
+              new SecretKeySpec(secret.getBytes, transformTokens(0).toUpperCase),
+              new IvParameterSpec(iv),
+              rand)
+
+            // encrypted data:
+            val encryptedBytes = cipher.doFinal(value.getBytes)
+
+            // append Initiation Vector as a prefix to use it during decryption:
+            val combinedPayload = new Array[Byte](iv.length + encryptedBytes.length)
+
+            // populate payload with prefix IV and encrypted data
+            System.arraycopy(iv, 0, combinedPayload, 0, iv.length)
+            System.arraycopy(encryptedBytes, 0, combinedPayload, iv.length, encryptedBytes.length)
+
+            Val.Str(Base64.getEncoder.encodeToString(combinedPayload))
+          }
+
+      },
+
+      /**
+       * Decrypts the Base64 value with specified JDK Cipher Transformation and the provided secret.
+       *
+       * @builtinParam value The encrypted message to be decrypted.
+       *    @types [String]
+       * @builtinParam secret The secret used to encrypt the original messsage.
+       *    @types [String]
+       * @builtinParam algorithm The algorithm used for the encryption.
+       *    @types [String]
+       * @builtinParam mode The encryption mode to be used.
+       *    @types [String]
+       * @builtinParam padding The encryption secret padding to be used
+       *    @types [String]
+       * @builtinReturn Base64 String value of the encrypted message
+       *    @types [String]
+       * @changed 2.0.3
+       */
+      builtin0[Val]("decrypt", "value", "secret", "transformation") {
+        (vals, ev,fs) =>
+          val valSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead))
+          val value = valSeq(0).asInstanceOf[String]
+          val secret = valSeq(1).asInstanceOf[String]
+          val transformation = valSeq(2).asInstanceOf[String]
+
+          val cipher = Cipher.getInstance(transformation)
+          val transformTokens = transformation.split("/")
+
+          // special case for ECB because of java.security.InvalidAlgorithmParameterException: ECB mode cannot use IV
+          if (transformTokens.length >= 2 && "ECB".equals(transformTokens(1))) {
+            cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(secret.getBytes, transformTokens(0).toUpperCase))
+            Val.Str(new String(cipher.doFinal(Base64.getDecoder.decode(value))))
+
+          } else {
+            // https://stackoverflow.com/a/52571774/4814697
+            // separate prefix with IV from the rest of encrypted data//separate prefix with IV from the rest of encrypted data
+            val encryptedPayload = Base64.getDecoder.decode(value)
+            val iv = new Array[Byte](cipher.getBlockSize)
+            val encryptedBytes = new Array[Byte](encryptedPayload.length - iv.length)
+            val rand: SecureRandom = new SecureRandom()
+
+            // populate iv with bytes:
+            System.arraycopy(encryptedPayload, 0, iv, 0, iv.length)
+
+            // populate encryptedBytes with bytes:
+            System.arraycopy(encryptedPayload, iv.length, encryptedBytes, 0, encryptedBytes.length)
+
+            cipher.init(Cipher.DECRYPT_MODE,
+              new SecretKeySpec(secret.getBytes, transformTokens(0).toUpperCase),
+              new IvParameterSpec(iv),
+              rand)
+
+            Val.Str(new String(cipher.doFinal(encryptedBytes)))
+          }
       }
     ),
 
@@ -2227,7 +2344,7 @@ object DSLowercase extends Library {
     val paramsAsJava = ujsonUtils.javaObjectFrom(ujson.read(Materializer.apply(params)(ev)).obj).asInstanceOf[java.util.Map[String, String]]
     val doc = new DefaultDocument(data, new MediaType(supert, subt, paramsAsJava))
 
-    val plugin = dataFormats.thatAccepts(doc)
+    val plugin = dataFormats.thatCanRead(doc)
       .orElseThrow(() => Error.Delegate("No suitable plugin found for mime type: " + mimeType))
 
     Materializer.reverse(plugin.read(doc))
@@ -2238,7 +2355,7 @@ object DSLowercase extends Library {
     val paramsAsJava = ujsonUtils.javaObjectFrom(ujson.read(Materializer.apply(params)(ev)).obj).asInstanceOf[java.util.Map[String, String]]
     val mediaType = new MediaType(supert, subt, paramsAsJava)
 
-    val plugin = dataFormats.thatProduces(mediaType, classOf[String])
+    val plugin = dataFormats.thatCanWrite(mediaType, classOf[String])
       .orElseThrow(() => Error.Delegate("No suitable plugin found for mime type: " + mimeType))
 
     plugin.write(Materializer.apply(json)(ev), mediaType, classOf[String]).getContent
@@ -2668,7 +2785,7 @@ object DSUppercase extends Library {
         val data = args("data").cast[Val.Str].value
         val mimeType = args("mimeType").cast[Val.Str].value
         val params = if (args("params") == Val.Null) {
-          Library.emptyObj
+          Library.EmptyObj
         } else {
           args("params").cast[Val.Obj]
         }
@@ -2681,7 +2798,7 @@ object DSUppercase extends Library {
         val data = args("data")
         val mimeType = args("mimeType").cast[Val.Str].value
         val params = if (args("params") == Val.Null) {
-          Library.emptyObj
+          Library.EmptyObj
         } else {
           args("params").cast[Val.Obj]
         }
@@ -2730,15 +2847,15 @@ object DSUppercase extends Library {
       },
       builtin("hmac", "value", "secret", "algorithm") {
         (ev, fs, value: String, secret: String, algorithm: String) =>
-          datasonnet.Crypto.hmac(value, secret, algorithm)
+          Crypto.hmac(value, secret, algorithm)
       },
       builtin("encrypt", "value", "password") {
         (ev, fs, value: String, password: String) =>
-          datasonnet.Crypto.encrypt(value, password)
+          Crypto.encrypt(value, password)
       },
       builtin("decrypt", "value", "password") {
         (ev, fs, value: String, password: String) =>
-          datasonnet.Crypto.decrypt(value, password)
+          Crypto.decrypt(value, password)
       },
     ),
 

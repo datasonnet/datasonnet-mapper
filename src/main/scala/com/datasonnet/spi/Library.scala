@@ -29,7 +29,7 @@ import scala.io.Source
 import scala.jdk.CollectionConverters._
 
 object Library {
-  val emptyObj = new Val.Obj(mutable.HashMap.empty[String, Obj.Member], _ => (), None)
+  val EmptyObj = new Val.Obj(mutable.HashMap.empty[String, Obj.Member], _ => (), None)
 
   def memberOf(value: Val): Obj.Member = Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => value)
 }
