@@ -66,16 +66,14 @@ public class Header {
     public Header(String version,
                   boolean preserveOrder,
                   Map<String, Collection<MediaType>> namedInputs,
-                  Map<String, MediaType> defaultInputs,
                   List<MediaType> outputs,
-                  MediaType defaultOutput,
                   Iterable<MediaType> allInputs,
                   Iterable<MediaType> dataFormats) {
         String[] versions = version.split("\\.",2); //[0] = major [1] = minor + remainder if exists
         this.versionMajor = versions[0];
         this.versionMinor = versions[1];
         this.preserveOrder = preserveOrder;
-        this.defaultInputs = new HashMap<>(defaultInputs);
+        this.defaultInputs = new HashMap<>();
         this.namedInputs = new HashMap<>();
 
         for (Map.Entry<String, Collection<MediaType>> entry : namedInputs.entrySet()) {
@@ -91,12 +89,12 @@ public class Header {
         }
 
         this.outputs = indexMediaTypes(outputs);
-        if (defaultOutput == null && outputs.size() > 0) {
+        if (outputs.size() > 0) {
             List<MediaType> sorted = new ArrayList<>(outputs);
             MediaType.sortByQualityValue(sorted);
             this.defaultOutput = sorted.get(0);
         } else {
-            this.defaultOutput = defaultOutput;
+            this.defaultOutput = MediaTypes.ANY;
         }
 
         this.allInputs = indexMediaTypes(allInputs);
@@ -116,7 +114,7 @@ public class Header {
     }
 
     private static final Header EMPTY =
-            new Header(LATEST_RELEASE_VERSION, true, Collections.emptyMap(), Collections.emptyMap(), Collections.emptyList(), MediaTypes.ANY, Collections.emptyList(), Collections.emptyList());
+            new Header(LATEST_RELEASE_VERSION, true, Collections.emptyMap(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 
     public static Header parseHeader(String script) throws HeaderParseException {
         if (!script.trim().startsWith(DATASONNET_HEADER)) {
@@ -220,9 +218,7 @@ public class Header {
             return new Header("1.0",
                     getBoolean(propsMap,DATASONNET_PRESERVE_ORDER, true),
                     inputs,
-                    Collections.emptyMap(),
                     output,
-                    null,
                     allInputs,
                     dataFormat);
         } catch (IOException|IllegalArgumentException exc) {
@@ -312,7 +308,7 @@ public class Header {
             }
         }
 
-        return new Header(version, preserve, Collections.unmodifiableMap(inputs), Collections.emptyMap(), outputs, null, allInputs, dataformat);
+        return new Header(version, preserve, Collections.unmodifiableMap(inputs), outputs, allInputs, dataformat);
     }
 
     @NotNull

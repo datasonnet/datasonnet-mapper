@@ -144,7 +144,7 @@ public class HeaderTest {
     }
 
     @Test
-    public void test_default_output() throws HeaderParseException {
+    public void testDefaultOutput() throws HeaderParseException {
         Header header1 = Header.parseHeader("/** DataSonnet\n" +
                 "version=2.0\n" +
                 "output application/x-java-object;q=0.9\n" +
@@ -156,11 +156,11 @@ public class HeaderTest {
     }
 
     @Test
-    public void test_default_input() throws HeaderParseException {
+    public void testDefaultInput() throws HeaderParseException {
         Header header1 = Header.parseHeader("/** DataSonnet\n" +
                 "version=2.0\n" +
-                "input payload application/json;q=0.9\n" +
                 "input payload application/x-java-object;q=1.0\n" +
+                "input payload application/json;q=0.9\n" +
                 "*/");
 
         assertTrue(header1.getDefaultPayload().isPresent());
