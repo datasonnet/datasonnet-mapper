@@ -1,0 +1,21 @@
+{
+  "a": {
+    "@xmlns": {
+      "$":"https://example.org"
+    },
+    "b:b": {
+      "@xmlns": {
+        "b":"https://example.com"
+      },
+      "b:c": {
+        "@xmlns": {
+          "c":"https://example.net"
+        },
+        "@c:d":"orange",
+        "c:e": {
+          "$":"nested","~":1
+        }, "~":1
+      }, "~":1
+    }, "~":1
+  }
+}
