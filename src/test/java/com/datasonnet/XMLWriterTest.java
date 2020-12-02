@@ -238,8 +238,6 @@ public class XMLWriterTest {
         assertEquals(expected, mapped, "Expected " + expected + " but got " + mapped);
     }
 
-
-
     @Test
     void testXMLRoot() throws Exception {
         String jsonData = TestResourceReader.readFileAsString("xmlRoot.json");
@@ -265,5 +263,16 @@ public class XMLWriterTest {
         } catch (IllegalArgumentException e) {
             fail("This transformation should not fail");
         }
+    }
+
+    @Test
+    void testNestedNamespaces() throws Exception {
+        String jsonData = TestResourceReader.readFileAsString("xmlNestedNamespaces.json");
+        String expectedXml = TestResourceReader.readFileAsString("xmlNestedNamespaces.xml");
+
+        Mapper mapper = new Mapper("payload");
+
+        String mappedXml = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
+        assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
     }
 }

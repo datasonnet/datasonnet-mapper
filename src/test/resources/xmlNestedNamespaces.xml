@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<a xmlns="https://example.org">
+    <b:b xmlns:b="https://example.com">
+        <b:c c:d="orange" xmlns:c="https://example.net">
+            <c:e>nested</c:e>
+        </b:c>
+    </b:b>
+</a>
