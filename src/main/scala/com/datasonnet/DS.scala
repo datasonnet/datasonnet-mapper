@@ -28,6 +28,7 @@ import java.util.{Base64, Scanner}
 import com.datasonnet
 import com.datasonnet.document.{DefaultDocument, MediaType}
 import com.datasonnet.header.Header
+import com.datasonnet.modules.{Crypto, JsonPath, Regex}
 import com.datasonnet.spi.{DataFormatService, Library, ujsonUtils}
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet.ReadWriter.{ApplyerRead, ArrRead, StringRead}
@@ -382,7 +383,7 @@ object DSLowercase extends Library {
       val data = args("data").cast[Val.Str].value
       val mimeType = args("mimeType").cast[Val.Str].value
       val params = if (args("params") == Val.Null) {
-        Library.emptyObj
+        Library.EmptyObj
       } else {
         args("params").cast[Val.Obj]
       }
@@ -525,7 +526,7 @@ object DSLowercase extends Library {
       val data = args("data")
       val mimeType = args("mimeType").cast[Val.Str].value
       val params = if (args("params") == Val.Null) {
-        Library.emptyObj
+        Library.EmptyObj
       } else {
         args("params").cast[Val.Obj]
       }
@@ -766,7 +767,7 @@ object DSLowercase extends Library {
         (args, ev) =>
           val element = args("element").cast[Val.Obj]
           val namespaces = if (args("namespaces") == Val.Null) {
-            Library.emptyObj
+            Library.EmptyObj
           } else {
             args("namespaces").cast[Val.Obj]
           }
@@ -1058,7 +1059,7 @@ object DSLowercase extends Library {
 
       builtin("hmac", "value", "secret", "algorithm") {
         (_, _, value: String, secret: String, algorithm: String) =>
-          datasonnet.Crypto.hmac(value, secret, algorithm)
+          Crypto.hmac(value, secret, algorithm)
       }
     ),
 
@@ -2227,7 +2228,7 @@ object DSLowercase extends Library {
     val paramsAsJava = ujsonUtils.javaObjectFrom(ujson.read(Materializer.apply(params)(ev)).obj).asInstanceOf[java.util.Map[String, String]]
     val doc = new DefaultDocument(data, new MediaType(supert, subt, paramsAsJava))
 
-    val plugin = dataFormats.thatAccepts(doc)
+    val plugin = dataFormats.thatCanRead(doc)
       .orElseThrow(() => Error.Delegate("No suitable plugin found for mime type: " + mimeType))
 
     Materializer.reverse(plugin.read(doc))
@@ -2238,7 +2239,7 @@ object DSLowercase extends Library {
     val paramsAsJava = ujsonUtils.javaObjectFrom(ujson.read(Materializer.apply(params)(ev)).obj).asInstanceOf[java.util.Map[String, String]]
     val mediaType = new MediaType(supert, subt, paramsAsJava)
 
-    val plugin = dataFormats.thatProduces(mediaType, classOf[String])
+    val plugin = dataFormats.thatCanWrite(mediaType, classOf[String])
       .orElseThrow(() => Error.Delegate("No suitable plugin found for mime type: " + mimeType))
 
     plugin.write(Materializer.apply(json)(ev), mediaType, classOf[String]).getContent
@@ -2668,7 +2669,7 @@ object DSUppercase extends Library {
         val data = args("data").cast[Val.Str].value
         val mimeType = args("mimeType").cast[Val.Str].value
         val params = if (args("params") == Val.Null) {
-          Library.emptyObj
+          Library.EmptyObj
         } else {
           args("params").cast[Val.Obj]
         }
@@ -2681,7 +2682,7 @@ object DSUppercase extends Library {
         val data = args("data")
         val mimeType = args("mimeType").cast[Val.Str].value
         val params = if (args("params") == Val.Null) {
-          Library.emptyObj
+          Library.EmptyObj
         } else {
           args("params").cast[Val.Obj]
         }
@@ -2730,15 +2731,15 @@ object DSUppercase extends Library {
       },
       builtin("hmac", "value", "secret", "algorithm") {
         (ev, fs, value: String, secret: String, algorithm: String) =>
-          datasonnet.Crypto.hmac(value, secret, algorithm)
+          Crypto.hmac(value, secret, algorithm)
       },
       builtin("encrypt", "value", "password") {
         (ev, fs, value: String, password: String) =>
-          datasonnet.Crypto.encrypt(value, password)
+          Crypto.encrypt(value, password)
       },
       builtin("decrypt", "value", "password") {
         (ev, fs, value: String, password: String) =>
-          datasonnet.Crypto.decrypt(value, password)
+          Crypto.decrypt(value, password)
       },
     ),
 
