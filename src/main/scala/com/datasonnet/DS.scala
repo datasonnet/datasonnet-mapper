@@ -1066,7 +1066,7 @@ object DSLowercase extends Library {
       },
 
       /**
-       * Encrypts the value with specified JDK Cipher Transformation using the provided secret. Converts the encryption
+       * Encrypts the value with specified JDK Cipher Transformation and the provided secret. Converts the encryption
        * to a readable format with Base64
        *
        * @builtinParam value The message to be encrypted.
@@ -1080,7 +1080,7 @@ object DSLowercase extends Library {
        *    @types [String]
        * @builtinReturn Base64 String value of the encrypted message
        *    @types [String]
-       * @changed 0.7.2
+       * @changed 2.0.3
        */
       builtin0[Val]("encrypt", "value", "secret", "transformation") {
         (vals, ev, fs) =>
@@ -1124,9 +1124,7 @@ object DSLowercase extends Library {
       },
 
       /**
-       * Decrypts the Base64 value with specified algorithm, mode, and padding using the provided secret.
-       * Possible algorithms to use are AES, DES, and DESede. The provided secret must be of lengths 16 or 32, 8, and 24 respectively.
-       * All Algorithms only support NoPadding or PKCS5Padding
+       * Decrypts the Base64 value with specified JDK Cipher Transformation and the provided secret.
        *
        * @builtinParam value The encrypted message to be decrypted.
        *    @types [String]
@@ -1138,11 +1136,9 @@ object DSLowercase extends Library {
        *    @types [String]
        * @builtinParam padding The encryption secret padding to be used
        *    @types [String]
-       *
        * @builtinReturn Base64 String value of the encrypted message
        *    @types [String]
-       *
-       * @changed 0.7.1
+       * @changed 2.0.3
        */
       builtin0[Val]("decrypt", "value", "secret", "transformation") {
         (vals, ev,fs) =>

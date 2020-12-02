@@ -1,29 +1,29 @@
 ## crypto
 
 ### `decrypt(string value, string secret, string algorithm, string mode, string padding)`
-Decrypts the Base64 value with specified algorithm, mode, and padding using the provided secret.
-Possible algorithms to use are AES, DES, and DESede. The provided secret must be of lengths 16 or 32, 8, and 24 respectively.
-All Algorithms only support NoPadding or PKCS5Padding
+Decrypts the Base64 value with specified JDK Cipher Transformation string and the provided secret.
+
+The transformation string describes the operation (or set of operations) to be performed on the given input, to produce some output. A transformation always includes the name of a cryptographic algorithm (e.g., AES), and may be followed by a feedback mode and padding scheme. A transformation is of the form: "algorithm/mode/padding" or "algorithm". See https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html[Java Cipher] for more information.
 
 *Example:*
 
 ------------------------
-ds.crypto.decrypt("Hello World", "DataSonnet123456", "AES", "ECB", "PKCS5Padding")
+ds.crypto.decrypt("Hello World", "DataSonnet123456", "AES/ECB/PKCS5Padding")
 ------------------------
 .Result
 ------------------------
 "HrkF1grBXCtATMLxh1gZVA=="
 ------------------------
 
-### `encrypt(string value, string secret, string algorithm, string mode, string padding)`
-Encrypts the value with specified algorithm, mode, and padding using the provided secret. Converts the encryption to a readable format with Base64
-Possible algorithms to use are AES, DES, and DESede. The provided secret must be of lengths 16 or 32, 8, and 24 respectively.
-All Algorithms only support NoPadding or PKCS5Padding
+### `encrypt(string value, string secret, string transformation)`
+Encrypts the value with specified JDK Cipher Transformation and the provided secret. Converts the encryption to a readable format with Base64.
+
+The transformation string describes the operation (or set of operations) to be performed on the given input, to produce some output. A transformation always includes the name of a cryptographic algorithm (e.g., AES), and may be followed by a feedback mode and padding scheme. A transformation is of the form: "algorithm/mode/padding" or "algorithm". See https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html[Java Cipher] for more information.
 
 *Example:*
 
 ------------------------
-ds.crypto.decrypt("HrkF1grBXCtATMLxh1gZVA==", "DataSonnet123456", "AES", "ECB", "PKCS5Padding")
+ds.crypto.decrypt("HrkF1grBXCtATMLxh1gZVA==", "DataSonnet123456", "AES/ECB/PKCS5Padding")
 ------------------------
 .Result
 ------------------------
