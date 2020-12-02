@@ -71,5 +71,4 @@ public class XMLPropertyTest {
             fail("Unable to convert to xml: " + json);
         }
     }
-
 }

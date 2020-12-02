@@ -17,6 +17,7 @@ package com.datasonnet;
  */
 
 import com.datasonnet.document.DefaultDocument;
+import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.Test;
@@ -211,6 +212,33 @@ public class XMLWriterTest {
 
         assertTrue(mappedXml.startsWith("<?xml"));
     }
+
+    // TODO add version using namespaces
+    @Test
+    void testFlattenMixedContent() throws Exception {
+        String xmlData = TestResourceReader.readFileAsString("xmlMixedContent.xml");
+        String expected = TestResourceReader.readFileAsString("xmlMixedContent.txt");
+
+        Mapper mapper = new Mapper("ds.xml.flattenContents(payload.letter)");
+
+        String mapped = mapper.transform(new DefaultDocument<>(xmlData, MediaType.valueOf(MediaTypes.APPLICATION_XML_VALUE)), Collections.emptyMap(), MediaTypes.TEXT_PLAIN).getContent();
+
+        assertEquals(expected, mapped);
+    }
+
+    @Test
+    void testFlattenMixedContentWithNamespaces() throws Exception {
+        String xmlData = TestResourceReader.readFileAsString("xmlMixedContentNamespaces.xml");
+        String expected = TestResourceReader.readFileAsString("xmlMixedContent.txt");
+
+        Mapper mapper = new Mapper("ds.xml.flattenContents(payload[\"ns:letter\"], {\"$\": \"https://example.com\"})");
+
+        String mapped = mapper.transform(new DefaultDocument<>(xmlData, MediaType.valueOf(MediaTypes.APPLICATION_XML_VALUE)), Collections.emptyMap(), MediaTypes.TEXT_PLAIN).getContent();
+
+        assertEquals(expected, mapped, "Expected " + expected + " but got " + mapped);
+    }
+
+
 
     @Test
     void testXMLRoot() throws Exception {
