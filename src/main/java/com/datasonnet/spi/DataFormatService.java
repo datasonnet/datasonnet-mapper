@@ -23,6 +23,7 @@ import com.datasonnet.plugins.DefaultJSONFormatPlugin;
 import com.datasonnet.plugins.DefaultJavaFormatPlugin;
 import com.datasonnet.plugins.DefaultPlainTextFormatPlugin;
 import com.datasonnet.plugins.DefaultXMLFormatPlugin$;
+import com.datasonnet.plugins.DefaultYamlFormatPlugin;
 import ujson.Value;
 
 import java.util.Arrays;
@@ -38,7 +39,8 @@ public class DataFormatService {
                     new DefaultJavaFormatPlugin(),
                     DefaultXMLFormatPlugin$.MODULE$,
                     new DefaultCSVFormatPlugin(),
-                    new DefaultPlainTextFormatPlugin()));
+                    new DefaultPlainTextFormatPlugin(),
+                    new DefaultYamlFormatPlugin()));
 
     public DataFormatService(List<DataFormatPlugin> plugins) {
         this.plugins = plugins;
