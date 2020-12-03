@@ -89,7 +89,9 @@ public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
             charset = Charset.defaultCharset();
         }
 
-        //TODO remove quotes if specified in header
+        // may want to add the ability to remove quotes in the future,
+        // but for now this may break some things like reading '3.0.0' as a number,
+        // which would throw an error
 
         try {
             Object inputAsJava = ujsonUtils.javaObjectFrom(input);
