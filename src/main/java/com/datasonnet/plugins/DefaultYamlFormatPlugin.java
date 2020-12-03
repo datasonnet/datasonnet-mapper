@@ -38,6 +38,9 @@ import java.util.List;
 public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
 
     public static final String DS_PARAM_YAML_HEADER = "removehead";
+    // this may break some things like reading 3.0.0 as a number,
+    // would need to specify this in docs
+    public static final String DS_PARAM_DISABLE_QUOTES = "disablequotes";
 
     public DefaultYamlFormatPlugin(){
         supportedTypes.add(MediaTypes.APPLICATION_YAML);
@@ -54,6 +57,7 @@ public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
 
         readerParams.add(DS_PARAM_YAML_HEADER);
         writerParams.addAll(readerParams);
+        writerParams.add(DS_PARAM_DISABLE_QUOTES);
 
     }
 
@@ -89,10 +93,6 @@ public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
             charset = Charset.defaultCharset();
         }
 
-        // may want to add the ability to remove quotes in the future,
-        // but for now this may break some things like reading '3.0.0' as a number,
-        // which would throw an error
-
         try {
             Object inputAsJava = ujsonUtils.javaObjectFrom(input);
             ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
@@ -114,20 +114,25 @@ public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
                 }
             }
 
+            String output = value.toString();
+            if(mediaType.getParameters().containsKey(DS_PARAM_DISABLE_QUOTES)){
+                output = output.replaceAll("\"","");
+            }
+
             if (targetType.isAssignableFrom(String.class)) {
-                return new DefaultDocument<>((T) value.toString(), MediaTypes.APPLICATION_YAML);
+                return new DefaultDocument<>((T) output, MediaTypes.APPLICATION_YAML);
             }
 
             if (targetType.isAssignableFrom(CharSequence.class)) {
-                return new DefaultDocument<>((T) value.toString(), MediaTypes.APPLICATION_YAML);
+                return new DefaultDocument<>((T) output, MediaTypes.APPLICATION_YAML);
             }
 
             if (targetType.isAssignableFrom(ByteBuffer.class)) {
-                return new DefaultDocument<>((T) ByteBuffer.wrap(value.toString().getBytes(charset)), MediaTypes.APPLICATION_YAML);
+                return new DefaultDocument<>((T) ByteBuffer.wrap(output.getBytes(charset)), MediaTypes.APPLICATION_YAML);
             }
 
             if (targetType.isAssignableFrom(byte[].class)) {
-                return new DefaultDocument<>((T) value.toString().getBytes(charset), MediaTypes.APPLICATION_YAML);
+                return new DefaultDocument<>((T) output.getBytes(charset), MediaTypes.APPLICATION_YAML);
             }
 
             throw new PluginException("Unable to parse to target type.");

@@ -53,7 +53,7 @@ public class YamlWriterTest {
 
 
     @Test
-    void testYamlWriterHeader() throws Exception {
+    void testYamlWriterRemoveHead() throws Exception {
         String data ="{\"message\":\"Hello World\",\"object\":{\"num\":3.14159,\"bool\":true,\"array\":[1,2]}}";
         DefaultDocument<?> doc = new DefaultDocument<>(data, MediaTypes.APPLICATION_JSON);
 
@@ -90,6 +90,30 @@ public class YamlWriterTest {
         assertEquals(expectedYaml,mapped);
     }
 
+    @Test
+    void testYamlWriterDisableQuotes() throws Exception {
+        String data ="{\"message\":\"Hello World\",\"object\":{\"num\":3.14159,\"bool\":true,\"array\":[1,2]}}";
+        DefaultDocument<?> doc = new DefaultDocument<>(data, MediaTypes.APPLICATION_JSON);
+
+        String mapping = "/** DataSonnet\n" +
+                "version=2.0\n" +
+                "output application/yaml; DisableQuotes=true\n" +
+                "input payload application/json\n" +
+                "*/\n" +
+                "payload";
+
+        Mapper mapper = new Mapper(mapping);
+        String mapped = mapper.transform(doc, new HashMap<>(), MediaTypes.APPLICATION_YAML).getContent();
+
+        String expectedYaml ="---\nmessage: Hello World\n" +
+                "object:\n" +
+                "  num: 3.14159\n" +
+                "  bool: true\n" +
+                "  array:\n" +
+                "  - 1.0\n" +
+                "  - 2.0\n";
+        assertEquals(expectedYaml,mapped);
+    }
 
     @Test
     void testYamlToYaml() throws Exception {
