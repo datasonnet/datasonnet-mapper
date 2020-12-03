@@ -75,7 +75,21 @@ public class YamlWriterTest {
                 "  - 1.0\n" +
                 "  - 2.0\n";
         assertEquals(expectedYaml,mapped);
+
+        mapping = "/** DataSonnet\n" +
+                "version=2.0\n" +
+                "output application/yaml; RemoveHead=true\n" +
+                "input payload application/json\n" +
+                "*/\n" +
+                "payload.message";
+
+        mapper = new Mapper(mapping);
+        mapped = mapper.transform(doc, new HashMap<>(), MediaTypes.APPLICATION_YAML).getContent();
+
+        expectedYaml ="\"Hello World\"\n";
+        assertEquals(expectedYaml,mapped);
     }
+
 
     @Test
     void testYamlToYaml() throws Exception {

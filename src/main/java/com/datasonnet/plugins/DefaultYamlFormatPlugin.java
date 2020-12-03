@@ -89,9 +89,9 @@ public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
             ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
             String value = yamlMapper.writeValueAsString(inputAsJava);
-            //remove the begining '---\n' if specified
+            //remove the begining '---' if specified
             if(mediaType.getParameters().containsKey(DS_PARAM_YAML_HEADER)){
-                value = value.replace("---\n", "");
+                value = value.replaceFirst("---(\\n| )", "");
             }
 
             if (targetType.isAssignableFrom(String.class)) {
