@@ -23,17 +23,17 @@ import com.datasonnet.document.MediaTypes;
 import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.ujsonUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
 import ujson.Value;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.List;
 
 public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
 
@@ -64,13 +64,18 @@ public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
         }
 
         try {
-            ObjectMapper yamlReader = new ObjectMapper(new YAMLFactory());
-            Object obj = yamlReader.readValue((String) doc.getContent(), Object.class);
 
+            YAMLFactory yaml = new YAMLFactory();
             ObjectMapper mapper = new ObjectMapper();
-            JsonNode inputAsNode = mapper.valueToTree(obj);
-            return ujsonFrom(inputAsNode);
-        } catch (JsonProcessingException e) {
+
+            YAMLParser yamlParser = yaml.createParser((String) doc.getContent());
+            List<JsonNode> docs = mapper.readValues(yamlParser, new TypeReference<JsonNode>() {}).readAll();
+
+            if(docs.size()<=1){ //if only one node, only one object so dont return the list
+                return ujsonFrom(mapper.valueToTree(docs.get(0)));
+            }
+            return ujsonFrom(mapper.valueToTree(docs));
+        } catch (IOException e) {
             e.printStackTrace();
             throw new PluginException("Failed to read yaml data");
         }
@@ -84,30 +89,43 @@ public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
             charset = Charset.defaultCharset();
         }
 
+        //TODO remove quotes if specified in header
+
         try {
             Object inputAsJava = ujsonUtils.javaObjectFrom(input);
             ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+            StringBuilder value = null;
 
-            String value = yamlMapper.writeValueAsString(inputAsJava);
-            //remove the begining '---' if specified
-            if(mediaType.getParameters().containsKey(DS_PARAM_YAML_HEADER)){
-                value = value.replaceFirst("---(\\n| )", "");
+            //if instance of list, it is multiple docs in one.
+            if(inputAsJava instanceof List){
+                List<Object> listInputAsJava = (List<Object>) inputAsJava;
+                value = new StringBuilder();
+                for(Object obj : listInputAsJava){
+                    value.append(yamlMapper.writeValueAsString(obj));
+                }
+            }else{ //single document
+                value = new StringBuilder(yamlMapper.writeValueAsString(inputAsJava));
+                //remove the beginning '---' if specified
+                //only available for single docs
+                if(mediaType.getParameters().containsKey(DS_PARAM_YAML_HEADER)){
+                    value = new StringBuilder(value.toString().replaceFirst("---(\\n| )", ""));
+                }
             }
 
             if (targetType.isAssignableFrom(String.class)) {
-                return new DefaultDocument<>((T) value, MediaTypes.APPLICATION_YAML);
+                return new DefaultDocument<>((T) value.toString(), MediaTypes.APPLICATION_YAML);
             }
 
             if (targetType.isAssignableFrom(CharSequence.class)) {
-                return new DefaultDocument<>((T) value, MediaTypes.APPLICATION_YAML);
+                return new DefaultDocument<>((T) value.toString(), MediaTypes.APPLICATION_YAML);
             }
 
             if (targetType.isAssignableFrom(ByteBuffer.class)) {
-                return new DefaultDocument<>((T) ByteBuffer.wrap(value.getBytes(charset)), MediaTypes.APPLICATION_YAML);
+                return new DefaultDocument<>((T) ByteBuffer.wrap(value.toString().getBytes(charset)), MediaTypes.APPLICATION_YAML);
             }
 
             if (targetType.isAssignableFrom(byte[].class)) {
-                return new DefaultDocument<>((T) value.getBytes(charset), MediaTypes.APPLICATION_YAML);
+                return new DefaultDocument<>((T) value.toString().getBytes(charset), MediaTypes.APPLICATION_YAML);
             }
 
             throw new PluginException("Unable to parse to target type.");

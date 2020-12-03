@@ -75,4 +75,25 @@ public class YamlReaderTest {
         JSONAssert.assertEquals(expectedJson, mapped, true);
     }
 
+    @Test
+    void testYamlReaderMultiple() throws Exception {
+        String data =   "---\n" +
+                "message: \"Hello World\"\n" +
+                "---\n" +
+                "test: \"Value\"\n";
+        DefaultDocument<?> doc = new DefaultDocument<>(data, MediaTypes.APPLICATION_YAML);
+
+        String mapping = "/** DataSonnet\n" +
+                "version=2.0\n" +
+                "output application/json\n" +
+                "input payload application/yaml\n" +
+                "*/\n" +
+                "payload";
+
+        Mapper mapper = new Mapper(mapping);
+        String mapped = mapper.transform(doc, new HashMap<>(), MediaTypes.APPLICATION_JSON).getContent();
+
+        String expectedJson = "[{\"message\":\"Hello World\"},{\"test\":\"Value\"} ]";
+        JSONAssert.assertEquals(expectedJson, mapped, true);
+    }
 }

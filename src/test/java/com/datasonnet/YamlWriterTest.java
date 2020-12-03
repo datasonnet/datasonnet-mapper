@@ -122,5 +122,29 @@ public class YamlWriterTest {
         assertEquals(expectedYaml,mapped);
     }
 
+    @Test
+    void testYamlWriterMultiple() throws Exception {
+        String data =   "---\n" +
+                "message: \"Hello World\"\n" +
+                "---\n" +
+                "test: \"Value\"\n";
+        DefaultDocument<?> doc = new DefaultDocument<>(data, MediaTypes.APPLICATION_YAML);
+
+        String mapping = "/** DataSonnet\n" +
+                "version=2.0\n" +
+                "output application/yaml\n" +
+                "input payload application/yaml\n" +
+                "*/\n" +
+                "payload";
+
+        Mapper mapper = new Mapper(mapping);
+        String mapped = mapper.transform(doc, new HashMap<>(), MediaTypes.APPLICATION_YAML).getContent();
+
+        String expectedYaml =  "---\n" +
+                "message: \"Hello World\"\n" +
+                "---\n" +
+                "test: \"Value\"\n";
+        assertEquals(expectedYaml, mapped);
+    }
 
 }
