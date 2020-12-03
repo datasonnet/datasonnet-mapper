@@ -106,11 +106,12 @@ public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
                     value.append(yamlMapper.writeValueAsString(obj));
                 }
             }else{ //single document
-                value = new StringBuilder(yamlMapper.writeValueAsString(inputAsJava));
                 //remove the beginning '---' if specified
                 //only available for single docs
                 if(mediaType.getParameters().containsKey(DS_PARAM_YAML_HEADER)){
-                    value = new StringBuilder(value.toString().replaceFirst("---(\\n| )", ""));
+                    value = new StringBuilder(yamlMapper.writeValueAsString(inputAsJava).replaceFirst("---(\\n| )", ""));
+                }else{
+                    value = new StringBuilder(yamlMapper.writeValueAsString(inputAsJava));
                 }
             }
 
