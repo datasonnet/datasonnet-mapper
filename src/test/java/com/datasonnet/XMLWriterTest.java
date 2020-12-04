@@ -116,7 +116,7 @@ public class XMLWriterTest {
         String expectedXml = TestResourceReader.readFileAsString("writeXMLEscapedTest.xml");
 
         Mapper mapper = new Mapper(datasonnet);
-        String mappedXml = mapper.transform(new DefaultDocument<>(null), Collections.emptyMap(), MediaTypes.APPLICATION_XML, String.class).getContent();
+        String mappedXml = mapper.transform(DefaultDocument.NULL_INSTANCE, Collections.emptyMap(), MediaTypes.APPLICATION_XML, String.class).getContent();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
     }
