@@ -52,6 +52,8 @@ public class JavaWriterTest {
 
         Document<Gizmo> mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, Gizmo.class);
 
+        assertTrue(MediaTypes.APPLICATION_JAVA.equalsTypeAndSubtype(mapped.getMediaType()));
+
         Object result = mapped.getContent();
         assertTrue(result instanceof Gizmo);
 
