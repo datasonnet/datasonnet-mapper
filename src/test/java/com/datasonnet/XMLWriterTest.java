@@ -17,6 +17,7 @@ package com.datasonnet;
  */
 
 import com.datasonnet.document.DefaultDocument;
+import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.TestResourceReader;
@@ -87,9 +88,9 @@ public class XMLWriterTest {
 
         Mapper mapper = new Mapper(datasonnet);
 
-        String mappedXml = mapper.transform(new DefaultDocument<>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
-
-        assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
+        Document<String> mappedXml = mapper.transform(new DefaultDocument<>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML);
+        assertEquals(MediaTypes.APPLICATION_XML, mappedXml.getMediaType());
+        assertThat(mappedXml.getContent(), CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
     }
 
     @Test
