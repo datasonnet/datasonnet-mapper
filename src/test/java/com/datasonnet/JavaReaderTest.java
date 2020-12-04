@@ -54,7 +54,7 @@ public class JavaReaderTest {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         theGizmo.setDate(df.parse("2020-01-06"));
 
-        Document<Gizmo> data = new DefaultDocument<>(theGizmo);
+        Document<Gizmo> data = new DefaultDocument<>(theGizmo, MediaTypes.APPLICATION_JAVA);
 
         String mapping = TestResourceReader.readFileAsString("readJavaTest.ds");
 
@@ -73,7 +73,7 @@ public class JavaReaderTest {
         obj.setTestField(new JAXBElement<TestField>(new QName("http://com.datasonnet.test", "testField"),
                 TestField.class,
                 testField));
-        Document<WsdlGeneratedObj> data = new DefaultDocument<>(obj);
+        Document<WsdlGeneratedObj> data = new DefaultDocument<>(obj, MediaTypes.APPLICATION_JAVA);
         Mapper mapper = new Mapper("payload");
         Document<String> mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JSON);
 
@@ -83,7 +83,7 @@ public class JavaReaderTest {
 
     @Test
     void testNullJavaObject() throws Exception {
-        Document<Gizmo> nullObj = new DefaultDocument<>(null);
+        Document<?> nullObj = DefaultDocument.NULL_INSTANCE;
         Mapper mapper = new Mapper("payload == null");
         Document<Boolean> mapped = mapper.transform(nullObj, new HashMap<>(), MediaTypes.APPLICATION_JAVA, Boolean.class);
         assertTrue(mapped.getContent());

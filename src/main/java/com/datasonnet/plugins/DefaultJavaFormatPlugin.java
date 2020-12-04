@@ -103,7 +103,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
     @Override
     public <T> Document<T> write(Value input, MediaType mediaType, Class<T> targetType) throws PluginException {
         T converted = writeValue(input, mediaType, targetType);
-        return new DefaultDocument<>(converted);
+        return new DefaultDocument<>(converted, mediaType);
     }
 
     @Nullable
