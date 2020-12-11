@@ -1372,7 +1372,7 @@ ds.scan(payload.email, "(.*)@(.*)(.com)")
 ]
 ------------------------
 
-### `select(object obj, string path`
+### `select(object obj, string path)`
 Returns a value inside `obj` by the provided `path`. For nested objects, the path is separated by a dot ('.').
 
 *Example*
