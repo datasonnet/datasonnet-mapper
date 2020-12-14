@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: DataSonnet Mapper Documentation</title>
+    <link rel="canonical" href="https://MS3Inc.github.io/datasonnet-mapper/datasonnet/latest/libraries-strings.html">
+    <meta name="generator" content="Antora 2.3.3">
+    <link rel="stylesheet" href="../../_/css/site.css">
+    <script>var uiRootPath = '../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://MS3Inc.github.io/datasonnet-mapper">DataSonnet Mapper Documentation</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Resources</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Resource A</a>
+            <a class="navbar-item" href="#">Resource B</a>
+            <a class="navbar-item" href="#">Resource C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="datasonnet" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">DataSonnet</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="index.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="quickstart.html">Quick Start</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="dataformats.html">Data Formats</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="headers.html">DataSonnet Header</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jsonnet-doc.html">Standard Library Documentation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Additional DataSonnet Libraries</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-core.html">Core</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-arrays.html">Arrays</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-binaries.html">Binaries</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-crypto.html">Crypto</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-datetime.html">Datetime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-jsonpath.html">JsonPath</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-localdatetime.html">LocalDateTime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-math.html">Math</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-numbers.html">Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-objects.html">Objects</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-regex.html">Regex</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="libraries-strings.html">Strings</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-url.html">Url</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="cli.html">Command Line Interface</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="jar-cli.html">Using the CLI via a Jar</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="docker-cli.html">Using the CLI via Docker</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="cookbook.html">Cookbook</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jar-lib.html">Using DataSonnet Programmatically</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="#intellij:ROOT:index.adoc">IntelliJ Plugin</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">DataSonnet</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="index.html">DataSonnet</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">DataSonnet</a></li>
+    <li>Additional DataSonnet Libraries</li>
+    <li><a href="libraries-strings.html">Strings</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/libraries-strings.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<div class="sect1">
+<h2 id="_strings"><a class="anchor" href="#_strings"></a>strings</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_appendifmissingstring_str_string_value"><a class="anchor" href="#_appendifmissingstring_str_string_value"></a><code>appendIfMissing(string str, string value)</code></h3>
+<div class="paragraph">
+<p>Appends <code>str</code> with <code>value</code> if <code>str</code> does not already end with <code>value</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    existing: ds.strings.appendIfMissing("Hello World","World"),
+    missing: ds.strings.appendIfMissing("Hello ","World")
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "existing": "Hello World",
+  "missing": "Hello World"
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_camelizestring_str"><a class="anchor" href="#_camelizestring_str"></a><code>camelize(string str)</code></h3>
+<div class="paragraph">
+<p>Converts words in <code>str</code> using camel case, which removes all spaces and converts the first letter of each word except the first word to upper case.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.camelize("Hello_world")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"helloWorld"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_capitalizestring_str"><a class="anchor" href="#_capitalizestring_str"></a><code>capitalize(string str)</code></h3>
+<div class="paragraph">
+<p>Converts words in <code>str</code> using capitalized case, which changes the first letter of each word to uppercase, with the rest of the letters in lowercase.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.capitalize("hello world")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"Hello World"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_charcodestring_char"><a class="anchor" href="#_charcodestring_char"></a><code>charCode(string char)</code></h3>
+<div class="paragraph">
+<p>Converts <code>char</code> to its char code.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.charCode("*")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>42</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_charcodeatstring_str_number_index"><a class="anchor" href="#_charcodeatstring_str_number_index"></a><code>charCodeAt(string str, number index)</code></h3>
+<div class="paragraph">
+<p>Returns the char code at <code>index</code> in <code>str</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.charCodeAt("*", 0)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>42</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_dasherizestring_str"><a class="anchor" href="#_dasherizestring_str"></a><code>dasherize(string str)</code></h3>
+<div class="paragraph">
+<p>Converts words in <code>str</code> using kebab-case, which converts all letters in <code>str</code> to lowercase and all spaces into dashes (-).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.dasherize("Hello WorldX")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"hello-world-x"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fromcharcodenumber_charcode"><a class="anchor" href="#_fromcharcodenumber_charcode"></a><code>fromCharCode(number charCode)</code></h3>
+<div class="paragraph">
+<p>Converts <code>charCode</code> to its string value.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.fromCharCode(42)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"*"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isalphastring_str"><a class="anchor" href="#_isalphastring_str"></a><code>isAlpha(string str)</code></h3>
+<div class="paragraph">
+<p>Returns a boolean which determines if the provided string only contains alpha characters.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.isAlpha("abcde")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isalphanumericstring_str"><a class="anchor" href="#_isalphanumericstring_str"></a><code>isAlphanumeric(string str)</code></h3>
+<div class="paragraph">
+<p>Returns a boolean which determines if <code>str</code> only contains alpha numeric values.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.isAlphanumeric("a1b2cd3e4")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_islowercasestring_str"><a class="anchor" href="#_islowercasestring_str"></a><code>isLowerCase(string str)</code></h3>
+<div class="paragraph">
+<p>Returns a boolean which determines if <code>str</code> is all lowercase.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.isLowerCase("hello")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isnumericstring_str"><a class="anchor" href="#_isnumericstring_str"></a><code>isNumeric(string str)</code></h3>
+<div class="paragraph">
+<p>Returns a boolean which determines if <code>str</code> contains only numbers.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.isNumeric("34634")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isuppercasestring_str"><a class="anchor" href="#_isuppercasestring_str"></a><code>isUpperCase(string str)</code></h3>
+<div class="paragraph">
+<p>Returns a boolean which determines if <code>str</code> is all uppercase.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.isUpperCase("HELLO")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_iswhitespacestring_str"><a class="anchor" href="#_iswhitespacestring_str"></a><code>isWhitespace(string str)</code></h3>
+<div class="paragraph">
+<p>Returns a boolean which determines if <code>str</code> only contains spaces.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.isWhitespace("      ")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_leftpadstring_str_number_offset"><a class="anchor" href="#_leftpadstring_str_number_offset"></a><code>leftPad(string str, number offset)</code></h3>
+<div class="paragraph">
+<p>Pads the left side of <code>str</code> with spaces if the string is below the <code>offset</code> length.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.leftPad("Hello",10)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"     Hello"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ordinalizenumber_num"><a class="anchor" href="#_ordinalizenumber_num"></a><code>ordinalize(number num)</code></h3>
+<div class="paragraph">
+<p>Converts <code>num</code> to its ordinal string format, e.g. 1st, 2nd, 3rd, etc.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.ordinalize(1)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"1st"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pluralizestring_singularword"><a class="anchor" href="#_pluralizestring_singularword"></a><code>pluralize(string singularWord)</code></h3>
+<div class="paragraph">
+<p>Converts <code>singularWord</code> to its plural counterpart. May not work with all edge cases.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.pluralize("car")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"cars"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_prependifmissingstring_str_string_value"><a class="anchor" href="#_prependifmissingstring_str_string_value"></a><code>prependIfMissing(string str, string value)</code></h3>
+<div class="paragraph">
+<p>Prepends <code>str</code> with <code>value</code> if <code>str</code> does not already begin with <code>value</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    existing: ds.strings.prependIfMissing("Hello World","Hello"),
+    missing: ds.strings.prependIfMissing(" World","Hello")
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "existing": "Hello World",
+  "missing": "Hello World"
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_repeatstring_str_number_times"><a class="anchor" href="#_repeatstring_str_number_times"></a><code>repeat(string str, number times)</code></h3>
+<div class="paragraph">
+<p>Repeats <code>str</code> the given amount of <code>times</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.repeat("Hello ", 2)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"Hello Hello "</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_rightpadstring_str_number_offset"><a class="anchor" href="#_rightpadstring_str_number_offset"></a><code>rightPad(string str, number offset)</code></h3>
+<div class="paragraph">
+<p>Pads the right side <code>str</code> with spaces if the string is below the <code>offset</code> length.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.rightPad("Hello",10)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"Hello     "</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_singularizestring_pluralword"><a class="anchor" href="#_singularizestring_pluralword"></a><code>singularize(string pluralWord)</code></h3>
+<div class="paragraph">
+<p>Converts <code>pluralWord</code> to a singular word. May not work with all edge cases.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.singularize("cars")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"car"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_substringafterstring_str_string_separator"><a class="anchor" href="#_substringafterstring_str_string_separator"></a><code>substringAfter(string str, string separator)</code></h3>
+<div class="paragraph">
+<p>Gets the substring of <code>str</code> after the first occurrence of the <code>separator</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.substringAfter("!XHelloXWorldXAfter", "X")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"HelloXWorldXAfter"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_substringafterlaststring_str_string_separator"><a class="anchor" href="#_substringafterlaststring_str_string_separator"></a><code>substringAfterLast(string str, string separator)</code></h3>
+<div class="paragraph">
+<p>Gets the substring in <code>str</code> after the final occurrence of the <code>separator</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.substringAfterLast("!XHelloXWorldXAfter", "X")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"After"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_substringbeforestring_str_string_separator"><a class="anchor" href="#_substringbeforestring_str_string_separator"></a><code>substringBefore(string str, string separator)</code></h3>
+<div class="paragraph">
+<p>Gets the substring in <code>str</code> before the first occurrence of the <code>separator</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.substringBefore("!XHelloXWorldXAfter", "X")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"!"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_substringbeforelaststring_str_string_separator"><a class="anchor" href="#_substringbeforelaststring_str_string_separator"></a><code>substringBeforeLast(string str, string separator)</code></h3>
+<div class="paragraph">
+<p>Gets the substring in <code>str</code> before the final occurrence of the <code>separator</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.substringBeforeLast("!XHelloXWorldXAfter", "X")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"!XHelloXWorld"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_underscorestring_str"><a class="anchor" href="#_underscorestring_str"></a><code>underscore(string str)</code></h3>
+<div class="paragraph">
+<p>Converts words in <code>str</code> using snake case, which converts all letters in <code>str</code> to lowercase and all spaces into underscores (_).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.underscore("Hello WorldX")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"hello_world_x"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_unwrapstring_str_string_wrapper"><a class="anchor" href="#_unwrapstring_str_string_wrapper"></a><code>unwrap(string str, string wrapper)</code></h3>
+<div class="paragraph">
+<p>Returns the <code>str</code> without the <code>wrapper</code> text.
+Returns the <code>str</code> without the <code>wrapper</code> text.
+The <code>wrapper</code> text is the prepended and/or appended values to the <code>str</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    exists: ds.strings.unwrap("Hello World Hello","Hello"),
+    partial: ds.strings.unwrap("Hello World ","Hello"),
+    missing: ds.strings.unwrap(" World ","Hello")
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "exists": " World ",
+  "partial": " World Hello",
+  "missing": " World "
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_withmaxsizestring_str_number_size"><a class="anchor" href="#_withmaxsizestring_str_number_size"></a><code>withMaxSize(string str, number size)</code></h3>
+<div class="paragraph">
+<p>Limits the <code>size</code> of <code>str</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.withMaxSize("Hello World", 5)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"Hello"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_wrapifmissingstring_str_string_wrapper"><a class="anchor" href="#_wrapifmissingstring_str_string_wrapper"></a><code>wrapIfMissing(string str, string wrapper)</code></h3>
+<div class="paragraph">
+<p>Prepends and appends the <code>wrapper</code> to <code>str</code> if <code>str</code> is not already wrapped. Will update only missing side if <code>wrapper</code> already exists at the beginning or end.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    exists: ds.strings.wrapIfMissing("Hello World Hello","Hello"),
+    partialBeg: ds.strings.wrapIfMissing("Hello World ","Hello"),
+    partialEnd: ds.strings.wrapIfMissing(" World Hello","Hello"),
+    missing: ds.strings.wrapIfMissing(" World ","Hello")
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "exists": "Hello World Hello",
+  "partialBeg": "Hello World Hello",
+  "partialEnd": "Hello World Hello",
+  "missing": "Hello World Hello"
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_wrapwithstring_str_string_wrapper"><a class="anchor" href="#_wrapwithstring_str_string_wrapper"></a><code>wrapWith(string str, string wrapper)</code></h3>
+<div class="paragraph">
+<p>Prepends and appends the <code>wrapper</code> to <code>str</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.strings.wrapWith(" World ","Hello")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"Hello World Hello"</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../_/js/site.js"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

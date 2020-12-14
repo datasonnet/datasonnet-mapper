@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Quick Start :: DataSonnet Mapper Documentation</title>
+    <link rel="canonical" href="https://MS3Inc.github.io/datasonnet-mapper/datasonnet/latest/quickstart.html">
+    <meta name="generator" content="Antora 2.3.3">
+    <link rel="stylesheet" href="../../_/css/site.css">
+    <script>var uiRootPath = '../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://MS3Inc.github.io/datasonnet-mapper">DataSonnet Mapper Documentation</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Resources</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Resource A</a>
+            <a class="navbar-item" href="#">Resource B</a>
+            <a class="navbar-item" href="#">Resource C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="datasonnet" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">DataSonnet</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="index.html">Introduction</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="quickstart.html">Quick Start</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="dataformats.html">Data Formats</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="headers.html">DataSonnet Header</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jsonnet-doc.html">Standard Library Documentation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Additional DataSonnet Libraries</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-core.html">Core</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-arrays.html">Arrays</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-binaries.html">Binaries</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-crypto.html">Crypto</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-datetime.html">Datetime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-jsonpath.html">JsonPath</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-localdatetime.html">LocalDateTime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-math.html">Math</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-numbers.html">Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-objects.html">Objects</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-regex.html">Regex</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-strings.html">Strings</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-url.html">Url</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="cli.html">Command Line Interface</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="jar-cli.html">Using the CLI via a Jar</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="docker-cli.html">Using the CLI via Docker</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="cookbook.html">Cookbook</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jar-lib.html">Using DataSonnet Programmatically</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="#intellij:ROOT:index.adoc">IntelliJ Plugin</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">DataSonnet</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="index.html">DataSonnet</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">DataSonnet</a></li>
+    <li><a href="quickstart.html">Quick Start</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/quickstart.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Quick Start</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_setting_up_intellij">Setting up IntelliJ</a>
+<ul class="sectlevel2">
+<li><a href="#_creating_a_playground_project">Creating a playground project</a></li>
+<li><a href="#_installing_the_plugin">Installing the plugin</a></li>
+<li><a href="#_creating_your_working_files">Creating your working files</a></li>
+</ul>
+</li>
+<li><a href="#_datasonnet_basics">DataSonnet Basics</a>
+<ul class="sectlevel2">
+<li><a href="#_the_minimal_transformation">The minimal transformation</a></li>
+<li><a href="#_including_a_value_from_the_input">Including a value from the input</a></li>
+<li><a href="#_transforming_an_array_of_items">Transforming an array of items</a></li>
+<li><a href="#_filtering_an_array">Filtering an array</a></li>
+<li><a href="#_using_a_local_variable_to_reuse_a_transformation">Using a local variable to reuse a transformation</a></li>
+<li><a href="#_combining_objects">Combining objects</a></li>
+</ul>
+</li>
+<li><a href="#_further_reading">Further reading</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_setting_up_intellij"><a class="anchor" href="#_setting_up_intellij"></a>Setting up IntelliJ</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you don&#8217;t already have IntelliJ, you&#8217;ll need to install it.
+You can download the Community Edition, which is free, at <a href="https://www.jetbrains.com/idea/download/" class="bare">https://www.jetbrains.com/idea/download/</a></p>
+</div>
+<div class="sect2">
+<h3 id="_creating_a_playground_project"><a class="anchor" href="#_creating_a_playground_project"></a>Creating a playground project</h3>
+<div class="paragraph">
+<p>You can use the DataSonnet IntelliJ Plugin in any IntelliJ project, but you&#8217;ll set one up just for this tutorial.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create a new project.
+If you&#8217;ve just installed IntelliJ, you may have a Create New Project option.
+Otherwise, you can go to the File menu and select <code>New &#8594; Project&#8230;&#8203;</code>.
+A window will appear with a list of project types along the left.</p>
+</li>
+<li>
+<p>Select "Maven" (it has a blue "m" to the left of it).</p>
+</li>
+<li>
+<p>Leaving everything else set to the defaults, press the "Next" button in the lower right.</p>
+</li>
+<li>
+<p>The next page has three fields, and you need to put values in <code>GroupID</code> and <code>ArtifactID</code>.
+You can leave <code>Version</code> as the default value.
+You can use any values you like (that are legal for Maven), but some that will work just fine are <code>tutorial</code> and <code>tutorial</code>.</p>
+</li>
+<li>
+<p>Press "Next" in the lower right again.</p>
+</li>
+<li>
+<p>On this screen the default values are fine, so conclude with "Finish", again in the lower right.</p>
+</li>
+<li>
+<p>Wait a short period for the project to initialize.
+If a pop-up appears (usually in the lower right) saying "Maven projects need to be imported" and offering you the option to "Enable Auto-Import", choose that option.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_installing_the_plugin"><a class="anchor" href="#_installing_the_plugin"></a>Installing the plugin</h3>
+<div class="paragraph">
+<p>Now, follow the directions for installing the plugin at <a href="#intellij:ROOT:index.adoc" class="page unresolved">IntelliJ Plugin</a>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_creating_your_working_files"><a class="anchor" href="#_creating_your_working_files"></a>Creating your working files</h3>
+<div class="paragraph">
+<p>Now that the basic project is created and the plugin is installed, you&#8217;ll create the first DataSonnet transformation and scenario for experimentation.
+On the left side of IntelliJ is a pane representing the structure of your project.
+If you named the project <code>tutorial</code>, it has a folder icon with the word <code>tutorial</code> in bold.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Expand the carets next to and below that icon to reach <code>src &#8594; main &#8594; resources</code>.</p>
+</li>
+<li>
+<p>Right click on <code>src &#8594; main &#8594; resources</code> and choose <code>New &#8594; File</code>, naming the file <code>transformation.ds</code>.</p>
+</li>
+<li>
+<p>Now, expand the carets to reach <code>src &#8594; test</code>.</p>
+</li>
+<li>
+<p>Right click on <code>test</code> and choose <code>New &#8594; Directory</code>, naming it <code>resources</code>.</p>
+</li>
+<li>
+<p>Right click on <code>src &#8594; test &#8594; resources</code> and choose (near the end of the menu) <code>Mark Directory as &#8594; Test Resources Root</code>.</p>
+</li>
+<li>
+<p>Your <code>transformation.ds</code> file should still be open.
+If it isn&#8217;t, double click it.</p>
+</li>
+<li>
+<p>On the left side of the file you&#8217;ll see an icon with a plus and several lines.
+It adds a new scenario, go ahead and click it.
+For the scenario name, enter <code>tutorial</code>.</p>
+</li>
+<li>
+<p>There will now be a new icon just to the right of the previous icon, with a plus over a page icon.
+It adds a new input to the scenario, go ahead and click it.
+For the name, enter <code>payload</code>, and leave the format as JSON.</p>
+</li>
+<li>
+<p>Now, copy and paste the following contents into the <code>payload</code> input that has appeared.
+This is the data that will be used for the tutorial.</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-json hljs" data-lang="json">{
+  "from": "Rafael Gómez",
+  "to": "李娜",
+  "items": [
+    {
+      "id": "A-42",
+      "remainingQuantity": 5,
+      "secretInfo": "DO NOT REVEAL THIS"
+    },
+    {
+      "id": "C-1",
+      "remainingQuantity": 0
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_datasonnet_basics"><a class="anchor" href="#_datasonnet_basics"></a>DataSonnet Basics</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Currently your rightmost pane under <code>transformation.ds</code>, which says "Preview", probably has an error message in it.
+To fix that, you need to update your DataSonnet file, which is the currently empty middle pane.</p>
+</div>
+<div class="sect2">
+<h3 id="_the_minimal_transformation"><a class="anchor" href="#_the_minimal_transformation"></a>The minimal transformation</h3>
+<div class="paragraph">
+<p>In the empty middle pane, put two curly brackets <code>{}</code>.
+This is a minimal DataSonnet transformation, though it does not use the input data at all.</p>
+</div>
+<div class="paragraph">
+<p>It returns itself as a value, so you should see the Preview change to also have <code>{}</code>.
+If you don&#8217;t, hit the second icon down directly to the left of the Preview area, the red refresh icon.</p>
+</div>
+<div class="paragraph">
+<p>Now you&#8217;ll change this to use the input data.
+First, remove the curly brackets and put the word <code>payload</code>, with no quotation marks.
+The Preview area should now show an exact copy of the <code>payload</code> input.</p>
+</div>
+<div class="paragraph">
+<p>The input data is available in the <code>payload</code> variable, and the last expression of the transformation is what it outputs, so a line with just <code>payload</code> on it outputs the input.</p>
+</div>
+<div class="paragraph">
+<p>That isn&#8217;t very interesting, so make one last alteration to see a minimal transformation that actually does something (small).
+Change the transformation to be <code>{payload: payload}</code>.</p>
+</div>
+<div class="paragraph">
+<p>The Preview area should look very similar, but with the input inside an object underneath a key named <code>"payload"</code>.
+In the transformation, the first <code>payload</code> is a field key.</p>
+</div>
+<div class="paragraph">
+<p>So long as those don&#8217;t have spaces or other special characters, they don&#8217;t need to be in quotation marks.
+Then the value is an expression, which is the same <code>payload</code> variable from the previous minimal transformation.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_including_a_value_from_the_input"><a class="anchor" href="#_including_a_value_from_the_input"></a>Including a value from the input</h3>
+<div class="paragraph">
+<p>To include a single value from the input in the output, you can access fields of the payload.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">{
+    shipper: payload.from
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This transformation outputs an object with a key named <code>"shipper"</code> with a value copied from the <code>from</code> field of the payload.</p>
+</div>
+<div class="paragraph">
+<p>There&#8217;s an alternative way of looking up that field, which you can use if the field has special characters or if you want to look up a field based on an expression.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">{
+    shipper: payload["from"]
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_transforming_an_array_of_items"><a class="anchor" href="#_transforming_an_array_of_items"></a>Transforming an array of items</h3>
+<div class="paragraph">
+<p>The main way to transform arrays in DataSonnet is called an array comprehension.
+To create a new array derived from the <code>items</code> in the input, update the transformation to</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">{
+    shipper: payload.from,
+    items: [item.id for item in payload.items]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This comprehension creates a new array where each element in it is the <code>id</code> from a corresponding item in the input.
+You could put any expression where it has <code>item.id</code> currently.
+Try changing it to the following and see how the output changes.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">{
+    shipper: payload.from,
+    items: [
+        item + { inStock: true } for item in payload.items
+    ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>What&#8217;s happening in this line will be covered later in the tutorial, for now notice how any expression works in that location.</p>
+</div>
+<div class="paragraph">
+<p>Now, notice how there&#8217;s a comma after the line you already had, that&#8217;s the field separator inside an object.
+If you left out that comma, you&#8217;d get an error something like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code>Problem parsing: Expected "}":4:5, found "items: [it"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Generally speaking when you see <code>Expected "}"</code>, that means there&#8217;s a missing comma.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_filtering_an_array"><a class="anchor" href="#_filtering_an_array"></a>Filtering an array</h3>
+<div class="paragraph">
+<p>Array comprehensions support filtering.
+To filter the items in the input by their remainingQuantity, update the transformation to</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">{
+    shipper: payload.from,
+    items: [
+        item.id
+        for item in payload.items
+        if item.remainingQuantity &gt; 0
+    ]
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Again, you can change the expression that goes after the if, but in this location it must always have a value of either true or false.</p>
+</div>
+<div class="paragraph">
+<p>If you accidentally made a typo in which field you use, or if some items did not have a <code>remainingQuantity</code> field, you would see an error something like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code>Problem executing map: sjsonnet.Error: Field does not exist: remainingQuantiy
+    at line 3 column 54 of the transformation</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>DataSonnet is much stricter about issues like this than Javascript.
+This means it tends to fail if unusual data arrives rather than produce unexpected output, a crucial feature for data transformations.
+Use realistic testing data and you can be confident that the transformation in production will either work correctly or fail if the data does not match your expectations.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_using_a_local_variable_to_reuse_a_transformation"><a class="anchor" href="#_using_a_local_variable_to_reuse_a_transformation"></a>Using a local variable to reuse a transformation</h3>
+<div class="paragraph">
+<p>So far the DataSonnet transformation is a single expression with a number of parts, but accomplishing complex transformations requires the ability to break down code into smaller pieces.
+Update the transformation to</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">local items = [
+    item.id
+    for item in payload.items
+    if item.remainingQuantity &gt; 0
+];
+
+{
+    shipper: payload.from,
+    items: items
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This performs the exact same transformation as the previous example.
+It extracts the logic for constructing the array into a variable named <code>items</code>.
+The name is completely arbitrary&#8212;&#8203;here&#8217;s the same transformation again, but with a different name.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">local things = [
+    item.id
+    for item in payload.items
+    if item.remainingQuantity &gt; 0
+];
+
+{
+    shipper: payload.from,
+    items: things
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice that while the variable name changed to <code>things</code>, the <code>items</code> key in the output needs to remain the same if you want the same output.</p>
+</div>
+<div class="paragraph">
+<p>There&#8217;s a semicolon after the line with the local variable.
+Every statement you write before the last expression, which will usually be assignments to local variables, must end with a semicolon.
+If you left out that semicolon, you&#8217;d get an error something like</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code>Problem parsing: Expected ";":7:2, found ""</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As the error says, a semicolon was expected.</p>
+</div>
+<div class="paragraph">
+<p>So far this is no big improvement on the original transformation.
+But, by having the variable it is easy to do new things with the same values.
+Update the transformation to</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">local items = [
+    item.id
+    for item in payload.items
+    if item.remainingQuantity &gt; 0
+];
+
+{
+    shipper: payload.from,
+    items: items,
+    totalItems: std.length(items)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output object now has an additional field indicating the total number of items included.
+<code>std.length</code> finds the number of things in an array, so using it with the <code>items</code> variable makes it easy to compute the value.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_combining_objects"><a class="anchor" href="#_combining_objects"></a>Combining objects</h3>
+<div class="paragraph">
+<p>In data transformations, parts of the input data are often reproduced in the output.
+Even when that is not the case, it&#8217;s often useful to build objects in layers.
+DataSonnet makes that easy by supporting object combination.
+Update the transformation to</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">local items = [
+    item + { inStock: true }
+    for item in payload.items
+    if item.remainingQuantity &gt; 0
+];
+
+{
+    shipper: payload.from,
+    items: items,
+    totalItems: std.length(items)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This transformation combines the input item objects with an additional object that gets overlaid, containing an extra field.
+But now everything in the input is shown, including the <code>secretInfo</code> on one object.</p>
+</div>
+<div class="paragraph">
+<p>One option would be to not use combinations and only copy the desired fields, but with numerous fields that is a lot of extra code.
+Instead, update the transformation to</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">local items = [
+    item + { inStock: true, secretInfo:: null }
+    for item in payload.items
+    if item.remainingQuantity &gt; 0
+];
+
+{
+    shipper: payload.from,
+    items: items,
+    totalItems: std.length(items)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Using two colons instead of one for a field makes it a hidden field, and it won&#8217;t show up in output.
+Since the value isn&#8217;t used in this transformation, I assigned it to null, but even if it had a non-null value it would not show up.</p>
+</div>
+<div class="paragraph">
+<p>Combining objects like this is useful but limited, with fields replacing other fields.
+DataSonnet supports much more powerful operations when combining objects.
+Update the transformation to</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-javascript hljs" data-lang="javascript">local overlay = {
+    inStock: super.remainingQuantity &gt; 0,
+    secretInfo:: null
+};
+
+local items = [item + overlay for item in payload.items];
+
+{
+    shipper: payload.from,
+    items: items,
+    totalItems: std.length(items)
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now, instead of only including in-stock items in the output, all items are included, and they are marked with whether or not they are in stock.
+To do that, the overlay refers to the <code>remainingQuantity</code> of the item it gets combined with via <code>super</code>.
+Additionally, the overlay is abstracted into a separate variable.
+When combined with each item in the array comprehension, the combination is dynamically evaluated, giving the right output.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_further_reading"><a class="anchor" href="#_further_reading"></a>Further reading</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The JSonnet language DataSonnet uses includes many more powerful capabilities.
+You can learn more of them in <a href="https://jsonnet.org/learning/tutorial.html">the tutorial on the JSonnet website</a>, though it is more focused on generating configurations.</p>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../_/js/site.js"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

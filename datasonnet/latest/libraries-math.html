@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: DataSonnet Mapper Documentation</title>
+    <link rel="canonical" href="https://MS3Inc.github.io/datasonnet-mapper/datasonnet/latest/libraries-math.html">
+    <meta name="generator" content="Antora 2.3.3">
+    <link rel="stylesheet" href="../../_/css/site.css">
+    <script>var uiRootPath = '../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://MS3Inc.github.io/datasonnet-mapper">DataSonnet Mapper Documentation</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Resources</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Resource A</a>
+            <a class="navbar-item" href="#">Resource B</a>
+            <a class="navbar-item" href="#">Resource C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="datasonnet" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">DataSonnet</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="index.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="quickstart.html">Quick Start</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="dataformats.html">Data Formats</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="headers.html">DataSonnet Header</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jsonnet-doc.html">Standard Library Documentation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Additional DataSonnet Libraries</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-core.html">Core</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-arrays.html">Arrays</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-binaries.html">Binaries</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-crypto.html">Crypto</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-datetime.html">Datetime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-jsonpath.html">JsonPath</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-localdatetime.html">LocalDateTime</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="libraries-math.html">Math</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-numbers.html">Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-objects.html">Objects</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-regex.html">Regex</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-strings.html">Strings</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-url.html">Url</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="cli.html">Command Line Interface</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="jar-cli.html">Using the CLI via a Jar</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="docker-cli.html">Using the CLI via Docker</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="cookbook.html">Cookbook</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jar-lib.html">Using DataSonnet Programmatically</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="#intellij:ROOT:index.adoc">IntelliJ Plugin</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">DataSonnet</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="index.html">DataSonnet</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">DataSonnet</a></li>
+    <li>Additional DataSonnet Libraries</li>
+    <li><a href="libraries-math.html">Math</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/libraries-math.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<div class="sect1">
+<h2 id="_math"><a class="anchor" href="#_math"></a>math</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_absnumber_num"><a class="anchor" href="#_absnumber_num"></a><code>abs(number num)</code></h3>
+<div class="paragraph">
+<p>Returns the absolute value of <code>num</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.abs(-1)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>1</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_acosnumber_num"><a class="anchor" href="#_acosnumber_num"></a><code>acos(number num)</code></h3>
+<div class="paragraph">
+<p>Performs math acos operation on <code>num</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.acos(1)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>0</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_asinnumber_num"><a class="anchor" href="#_asinnumber_num"></a><code>asin(number num)</code></h3>
+<div class="paragraph">
+<p>Performs math asin operation on <code>num</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.asin(1)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>1.5707963267948966</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_atannumber_num"><a class="anchor" href="#_atannumber_num"></a><code>atan(number num)</code></h3>
+<div class="paragraph">
+<p>Performs math atan operation on <code>num</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.atan(1)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>0.7853981633974483</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_avgarray_arr"><a class="anchor" href="#_avgarray_arr"></a><code>avg(array arr)</code></h3>
+<div class="paragraph">
+<p>Returns the average value of <code>arr</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.avg([1,2,3])</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>2</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ceilnumber_num"><a class="anchor" href="#_ceilnumber_num"></a><code>ceil(number num)</code></h3>
+<div class="paragraph">
+<p>Rounds <code>num</code> up.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.ceil(1.01)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>2</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_clampnumber_value_number_minval_number_maxval"><a class="anchor" href="#_clampnumber_value_number_minval_number_maxval"></a><code>clamp(number value, number minVal, number maxVal)</code></h3>
+<div class="paragraph">
+<p>Limits <code>value</code> to the range of <code>minVal</code> and <code>maxVal</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.clamp(100, 0, 10)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>10</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_cosnumber_num"><a class="anchor" href="#_cosnumber_num"></a><code>cos(number num)</code></h3>
+<div class="paragraph">
+<p>Performs math cos operation on <code>num</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.cos(0)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>1</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_expnumber_num"><a class="anchor" href="#_expnumber_num"></a><code>exp(number num)</code></h3>
+<div class="paragraph">
+<p>Returns the result of e to the power of <code>num</code>, in other words e<sup><code>num</code></sup>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.exp(2)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>7.38905609893065</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_exponentnumber_num"><a class="anchor" href="#_exponentnumber_num"></a><code>exponent(number num)</code></h3>
+<div class="paragraph">
+<p>Returns the non-decimal portion of a logarithmic operation.</p>
+</div>
+<div class="paragraph">
+<p>exponent = (log(<code>num</code>)/log(2)) + 1</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.exponent(2)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>2</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_floornumber_num"><a class="anchor" href="#_floornumber_num"></a><code>floor(number num)</code></h3>
+<div class="paragraph">
+<p>Rounds <code>num</code> down.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.floor(4.99)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>4</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_lognumber_num"><a class="anchor" href="#_lognumber_num"></a><code>log(number num)</code></h3>
+<div class="paragraph">
+<p>Performs math log operation. on <code>num</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.log(2)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>0.6931471805599453</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mantissanumber_num"><a class="anchor" href="#_mantissanumber_num"></a><code>mantissa(number num)</code></h3>
+<div class="paragraph">
+<p>Returns the decimal portion of a logarithmic operation.</p>
+</div>
+<div class="paragraph">
+<p>exponent = (log(<code>num</code>)/log(2)) + 1
+mantissa = <code>num</code> * pow(2, -exponent)</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.mantissa(2)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>0.5</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_modnumber_num1_number_num2"><a class="anchor" href="#_modnumber_num1_number_num2"></a><code>mod(number num1, number num2)</code></h3>
+<div class="paragraph">
+<p>Performs modulo operation, returns how many times <code>num1</code> can go into <code>num2</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.mod(2,4)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>2</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_pownumber_num1_number_num2"><a class="anchor" href="#_pownumber_num1_number_num2"></a><code>pow(number num1, number num2)</code></h3>
+<div class="paragraph">
+<p>Returns the value of <code>num1</code> to the power of <code>num2</code>, in other words <code>num1</code><sup><code>num2</code></sup>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.pow(2,2)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>4</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_random"><a class="anchor" href="#_random"></a><code>random</code></h3>
+<div class="paragraph">
+<p>Returns a random float value between 0 and 1.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.random</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>0.5963038027787421</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_randomintnumber_num"><a class="anchor" href="#_randomintnumber_num"></a><code>randomInt(number num)</code></h3>
+<div class="paragraph">
+<p>Returns a random integer between 0 and the provided number inclusive.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.randomInt(500)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>485</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_roundnumber_num"><a class="anchor" href="#_roundnumber_num"></a><code>round(number num)</code></h3>
+<div class="paragraph">
+<p>Rounds <code>num</code> to the nearest whole number.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.round(2.5)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>3</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sinnumber_num"><a class="anchor" href="#_sinnumber_num"></a><code>sin(number num)</code></h3>
+<div class="paragraph">
+<p>Performs math sin operation on <code>num</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.sin(1)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>0.8414709848078965</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sqrtnumber_num"><a class="anchor" href="#_sqrtnumber_num"></a><code>sqrt(number num)</code></h3>
+<div class="paragraph">
+<p>Performs math square root operation on <code>num</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.sqrt(4)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>2</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sumarray_arr"><a class="anchor" href="#_sumarray_arr"></a><code>sum(array arr)</code></h3>
+<div class="paragraph">
+<p>Returns sum of all elements in <code>arr</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[ 10, 20, 30 ]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.sum(payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>60</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_tannumber_num"><a class="anchor" href="#_tannumber_num"></a><code>tan(number num)</code></h3>
+<div class="paragraph">
+<p>Performs math tan operation on <code>num</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.math.tan(1)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>1.5574077246549023</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../_/js/site.js"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

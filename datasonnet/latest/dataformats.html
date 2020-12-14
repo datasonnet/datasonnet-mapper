@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Formats Library :: DataSonnet Mapper Documentation</title>
+    <link rel="canonical" href="https://MS3Inc.github.io/datasonnet-mapper/datasonnet/latest/dataformats.html">
+    <meta name="generator" content="Antora 2.3.3">
+    <link rel="stylesheet" href="../../_/css/site.css">
+    <script>var uiRootPath = '../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://MS3Inc.github.io/datasonnet-mapper">DataSonnet Mapper Documentation</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Resources</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Resource A</a>
+            <a class="navbar-item" href="#">Resource B</a>
+            <a class="navbar-item" href="#">Resource C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="datasonnet" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">DataSonnet</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="index.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="quickstart.html">Quick Start</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="dataformats.html">Data Formats</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="headers.html">DataSonnet Header</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jsonnet-doc.html">Standard Library Documentation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Additional DataSonnet Libraries</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-core.html">Core</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-arrays.html">Arrays</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-binaries.html">Binaries</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-crypto.html">Crypto</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-datetime.html">Datetime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-jsonpath.html">JsonPath</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-localdatetime.html">LocalDateTime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-math.html">Math</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-numbers.html">Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-objects.html">Objects</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-regex.html">Regex</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-strings.html">Strings</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-url.html">Url</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="cli.html">Command Line Interface</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="jar-cli.html">Using the CLI via a Jar</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="docker-cli.html">Using the CLI via Docker</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="cookbook.html">Cookbook</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jar-lib.html">Using DataSonnet Programmatically</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="#intellij:ROOT:index.adoc">IntelliJ Plugin</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">DataSonnet</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="index.html">DataSonnet</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">DataSonnet</a></li>
+    <li><a href="dataformats.html">Data Formats</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/dataformats.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">Formats Library</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_generic_read_and_write_functions">Generic Read and Write Functions</a></li>
+<li><a href="#_xml_format">XML Format</a></li>
+<li><a href="#_csv_format">CSV Format</a></li>
+<li><a href="#_java_objects">Java Objects</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="_generic_read_and_write_functions"><a class="anchor" href="#_generic_read_and_write_functions"></a>Generic Read and Write Functions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>Formats</code> library contains <code>read</code>, and <code>write</code> functions for serializing and deserializing data in other formats, e.g. XML or CSV. The XML and CSV plugins are built into the standard DataSonnet distributions while other formats can be supported by implementing <code>DataFormatPlugin</code> interface.</p>
+</div>
+<div class="paragraph">
+<p>These functions can be used if the data contains embedded data in other formats, for example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+    "embeddedXMLValue": "&lt;test&gt;Hello&lt;/test&gt;"
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the payload or variable itself is in the format other than JSON, it will be automatically detected by the DataSonnet, therefore using the <code>read</code> will cause an error. The input and output of payload and variables is controlled by <a href="headers.html" class="page">the headers</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="_readstring_input_string_inputmimetype_object_params"><a class="anchor" href="#_readstring_input_string_inputmimetype_object_params"></a><code>read(string input, string inputMimeType, object params={})</code></h3>
+<div class="paragraph">
+<p>Reads input data in the specified mime type and accepts additional parameters which override default plugin behavior. The list and format of parameters is specific to a plugin implementation.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.read(payload.embeddedXMLValue, "application/xml")</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>local params = {
+    "NamespaceDeclarations" : {
+        "datasonnet" : "http://www.modusbox.com"
+    },
+    "NamespaceSeparator": "%",
+    "TextValueKey": "__text",
+    "AttributeCharacter": "*"
+};
+
+ds.read(payload.embeddedXMLValue, "application/xml", params);</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_writestring_output_string_outputmimetype_object_params"><a class="anchor" href="#_writestring_output_string_outputmimetype_object_params"></a><code>write(string output, string outputMimeType, object params={})</code></h3>
+<div class="paragraph">
+<p>Outputs the data into specified data format and accepts additional parameters which override default plugin behavior. The list and format of parameters is specific to a plugin implementation.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.write(payload.embeddedXMLValue, "application/xml")</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>local params = {
+    "NamespaceDeclarations" : {
+        "datasonnet" : "http://www.modusbox.com"
+    },
+    "NamespaceSeparator": "%",
+    "TextValueKey": "__text",
+    "AttributeCharacter": "*",
+    "XmlVersion" : "1.1",
+    "AutoEmptyElements": false
+};
+
+ds.write(payload.someObj, "application/xml", params);</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_xml_format"><a class="anchor" href="#_xml_format"></a>XML Format</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_mime_types_and_identifiers"><a class="anchor" href="#_mime_types_and_identifiers"></a>MIME types and identifiers</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>application/xml</code></p>
+</li>
+<li>
+<p><code>xml</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_read"><a class="anchor" href="#_read"></a><code>read</code></h3>
+<div class="paragraph">
+<p>Converts input XML string to a JSON object using <a href="http://wiki.open311.org/JSON_and_XML_Conversion/#the-badgerfish-convention">BadgerFish convention</a>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Element names become object properties</p>
+</li>
+<li>
+<p>Text content of elements goes in the <code>$</code> property of an object.</p>
+</li>
+<li>
+<p>Nested elements become nested properties</p>
+</li>
+<li>
+<p>Multiple elements at the same level become array elements.</p>
+</li>
+<li>
+<p>Attributes go in properties whose names begin with <code>@</code>.</p>
+</li>
+<li>
+<p>Active namespaces for an element go in the element&#8217;s <code>@xmlns</code> property.</p>
+</li>
+<li>
+<p>The default namespace URI goes in <code>@xmlns.$</code>.</p>
+</li>
+<li>
+<p>Other namespaces go in other properties of <code>@xmlns</code>.</p>
+</li>
+<li>
+<p>Elements with namespace prefixes become object properties, too.</p>
+</li>
+<li>
+<p>The <code>@xmlns</code> property goes only in object relative to the element where namespace was declared.</p>
+</li>
+<li>
+<p>CDATA sections go in properties named <code>#1</code>, <code>#2</code>, etc.</p>
+</li>
+<li>
+<p>Text fragments in mixed contents (elements and text) goes in properties named <code>$1</code>, <code>$2</code>, etc.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Embedded XML value</div>
+<div class="content">
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;test:root xmlns:test="http://www.modusbox.com"&gt;
+    &lt;test:datasonnet version="1.0"&gt;Hello World&lt;/test:datasonnet&gt;
+&lt;/test:root&gt;</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.read(payload.embeddedXMLValue, "application/xml")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+    "test:root": {
+        "@xmlns": {
+            "test":"http://www.modusbox.com"
+        },
+        "test:datasonnet": {
+            "@version": "1.0",
+            "$": "Hello World"
+        }
+    }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Providing an optional <code>params</code> object allows for additional control over JSON generation. The <code>params</code> is a JSON object where following properties can be set:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>NamespaceSeparator</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Separator between the prefix and the local name</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>:</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>TextValueKey</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Key prefix for the text value property</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>$</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>CdataValueKey</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Key prefix for the CDATA value property</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>#</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>AttributeCharacter</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Property key prefix which designates an XML element attribute</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>@</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>NamespaceDeclarations</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Map of internal prefixes to the namespaces which overrides namespaces declarations in the input. Multiple values are allowed, for example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code>"NamespaceDeclarations" : {
+    "datasonnet" : "http://www.datasonnet.com",
+    "test" : "urn:com.foo.bar",
+    "": "http://www.modusbox.com"
+}</code></pre>
+</div>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>RootElement</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>if set, the output will be wrapped in a root element with the given name</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Embedded XML value</div>
+<div class="content">
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;test:root xmlns:test="http://www.modusbox.com"&gt;
+    &lt;test:datasonnet version="1.0"&gt;Hello World&lt;/test:datasonnet&gt;
+&lt;/test:root&gt;</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>local params = {
+    "NamespaceDeclarations" : {
+        "datasonnet": "http://www.modusbox.com"
+    },
+    "NamespaceSeparator": "%",
+    "TextValueKey": "__text",
+    "AttributeCharacter": "*"
+};
+
+ds.read(payload.embeddedXMLValue, "application/xml", params);</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+    "datasonnet%root": {
+        "*xmlns": {
+            "datasonnet": "http://www.modusbox.com"
+        },
+        "datasonnet%datasonnet": {
+            "*version": "1.0",
+            "__text": "Hello World"
+        }
+    }
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_write"><a class="anchor" href="#_write"></a><code>write</code></h3>
+<div class="paragraph">
+<p>Converts the input JSON object into XML using the Badgerfish convention.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The input JSON must have a single key which will be mapped to the root element of the resulting XML.</p>
+</div>
+<div class="listingblock">
+<div class="title">Correct:</div>
+<div class="content">
+<pre>{
+  <strong>"person"</strong>: {
+    "firstName": "John",
+    "lastName": "Doe",
+    "title": "Rookie DataSonnet mapper"
+  }
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Incorrect:</div>
+<div class="content">
+<pre>{
+  "firstName": "John",
+  "lastName": "Doe",
+  "title": "Rookie DataSonnet mapper"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Incorrect:</div>
+<div class="content">
+<pre>{
+  "person": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "title": "Rookie DataSonnet mapper"
+  },
+  "anotherKey": "anotherValue"
+}</pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "test:root": {
+        "@xmlns": {
+            "test":"http://www.modusbox.com"
+        },
+        "test:datasonnet": {
+            "@version": "1.0",
+            "$": "Hello World"
+        }
+    }
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    embeddedXMLValue: ds.write(payload, "application/xml")
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+    "embeddedXMLValue": "&lt;?xml version=\"1.0\" encoding=\"UTF-8\"?&gt; &lt;test:root xmlns:test=\"http://www.modusbox.com\"&gt; &lt;test:datasonnet version=\"1.0\"&gt;Hello World&lt;/test:datasonnet&gt; &lt;/test:root&gt;"
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Providing a <code>params</code> object allows for more control over generated XML. In addition to the parameters described in the <code>read</code> section, the following XML output-only parameters are supported:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>XmlVersion</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>XML version in the XML declaration</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>1.0</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Encoding</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>XML encoding</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>UTF-8</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>AutoEmptyElements</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>If set to <code>true</code>, empty elements are mapped to self-closing tags. If set to <code>false</code>, start- and end tags are generated.</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>true</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>NullAsEmptyElement</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>If set to <code>true</code>, element with null value is treated as empty element. Otherwise null values are skipped.</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>true</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>OmitXmlDeclaration</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>If set to <code>true</code>, XML declaration is not written in the resulting output.</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>false</code></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "test%root": {
+        "*xmlns": {
+            "test":"http://www.modusbox.com"
+        },
+        "test%datasonnet": {
+            "*version": "1.0",
+            "__text": "Hello World"
+        },
+        "test%empty": {}
+    }
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>local params = {
+    "NamespaceDeclarations" : {
+        "datasonnet" : "http://www.modusbox.com"
+    },
+    "NamespaceSeparator": "%",
+    "TextValueKey": "__text",
+    "AttributeCharacter": "*",
+    "XmlVersion" : "1.1",
+    "AutoEmptyElements": false
+};
+
+{
+    embeddedXMLValue: ds.write(payload, "application/xml")
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+    "embeddedXMLValue": "&lt;?xml version=\"1.1\" encoding=\"UTF-8\"?&gt; &lt;datasonnet:root xmlns:test=\"http://www.modusbox.com\"&gt; &lt;datasonnet:datasonnet version=\"1.0\"&gt;Hello World&lt;/datasonnet:datasonnet&gt; &lt;datasonnet:empty/&gt; &lt;/datasonnet:root&gt;"</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_csv_format"><a class="anchor" href="#_csv_format"></a>CSV Format</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_mime_types_and_identifiers_2"><a class="anchor" href="#_mime_types_and_identifiers_2"></a>MIME types and identifiers</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>application/csv</code></p>
+</li>
+<li>
+<p><code>text/csv</code></p>
+</li>
+<li>
+<p><code>csv</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_read_2"><a class="anchor" href="#_read_2"></a><code>read</code></h3>
+<div class="paragraph">
+<p>Parses the CSV and converts it to a JSON array of objects. It expects the CSV input to be in a default format, with first row as column headers, comma separator, double quote, backslash escape character and <code>\n</code> newline character. CSV headers are used as keys for the corresponding JSON object values.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Embedded CSV value</div>
+<div class="content">
+<pre>"First Name","Last Name",Phone
+William,Shakespeare,"(123)456-7890"
+Christopher,Marlow,"(987)654-3210"</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    local csvInput = ds.read(payload.embeddedCSVValue, "application/csv");
+
+    {
+        name: csvInput[0]["First Name"] + " " + csvInput[0]["Last Name"]
+    }
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+    "name": "William Shakespeare"
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Providing an optional <code>params</code> object allows more control over the format of the input CSV. The <code>params</code> is a JSON object where following properties can be set:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>UseHeader</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>If set to <code>true</code>, the first row of CSV will be interpreted as a list of column headers and will map to the JSON object property names</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>true</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Quote</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>specifies the quote character</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>"</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Separator</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>CSV separator character</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>,</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Escape</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>CSV escape character (only used for parsing CSV)</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>\\</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>NewLine</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>New line character combination</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>\n</code></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Embedded CSV value</div>
+<div class="content">
+<pre>'William'|'Shakespeare'|'(123)456-7890'
+'Christopher'|'Marlow'|'(987)654-3210'</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>local params = {
+    "UseHeader": false,
+    "Quote": "'",
+    "Separator": "|",
+    "Escape": "\\",
+    "NewLine": "\n"
+};
+
+local csvInput = ds.read(payload.embeddedCSVValue, "application/csv", params);
+
+{
+    name: csvInput[0][0] + " " + csvInput[0][1]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+    "name": "William Shakespeare"
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_write_2"><a class="anchor" href="#_write_2"></a><code>write</code></h3>
+<div class="paragraph">
+<p>Creates a CSV out of an array of JSON objects, using default quote, separator, escape and new line characters. The keys of JSON object values are used as a CSV headers.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  {
+    "First Name": "William",
+    "Last Name": "Shakespeare",
+    "Phone": "(123)456-7890"
+  },
+  {
+    "First Name": "Christopher",
+    "Last Name": "Marlow",
+    "Phone": "(987)654-3210"
+  }
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    embeddedCSVValue: ds.write(payload, "application/csv")
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+    "embeddedCSVValue": "\"First Name\",\"Last Name\",Phone\nWilliam,Shakespeare,\"(123)456-7890\"\nChristopher,Marlow,\"(987)654-3210\"\n"
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Providing an optional <code>params</code> object allows for more control over the format of the output CSV. Quote, separator, and new line characters can be specified, CSV can be created without headers - in this case the input can be an array of arrays. In addition, a list of columns can be specified to override the JSON object names. In addition to the parameters described in the <code>read</code> section, the following CSV output-only parameters are supported:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>DisableQuotes</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>If set to <code>true</code>, CSV quotes will not be used and the value of the <code>Quote</code> parameter will be ignored</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>false</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Headers</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>an array of strings to use as column names (has no effect if <code>UseHeader</code> is set to <code>false</code>)</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>"</code></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  [
+    "William",
+    "Shakespeare",
+    "(123)456-7890"
+  ],
+  [
+    "Christopher",
+    "Marlow",
+    "(987)654-3210"
+  ]
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>local params = {
+    "UseHeader": false,
+    "Quote": "'",
+    "Separator": "|",
+    "NewLine": "\n"
+};
+
+{
+    embeddedCSVValue: ds.write(payload, "application/csv", params)
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+    "embeddedCSVValue": "'William'|'Shakespeare'|'(123)456-7890'\n'Christopher'|'Marlow'|'(987)654-3210'\n"
+}</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_java_objects"><a class="anchor" href="#_java_objects"></a>Java Objects</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_read_3"><a class="anchor" href="#_read_3"></a><code>read</code></h3>
+<div class="paragraph">
+<p>Converts POJO to JSON format using <a href="https://github.com/FasterXML/jackson">Jackson ObjectMapper</a>.</p>
+</div>
+<div class="paragraph">
+<p>The following read parameters are supported:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>DateFormat</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Converts POJO date / time fields to JSON strings using specified date format. See <a href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a> for details.</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>yyyy-MM-dd&#8217;T&#8217;HH:mm:ss.SSSZ</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>FailOnEmptyBeans</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>If set to <code>true</code>, an exception is thrown if no serializer is found for a Java type. Setting it to <code>false</code> instructs DataSonnet to ignore the field that cannot be serialized. See <a href="https://github.com/FasterXML/jackson-databind/wiki/Serialization-Features">Jackson Serialization Features</a> for details.</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>true</code></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_write_3"><a class="anchor" href="#_write_3"></a><code>write</code></h3>
+<div class="paragraph">
+<p>Converts JSON objects to Java POJOs using <a href="https://github.com/FasterXML/jackson">Jackson ObjectMapper</a>.</p>
+</div>
+<div class="paragraph">
+<p>The following write parameters are supported:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>DateFormat</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Converts POJO date / time fields to JSON strings using specified date format. See <a href="https://docs.oracle.com/javase/8/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a> for details.</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>yyyy-MM-dd&#8217;T&#8217;HH:mm:ss.SSSZ</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>OutputClass</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Produces an instance of specified class. If parameter is not set, the following conversion rules are used:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Objects &#8594; <code>java.util.HashMap</code></p>
+</li>
+<li>
+<p>Arrays &#8594; <code>java.util.ArrayList</code></p>
+</li>
+<li>
+<p>String values &#8594; <code>java.lang.String</code></p>
+</li>
+<li>
+<p>Boolean values &#8594; <code>java.lang.Boolean</code></p>
+</li>
+<li>
+<p>Numerical values &#8594; <code>java.lang.Number</code></p>
+</li>
+</ul>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_jaxbelement_serialization_and_deserialization"><a class="anchor" href="#_jaxbelement_serialization_and_deserialization"></a><code>JAXBElement</code> serialization and deserialization</h3>
+<div class="paragraph">
+<p>When serializing or deserializing Java object with fields of type <code>JAXBElement</code>, the mapping has to include additional fields <code>value</code>, <code>name</code> and <code>declaredType</code>. For example, a JAXB-annotated class may look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>@XmlRootElement(name = "WsdlGeneratedObj")
+public class WsdlGeneratedObj {
+    @XmlElementRef(name = "testField", namespace = "http://com.datasonnet.test", type = JAXBElement.class, required = true)
+    protected JAXBElement&lt;TestField&gt; testField;
+...
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Mapping from JSON to the <code>WsdlGeneratedObj</code> is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>/** DataSonnet
+version=1.0
+output.application/java.OutputClass=com.datasonnet.javatest.WsdlGeneratedObj
+*/
+{
+    "testField": {
+        "name": "{http://com.datasonnet.test}testField",
+        "declaredType": "com.datasonnet.test.TestField",
+        "value": {
+            test: "Hello World"
+        }
+    }
+}</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../_/js/site.js"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

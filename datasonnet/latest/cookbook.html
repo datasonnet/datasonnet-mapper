@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>DataSonnet Cookbook :: DataSonnet Mapper Documentation</title>
+    <link rel="canonical" href="https://MS3Inc.github.io/datasonnet-mapper/datasonnet/latest/cookbook.html">
+    <meta name="generator" content="Antora 2.3.3">
+    <link rel="stylesheet" href="../../_/css/site.css">
+    <script>var uiRootPath = '../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://MS3Inc.github.io/datasonnet-mapper">DataSonnet Mapper Documentation</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Resources</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Resource A</a>
+            <a class="navbar-item" href="#">Resource B</a>
+            <a class="navbar-item" href="#">Resource C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="datasonnet" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">DataSonnet</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="index.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="quickstart.html">Quick Start</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="dataformats.html">Data Formats</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="headers.html">DataSonnet Header</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jsonnet-doc.html">Standard Library Documentation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Additional DataSonnet Libraries</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-core.html">Core</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-arrays.html">Arrays</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-binaries.html">Binaries</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-crypto.html">Crypto</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-datetime.html">Datetime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-jsonpath.html">JsonPath</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-localdatetime.html">LocalDateTime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-math.html">Math</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-numbers.html">Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-objects.html">Objects</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-regex.html">Regex</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-strings.html">Strings</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-url.html">Url</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="cli.html">Command Line Interface</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="jar-cli.html">Using the CLI via a Jar</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="docker-cli.html">Using the CLI via Docker</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="cookbook.html">Cookbook</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jar-lib.html">Using DataSonnet Programmatically</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="#intellij:ROOT:index.adoc">IntelliJ Plugin</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">DataSonnet</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="index.html">DataSonnet</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">DataSonnet</a></li>
+    <li><a href="cookbook.html">Cookbook</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/cookbook.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">DataSonnet Cookbook</h1>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel2">
+<li><a href="#_single_field_to_single_field">Single Field to Single Field</a></li>
+<li><a href="#_multiple_fields_to_single_field">Multiple Fields to Single Field</a></li>
+<li><a href="#_conditional_mapping">Conditional Mapping</a></li>
+<li><a href="#_validation">Validation</a></li>
+<li><a href="#_array_index_selector">Array Index Selector</a></li>
+<li><a href="#_looping">Looping</a></li>
+<li><a href="#_filter_by">Filter By</a></li>
+<li><a href="#_order_by_sorting">Order By / Sorting</a></li>
+<li><a href="#_group_by">Group By</a></li>
+<li><a href="#_distinct_by">Distinct By</a></li>
+<li><a href="#_count">Count</a></li>
+<li><a href="#_array_flattening">Array Flattening</a></li>
+<li><a href="#_insert_literal_data">Insert Literal Data</a></li>
+<li><a href="#_sum_up_numbers_in_an_array">Sum Up Numbers in an Array</a></li>
+<li><a href="#_default_values">Default Values</a></li>
+<li><a href="#_add_and_subtract_dates">Add and Subtract Dates</a></li>
+<li><a href="#_creating_a_pivot_table">Creating a Pivot Table</a></li>
+<li><a href="#_removing_fields_from_object">Removing Fields from Object</a></li>
+<li><a href="#_finding_if_array_contains_value">Finding If Array Contains Value</a></li>
+<li><a href="#_merging_objects_and_adding_fields_to_objects">Merging Objects and Adding Fields to Objects</a></li>
+<li><a href="#_reading_and_writing_xml">Reading and writing XML</a>
+<ul class="sectlevel3">
+<li><a href="#_reading_xml">Reading XML</a></li>
+<li><a href="#_writing_xml">Writing XML</a></li>
+</ul>
+</li>
+<li><a href="#_reading_and_writing_csv">Reading and writing CSV</a>
+<ul class="sectlevel3">
+<li><a href="#_reading_csv">Reading CSV</a></li>
+<li><a href="#_writing_csv">Writing CSV</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_single_field_to_single_field"><a class="anchor" href="#_single_field_to_single_field"></a>Single Field to Single Field</h3>
+<div class="paragraph">
+<p>Here&#8217;s an example of оne-to-one mapping of JSON object fields to the JSON output:</p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+  "userId" : "123",
+  "name" : "DataSonnet"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>{
+  "uid": payload.userId,
+  "uname": payload.name,
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>{
+  "uid" : "123",
+  "uname" : "DataSonnet"
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_multiple_fields_to_single_field"><a class="anchor" href="#_multiple_fields_to_single_field"></a>Multiple Fields to Single Field</h3>
+<div class="paragraph">
+<p>Field values can be combined together, concatenated as a string, added as numerical values or merged as objects. Strings may be concatenated with <strong><code>+</code></strong>, which implicitly converts one operand to string if needed. Objects may be combined with <strong><code>+</code></strong> where the right-hand side wins field conflicts.</p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+  "userId" : "123",
+  "name" : "DataSonnet",
+  "number1" : 1,
+  "number2" : 2,
+  "object1" : {
+    "Hello" : "Hello"
+  },
+  "object2" : {
+    "World" : "World"
+  },
+  "array1": [1, 2],
+  "array2": [3, 4],
+  "array3": [2, 4]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>{
+  "nameId": payload.name + " - " + payload.userId,
+  "numberPlusString" : payload.number1 + payload.name,
+  "stringPlusNumber" : payload.name + payload.number1,
+  "numberPlusNumber" : payload.number1 + payload.number2,
+  "objects" : payload.object1 + payload.object2,
+  "arrays" : payload.array1 +
+             payload.array2 +
+             payload.array3
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>{
+  "arrays": [
+    1,
+    2,
+    3,
+    4,
+    2,
+    4
+  ],
+  "nameId": "DataSonnet - 123",
+  "numberPlusNumber": 3,
+  "numberPlusString": "1DataSonnet",
+  "objects": {
+    "Hello": "Hello",
+    "World": "World"
+  },
+  "stringPlusNumber": "DataSonnet1"
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_conditional_mapping"><a class="anchor" href="#_conditional_mapping"></a>Conditional Mapping</h3>
+<div class="paragraph">
+<p>Conditional expressions look like <code>if b then e else e</code>. The <code>else</code> branch is optional and defaults to <code>null</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  {
+    "name" : "Joe",
+    "gender" : "Male",
+    "age" : 46,
+    "insurance": true
+  },
+  {
+    "name" : "Bob",
+    "gender" : "Male",
+    "age" : 40,
+    "insurance": false
+  },
+  {
+    "name" : "Jane",
+    "gender" : "Female",
+    "age" : 33
+  },
+  {
+    "name" : "Mary",
+    "gender" : "Female",
+    "age" : 40
+  }
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>{
+  "insured" : [
+    {
+      name: person.name,
+      gender: person.gender
+    }
+    for person in payload
+    <strong>if std.objectHas(person, "insurance") &&
+       person.insurance == true</strong>
+  ],
+  "uninsured" : [
+    {
+      name: person.name,
+      gender: person.gender
+    }
+    for person in payload
+    <strong>if !std.objectHas(person, "insurance") ||
+       person.insurance == false</strong>
+  ]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>{
+  "insured": [
+    {
+      "gender": "Male",
+      "name": "Joe"
+    }
+  ],
+  "uninsured": [
+    {
+      "gender": "Male",
+      "name": "Bob"
+    },
+    {
+      "gender": "Female",
+      "name": "Jane"
+    },
+    {
+      "gender": "Female",
+      "name": "Mary"
+    }
+  ]
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_validation"><a class="anchor" href="#_validation"></a>Validation</h3>
+<div class="paragraph">
+<p>Errors can arise from the language itself (e.g. an array overrun) or thrown from Jsonnet code. Stack traces provide context for the error.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>To raise an error: <code>error "foo"</code>;</p>
+</li>
+<li>
+<p>To assert a condition before an expression: <code>assert "foo"</code>;</p>
+</li>
+<li>
+<p>A custom failure message: <code>assert "foo" : "message"</code>;</p>
+</li>
+<li>
+<p>Assert fields have a property: <code>assert self.f == 10</code>;</p>
+</li>
+<li>
+<p>With custom failure message: <code>assert "foo" : "message"</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_array_index_selector"><a class="anchor" href="#_array_index_selector"></a>Array Index Selector</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>arr[x] selects element with the index X from the array. Indexes start with 0;</p>
+</li>
+<li>
+<p>arr[x : y] returns slice of an array from index X (inclusive) to index Y (exclusive). E.g.:</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[ "a", "b", "c", "d" ]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>{
+    slice1: payload[0 : 2],
+    slice2: payload[2 : 2],
+    slice3: payload[1 : 10]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>{
+   "slice1": [
+      "a",
+      "b"
+   ],
+   "slice2": [
+      "c"
+   ],
+   "slice3": [
+      "b",
+      "c",
+      "d"
+   ]
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_looping"><a class="anchor" href="#_looping"></a>Looping</h3>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[ "a", "b", "c", "d" ]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>[
+    {
+        letter: x
+    } for x in payload
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>[
+   {
+      "letter": "a"
+   },
+   {
+      "letter": "b"
+   },
+   {
+      "letter": "c"
+   },
+   {
+      "letter": "d"
+   }
+]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Indexes are not available in <code>for</code> loop. In order to use both element value and index in the mapping, use <code>std.mapWithIndex()</code> function with custom mapping function, e.g.
+.Payload</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+    "flights": [
+        {
+            "availableSeats": 45,
+            "airlineName": "Delta",
+            "aircraftBrand": "Boeing",
+            "aircraftType": "717",
+            "departureDate": "01/20/2019",
+            "origin": "PHX",
+            "destination": "SEA"
+        },
+        {
+            "availableSeats": 134,
+            "airlineName": "Delta",
+            "aircraftBrand": "Airbus",
+            "aircraftType": "A350",
+            "departureDate": "10/13/2018",
+            "origin": "AMS",
+            "destination": "DTW"
+        }
+    ]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre><strong>std.mapWithIndex</strong>(function(index, value)
+                 {
+                     "index": index,
+                     "value": value
+                 }, payload.flights)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>[
+   {
+      "index": 0,
+      "value": {
+         "aircraftBrand": "Boeing",
+         "aircraftType": "717",
+         "airlineName": "Delta",
+         "availableSeats": 45,
+         "departureDate": "01/20/2019",
+         "destination": "SEA",
+         "origin": "PHX"
+      }
+   },
+   {
+      "index": 1,
+      "value": {
+         "aircraftBrand": "Airbus",
+         "aircraftType": "A350",
+         "airlineName": "Delta",
+         "availableSeats": 134,
+         "departureDate": "10/13/2018",
+         "destination": "DTW",
+         "origin": "AMS"
+      }
+   }
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_filter_by"><a class="anchor" href="#_filter_by"></a>Filter By</h3>
+<div class="paragraph">
+<p>Standard Jsonnet library has <code>std.filter()</code> function:</p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  {
+    "name" : "Joe",
+    "gender" : "Male",
+    "age" : 46,
+    "insurance": true
+  },
+  {
+    "name" : "Bob",
+    "gender" : "Male",
+    "age" : 40,
+    "insurance": false
+  },
+  {
+    "name" : "Jane",
+    "gender" : "Female",
+    "age" : 33,
+    "insurance": true
+  },
+  {
+    "name" : "Mary",
+    "gender" : "Female",
+    "age" : 40
+  }
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>local isInsured(person) = std.objectHas(person, "insurance") &&
+                          person.insurance == true;
+
+{
+    "insured" : <strong>std.filter</strong>(function(person) isInsured(person), payload)
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>{
+   "insured": [
+      {
+         "age": 46,
+         "gender": "Male",
+         "insurance": true,
+         "name": "Joe"
+      },
+      {
+         "age": 33,
+         "gender": "Female",
+         "insurance": true,
+         "name": "Jane"
+      }
+   ]
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_order_by_sorting"><a class="anchor" href="#_order_by_sorting"></a>Order By / Sorting</h3>
+<div class="paragraph">
+<p>The <code>std.sort(arr)</code> function is available in the standard library. All elements of an array must be of the same type. If elements of array are objects or other arrays, a function must be provided to to extract comparison key from each list element.</p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  3,
+  4,
+  5,
+  6,
+  7,
+  1,
+  2
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>std.sort(payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>[
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_group_by"><a class="anchor" href="#_group_by"></a>Group By</h3>
+<div class="paragraph">
+<p><code>DS.Util.groupBy()</code> function provided. The first argument is a list of objects, the second is the name of the element to group by. The following example groups list of objects by name of the language:</p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+  "languages": [
+    {
+      "language": {
+        "name": "Java",
+        "version": "1.8"
+      }
+    },
+    {
+      "language": {
+        "name": "Scala",
+        "version": "2.13.0"
+      }
+    },
+    {
+      "language": {
+        "name": "Java",
+        "version": "1.7"
+      }
+    },
+    {
+      "language": {
+        "name": "Scala",
+        "version": "2.11.12"
+      }
+    }
+  ]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>{
+  languages: DS.Util.groupBy(payload.languages, 'language.name'),
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>{
+   "languages": {
+      "Java": [
+         {
+            "language": {
+               "name": "Java",
+               "version": "1.8"
+            }
+         },
+         {
+            "language": {
+               "name": "Java",
+               "version": "1.7"
+            }
+         }
+      ],
+      "Scala": [
+         {
+            "language": {
+               "name": "Scala",
+               "version": "2.13.0"
+            }
+         },
+         {
+            "language": {
+               "name": "Scala",
+               "version": "2.11.12"
+            }
+         }
+      ]
+   }
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_distinct_by"><a class="anchor" href="#_distinct_by"></a>Distinct By</h3>
+<div class="paragraph">
+<p><code>DS.Util.distinctBy()</code> function provided.</p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+   "arrayOfLetters": [ "a", "c", "b", "c", "d", "c", "a", "b", "b" ],
+   "arrayOfObjects": [
+        {
+            "a": "a",
+            "b":"b"
+        },
+        {
+            "a": "a",
+            "c" : {
+                "t":"t",
+                "y":"y"
+            },
+        },
+        {
+            "a": "a"
+        },
+        {
+            "a": "a"
+        },
+        {
+            "a": "a"
+        },
+        {
+            "a": "a",
+            "c" : {
+                "y":"y",
+                "t":"t"
+            },
+        },
+        {
+            "a": "a"
+        }
+   ]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>{
+  uniqueLetters: <strong>DS.Util.distinctBy</strong>(payload.arrayOfLetters),
+  uniqueObjects: <strong>DS.Util.distinctBy</strong>(payload.arrayOfObjects)
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>{
+  "uniqueLetters": [
+    "a",
+    "c",
+    "b",
+    "d"
+  ],
+  "uniqueObjects": [
+    {
+      "a": "a",
+      "b": "b"
+    },
+    {
+      "a": "a",
+      "c": {
+        "t": "t",
+        "y": "y"
+      }
+    },
+    {
+      "a": "a"
+    }
+  ]
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An optional <code>criterion</code> parameter can be provided, in this case only value of the field specified in the parameter considered when objects are checked for uniqueness. For example, the following mapping only selects distinct languages, regardless of their versions:</p>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>local listOfLanguages =
+    [
+      {
+        "language": {
+          "name": "Java",
+          "version": "1.8"
+        }
+      },
+      {
+        "language": {
+          "name": "Scala",
+          "version": "2.13.0"
+        }
+      },
+      {
+        "language": {
+          "name": "Java",
+          "version": "1.7"
+        }
+      },
+      {
+        "language": {
+          "name": "Scala",
+          "version": "2.11.12"
+        }
+      }
+    ];
+
+DS.Util.distinctBy(listOfLanguages, <strong>"language.name"</strong>)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>[
+   {
+      "language": {
+         "name": "Java",
+         "version": "1.8"
+      }
+   },
+   {
+      "language": {
+         "name": "Scala",
+         "version": "2.13.0"
+      }
+   }
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_count"><a class="anchor" href="#_count"></a>Count</h3>
+<div class="paragraph">
+<p><code>std.length()</code> function is available out of the box. If parameter is an array, it will return number of elements in the array.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_array_flattening"><a class="anchor" href="#_array_flattening"></a>Array Flattening</h3>
+<div class="paragraph">
+<p><code>DS.Util.deepFlattenArrays()</code> function recursively iterates over array of elements, some or all of which may be arrays too, and merges them all in a single array.</p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  [
+    3
+  ],
+  [
+    4,
+    [
+      5,
+      6,
+      7
+    ],
+    {
+      "x": "y"
+    }
+  ]
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>DS.Util.deepFlattenArrays(payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  {
+    "x": "y"
+  }
+]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that <code>std.flattenArrays(arrs)</code> function is also available, it only flattens a single level of nesting.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_insert_literal_data"><a class="anchor" href="#_insert_literal_data"></a>Insert Literal Data</h3>
+<div class="paragraph">
+<p>It&#8217;s possible to import both code and raw data from other files.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The import construct is like copy/pasting Jsonnet code.</p>
+</li>
+<li>
+<p>Files designed for import by convention end with <code>.libsonnet</code></p>
+</li>
+<li>
+<p>Raw JSON can be imported this way too.</p>
+</li>
+<li>
+<p>The <code>importstr</code> construct is for verbatim UTF-8 text.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Usually, imported Jsonnet content is stashed in a top-level local variable. This resembles the way other programming languages handle modules. Jsonnet libraries typically return an object, so that they can easily be extended. Neither of these conventions are enforced.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sum_up_numbers_in_an_array"><a class="anchor" href="#_sum_up_numbers_in_an_array"></a>Sum Up Numbers in an Array</h3>
+<div class="paragraph">
+<p>Standard library has the <code>foldl</code> function which calls the function on each array element and the result of the previous function call, or init in the case of the initial element. It traverses the array from left to right.</p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  2,
+  3,
+  5,
+  7,
+  11,
+  13,
+  17
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>{
+  sum: <strong>std.foldl</strong>(function(aggregate, num) aggregate + num, payload, 0)
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>{
+  "sum": 58
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_default_values"><a class="anchor" href="#_default_values"></a>Default Values</h3>
+<div class="paragraph">
+<p>One option to set fields with default values is to create an overlay object with default values and add your input objects to it. Consider the following example:</p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  {
+    "name": "Steve Jobs",
+    "company": "Apple"
+  },
+  {
+    "name": "Bill Gates",
+    "company": "Microsoft"
+  },
+  {
+    "name": "John Doe"
+  },
+  {
+    "name": "John Smith"
+  },
+  {
+    "company": "ACME Software"
+  }
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>local <strong>defaultValues</strong> = {
+    "name": "No Name",
+    "company": "N/A"
+};
+
+std.map(function(obj) <strong>defaultValues + obj</strong>, payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>[
+  {
+    "company": "Apple",
+    "name": "Steve Jobs"
+  },
+  {
+    "company": "Microsoft",
+    "name": "Bill Gates"
+  },
+  {
+    <strong>"company": "N/A"</strong>,
+    "name": "John Doe"
+  },
+  {
+    <strong>"company": "N/A"</strong>,
+    "name": "John Smith"
+  },
+  {
+    "company": "ACME Software",
+    <strong>"name": "No Name"</strong>
+  }
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_add_and_subtract_dates"><a class="anchor" href="#_add_and_subtract_dates"></a>Add and Subtract Dates</h3>
+<div class="paragraph">
+<p>DataSonnet uses ISO-8601 dates and periods. To add or subtract a number of years. months and days, use <code>DS.LocalDateTime.offset()</code> and <code>DS.ZonedDateTime.offset()</code> functions.</p>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>DS.LocalDateTime.offset("2019-07-22T21:00:00", "P1Y1D")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>2020-07-23T21:00:00</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>See <a href="https://docs.oracle.com/javase/8/docs/api/java/time/Period.html#parse-java.lang.CharSequence-">Java 8 Period documentation</a> for period format details and examples.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_creating_a_pivot_table"><a class="anchor" href="#_creating_a_pivot_table"></a>Creating a Pivot Table</h3>
+<div class="paragraph">
+<p>There are number of ways to pivot a table in DataSonnet. For example, <code>std.foldl</code> reduce function can be used:</p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  {
+    "name": "Steve Jobs",
+    "company": "Apple"
+  },
+  {
+    "name": "Bill Gates",
+    "company": "Microsoft"
+  },
+  {
+    "name": "John Doe"
+  },
+  {
+    "name": "John Smith"
+  },
+  {
+    "company": "ACME Software"
+  }
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>local overlay = {
+  "name": "No Name",
+  "company": "N/A"
+};
+
+local payloadWithDefaults = std.map(function(obj) overlay + obj, payload);
+
+{
+  names: std.foldl(function(aggregate, obj) aggregate + [obj.name], payloadWithDefaults, []),
+  companies: std.foldl(function(aggregate, obj) aggregate + [obj.company], payloadWithDefaults, []),
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>{
+  "companies": [
+    "Apple",
+    "Microsoft",
+    "N/A",
+    "N/A",
+    "ACME Software"
+  ],
+  "names": [
+    "Steve Jobs",
+    "Bill Gates",
+    "John Doe",
+    "John Smith",
+    "No Name"
+  ]
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_removing_fields_from_object"><a class="anchor" href="#_removing_fields_from_object"></a>Removing Fields from Object</h3>
+<div class="paragraph">
+<p>The field will not be included in the result object if its key is set to <code>null</code>. For example:</p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "account_id": "654",
+    "disabled": false,
+    "email_address": "wexler@modusbox.com",
+    "full_name": "Dave Wexler",
+    "generic": false,
+    "headline": "CEO",
+    "id": "789",
+    "photo": "n/a",
+    "update_whitelist": [
+        "full_name",
+        "headline",
+        "email_address",
+        "external_reference"
+    ]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>local removeFields = [ "photo", "generic", "disabled", "update_whitelist", "id" ];
+
+{
+    [ if std.count(removeFields, k) <= 0 then k else <strong>null</strong> ] : payload[k]
+    for k in std.objectFields(payload)
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>{
+    "account_id": "654",
+    "email_address": "wexler@modusbox.com",
+    "full_name": "Dave Wexler",
+    "headline": "CEO"
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>DS.Util.remove(object, key)</code> and <code>DS.Util.removeAll(object, arrayOfKeys)</code> functions provided for convenience:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre><strong>DS.Util.removeAll</strong>(payload, [ "photo", "generic", "disabled", "update_whitelist", "id" ])</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_finding_if_array_contains_value"><a class="anchor" href="#_finding_if_array_contains_value"></a>Finding If Array Contains Value</h3>
+<div class="paragraph">
+<p>For simple scenarios <code>std.count(arr, val) &gt; 0</code> will return <code>true</code> if an array contains the value. For more complex scenarios JsonPath can be used.</p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+   {
+      "language": {
+         "name": "Java",
+         "version": "1.8"
+      }
+   },
+   {
+      "language": {
+         "name": "Scala",
+         "version": "2.13.0"
+      }
+   }
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>local javaLanguages = DS.JsonPath.select(payload, "$..language[?(@.name == 'Java')]");
+
+std.length(javaLanguages) > 0</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_merging_objects_and_adding_fields_to_objects"><a class="anchor" href="#_merging_objects_and_adding_fields_to_objects"></a>Merging Objects and Adding Fields to Objects</h3>
+<div class="paragraph">
+<p>DataSonnet allows objects to be merged, i.e. there&#8217;s a <code>+</code> operation defined with the resulting object being a union of both objects. This allows adding fields to existing objects without having to map each field individually. For example:</p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "firstName": "Java",
+    "lastName": "Duke",
+    "title": "Duke of Java",
+    "addresses": [
+        {
+            "street1": "123 Foo",
+            "city": "Menlo Park"
+        }
+    ]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Mapping</div>
+<div class="content">
+<pre>payload + { "middleName": "NMN",
+            "addresses": [
+              addr + { "state": "CA" } for addr in payload.addresses
+            ]
+          }</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Output</div>
+<div class="content">
+<pre>{
+  "addresses": [
+    {
+      "city": "Menlo Park",
+      <strong>"state": "CA",</strong>
+      "street1": "123 Foo"
+    }
+  ],
+  "firstName": "Java",
+  "lastName": "Duke",
+  <strong>"middleName": "NMN",</strong>
+  "title": "Duke of Java"
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_reading_and_writing_xml"><a class="anchor" href="#_reading_and_writing_xml"></a>Reading and writing XML</h3>
+<div class="paragraph">
+<p>DataSonnet supports XML as an input and output format. <a href="headers.html" class="page">Headers</a> can be used to control the behavior of the mapper.</p>
+</div>
+<div class="sect3">
+<h4 id="_reading_xml"><a class="anchor" href="#_reading_xml"></a>Reading XML</h4>
+<div class="paragraph">
+<p>Let&#8217;s take the following XML input as an example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;test:root xmlns:test="http://www.datasonnet.com"&gt;
+    &lt;test:datasonnet version="1.0"&gt;Hello World&lt;/test:datasonnet&gt;
+&lt;/test:root&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The internal representation of this input in DataSonnet would be:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+  "test:root": {
+    "@xmlns": {
+      "test": "http://www.datasonnet.com"
+    },
+    "test:datasonnet": {
+      "@version": "1.0",
+      "$": "Hello World"
+    }
+  }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Our mapping can simply extract the value of the <code>&lt;test:datasonnet&gt;</code> elemeng, e.g.:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+  greeting: payload["test:root"]["test:datasonnet"]["$"]
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that <code>["<em>key</em>"]</code> syntax is used to look up the property instead of <code>.<em>key</em></code> syntax, because colon <code>:</code> cannot be used in the DataSonnet identifier. In addition, the text value of the element is mapped to a dollar sign <code>$</code> which is not a valid identifier either. Let&#8217;s use headers to fix this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>/** DataSonnet
+version=1.0
+input.payload.application/xml.NamespaceSeparator=_
+input.payload.application/xml.TextValueKey=__text
+*/
+
+{
+  greeting: payload.test_root.test_datasonnet.__text
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_writing_xml"><a class="anchor" href="#_writing_xml"></a>Writing XML</h4>
+<div class="paragraph">
+<p>To control the resulting XML, the <code>output</code> headers can be used. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>/** DataSonnet
+version=1.0
+output.application/xml.NamespaceDeclarations.datasonnet=http://www.modusbox.com
+output.application/xml.NamespaceSeparator=%
+output.application/xml.TextValueKey=__text
+output.application/xml.AttributeCharacter=*
+output.application/xml.XmlVersion=1.0
+*/
+
+{
+    "datasonnet%root": {
+        "*xmlns": {
+            "datasonnet": "http://www.modusbox.com"
+        },
+        "datasonnet%datasonnet": {
+            "*version": "1.0",
+            "__text": "Hello World"
+        }
+    }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For more information and details see <a href="headers.html" class="page">Headers</a> and <a href="dataformats.html#xml-format" class="page">XML Data Format</a> sections.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>XML can only contain one root element. That means the mapping must only contain one top-level key. For example, the folowing mapping cannot be written as XML:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+  key1: value1,
+  key2: value2
+}</pre>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_reading_and_writing_csv"><a class="anchor" href="#_reading_and_writing_csv"></a>Reading and writing CSV</h3>
+<div class="sect3">
+<h4 id="_reading_csv"><a class="anchor" href="#_reading_csv"></a>Reading CSV</h4>
+<div class="paragraph">
+<p>The CSV files are represented as arrays of arrays or arrays of maps (if the CSV contains headers). For example, if the CSV input is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>first_name,last_name,email
+Ryann,Thinn,rthinn0@seesaa.net
+Farley,Muckeen,fmuckeen1@macromedia.com
+Penelopa,Vasilic,pvasilic2@google.pl</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The mapping can access it as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+  firstPerson: {
+    firstName: payload[0]["first_name"], //Either "dot" or ["key"] notation can be used here
+    lastName: payload[0].last_name,
+    email: payload[0].email
+  }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Headers can be used to parse the CSV-like flat files. For example, the separator can be pipe <code>|</code> instead of comma and the file does not contain headers:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Ryann|Thinn|rthinn0@seesaa.net
+Farley|Muckeen|fmuckeen1@macromedia.com
+Penelopa|Vasilic|pvasilic2@google.pl</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In this case the headers are required:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>/** DataSonnet
+version=1.0
+input.payload.application/csv.UseHeader=false
+input.payload.application/csv.Separator=|
+*/
+
+{
+  firstPerson: {
+    firstName: payload[0][0],
+    lastName: payload[0][1],
+    email: payload[0][2]
+  }
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_writing_csv"><a class="anchor" href="#_writing_csv"></a>Writing CSV</h4>
+<div class="paragraph">
+<p>To produce a valid CSV, the mapping must result in array of arrays or array of objects with identical keys (in this case the keys from the first object will be used as CSV headers). Header can be used to override the default CSV file generation, i.e. set custom separator, quote character, etc. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>/** DataSonnet
+version=1.0
+output.application/csv.UseHeader=false
+output.application/csv.Quote='
+output.application/csv.Separator=|
+*/
+[
+  [
+    "William",
+    "Shakespeare",
+    "Hamlet"
+  ],
+  [
+    "Christopher",
+    "Marlowe",
+    "Doctor Faustus"
+  ]
+]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>produces the following CSV:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>'William'|'Shakespeare'|'Hamlet'
+'Christopher'|'Marlow'|'Doctor Faustus'</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For more information and details see <a href="headers.html" class="page">Headers</a> and <a href="dataformats.html#csv-format" class="page">CSV Data Format</a> sections.</p>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../_/js/site.js"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

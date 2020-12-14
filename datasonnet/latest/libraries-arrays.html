@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: DataSonnet Mapper Documentation</title>
+    <link rel="canonical" href="https://MS3Inc.github.io/datasonnet-mapper/datasonnet/latest/libraries-arrays.html">
+    <meta name="generator" content="Antora 2.3.3">
+    <link rel="stylesheet" href="../../_/css/site.css">
+    <script>var uiRootPath = '../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://MS3Inc.github.io/datasonnet-mapper">DataSonnet Mapper Documentation</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Resources</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Resource A</a>
+            <a class="navbar-item" href="#">Resource B</a>
+            <a class="navbar-item" href="#">Resource C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="datasonnet" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">DataSonnet</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="index.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="quickstart.html">Quick Start</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="dataformats.html">Data Formats</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="headers.html">DataSonnet Header</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jsonnet-doc.html">Standard Library Documentation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Additional DataSonnet Libraries</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-core.html">Core</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="libraries-arrays.html">Arrays</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-binaries.html">Binaries</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-crypto.html">Crypto</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-datetime.html">Datetime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-jsonpath.html">JsonPath</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-localdatetime.html">LocalDateTime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-math.html">Math</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-numbers.html">Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-objects.html">Objects</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-regex.html">Regex</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-strings.html">Strings</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-url.html">Url</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="cli.html">Command Line Interface</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="jar-cli.html">Using the CLI via a Jar</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="docker-cli.html">Using the CLI via Docker</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="cookbook.html">Cookbook</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jar-lib.html">Using DataSonnet Programmatically</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="#intellij:ROOT:index.adoc">IntelliJ Plugin</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">DataSonnet</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="index.html">DataSonnet</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">DataSonnet</a></li>
+    <li>Additional DataSonnet Libraries</li>
+    <li><a href="libraries-arrays.html">Arrays</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/libraries-arrays.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<div class="sect1">
+<h2 id="_arrays"><a class="anchor" href="#_arrays"></a>arrays</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_countbyarray_arr_function_func"><a class="anchor" href="#_countbyarray_arr_function_func"></a><code>countBy(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Returns the number of items in <code>arr</code> that passes the condition of <code>func</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the value as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+    1,
+    2,
+    3,
+    4,
+    5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.countBy(payload, function(item) item &gt; 2)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>3</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_deepflattenarray_arr"><a class="anchor" href="#_deepflattenarray_arr"></a><code>deepFlatten(array arr)</code></h3>
+<div class="paragraph">
+<p>Given <code>arr</code>, which contains one level and multi level arrays, returns a flat array.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  [
+    1,
+    2
+  ],
+  [
+    3,
+    4,
+    [
+      5,
+      6
+    ]
+  ]
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.deepFlatten(payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5,
+  6
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_dividebyarray_arr_number_size"><a class="anchor" href="#_dividebyarray_arr_number_size"></a><code>divideBy(array arr, number size)</code></h3>
+<div class="paragraph">
+<p>Divides a single array <code>arr</code> into multiple arrays, limiting each one to <code>size</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.divideBy(payload, 2)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  [
+    1,
+    2
+  ],
+  [
+    3,
+    4
+  ],
+  [
+    5
+  ]
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_droparray_arr_number_index"><a class="anchor" href="#_droparray_arr_number_index"></a><code>drop(array arr, number index)</code></h3>
+<div class="paragraph">
+<p>Removes every item in <code>arr</code> until the specified <code>index</code> is reached.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.drop(payload, 3)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  4,
+  5
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_dropwhilearray_arr_function_func"><a class="anchor" href="#_dropwhilearray_arr_function_func"></a><code>dropWhile(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Removes every item in <code>arr</code> until <code>func</code> returns a false result, then stops.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the item as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.dropWhile(payload, function(item) item &lt; 3)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_duplicatesarray_arr"><a class="anchor" href="#_duplicatesarray_arr"></a><code>duplicates(array arr)</code></h3>
+<div class="paragraph">
+<p>Returns the values that exist more than once in <code>arr</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  1,
+  2
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.duplicates(payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  1
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_everyarray_arr_function_func"><a class="anchor" href="#_everyarray_arr_function_func"></a><code>every(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Returns true if every value <code>arr</code> returns true in <code>func</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the item as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.every(payload, function(item) item &gt; 0)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_firstwitharray_arr_function_func"><a class="anchor" href="#_firstwitharray_arr_function_func"></a><code>firstWith(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Returns the first value that passes the condition of <code>func</code> then stops.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the value as the first parameter (required) and the index as the second (optional).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.firstWith(payload, function(item,index) item == index + 1)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>1</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_indexofarray_arr_any_value"><a class="anchor" href="#_indexofarray_arr_any_value"></a><code>indexOf(array arr, any value)</code></h3>
+<div class="paragraph">
+<p>Returns the current index of the matching <code>value</code> in <code>arr</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.indexOf(payload, 3)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>2</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_indexwherearray_arr_function_func"><a class="anchor" href="#_indexwherearray_arr_function_func"></a><code>indexWhere(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Returns the first index where the condition of <code>func</code> passes.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the item as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.indexWhere(payload, function(item) item == 3)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>2</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_joinarray_arrl_array_arrr_function_funcl_function_funcr"><a class="anchor" href="#_joinarray_arrl_array_arrr_function_funcl_function_funcr"></a><code>join(array arrL, array arrR, function funcL, function funcR)</code></h3>
+<div class="paragraph">
+<p>Joins two arrays together, returns the items of <code>arrL</code> with the items that match from <code>arrR</code>.</p>
+</div>
+<div class="paragraph">
+<p>Both functions <code>funcL</code> and <code>funcR</code> are expected to take the item as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "countries": [
+      {
+        "id": 1,
+        "name":"Spain"
+      },
+      {
+        "id": 2,
+        "name":"France"
+      },
+      {
+        "id": 3,
+        "name":"Germany"
+      }
+    ],
+    "languages": [
+      {
+        "countryId": 1,
+        "name":"Spanish"
+      },
+      {
+        "countryId": 2,
+        "name":"French"
+      },
+      {
+        "countryId": 4,
+        "name":"Danish"
+      }
+    ]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.join(
+    payload.countries,
+    payload.languages,
+    function(item) item.id,
+    function(item) item.countryId
+)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  {
+    "r": {
+      "countryId": 1,
+      "name": "Spanish"
+    },
+    "l": {
+      "id": 1,
+      "name": "Spain"
+    }
+  },
+  {
+    "r": {
+      "countryId": 2,
+      "name": "French"
+    },
+    "l": {
+      "id": 2,
+      "name": "France"
+    }
+  }
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_leftjoinarray_arrl_array_arrr_function_funcl_function_funcr"><a class="anchor" href="#_leftjoinarray_arrl_array_arrr_function_funcl_function_funcr"></a><code>leftJoin(array arrL, array arrR, function funcL, function funcR)</code></h3>
+<div class="paragraph">
+<p>Joins two arrays together, returns all of the items of <code>arrL</code>, with the items that match from <code>arrR</code>.</p>
+</div>
+<div class="paragraph">
+<p>Both functions <code>funcL</code> and <code>funcR</code> are expected to take the item as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "countries": [
+      {
+        "id": 1,
+        "name":"Spain"
+      },
+      {
+        "id": 2,
+        "name":"France"
+      },
+      {
+        "id": 3,
+        "name":"Germany"
+      }
+    ],
+    "languages": [
+      {
+        "countryId": 1,
+        "name":"Spanish"
+      },
+      {
+        "countryId": 2,
+        "name":"French"
+      },
+      {
+        "countryId": 4,
+        "name":"Danish"
+      }
+    ]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.leftJoin(
+    payload.countries,
+    payload.languages,
+    function(item) item.id,
+    function(item) item.countryId
+)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  {
+    "r": {
+      "countryId": 1,
+      "name": "Spanish"
+    },
+    "l": {
+      "id": 1,
+      "name": "Spain"
+    }
+  },
+  {
+    "r": {
+      "countryId": 2,
+      "name": "French"
+    },
+    "l": {
+      "id": 2,
+      "name": "France"
+    }
+  },
+  {
+    "l": {
+      "id": 3,
+      "name": "Germany"
+    }
+  }
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_outerjoinarray_arrl_array_arrr_function_funcl_function_funcr"><a class="anchor" href="#_outerjoinarray_arrl_array_arrr_function_funcl_function_funcr"></a><code>outerJoin(array arrL, array arrR, function funcL, function funcR)</code></h3>
+<div class="paragraph">
+<p>Joins two arrays together, returns the items of <code>arrL</code> with the items that match from <code>arrR</code>, the items from <code>arrL</code> that don&#8217;t have matches, and items from <code>arrR</code> that don&#8217;t have matches.</p>
+</div>
+<div class="paragraph">
+<p>Both functions <code>funcL</code> and <code>funcR</code> are expected to take the item as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "countries": [
+      {
+        "id": 1,
+        "name":"Spain"
+      },
+      {
+        "id": 2,
+        "name":"France"
+      },
+      {
+        "id": 3,
+        "name":"Germany"
+      }
+    ],
+    "languages": [
+      {
+        "countryId": 1,
+        "name":"Spanish"
+      },
+      {
+        "countryId": 2,
+        "name":"French"
+      },
+      {
+        "countryId": 4,
+        "name":"Danish"
+      }
+    ]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.outerJoin(
+    payload.countries,
+    payload.languages,
+    function(item) item.id,
+    function(item) item.countryId
+)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  {
+    "r": {
+      "countryId": 1,
+      "name": "Spanish"
+    },
+    "l": {
+      "id": 1,
+      "name": "Spain"
+    }
+  },
+  {
+    "r": {
+      "countryId": 2,
+      "name": "French"
+    },
+    "l": {
+      "id": 2,
+      "name": "France"
+    }
+  },
+  {
+    "l": {
+      "id": 3,
+      "name": "Germany"
+    }
+  },
+  {
+    "r": {
+      "countryId": 4,
+      "name": "Danish"
+    }
+  }
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_occurrencesarray_arr_function_func"><a class="anchor" href="#_occurrencesarray_arr_function_func"></a><code>occurrences(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Returns an object where the keys of the object are the result of <code>func</code> and the values of the object indicate how many times the key occurs in <code>arr</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the value as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  "a",
+  "a",
+  "b",
+  "b",
+  "b",
+  "c"
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.occurrences(payload, function(item) item)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "a": 2,
+  "b": 3,
+  "c": 1
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_partitionarray_arr_function_func"><a class="anchor" href="#_partitionarray_arr_function_func"></a><code>partition(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Splits <code>arr</code> into two arrays of successes and failures from the results of <code>func</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the value as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.partition(payload, function(item) item &gt; 3)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "success": [
+    4,
+    5
+  ],
+  "failure": [
+    1,
+    2,
+    3
+  ]
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_slicearray_arr_number_start_number_end"><a class="anchor" href="#_slicearray_arr_number_start_number_end"></a><code>slice(array arr, number start, number end)</code></h3>
+<div class="paragraph">
+<p>Returns a subset of <code>arr</code> between the indexes of <code>start</code> and <code>end</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.slice(payload, 2, 4)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  3,
+  4
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_somearray_arr_function_func"><a class="anchor" href="#_somearray_arr_function_func"></a><code>some(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Returns true if at least one item in <code>arr</code> passes the condition in <code>func</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the item as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.some(payload, function(item) item &gt; 2)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_splitatarray_arr_number_index"><a class="anchor" href="#_splitatarray_arr_number_index"></a><code>splitAt(array arr, number index)</code></h3>
+<div class="paragraph">
+<p>Splits <code>arr</code> into a left and right array based on the <code>index</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.splitAt(payload, 3)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "r": [
+    4,
+    5
+  ],
+  "l": [
+    1,
+    2,
+    3
+  ]
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_splitwherearray_arr_function_func"><a class="anchor" href="#_splitwherearray_arr_function_func"></a><code>splitWhere(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Splits <code>arr</code> into a left and right array based on the first index that returns true for <code>func</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the item as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.splitWhere(payload, function(item) item &gt; 3)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "r": [
+    4,
+    5
+  ],
+  "l": [
+    1,
+    2,
+    3
+  ]
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sumbyarray_arr_function_func"><a class="anchor" href="#_sumbyarray_arr_function_func"></a><code>sumBy(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Calculates the sum of <code>arr</code> by the function provided value.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the item as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.sumBy(payload, function(item) item)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>15</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_takearray_arr_number_index"><a class="anchor" href="#_takearray_arr_number_index"></a><code>take(array arr, number index)</code></h3>
+<div class="paragraph">
+<p>Returns all values from <code>arr</code> up to the <code>index</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.take(payload, 3)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_takewhilearray_arr_function_func"><a class="anchor" href="#_takewhilearray_arr_function_func"></a><code>takeWhile(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Takes all items from the array while <code>func</code> is true. Stops at the first false value.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the value as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4,
+  5
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.arrays.takeWhile(payload, function(item) item &lt; 3)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  1,
+  2
+]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../_/js/site.js"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

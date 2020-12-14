@@ -1,0 +1,2484 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Untitled :: DataSonnet Mapper Documentation</title>
+    <link rel="canonical" href="https://MS3Inc.github.io/datasonnet-mapper/datasonnet/latest/libraries-core.html">
+    <meta name="generator" content="Antora 2.3.3">
+    <link rel="stylesheet" href="../../_/css/site.css">
+    <script>var uiRootPath = '../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://MS3Inc.github.io/datasonnet-mapper">DataSonnet Mapper Documentation</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Resources</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Resource A</a>
+            <a class="navbar-item" href="#">Resource B</a>
+            <a class="navbar-item" href="#">Resource C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="datasonnet" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">DataSonnet</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="index.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="quickstart.html">Quick Start</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="dataformats.html">Data Formats</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="headers.html">DataSonnet Header</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jsonnet-doc.html">Standard Library Documentation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Additional DataSonnet Libraries</span>
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="libraries-core.html">Core</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-arrays.html">Arrays</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-binaries.html">Binaries</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-crypto.html">Crypto</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-datetime.html">Datetime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-jsonpath.html">JsonPath</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-localdatetime.html">LocalDateTime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-math.html">Math</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-numbers.html">Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-objects.html">Objects</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-regex.html">Regex</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-strings.html">Strings</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-url.html">Url</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="cli.html">Command Line Interface</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="jar-cli.html">Using the CLI via a Jar</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="docker-cli.html">Using the CLI via Docker</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="cookbook.html">Cookbook</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jar-lib.html">Using DataSonnet Programmatically</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="#intellij:ROOT:index.adoc">IntelliJ Plugin</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">DataSonnet</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="index.html">DataSonnet</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">DataSonnet</a></li>
+    <li>Additional DataSonnet Libraries</li>
+    <li><a href="libraries-core.html">Core</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/libraries-core.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<div class="sect1">
+<h2 id="_core"><a class="anchor" href="#_core"></a>core</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_appendarray_arr_any_val"><a class="anchor" href="#_appendarray_arr_any_val"></a><code>append(array arr, any val)</code></h3>
+<div class="paragraph">
+<p>Given <code>arr</code> and <code>val</code>, appends <code>val</code> to the end of <code>arr</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+    2,
+    3,
+    5,
+    7
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.append(payload, 11)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  2,
+  3,
+  5,
+  7,
+  11
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_combineany_first_any_second"><a class="anchor" href="#_combineany_first_any_second"></a><code>combine(any first, any second)</code></h3>
+<div class="paragraph">
+<p>Combines <code>first</code> and <code>second</code>. Some values will auto-coerce, e.g. the number 5 will auto coerce to the string "5."</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    string: ds.combine("Hello ", "World"),
+    number: ds.combine(5, 7),
+    auto1: ds.combine("Hello ", 5),
+    auto2: ds.combine(5, "10"),
+    array: ds.combine([1,2], [3,4]),
+    obj: ds.combine({a:1}, {b:2})
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "string": "Hello World",
+  "number": "57",
+  "auto1": "Hello 5",
+  "auto2": "510",
+  "array": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "obj": {
+    "a": 1,
+    "b": 2
+  }
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_containsarraystring_item_any_val"><a class="anchor" href="#_containsarraystring_item_any_val"></a><code>contains(array|string item, any val)</code></h3>
+<div class="paragraph">
+<p>If <code>item</code> is an array, returns true if <code>item</code> contains <code>val</code>.</p>
+</div>
+<div class="paragraph">
+<p>If <code>item</code> is a string, returns true if <code>item</code> contains the sub string <code>val</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+    2,
+    3,
+    5,
+    7
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.contains(payload, 2)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_distinctbyarrayobject_item_function_discriminator"><a class="anchor" href="#_distinctbyarrayobject_item_function_discriminator"></a><code>distinctBy(array|object item, function discriminator)</code></h3>
+<div class="paragraph">
+<p>Returns a new object containing only the items that are a unique result from <code>discriminator</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>discriminator</code> is expected to take the value as the first parameter (required) and the index as the second (optional).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+  "array": [
+    1,
+    1,
+    2,
+    2,
+    3,
+    3,
+    4,
+    4,
+    5
+  ],
+  "obj": {
+    "a": 1,
+    "b": 2,
+    "c": 1
+  }
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    array: ds.distinctBy(payload.array, function(item,index) item),
+    obj: ds.distinctBy(payload.obj, function(value,key) value)
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "array": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "obj": {
+    "a": 1,
+    "b": 2
+  }
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_endswithstring_str_string_substr"><a class="anchor" href="#_endswithstring_str_string_substr"></a><code>endsWith(string str, string subStr)</code></h3>
+<div class="paragraph">
+<p>Returns true if <code>str</code> ends with <code>subStr</code>. Ignores casing.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "name": "Scala",
+    "version": "1.0"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.endsWith(payload.version, ".0")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_entriesofobject_obj"><a class="anchor" href="#_entriesofobject_obj"></a><code>entriesOf(object obj)</code></h3>
+<div class="paragraph">
+<p>Returns an array of objects describing each key value pair of <code>obj</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "name": "Scala",
+    "version": "1.0"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.entriesOf(payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  {
+    "value": "Scala",
+    "key": "name"
+  },
+  {
+    "value": "1.0",
+    "key": "version"
+  }
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_filterarray_arr_function_func"><a class="anchor" href="#_filterarray_arr_function_func"></a><code>filter(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Filters <code>arr</code> depending on the result of <code>func</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the value as the first parameter (required) and the index as the second (optional).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+    1,
+    2,
+    3,
+    4
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.filter(payload, function(value, index) value &lt; 3)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  1,
+  2
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_filterobjectobject_obj_function_func"><a class="anchor" href="#_filterobjectobject_obj_function_func"></a><code>filterObject(object obj, function func)</code></h3>
+<div class="paragraph">
+<p>Filters <code>obj</code> depending on the result of <code>func</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the property value as the first parameter (required), the property key as the second (optional) and the index as the third (optional).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "version": 1.7
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.filterObject(payload, function(value, key, index) value &gt; 1.5)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "version": 1.7
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_findstringarray_item_any_val"><a class="anchor" href="#_findstringarray_item_any_val"></a><code>find(string|array item, any val)</code></h3>
+<div class="paragraph">
+<p>Returns an array containing the location where <code>val</code> occurs in <code>item</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "string": "Hello World",
+    "array": [1,2,3,4]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    string: ds.find(payload.string, "World"),
+    array: ds.find(payload.array, 3)
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "string": [6],
+  "array": [2]
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_flattenarray_arr"><a class="anchor" href="#_flattenarray_arr"></a><code>flatten(array arr)</code></h3>
+<div class="paragraph">
+<p>Given <code>arr</code>, which contains one level arrays, creates a flat array.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  [
+    1,
+    2
+  ],
+  [
+    3,
+    4
+  ]
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.flatten(payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_flatmaparray_arr_function_func"><a class="anchor" href="#_flatmaparray_arr_function_func"></a><code>flatMap(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Given an array of arrays <code>arr</code>, creates a flat array using the outcome of <code>func</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the value as the first parameter (required) and the index as the second (optional).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+    [
+        2,
+        3,
+        5,
+        7
+    ],
+    [
+        11,
+        13,
+        17,
+        19
+    ]
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.flatMap(payload, function(value, index) value)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  2,
+  3,
+  5,
+  7,
+  11,
+  13,
+  17,
+  19
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_foldleftarray_arr_any_initval_function_func"><a class="anchor" href="#_foldleftarray_arr_any_initval_function_func"></a><code>foldLeft(array arr, any initVal, function func)</code></h3>
+<div class="paragraph">
+<p>Iterates over <code>arr</code>, applying <code>func</code> to the previous result. Starts with the value provided in <code>initVal</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the current value as the first parameter (required) and the previous value as the second parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+    1,
+    2,
+    3,
+    4
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.foldLeft(payload, 1, function(curr, prev) curr * prev)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>24
+/*
+  1 * 1 = 1
+  2 * 1 = 2
+  3 * 2 = 6
+  4 * 6 = 24
+*/</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_foldrightarray_arr_any_initval_function_func"><a class="anchor" href="#_foldrightarray_arr_any_initval_function_func"></a><code>foldRight(array arr, any initVal, function func)</code></h3>
+<div class="paragraph">
+<p>Iterates backwards over an array, applying <code>func</code> to the previous result. Starts with the value provided in <code>initVal</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the current value as the first parameter (required) and the previous value as the second parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+    1,
+    2,
+    3,
+    4
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.foldRight(payload, 1, function(curr, prev) curr * prev)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>24
+/*
+  4 * 1 = 4 // 1 in this case is the initial value
+  3 * 4 = 12
+  2 * 12 = 24
+  1 * 24 = 24
+*/</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_groupbyarrayobject_items_function_discriminator"><a class="anchor" href="#_groupbyarrayobject_items_function_discriminator"></a><code>groupBy(array|object items, function discriminator)</code></h3>
+<div class="paragraph">
+<p>Groups the provided <code>items</code> into an object based on the result of <code>discriminator</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>discriminator</code> is expected to take the value as the first parameter (required) and the index as the second (optional).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "array": [
+        "a",
+        "b",
+        "a"
+    ],
+    "obj": {
+        "a":"Alpha",
+        "b":"Bravo",
+        "c": "Alpha"
+    }
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    array: ds.groupBy(payload.array, function(item,index) item ),
+    obj: ds.groupBy(payload.obj, function(value,key) value)
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "array": {
+    "a": [
+      "a",
+      "a"
+    ],
+    "b": [
+      "b"
+    ]
+  },
+  "obj": {
+    "Alpha": {
+      "a": "Alpha",
+      "c": "Alpha"
+    },
+    "Bravo": {
+      "b": "Bravo"
+    }
+  }
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isarrayany_valtocheck"><a class="anchor" href="#_isarrayany_valtocheck"></a><code>isArray(any valToCheck)</code></h3>
+<div class="paragraph">
+<p>Accepts any given value as <code>valToCheck</code> and checks if it is of type array.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+    1,
+    2,
+    3,
+    4
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.isArray(payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isblankstring_strtocheck"><a class="anchor" href="#_isblankstring_strtocheck"></a><code>isBlank(string strToCheck)</code></h3>
+<div class="paragraph">
+<p>Checks if <code>strToCheck</code> is blank. Also returns true if null.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    str1: ds.isBlank("     "),
+    str2: ds.isBlank(""),
+    'null': ds.isBlank(null)
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "str1": true,
+  "str2": true,
+  "null": true
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isbooleanany_valtocheck"><a class="anchor" href="#_isbooleanany_valtocheck"></a><code>isBoolean(any valToCheck)</code></h3>
+<div class="paragraph">
+<p>Accepts any given value as <code>valToCheck</code> and checks if it is of type bool.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+  "name": "Java",
+  "isObjectOriented": true
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.isBoolean(payload.isObjectOriented)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isdecimalnum_numtocheck"><a class="anchor" href="#_isdecimalnum_numtocheck"></a><code>isDecimal(num numToCheck)</code></h3>
+<div class="paragraph">
+<p>Checks that the input number <code>numToCheck</code> is a decimal number. Trailing zeros are ignored.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    a: ds.isDecimal(2),
+    b: ds.isDecimal(2.0),
+    c: ds.isDecimal(2.1),
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "a": false,
+  "b": false,
+  "c": true
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isemptyany_valtocheck"><a class="anchor" href="#_isemptyany_valtocheck"></a><code>isEmpty(any valToCheck)</code></h3>
+<div class="paragraph">
+<p>Checks if <code>valToCheck</code> is empty. Does not ignore white space if string. Returns true if null.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    "null": ds.isEmpty(null),
+    str: ds.isEmpty("    "),
+    array: ds.isEmpty([]),
+    obj: ds.isEmpty({})
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "null": true,
+  "str": false,
+  "array": true,
+  "obj": true
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isevennum_numtocheck"><a class="anchor" href="#_isevennum_numtocheck"></a><code>isEven(num numToCheck)</code></h3>
+<div class="paragraph">
+<p>Checks that the input number <code>numToCheck</code> is an even number.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "version": 2.0
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.isEven(payload.version)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isfunctionany_valtocheck"><a class="anchor" href="#_isfunctionany_valtocheck"></a><code>isFunction(any valToCheck)</code></h3>
+<div class="paragraph">
+<p>Accepts any given value <code>valToCheck</code> and checks if it is of type function.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.isFunction(function() "5")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isintegernum_numtocheck"><a class="anchor" href="#_isintegernum_numtocheck"></a><code>isInteger(num numToCheck)</code></h3>
+<div class="paragraph">
+<p>Checks that the input number <code>numToCheck</code> is an integer. Trailing zeros are ignored.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "version": 2.0
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.isInteger(payload.version)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isnumberany_valtocheck"><a class="anchor" href="#_isnumberany_valtocheck"></a><code>isNumber(any valToCheck)</code></h3>
+<div class="paragraph">
+<p>Accepts any given value <code>valToCheck</code> and checks if it is of type number.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "age": 5
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.isNumber(payload.age)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isobjectany_valtocheck"><a class="anchor" href="#_isobjectany_valtocheck"></a><code>isObject(any valToCheck)</code></h3>
+<div class="paragraph">
+<p>Accepts any given value <code>valToCheck</code> and checks if it is of type object.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "language": "Java"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.isObject(payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isoddnum_numtocheck"><a class="anchor" href="#_isoddnum_numtocheck"></a><code>isOdd(num numToCheck)</code></h3>
+<div class="paragraph">
+<p>Checks that <code>numToCheck</code> is an odd number.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "age": 5
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.isOdd(payload.age)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_isstringany_valtocheck"><a class="anchor" href="#_isstringany_valtocheck"></a><code>isString(any valToCheck)</code></h3>
+<div class="paragraph">
+<p>Accepts any given value <code>valToCheck</code> and checks if it is of type string.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "language":"Java"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.isString(payload.language)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_joinbyarray_arr_string_separator"><a class="anchor" href="#_joinbyarray_arr_string_separator"></a><code>joinBy(array arr, string separator)</code></h3>
+<div class="paragraph">
+<p>Joins <code>arr</code> into a string with the provided <code>separator</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "versions": [1.0, 1.2, 1.7, 1.8]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.joinBy(payload.versions, ", ")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"1, 1.2, 1.7, 1.8"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_keysofobject_obj"><a class="anchor" href="#_keysofobject_obj"></a><code>keysOf(object obj)</code></h3>
+<div class="paragraph">
+<p>Returns an array of all the key names in <code>obj</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+   "departureDate": "01/20/2019",
+   "origin": "PHX",
+   "destination": "SEA"
+ }</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.keysOf(payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  "departureDate",
+  "origin",
+  "destination"
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_lowerstring_str"><a class="anchor" href="#_lowerstring_str"></a><code>lower(string str)</code></h3>
+<div class="paragraph">
+<p>Converts <code>str</code> to all lower case characters.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+   "origin": "PHX",
+   "destination": "SEA"
+ }</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.lower(payload.origin)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"phx"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_maparray_arr_function_func"><a class="anchor" href="#_maparray_arr_function_func"></a><code>map(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Loops through all items in <code>arr</code>, applies <code>func</code> to each, and returns a new array containing each result. Returns null if <code>arr</code> is null.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the value as the first parameter (required) and the index as the second (optional).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "versions": [1.0, 1.2, 1.7, 1.8]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.map(payload.versions, function(value, index) value &gt; 1.2)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  false,
+  false,
+  true,
+  true
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mapentriesobject_obj_function_func"><a class="anchor" href="#_mapentriesobject_obj_function_func"></a><code>mapEntries(object obj, function func)</code></h3>
+<div class="paragraph">
+<p>Loops through all properties in <code>obj</code>, applies <code>func</code> to each, and returns a new array containing each result.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the property value as the first parameter (required), the property key as the second (optional) and the index as the third (optional).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+   "origin": "PHX",
+   "destination": "SEA"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.mapEntries(payload, function(value, key, index) value)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  "PHX",
+  "SEA"
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_mapobjectobject_obj_function_func"><a class="anchor" href="#_mapobjectobject_obj_function_func"></a><code>mapObject(object obj, function func)</code></h3>
+<div class="paragraph">
+<p>Loops through all properties in <code>obj</code>, applies <code>func</code> to each, and returns a new object containing each result.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the property value as the first parameter (required), the property key as the second (optional) and the index as the third (optional).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+   "origin": "PHX",
+   "destination": "SEA"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.mapObject(payload, function(value, key, index) {[key]:value})</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "origin": "PHX",
+  "destination": "SEA"
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_matchstring_str_string_regex"><a class="anchor" href="#_matchstring_str_string_regex"></a><code>match(string str, string regex)</code></h3>
+<div class="paragraph">
+<p>Executes the regex expression <code>regex</code> against <code>str</code> and returns an array with the match groups.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "email": "test@server.com"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.match(payload.email, "(.*)@(.*)(.com)")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  "test@server.com",
+  "test",
+  "server",
+  ".com"
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_matchesstring_str_string_regex"><a class="anchor" href="#_matchesstring_str_string_regex"></a><code>matches(string str, string regex)</code></h3>
+<div class="paragraph">
+<p>Executes the regex expression <code>regex</code> against <code>str</code> and returns <code>true</code> or <code>false</code> if the expression matches the input.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "email": "test@server.com"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.matches(payload.email, "(.*)@(.*)(.com)")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_maxarray_arr"><a class="anchor" href="#_maxarray_arr"></a><code>max(array arr)</code></h3>
+<div class="paragraph">
+<p>Returns the max value in <code>arr</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+    5,
+    2,
+    7,
+    3
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.max(payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>7</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_maxbyarray_arr_function_func"><a class="anchor" href="#_maxbyarray_arr_function_func"></a><code>maxBy(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Returns the max result of <code>func</code> in <code>arr</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the value as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+    {"age": 5},
+    {"age": 7},
+    {"age": 3}
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.maxBy(payload, function(value) value.age)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "age": 7
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_minarray_arr"><a class="anchor" href="#_minarray_arr"></a><code>min(array arr)</code></h3>
+<div class="paragraph">
+<p>Returns the min value in <code>arr</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+    5,
+    2,
+    7,
+    3
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.min(payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>2</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_minbyarray_arr_function_func"><a class="anchor" href="#_minbyarray_arr_function_func"></a><code>minBy(array arr, function func)</code></h3>
+<div class="paragraph">
+<p>Returns the max result of <code>func</code> in <code>arr</code>.</p>
+</div>
+<div class="paragraph">
+<p>The function <code>func</code> is expected to take the value as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+    {"age": 5},
+    {"age": 7},
+    {"age": 3}
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.minBy(payload, function(value) value.age)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "age": 3
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_orderbyarrayobject_items_function_func"><a class="anchor" href="#_orderbyarrayobject_items_function_func"></a><code>orderBy(array|object items, function func)</code></h3>
+<div class="paragraph">
+<p>Reorders the array <code>items</code> by the result of <code>func</code>.</p>
+</div>
+<div class="paragraph">
+<p>If <code>items</code> is an array: the function <code>func</code> is expected to take the value as the first parameter (required).</p>
+</div>
+<div class="paragraph">
+<p>If <code>items</code> is an object: the function <code>func</code> is expected to take the value as the first parameter (required) and the key as the second parameter (optional).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+    {"age": 5},
+    {"age": 7},
+    {"age": 3}
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.orderBy(payload, function(value) value.age)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  {
+    "age": 3
+  },
+  {
+    "age": 5
+  },
+  {
+    "age": 7
+  }
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_parsedoublestring_str"><a class="anchor" href="#_parsedoublestring_str"></a><code>parseDouble(string str)</code></h3>
+<div class="paragraph">
+<p>Parses a string <code>str</code> containing a number and returns its decimal value. Trailing zeros are ignored.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "version":"1.5"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.parseDouble(payload.version)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>1.5</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_parsehexstring_str"><a class="anchor" href="#_parsehexstring_str"></a><code>parseHex(string str)</code></h3>
+<div class="paragraph">
+<p>Parses a hex value given as a string <code>str</code> and returns its decimal value.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "hex":"F"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.parseHex(payload.hex)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>15</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_parseintstring_str"><a class="anchor" href="#_parseintstring_str"></a><code>parseInt(string str)</code></h3>
+<div class="paragraph">
+<p>Parses an int value given as a string <code>str</code> and returns its integer value.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "number":"50"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.parseInt(payload.number)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>50</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_parseoctalstring_str"><a class="anchor" href="#_parseoctalstring_str"></a><code>parseOctal(string str)</code></h3>
+<div class="paragraph">
+<p>Parses an octal value given as a string <code>str</code> and returns its integer value.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "octal":"107136"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.parseOctal(payload.octal)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>36446</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_prependarray_arr_any_val"><a class="anchor" href="#_prependarray_arr_any_val"></a><code>prepend(array arr, any val)</code></h3>
+<div class="paragraph">
+<p>Given <code>arr</code> and <code>val</code>, inserts <code>val</code> at the beginning of <code>arr</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+    2,
+    3,
+    4
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.prepend(payload, 1)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  1,
+  2,
+  3,
+  4
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_rangenumber_start_number_end"><a class="anchor" href="#_rangenumber_start_number_end"></a><code>range(number start, number end)</code></h3>
+<div class="paragraph">
+<p>Returns an array with the numbers from the <code>start</code> to the <code>end</code> of the range, inclusive.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "start": 0,
+    "end": 3
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.range(payload.start, payload.end)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  0,
+  1,
+  2,
+  3
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_readstring_data_string_mimetype_object_params"><a class="anchor" href="#_readstring_data_string_mimetype_object_params"></a><code>read(string data, string mimeType, object params)</code></h3>
+<div class="paragraph">
+<p>Reads a string <code>data</code> as the given <code>mimetype</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.read("{\"price\": 8.95}", "application/json", {})</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "price": 8.95
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_readurlstring_url"><a class="anchor" href="#_readurlstring_url"></a><code>readUrl(string url)</code></h3>
+<div class="paragraph">
+<p>Reads <code>url</code> and returns the content of the url, if it&#8217;s JSON.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.readUrl("http://httpbin.org/get")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "args": {},
+  "headers": {
+    "Accept": "text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2",
+    "Host": "httpbin.org",
+    "User-Agent": "Java/14.0.1",
+    "X-Amzn-Trace-Id": "Root=1-5f7f568d-481e623471c21cc2686e53e8"
+  },
+  "origin": "69.250.49.68",
+  "url": "http://httpbin.org/get"
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_removearrayobject_item_stringarray_value"><a class="anchor" href="#_removearrayobject_item_stringarray_value"></a><code>remove(array|object item, string|array value)</code></h3>
+<div class="paragraph">
+<p>Removes <code>value</code> from <code>item</code> and returns the remaining array or object.
+All properties of the object can be removed using a <code>value</code> in the array format.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "array": [
+        1,
+        2,
+        3,
+        4
+    ],
+    "obj": {
+        "a": 1,
+        "b": 2
+    }
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+  array: ds.remove(payload.array, 3),
+  obj: ds.remove(payload.obj, "b"),
+  emptyObj: ds.remove(payload.obj, ["a","b"])
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "array": [
+    1,
+    2,
+    4
+  ],
+  "obj": {
+    "a": 1
+  },
+  "emptyObj": {}
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_removematcharrayobject_items_any_val"><a class="anchor" href="#_removematcharrayobject_items_any_val"></a><code>removeMatch(array|object items, any val)</code></h3>
+<div class="paragraph">
+<p>Given an array or an object <code>items</code> and <code>val</code> of the same type, removes the matching values. If <code>items</code> is an object, both key and value must match.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "array": [1,2,3,4],
+    "obj": {"a":1,"b":2}
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+  array: ds.removeMatch(payload.array, [1,4]),
+  obj: ds.removeMatch(payload.obj, {a:1,b:3})
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "array": [
+    2,
+    3
+  ],
+  "obj": {
+    "b": 2
+  }
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_replacestring_phrase_string_regex_string_replacement"><a class="anchor" href="#_replacestring_phrase_string_regex_string_replacement"></a><code>replace(string phrase, string regex, string replacement)</code></h3>
+<div class="paragraph">
+<p>Replaces the matching <code>regex</code> with the <code>replacement</code> in the <code>phrase</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "regex": "Hello",
+    "replacement": "Goodbye"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.replace("Hello World", payload.regex, payload.replacement)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"Goodbye World"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_reversearrayobject_items"><a class="anchor" href="#_reversearrayobject_items"></a><code>reverse(array|object items)</code></h3>
+<div class="paragraph">
+<p>Given an array or object as <code>items</code>, reverses the order of the elements.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "array": [
+        1,
+        2,
+        3,
+        4
+    ],
+    "obj": {
+        "a":1,
+        "b":2
+    }
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+  array: ds.reverse(payload.array),
+  obj: ds.reverse(payload.obj)
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "array": [
+    4,
+    3,
+    2,
+    1
+  ],
+  "obj": {
+    "b": 2,
+    "a": 1
+  }
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_scanstring_str_string_regex"><a class="anchor" href="#_scanstring_str_string_regex"></a><code>scan(string str, string regex)</code></h3>
+<div class="paragraph">
+<p>Executes the regex expression <code>regex</code> against <code>str</code> and returns an array with each match as an array.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "email": "test@server.com"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.scan(payload.email, "(.*)@(.*)(.com)")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  [
+    "test@server.com",
+    "test",
+    "server",
+    ".com"
+  ]
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_selectobject_obj_string_path"><a class="anchor" href="#_selectobject_obj_string_path"></a><code>select(object obj, string path)</code></h3>
+<div class="paragraph">
+<p>Returns a value inside <code>obj</code> by the provided <code>path</code>. For nested objects, the path is separated by a dot ('.').</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+  "language": {
+      "name": "Java",
+      "version": "1.8"
+  }
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+  language: ds.select(payload, 'language.name')
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "language": "Java"
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_sizeofany_val"><a class="anchor" href="#_sizeofany_val"></a><code>sizeOf(any val)</code></h3>
+<div class="paragraph">
+<p>Returns the size of <code>val</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "array": [1, 2],
+    "obj": {"prop": 2},
+    "string": "x"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    array: ds.sizeOf(payload.array),
+    object: ds.sizeOf(payload.obj),
+    'null': ds.sizeOf(null),
+    'function': ds.sizeOf(function(a,b,c) 1),
+    string: ds.sizeOf(payload.string)
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "array": 2,
+  "object": 1,
+  "null": 0,
+  "function": 3,
+  "string": 1
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_splitbystring_strtosplit_string_regex"><a class="anchor" href="#_splitbystring_strtosplit_string_regex"></a><code>splitBy(string strToSplit, string regex)</code></h3>
+<div class="paragraph">
+<p>Splits <code>strToSplit</code> into an array based on the matching <code>regex</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "string": "Hello World"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.splitBy(payload.string, " ")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  "Hello",
+  "World"
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_startswithstring_str_string_substr"><a class="anchor" href="#_startswithstring_str_string_substr"></a><code>startsWith(string str, string subStr)</code></h3>
+<div class="paragraph">
+<p>Checks if <code>str</code> starts with <code>subStr</code>. Ignores casing.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "string": "Hello World"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.startsWith(payload.string, "hello")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>true</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_tostringany_val"><a class="anchor" href="#_tostringany_val"></a><code>toString(any val)</code></h3>
+<div class="paragraph">
+<p>Returns <code>val</code> to a string.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "num": 5
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.toString(payload.num)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"5"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_trimstring_str"><a class="anchor" href="#_trimstring_str"></a><code>trim(string str)</code></h3>
+<div class="paragraph">
+<p>Removes leading and trailing spaces in <code>str</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "string": "      Hello World       "
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.trim(payload.string)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"Hello World"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_typeofany_val"><a class="anchor" href="#_typeofany_val"></a><code>typeOf(any val)</code></h3>
+<div class="paragraph">
+<p>Returns a string describing the type of object <code>val</code> is.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+    string: ds.typeOf(""),
+    bool: ds.typeOf(true),
+    "null": ds.typeOf(null),
+    number: ds.typeOf(0),
+    "function": ds.typeOf(function() 1),
+    array: ds.typeOf([]),
+    object: ds.typeOf({})
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "string": "string",
+  "bool": "boolean",
+  "null": "null",
+  "number": "number",
+  "function": "function",
+  "array": "array",
+  "object": "object"
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_unziparray_arr"><a class="anchor" href="#_unziparray_arr"></a><code>unzip(array arr)</code></h3>
+<div class="paragraph">
+<p>Unzips an array of arrays <code>arr</code> and creates a new array of arrays based on their index in <code>arr</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>[
+  [
+    1,
+    2
+  ],
+  [
+    1,
+    2
+  ]
+]</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.unzip(payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  [
+    1,
+    1
+  ],
+  [
+    2,
+    2
+  ]
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_upperstring_str"><a class="anchor" href="#_upperstring_str"></a><code>upper(string str)</code></h3>
+<div class="paragraph">
+<p>Converts a string to all uppercase characters.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "string": "HeLlO wOrLd"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.upper(payload.string)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"HELLO WORLD"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_uuid"><a class="anchor" href="#_uuid"></a><code>uuid</code></h3>
+<div class="paragraph">
+<p>Generates random alphanumeric uuid.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.uuid</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"cj36alpm-8mlt-fm43-8vth-mbd961259lqh"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_valuesofobject_obj"><a class="anchor" href="#_valuesofobject_obj"></a><code>valuesOf(object obj)</code></h3>
+<div class="paragraph">
+<p>Given an object <code>obj</code>, returns an array of the values inside <code>obj</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+   "origin": "PHX",
+   "destination": "SEA"
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.valuesOf(payload)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  "PHX",
+  "SEA"
+]</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_writearrayobject_item_string_mimetype_object_params"><a class="anchor" href="#_writearrayobject_item_string_mimetype_object_params"></a><code>write(array|object item, string mimeType, object params)</code></h3>
+<div class="paragraph">
+<p>Converts <code>item</code> to a string.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "price": 8.95
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.write(payload, "application/json", {})</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"{\"price\":8.95}"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ziparray_array1_array_array2"><a class="anchor" href="#_ziparray_array1_array_array2"></a><code>zip(array array1, array array2)</code></h3>
+<div class="paragraph">
+<p>Accepts <code>array1</code> and <code>array2</code> and combines them into one using elements with matching indexes.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">Payload</div>
+<div class="content">
+<pre>{
+    "firstNames": ["Evelyn", "Herman"],
+    "lastNames": ["Waugh" , "Melville", "Tolkien"]
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.zip(payload.firstNames, payload.lastNames)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>[
+  [
+    "Evelyn",
+    "Waugh"
+  ],
+  [
+    "Herman",
+    "Melville"
+  ]
+]</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../_/js/site.js"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

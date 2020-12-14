@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>DataSonnet Header :: DataSonnet Mapper Documentation</title>
+    <link rel="canonical" href="https://MS3Inc.github.io/datasonnet-mapper/datasonnet/latest/headers.html">
+    <meta name="generator" content="Antora 2.3.3">
+    <link rel="stylesheet" href="../../_/css/site.css">
+    <script>var uiRootPath = '../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://MS3Inc.github.io/datasonnet-mapper">DataSonnet Mapper Documentation</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="#">Home</a>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Products</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Product A</a>
+            <a class="navbar-item" href="#">Product B</a>
+            <a class="navbar-item" href="#">Product C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Services</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Service A</a>
+            <a class="navbar-item" href="#">Service B</a>
+            <a class="navbar-item" href="#">Service C</a>
+          </div>
+        </div>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link" href="#">Resources</a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="#">Resource A</a>
+            <a class="navbar-item" href="#">Resource B</a>
+            <a class="navbar-item" href="#">Resource C</a>
+          </div>
+        </div>
+        <div class="navbar-item">
+          <span class="control">
+            <a class="button is-primary" href="#">Download</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="datasonnet" data-version="latest">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">DataSonnet</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="index.html">Introduction</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="quickstart.html">Quick Start</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="dataformats.html">Data Formats</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="headers.html">DataSonnet Header</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jsonnet-doc.html">Standard Library Documentation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <span class="nav-text">Additional DataSonnet Libraries</span>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-core.html">Core</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-arrays.html">Arrays</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-binaries.html">Binaries</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-crypto.html">Crypto</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-datetime.html">Datetime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-jsonpath.html">JsonPath</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-localdatetime.html">LocalDateTime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-math.html">Math</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-numbers.html">Numbers</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-objects.html">Objects</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-regex.html">Regex</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-strings.html">Strings</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-url.html">Url</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="cli.html">Command Line Interface</a>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="jar-cli.html">Using the CLI via a Jar</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="docker-cli.html">Using the CLI via Docker</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="cookbook.html">Cookbook</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="jar-lib.html">Using DataSonnet Programmatically</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="#intellij:ROOT:index.adoc">IntelliJ Plugin</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">DataSonnet</span>
+    <span class="version">latest</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="index.html">DataSonnet</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">latest</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+  <a href="index.html" class="home-link"></a>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">DataSonnet</a></li>
+    <li><a href="headers.html">DataSonnet Header</a></li>
+  </ul>
+</nav>
+  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/headers.adoc">Edit this Page</a></div>
+  </div>
+  <div class="content">
+<article class="doc">
+<h1 class="page">DataSonnet Header</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>The header is an optional comment section in the mapping document which must start with <code>/** DataSonnet</code> followed by a new line character and end with a line <code>*/</code> and contains a set of configuration properties.
+The properties are hierarchical, with sections separated by the ` ` (space) character, e.g.:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>input payload application/xml;namespace-separator=":";text-value-key=__text
+input myVar application/csv;quote="""</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The header must be the first comment before any other line of code, in the following format:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>/** DataSonnet
+version=&lt;VERSION_NUMBER&gt;
+&lt;PROPERTY&gt;=&lt;VALUE&gt;
+...
+*/</pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>/** DataSonnet
+version=1.0
+*/
+//DataSonnet mapping starts here
+{
+    mappedValue: payload.value
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The header is optional; if omitted, all default settings will be used. The default version is <strong>1.0</strong>. For the data format-specific defaults see the <a href="dataformats.html" class="page">Data Formats</a> section.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_data_format_properties"><a class="anchor" href="#_data_format_properties"></a>Data Format Properties</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The data format properties control the data format plugins behavior. The property names must start with one of <code>input|output|*</code>.
+The input properties format must be <code>input &lt;INPUT_NAME&gt;|* &lt;MIME_TYPE&gt;;&lt;MIME_TYPE_SPECIFIC_PARAMETER&gt;</code>, where:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>&lt;INPUT_NAME&gt;</code> is a name of input variable or payload;</p>
+</li>
+<li>
+<p><code>&lt;MIME_TYPE&gt;</code> is a mime type supported by DataSonnet;</p>
+</li>
+<li>
+<p><code>&lt;MIME_TYPE_SPECIFIC_PARAMETER&gt;</code> is one of the parameters supported by the plugin for this mime type.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Additional <code>&lt;MIME_TYPE_SPECIFIC_PARAMETER&gt;`s can be added with a `;</code> (semicolon). The values that should be escaped with quotes are <code>;</code> (semicolon), <code>:</code> (colon),  <code>"</code> (quote) and <code>,</code> (comma).</p>
+</div>
+<div class="paragraph">
+<p>If a property is not recognized, an error will be raised.</p>
+</div>
+<div class="paragraph">
+<p>The wildcard <code>*</code> can be used to set the same parameter value for all inputs and output of the given format, instead of defining it explicitly. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>* application/csv;separator=|</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>is an equivalent of:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>input payload application/csv;separator=|
+input myVar application/csv;separator=|
+output application/csv;separator=|</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The wildcard may be used for inputs only, e.g.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>input * application/csv;separator=|
+output application/csv;separator=","</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>An explicit setting will override the wildcard setting for a specific input or output. For example, if there are multiple CSV inputs that have separator <code>|</code> except one that has separator <code>,</code>, the following configuration can be used:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>dataformat application/csv;*.separator=|
+dataformat application/csv;commaSeparatedVar.separator=","</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For the list of the supported data formats and their configurable properties, see the <a href="dataformats.html" class="page">Data Formats</a> section.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_miscellaneous_properties"><a class="anchor" href="#_miscellaneous_properties"></a>Miscellaneous Properties</h2>
+<div class="sectionbody">
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Header</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Required</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>version</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>DataSonnet language version. Currently this property has no effect on the DataSonnet behavior.</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>no</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>1.0</code></p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>preserveOrder</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Controls whether order of fields as they appear in the mapping will be preserved in the resulting JSON.</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>no</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>true</code></p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</article>
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <p>This page was built using the Antora default UI.</p>
+  <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
+</footer>
+<script src="../../_/js/site.js"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
