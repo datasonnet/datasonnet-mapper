@@ -26,7 +26,7 @@ If a pop-up appears (usually in the lower right) saying "Maven projects need to 
 
 ### Installing the plugin
 
-// hmm, with the single repo docs approach now we'll need to reorganize things
+// hmm, with the single repo docs approach now we'll need to reorganize things here
 
 Now, follow the directions for installing the plugin at xref:intellij:ROOT:index.adoc[IntelliJ Plugin].
 
