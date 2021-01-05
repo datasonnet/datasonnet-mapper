@@ -234,8 +234,6 @@ public class ArraysTest {
         mapper = new Mapper(lib + pack + ".slice([0,1,2,3,3,3], 1, 5)\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[1,2,3,3]", value);
-
-        System.out.println("Elapsed Time: " + (System.currentTimeMillis() - start));
     }
 
     @Test

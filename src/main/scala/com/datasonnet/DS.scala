@@ -22,7 +22,7 @@ import java.security.SecureRandom
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.time.{Duration, Instant, Period, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.{DateTimeException, Duration, Instant, LocalDateTime, Period, ZoneId, ZoneOffset, ZonedDateTime}
 import java.util.function.Function
 import java.util.{Base64, Scanner}
 
@@ -801,7 +801,18 @@ object DSLowercase extends Library {
       builtin0("now") { (vals, ev, fs) => ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) },
 
       builtin("parse", "datetime", "inputFormat") { (_, _, datetime: String, inputFormat: String) =>
-        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
+        var datetimeObj : ZonedDateTime = null
+        inputFormat.toLowerCase match {
+          case "timestamp" | "epoch" =>
+            datetimeObj = java.time.ZonedDateTime.ofInstant(Instant.ofEpochSecond(datetime.toInt.toLong), ZoneOffset.UTC)
+          case _ =>
+            datetimeObj = try{ //will catch any errors if zone data is missing and default to Z
+              java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
+            } catch {
+              case e: DateTimeException =>
+                LocalDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat)).atZone(ZoneId.of("Z"))
+            }
+        }
         datetimeObj.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
@@ -920,7 +931,6 @@ object DSLowercase extends Library {
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
             .parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-          System.out.println(date.getDayOfWeek.getValue)
 
           date.minusDays( if(date.getDayOfWeek.getValue == 7) 0 else date.getDayOfWeek.getValue  )
             .minusHours(date.getHour)
