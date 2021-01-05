@@ -848,12 +848,6 @@ object DSLowercase extends Library {
         }
       },
 
-      builtin("daysBetween", "datetime1", "datetime2") { (_, _, datetime1: String, datetime2: String) =>
-          val datetimeObj1 = java.time.ZonedDateTime.parse(datetime1, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-          val datetimeObj2 = java.time.ZonedDateTime.parse(datetime2, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-          datetimeObj1.compareTo(datetimeObj2)
-      },
-
       builtin("changeTimeZone", "datetime", "timezone") {
         (_, _, datetime: String, timezone: String) =>
           val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
