@@ -161,7 +161,7 @@ public class ZonedDateTimeTest {
     }
 
     @Test
-    void testDateTime_parseTimestamp() {
+    void testDateTime_parse() {
         Mapper mapper = new Mapper("ds.datetime.parse(\"1577836800\", \"timestamp\")");
         String newDate = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("2020-01-01T00:00:00Z", newDate);

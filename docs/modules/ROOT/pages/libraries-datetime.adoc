@@ -203,7 +203,7 @@ ds.datetime.now()
 "2021-01-05T13:09:45.476375-05:00"
 ------------------------
 
-### `parse(string datetime, string inputFormat)`
+### `parse(string|number datetime, string inputFormat)`
 Parses the datetime using the input format and returns the value in the default format.
 If an epoch or timestamp value is used as the datetime you can use `"epoch"` or `"timestamp"` as the inputFormat
 

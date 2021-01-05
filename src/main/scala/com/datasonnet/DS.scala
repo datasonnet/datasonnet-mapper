@@ -798,19 +798,25 @@ object DSLowercase extends Library {
       },
     ),
     "datetime" -> moduleFrom(
-      builtin0("now") { (vals, ev, fs) => ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) },
+      builtin0("now") { (_, _, _) => ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) },
 
-      builtin("parse", "datetime", "inputFormat") { (_, _, datetime: String, inputFormat: String) =>
+      builtin("parse", "datetime", "inputFormat") { (_, _, datetime: Val, inputFormat: String) =>
         var datetimeObj : ZonedDateTime = null
         inputFormat.toLowerCase match {
           case "timestamp" | "epoch" =>
-            datetimeObj = java.time.ZonedDateTime.ofInstant(Instant.ofEpochSecond(datetime.toInt.toLong), ZoneOffset.UTC)
+            var inst : Instant = null
+            datetime match{
+              case Val.Str(item) => inst = Instant.ofEpochSecond(item.toInt.toLong)
+              case Val.Num(item) => inst = Instant.ofEpochSecond(item.toLong)
+              case _ => throw Error.Delegate("Expected datetime to be a string or number, got: " + datetime.prettyName)
+            }
+            datetimeObj = java.time.ZonedDateTime.ofInstant(inst, ZoneOffset.UTC)
           case _ =>
             datetimeObj = try{ //will catch any errors if zone data is missing and default to Z
-              java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
+              java.time.ZonedDateTime.parse(datetime.cast[Val.Str].value, DateTimeFormatter.ofPattern(inputFormat))
             } catch {
               case e: DateTimeException =>
-                LocalDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat)).atZone(ZoneId.of("Z"))
+                LocalDateTime.parse(datetime.cast[Val.Str].value, DateTimeFormatter.ofPattern(inputFormat)).atZone(ZoneId.of("Z"))
             }
         }
         datetimeObj.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
