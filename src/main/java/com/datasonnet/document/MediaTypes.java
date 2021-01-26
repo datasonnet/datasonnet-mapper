@@ -415,6 +415,7 @@ public class MediaTypes {
                 return Optional.of(APPLICATION_CSV);
             case "txt":
                 return Optional.of(TEXT_PLAIN);
+            case "yml":
             case "yaml":
                 return Optional.of(APPLICATION_YAML);
             default:
