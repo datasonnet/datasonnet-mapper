@@ -44,4 +44,12 @@ public class JSONWriterTest {
         String expected = "{\"str\":\"value\",\"arr\":[1,2,3],\"obj\":{},\"num\":9,\"null\":null}";
         assertEquals(expected.trim(), mapped.getContent().trim());
     }
+
+    @Test
+    public void testNull() {
+        Mapper mapper = new Mapper("null");
+        Document<String> mapped = mapper.transform(DefaultDocument.NULL_INSTANCE, Collections.emptyMap(), MediaTypes.APPLICATION_JSON);
+
+        assertEquals("null", mapped.getContent().trim());
+    }
 }

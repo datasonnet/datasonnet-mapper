@@ -29,11 +29,13 @@ import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -151,5 +153,13 @@ public class JavaWriterTest {
         StringWriter objectWriter = new StringWriter();
         jaxbMarshaller.marshal(objectResult, objectWriter);
         assertEquals(writer.toString(), objectWriter.toString());
+    }
+
+    @Test
+    public void testNull() {
+        Mapper mapper = new Mapper("null");
+        Document<String> mapped = mapper.transform(DefaultDocument.NULL_INSTANCE, Collections.emptyMap(), MediaTypes.APPLICATION_JAVA);
+
+        assertNull(mapped.getContent());
     }
 }

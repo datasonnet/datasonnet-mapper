@@ -276,4 +276,16 @@ public class XMLWriterTest {
         String mappedXml = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
     }
+
+    @Test
+    public void testNull() {
+        Mapper mapper = new Mapper("null");
+
+        try {
+            mapper.transform(DefaultDocument.NULL_INSTANCE, Collections.emptyMap(), MediaTypes.APPLICATION_XML);
+            fail("Should not succeed");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Input for XML writer must be an Object"), "Failed with wrong message: " + e.getMessage());
+        }
+    }
 }
