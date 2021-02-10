@@ -99,7 +99,6 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         return ujsonFrom(inputAsNode);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> Document<T> write(Value input, MediaType mediaType, Class<T> targetType) throws PluginException {
         T converted = writeValue(input, mediaType, targetType);
@@ -108,6 +107,10 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
 
     @Nullable
     private <T> T writeValue(Value input, MediaType mediaType, Class<T> targetType) throws PluginException {
+        if (input == ujson.Null$.MODULE$) {
+            return null;
+        }
+
         ObjectMapper mapper = getObjectMapper(mediaType);
 
         try {
@@ -129,7 +132,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
             }
 
             // fancier version of the Object.equals optimization
-            if(targetType.isAssignableFrom(inputAsJava.getClass())) {
+            if (targetType.isAssignableFrom(inputAsJava.getClass())) {
                 return (T) inputAsJava;
             } else {
                 return mapper.convertValue(inputAsJava, targetType);
