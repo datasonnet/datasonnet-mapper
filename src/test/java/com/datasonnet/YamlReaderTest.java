@@ -39,7 +39,7 @@ public class YamlReaderTest {
         String mapping = "/** DataSonnet\n" +
                 "version=2.0\n" +
                 "output application/json\n" +
-                "input payload application/yaml\n" +
+                "input payload application/x-yaml\n" +
                 "*/\n" +
                 "payload";
 
@@ -64,7 +64,7 @@ public class YamlReaderTest {
         String mapping = "/** DataSonnet\n" +
                 "version=2.0\n" +
                 "output application/json\n" +
-                "input payload application/yaml\n" +
+                "input payload application/x-yaml\n" +
                 "*/\n" +
                 "payload";
 
@@ -86,7 +86,7 @@ public class YamlReaderTest {
         String mapping = "/** DataSonnet\n" +
                 "version=2.0\n" +
                 "output application/json\n" +
-                "input payload application/yaml\n" +
+                "input payload application/x-yaml\n" +
                 "*/\n" +
                 "payload";
 
