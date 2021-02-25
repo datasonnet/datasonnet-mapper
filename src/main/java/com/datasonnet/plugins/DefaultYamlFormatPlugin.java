@@ -37,6 +37,9 @@ import java.util.List;
 
 public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
 
+    private static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper();
+    private static final YAMLFactory DEFAULT_YAML_FACTORY = new YAMLFactory();
+
     public static final String DS_PARAM_YAML_HEADER = "removehead";
     // this may break some things like reading 3.0.0 as a number,
     // would need to specify this in docs
@@ -68,17 +71,13 @@ public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
         }
 
         try {
-
-            YAMLFactory yaml = new YAMLFactory();
-            ObjectMapper mapper = new ObjectMapper();
-
-            YAMLParser yamlParser = yaml.createParser((String) doc.getContent());
-            List<JsonNode> docs = mapper.readValues(yamlParser, new TypeReference<JsonNode>() {}).readAll();
+            YAMLParser yamlParser = DEFAULT_YAML_FACTORY.createParser((String) doc.getContent());
+            List<JsonNode> docs = DEFAULT_OBJECT_MAPPER.readValues(yamlParser, new TypeReference<JsonNode>() {}).readAll();
 
             if(docs.size()<=1){ //if only one node, only one object so dont return the list
-                return ujsonFrom(mapper.valueToTree(docs.get(0)));
+                return ujsonFrom(DEFAULT_OBJECT_MAPPER.valueToTree(docs.get(0)));
             }
-            return ujsonFrom(mapper.valueToTree(docs));
+            return ujsonFrom(DEFAULT_OBJECT_MAPPER.valueToTree(docs));
         } catch (IOException e) {
             e.printStackTrace();
             throw new PluginException("Failed to read yaml data");
@@ -95,7 +94,7 @@ public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
 
         try {
             Object inputAsJava = ujsonUtils.javaObjectFrom(input);
-            ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+            ObjectMapper yamlMapper = new ObjectMapper(DEFAULT_YAML_FACTORY);
             StringBuilder value = null;
 
             //if instance of list, it is multiple docs in one.

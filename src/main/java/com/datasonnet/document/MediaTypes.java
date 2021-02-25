@@ -356,7 +356,7 @@ public class MediaTypes {
     /**
      * A String equivalent of {@link MediaTypes#APPLICATION_YAML}.
      */
-    public static final String APPLICATION_YAML_VALUE = "application/yaml";
+    public static final String APPLICATION_YAML_VALUE = "application/x-yaml";
 
     // See Null Object pattern
     /**
@@ -401,7 +401,7 @@ public class MediaTypes {
         APPLICATION_JAVA = new MediaType("application", "x-java-object");
         APPLICATION_CSV = new MediaType("application", "csv");
         UNKNOWN = new MediaType("unknown", "unknown");
-        APPLICATION_YAML = new MediaType("application", "yaml");
+        APPLICATION_YAML = new MediaType("application", "x-yaml");
     }
 
     // TODO: 8/11/20 add explicit file extension support to MediaType class
