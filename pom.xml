@@ -83,7 +83,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <jackson.version>2.11.2</jackson.version>
         <junit.version>5.6.2</junit.version>
-        <bouncycastle.version>1.66</bouncycastle.version>
+        <bouncycastle.version>1.68</bouncycastle.version>
         <quickcheck.version>0.9.4</quickcheck.version>
         <xmlunit.version>2.7.0</xmlunit.version>
         <mycila.version>4.0.rc2</mycila.version>
