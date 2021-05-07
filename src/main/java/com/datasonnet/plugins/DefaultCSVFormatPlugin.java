@@ -1,7 +1,7 @@
 package com.datasonnet.plugins;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -151,24 +151,28 @@ public class DefaultCSVFormatPlugin extends BaseJacksonDataFormatPlugin {
 
             CsvSchema csvSchema = builder.build();
 
-            if (OutputStream.class.equals(targetType)) {
+            if (targetType.isAssignableFrom(String.class)) {
+                return (Document<T>) new DefaultDocument<>(CSV_MAPPER.writerFor(JsonNode.class)
+                        .with(csvSchema)
+                        .writeValueAsString(jsonTree), MediaTypes.APPLICATION_CSV);
+            }
+
+            if (targetType.isAssignableFrom(OutputStream.class)) {
                 OutputStream out = new BufferedOutputStream(new ByteArrayOutputStream());
                 CSV_MAPPER.writerFor(JsonNode.class)
                         .with(csvSchema)
                         .writeValue(out, jsonTree);
                 return (Document<T>) new DefaultDocument<>(out, MediaTypes.APPLICATION_CSV);
-            } else if (byte[].class.equals(targetType)) {
+            }
+
+            if (targetType.isAssignableFrom(byte[].class)) {
                 return (Document<T>) new DefaultDocument<>(CSV_MAPPER.writerFor(JsonNode.class)
                         .with(csvSchema)
                         .writeValueAsBytes(jsonTree), MediaTypes.APPLICATION_CSV);
-
-            } else if (String.class.equals(targetType)) {
-                return (Document<T>) new DefaultDocument<>(CSV_MAPPER.writerFor(JsonNode.class)
-                        .with(csvSchema)
-                        .writeValueAsString(jsonTree), MediaTypes.APPLICATION_CSV);
-            } else {
-                throw new PluginException(new IllegalArgumentException("Unsupported document content class, use the test method canWrite before invoking write"));
             }
+
+            throw new PluginException(new IllegalArgumentException("Unsupported document content class, use the test method canWrite before invoking write"));
+
         } catch (IOException e) {
             throw new PluginException("Unable to processing CSV", e);
         }
