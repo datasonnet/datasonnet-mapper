@@ -14,6 +14,7 @@
 ** xref:libraries-math.adoc[Math]
 ** xref:libraries-numbers.adoc[Numbers]
 ** xref:libraries-objects.adoc[Objects]
+** xref:libraries-period.adoc[Period]
 ** xref:libraries-regex.adoc[Regex]
 ** xref:libraries-strings.adoc[Strings]
 ** xref:libraries-url.adoc[Url]
