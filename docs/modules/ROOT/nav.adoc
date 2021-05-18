@@ -10,7 +10,6 @@
 ** xref:libraries-crypto.adoc[Crypto]
 ** xref:libraries-datetime.adoc[Datetime]
 ** xref:libraries-jsonpath.adoc[JsonPath]
-** xref:libraries-localdatetime.adoc[LocalDateTime]
 ** xref:libraries-math.adoc[Math]
 ** xref:libraries-numbers.adoc[Numbers]
 ** xref:libraries-objects.adoc[Objects]
