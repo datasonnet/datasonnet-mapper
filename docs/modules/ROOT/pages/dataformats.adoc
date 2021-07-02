@@ -568,6 +568,17 @@ The following write parameters are supported:
 |`MixIns`
 |Adds a map of classes and their mix-ins to customize the Datasonnet / Jackson deserialization behavior. See the example below for the
 example of polymorphic deserialization.
+|
+
+|`PolymorphicTypes`
+|A comma-separated list of abstract classes that have multiple sub-classes. See the example below for the
+example of polymorphic deserialization.
+|
+
+|`PolymorphicTypeIdProperty`
+|A property of the JSON object that contains the name of the deserialized class.
+|`@class`
+
 |===
 
 ### `JAXBElement` serialization and deserialization
@@ -693,3 +704,47 @@ output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar
 }
 --------------
 The value of the property `@type` will be matched to one of the annotations in the mix-in class.
+
+A simpler implementation will make use of the provided Datasonnet mix-in class instead of a custom one. In this case, the `PolymorphicTypes` header must be set, and optionally the `PolymorphicTypeIdProperty`, e.g.:
+
+--------------
+/** DataSonnet
+version=2.0
+output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar.Household; polymorphictypes=com.foo.bar.Person
+*/
+{
+    family: [
+       {
+            "@class": "com.foo.bar.Adult",
+            "name": "Joe",
+            "employer": "ModusBox"
+       },
+       {
+            "@class": "com.foo.bar.Child",
+            "name": "Jane",
+            "school": "Elk Grove Middle School"
+       }
+    ]
+}
+--------------
+--------------
+/** DataSonnet
+version=2.0
+output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar.Household; polymorphictypes=com.foo.bar.Person; polymorphictypeidproperty=__clazz
+*/
+{
+    family: [
+       {
+            "__clazz": "com.foo.bar.Adult",
+            "name": "Joe",
+            "employer": "ModusBox"
+       },
+       {
+            "__clazz": "com.foo.bar.Child",
+            "name": "Jane",
+            "school": "Elk Grove Middle School"
+       }
+    ]
+}
+--------------
+

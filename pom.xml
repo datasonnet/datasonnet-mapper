@@ -172,6 +172,12 @@
             <version>4.5.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.28.0-GA</version>
+        </dependency>
+
         <!-- test deps: start -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

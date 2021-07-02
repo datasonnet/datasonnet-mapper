@@ -23,11 +23,25 @@ import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.plugins.jackson.JAXBElementMixIn;
 import com.datasonnet.plugins.jackson.JAXBElementSerializer;
+import com.datasonnet.plugins.jackson.PolymorphicTypesMixIn;
 import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.ujsonUtils;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.introspect.SimpleMixInResolver;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.ClassFile;
+import javassist.bytecode.ConstPool;
+import javassist.bytecode.annotation.Annotation;
+import javassist.bytecode.annotation.EnumMemberValue;
+import javassist.bytecode.annotation.StringMemberValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ujson.Value;
@@ -35,8 +49,15 @@ import ujson.Value;
 import javax.xml.bind.JAXBElement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
 
 
 public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
@@ -45,7 +66,9 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
     public static final String DS_PARAM_DATE_FORMAT = "dateformat";
     public static final String DS_PARAM_TYPE = "type";  // aligns with existing java object mimetypes
     public static final String DS_PARAM_OUTPUT_CLASS = "outputclass";  // supports legacy
-    public static final String DS_PARAM_MIXINS = "mixins";  // supports legacy
+    public static final String DS_PARAM_MIXINS = "mixins";
+    public static final String DS_PARAM_POLYMORPHIC_TYPES = "polymorphictypes";
+    public static final String DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY = "polymorphictypeidproperty";
 
     private static final Map<Integer, ObjectMapper> MAPPER_CACHE = new RecentsMap<>(64);
 
@@ -75,6 +98,8 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         readerParams.add(DS_PARAM_OUTPUT_CLASS);
         writerParams.addAll(readerParams);
         writerParams.add(DS_PARAM_MIXINS);
+        writerParams.add(DS_PARAM_POLYMORPHIC_TYPES);
+        writerParams.add(DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY);
     }
 
     @Override
@@ -141,6 +166,8 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
     }
 
     private ObjectMapper getObjectMapper(MediaType mediaType) throws PluginException {
+        //I disabled the caching because it doesn't play well with manipulating mixins; instead, I clone the default mapper
+/*
         ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
 
         if (mediaType.getParameters().containsKey(DS_PARAM_DATE_FORMAT)) {
@@ -148,6 +175,13 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
             int cacheKey = dateFormat.hashCode();
             mapper = MAPPER_CACHE.computeIfAbsent(cacheKey,
                     integer -> new ObjectMapper().setDateFormat(makeDateFormat(dateFormat)));
+        }
+*/
+        ObjectMapper mapper = DEFAULT_OBJECT_MAPPER.copy();
+
+        if (mediaType.getParameters().containsKey(DS_PARAM_DATE_FORMAT)) {
+            String dateFormat = mediaType.getParameter(DS_PARAM_DATE_FORMAT);
+            mapper.setDateFormat(makeDateFormat(dateFormat));
         }
 
         if (mediaType.getParameters().containsKey(DS_PARAM_MIXINS)) {
@@ -160,6 +194,51 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
                 throw new PluginException("Invalid 'mixins' header format, must be JSON object", jpe);
             } catch (ClassNotFoundException cnfpe) {
                 throw new PluginException("Unable to add mixin", cnfpe);
+            }
+        }
+
+        Class mixinClass = PolymorphicTypesMixIn.class;
+
+        if (mediaType.getParameters().containsKey(DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY)) {
+            try {
+                ClassPool cp = ClassPool.getDefault();
+                CtClass cc = cp.get("com.datasonnet.plugins.jackson.PolymorphicTypesMixIn");
+                //cp.makePackage(cp.getClassLoader(), "com.datasonnet.plugins.jackson");
+                ClassFile cfile = cc.getClassFile();
+                ConstPool constPool = cfile.getConstPool();
+                AnnotationsAttribute attr = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
+                Annotation a = new Annotation("com.fasterxml.jackson.annotation.JsonTypeInfo", constPool);
+                a.addMemberValue("property", new StringMemberValue(mediaType.getParameter(DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY), constPool));
+                EnumMemberValue jsonTypeInfoId = new EnumMemberValue(constPool);
+                jsonTypeInfoId.setType(JsonTypeInfo.Id.class.getName());
+                jsonTypeInfoId.setValue(JsonTypeInfo.Id.CLASS.name());
+                a.addMemberValue("use", jsonTypeInfoId);
+                EnumMemberValue jsonTypeInfoAs = new EnumMemberValue(constPool);
+                jsonTypeInfoAs.setType(JsonTypeInfo.As.class.getName());
+                jsonTypeInfoAs.setValue(com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY.name());
+                a.addMemberValue("include", jsonTypeInfoAs);
+                attr.setAnnotation(a);
+
+                cfile.addAttribute(attr);
+                String newClassName = "com.datasonnet.plugins.jackson.MixIn" + UUID.randomUUID().toString();
+                cc.setName(newClassName);
+                cfile.setVersionToJava5();
+
+                mixinClass = cc.toClass();
+
+            } catch (Exception e) {
+                throw new PluginException("Unable to override polymorphic type property", e);
+            }
+        }
+
+        if (mediaType.getParameters().containsKey(DS_PARAM_POLYMORPHIC_TYPES)) {
+            try {
+                String[] polymorphicTypes = mediaType.getParameter(DS_PARAM_POLYMORPHIC_TYPES).split(",");
+                for (final String type : polymorphicTypes) {
+                    mapper.addMixIn(Class.forName(type), mixinClass);
+                }
+            } catch (ClassNotFoundException cnfpe) {
+                throw new PluginException("Polymorphic type cannot be resolved", cnfpe);
             }
         }
         return mapper;

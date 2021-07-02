@@ -175,4 +175,41 @@ public class JavaWriterTest {
         MixInTestClass result = (MixInTestClass)objectResult;
         assertTrue(result.getAnimal() instanceof com.datasonnet.javatest.Cat);
     }
+
+    @Test
+    void testPolymorphicTypes() throws Exception {
+        Document<String> data = new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON);
+        String mapping = TestResourceReader.readFileAsString("mixInsTest.ds");
+        Mapper mapper = new Mapper(mapping);
+
+        // First try without any headers, it should fail
+        try {
+            mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, MixInTestClass.class);
+            fail("Should not succeed");
+        } catch (Exception e) {
+            // this error is now thrown by jackson as it _will_ try to write a String...
+            assertTrue(e.getMessage().contains("Unable to convert to target type"), "Failed with wrong message: " + e.getMessage());
+        }
+        //Now let's add polymorphic types header
+        mapping = TestResourceReader.readFileAsString("polymorphicTypesTest.ds");
+
+        mapper = new Mapper(mapping);
+        Document<MixInTestClass> objectMapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, MixInTestClass.class);
+        Object objectResult = objectMapped.getContent();
+        assertTrue(objectResult instanceof MixInTestClass);
+        MixInTestClass result = (MixInTestClass) objectResult;
+        assertTrue(result.getAnimal() instanceof com.datasonnet.javatest.Cat);
+
+        //Override polymorphic type property
+        mapping = TestResourceReader.readFileAsString("polymorphicTypePropertyTest.ds");
+
+        try {
+            mapper = new Mapper(mapping);
+            Document<MixInTestClass> objectMapped1 = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, MixInTestClass.class);
+            Object objectResult1 = objectMapped1.getContent();
+            assertTrue(objectResult1 instanceof MixInTestClass);
+            MixInTestClass result1 = (MixInTestClass) objectResult1;
+            assertTrue(result1.getAnimal() instanceof com.datasonnet.javatest.Cat);
+        } catch (Exception e) { e.printStackTrace(); }
+    }
 }
