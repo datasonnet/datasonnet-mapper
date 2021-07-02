@@ -1,0 +1,10 @@
+/** DataSonnet
+version=2.0
+output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.datasonnet.javatest.MixInTestClass; mixins="{"com.datasonnet.javatest.Animal":"com.datasonnet.javatest.AnimalMixIn"}"
+*/
+{
+  animal: {
+    "@type": "cat",
+    catsName: "Fritz"
+  }
+}

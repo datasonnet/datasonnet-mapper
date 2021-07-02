@@ -20,6 +20,7 @@ import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.javatest.Gizmo;
+import com.datasonnet.javatest.MixInTestClass;
 import com.datasonnet.javatest.WsdlGeneratedObj;
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.Test;
@@ -149,5 +150,29 @@ public class JavaWriterTest {
         StringWriter objectWriter = new StringWriter();
         jaxbMarshaller.marshal(objectResult, objectWriter);
         assertEquals(writer.toString(), objectWriter.toString());
+    }
+
+    @Test
+    void testMixIns() throws Exception {
+        Document<String> data = new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON);
+        String mapping = TestResourceReader.readFileAsString("mixInsTest.ds");
+        Mapper mapper = new Mapper(mapping);
+
+        // First try without any headers, it should fail
+        try {
+            mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, MixInTestClass.class);
+            fail("Should not succeed");
+        } catch (Exception e) {
+            // this error is now thrown by jackson as it _will_ try to write a String...
+            assertTrue(e.getMessage().contains("Unable to convert to target type"), "Failed with wrong message: " + e.getMessage());
+        }
+        //Now let's add mixins header
+        mapping = TestResourceReader.readFileAsString("mixInsTestWithHeader.ds");
+        mapper = new Mapper(mapping);
+        Document<MixInTestClass> objectMapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, MixInTestClass.class);
+        Object objectResult = objectMapped.getContent();
+        assertTrue(objectResult instanceof MixInTestClass);
+        MixInTestClass result = (MixInTestClass)objectResult;
+        assertTrue(result.getAnimal() instanceof com.datasonnet.javatest.Cat);
     }
 }

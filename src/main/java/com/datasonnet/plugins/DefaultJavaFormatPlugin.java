@@ -25,10 +25,8 @@ import com.datasonnet.plugins.jackson.JAXBElementMixIn;
 import com.datasonnet.plugins.jackson.JAXBElementSerializer;
 import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.ujsonUtils;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,6 +45,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
     public static final String DS_PARAM_DATE_FORMAT = "dateformat";
     public static final String DS_PARAM_TYPE = "type";  // aligns with existing java object mimetypes
     public static final String DS_PARAM_OUTPUT_CLASS = "outputclass";  // supports legacy
+    public static final String DS_PARAM_MIXINS = "mixins";  // supports legacy
 
     private static final Map<Integer, ObjectMapper> MAPPER_CACHE = new RecentsMap<>(64);
 
@@ -75,6 +74,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         readerParams.add(DS_PARAM_TYPE);
         readerParams.add(DS_PARAM_OUTPUT_CLASS);
         writerParams.addAll(readerParams);
+        writerParams.add(DS_PARAM_MIXINS);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         }
     }
 
-    private ObjectMapper getObjectMapper(MediaType mediaType) {
+    private ObjectMapper getObjectMapper(MediaType mediaType) throws PluginException {
         ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
 
         if (mediaType.getParameters().containsKey(DS_PARAM_DATE_FORMAT)) {
@@ -148,6 +148,19 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
             int cacheKey = dateFormat.hashCode();
             mapper = MAPPER_CACHE.computeIfAbsent(cacheKey,
                     integer -> new ObjectMapper().setDateFormat(makeDateFormat(dateFormat)));
+        }
+
+        if (mediaType.getParameters().containsKey(DS_PARAM_MIXINS)) {
+            try {
+                Map<String, String> mixinsMap = mapper.readValue(mediaType.getParameter(DS_PARAM_MIXINS), Map.class);
+                for (Map.Entry<String,String> entry : mixinsMap.entrySet()) {
+                    mapper.addMixIn(Class.forName(entry.getKey()), Class.forName(entry.getValue()));
+                }
+            } catch (JsonProcessingException jpe) {
+                throw new PluginException("Invalid 'mixins' header format, must be JSON object", jpe);
+            } catch (ClassNotFoundException cnfpe) {
+                throw new PluginException("Unable to add mixin", cnfpe);
+            }
         }
         return mapper;
     }
