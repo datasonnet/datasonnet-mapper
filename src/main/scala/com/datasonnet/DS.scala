@@ -1,7 +1,7 @@
 package com.datasonnet
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import java.security.SecureRandom
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.time.{Duration, Instant, Period, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.{DateTimeException, Duration, Instant, LocalDateTime, Period, ZoneId, ZoneOffset, ZonedDateTime}
 import java.util.function.Function
 import java.util.{Base64, Scanner}
 
@@ -798,10 +798,27 @@ object DSLowercase extends Library {
       },
     ),
     "datetime" -> moduleFrom(
-      builtin0("now") { (vals, ev, fs) => ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) },
+      builtin0("now") { (_, _, _) => ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) },
 
-      builtin("parse", "datetime", "inputFormat") { (_, _, datetime: String, inputFormat: String) =>
-        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
+      builtin("parse", "datetime", "inputFormat") { (_, _, datetime: Val, inputFormat: String) =>
+        var datetimeObj : ZonedDateTime = null
+        inputFormat.toLowerCase match {
+          case "timestamp" | "epoch" =>
+            var inst : Instant = null
+            datetime match{
+              case Val.Str(item) => inst = Instant.ofEpochSecond(item.toInt.toLong)
+              case Val.Num(item) => inst = Instant.ofEpochSecond(item.toLong)
+              case _ => throw Error.Delegate("Expected datetime to be a string or number, got: " + datetime.prettyName)
+            }
+            datetimeObj = java.time.ZonedDateTime.ofInstant(inst, ZoneOffset.UTC)
+          case _ =>
+            datetimeObj = try{ //will catch any errors if zone data is missing and default to Z
+              java.time.ZonedDateTime.parse(datetime.cast[Val.Str].value, DateTimeFormatter.ofPattern(inputFormat))
+            } catch {
+              case e: DateTimeException =>
+                LocalDateTime.parse(datetime.cast[Val.Str].value, DateTimeFormatter.ofPattern(inputFormat)).atZone(ZoneId.of("Z"))
+            }
+        }
         datetimeObj.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
@@ -835,12 +852,6 @@ object DSLowercase extends Library {
         } else {
           datetime.minus(Period.parse(period)).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         }
-      },
-
-      builtin("daysBetween", "datetime1", "datetime2") { (_, _, datetime1: String, datetime2: String) =>
-          val datetimeObj1 = java.time.ZonedDateTime.parse(datetime1, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-          val datetimeObj2 = java.time.ZonedDateTime.parse(datetime2, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-          datetimeObj1.compareTo(datetimeObj2)
       },
 
       builtin("changeTimeZone", "datetime", "timezone") {
@@ -920,7 +931,6 @@ object DSLowercase extends Library {
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
             .parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-          System.out.println(date.getDayOfWeek.getValue)
 
           date.minusDays( if(date.getDayOfWeek.getValue == 7) 0 else date.getDayOfWeek.getValue  )
             .minusHours(date.getHour)

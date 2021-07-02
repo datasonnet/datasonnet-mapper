@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ public class ZonedDateTimeTest {
         Mapper mapper = new Mapper("ds.datetime.plus(\"2019-07-22T21:00:00Z\", \"P1Y1D\")");
         String offsetDate = mapper.transform("{}").replaceAll("\"", "");
         assertEquals(offsetDate, "2020-07-23T21:00:00Z");
-//        System.out.println("Offset date is " + offsetDate);
     }
 
     @Test
@@ -53,7 +52,6 @@ public class ZonedDateTimeTest {
     void testFormat() {
         Mapper mapper = new Mapper("ds.datetime.format(\"2019-07-04T21:00:00Z\", \"d MMM uuuu\")");
         String formattedDate = mapper.transform("{}").replaceAll("\"", "");
-        //System.out.println("Formatted date is " + formattedDate);
         assertEquals(formattedDate, "4 Jul 2019");
     }
 
@@ -61,7 +59,6 @@ public class ZonedDateTimeTest {
     void testCompare() {
         Mapper mapper = new Mapper("ds.datetime.compare(\"2019-07-04T21:00:00Z\", \"2019-07-04T21:00:00Z\")");
         String compareResult = mapper.transform("{}").replaceAll("\"", "");
-        //System.out.println("Formatted date is " + formattedDate);
         assertEquals(compareResult, "0");
     }
 
@@ -69,7 +66,6 @@ public class ZonedDateTimeTest {
     void testTimezone() {
         Mapper mapper = new Mapper("ds.datetime.changeTimeZone(\"2019-07-04T21:00:00-05:00\", \"America/Los_Angeles\")");
         String newTimezone = mapper.transform("{}").replaceAll("\"", "");
-        //System.out.println("New date is " + newTimezone);
         assertEquals(newTimezone, "2019-07-04T19:00:00-07:00");
     }
 
@@ -162,5 +158,20 @@ public class ZonedDateTimeTest {
         mapper = new Mapper("ds.datetime.date({\"timezone\":\"UTC\"})");
         newDate = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("0000-01-01T00:00:00Z", newDate );
+    }
+
+    @Test
+    void testDateTime_parse() {
+        Mapper mapper = new Mapper("ds.datetime.parse(\"1577836800\", \"timestamp\")");
+        String newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2020-01-01T00:00:00Z", newDate);
+
+        mapper = new Mapper("ds.datetime.parse(\"1577836800\", \"epoch\")");
+        newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2020-01-01T00:00:00Z", newDate);
+
+        mapper = new Mapper("ds.datetime.parse(\"12/31/1990 10:10:10\", \"MM/dd/yyyy HH:mm:ss\")");
+        newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("1990-12-31T10:10:10Z", newDate);
     }
 }
