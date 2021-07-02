@@ -23,7 +23,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -766,6 +769,9 @@ public class CoreTest {
         Mapper mapper = new Mapper(lib + ".uuid()\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals(5, value.split("-").length);
+        Pattern pattern = Pattern.compile("[^a-f0-9\\-]");
+        Matcher match = pattern.matcher(value.toLowerCase());
+        assertFalse(match.find());
 
         logger.info("UUID: " + value);
     }

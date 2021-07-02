@@ -502,7 +502,7 @@ object DSLowercase extends Library {
       (_, _, _) =>
         val n = 36
         val AlphaNumericString = "0123456789" +
-          "abcdefghijklmnopqrstuvxyz"
+          "abcdef"
         val sb = new StringBuilder(n)
         for (i <- 0 until n) {
           if (i.equals(8) || i.equals(13) || i.equals(18) || i.equals(23)) {
