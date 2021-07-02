@@ -1,4 +1,4 @@
-package com.datasonnet.spi;
+package com.datasonnet.javatest;
 
 /*-
  * Copyright 2019-2021 the original author or authors.
@@ -15,16 +15,15 @@ package com.datasonnet.spi;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class PluginException extends RuntimeException {
-    public PluginException(String message) {
-        super(message);
-    }
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-    public PluginException(Throwable e) {
-        super(e);
-    }
-
-    public PluginException(String message, Throwable e) {
-        super(message, e);
-    }
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Cat.class, name = "cat"),
+        @JsonSubTypes.Type(value = Dog.class, name = "dog") })
+public abstract class AnimalMixIn {
 }

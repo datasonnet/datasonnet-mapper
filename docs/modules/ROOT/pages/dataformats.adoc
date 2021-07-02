@@ -565,6 +565,19 @@ The following write parameters are supported:
 - Numerical values -> `java.lang.Number`
 
 |
+|`MixIns`
+|Adds a map of classes and their mix-ins to customize the Datasonnet / Jackson deserialization behavior. See the example below for the
+example of polymorphic deserialization.
+|
+
+|`PolymorphicTypes`
+|A comma-separated list of abstract classes that have multiple sub-classes. See the example below for the
+example of polymorphic deserialization.
+|
+
+|`PolymorphicTypeIdProperty`
+|A property of the JSON object that contains the name of the deserialized class.
+|`@class`
 
 |===
 
@@ -598,4 +611,140 @@ output.application/java.OutputClass=com.datasonnet.javatest.WsdlGeneratedObj
     }
 }
 -------------
+
+### Polymorphic deserialization
+
+In a situation where the property of the deserialized Java class is of an abstract type with multiple extending classes, it is necessary to provide an additional information so that Datasonnet can instantiate correct class. Consider the following mapping:
+--------------
+/** DataSonnet
+version=2.0
+output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar.Household;
+*/
+{
+    family: [
+       {
+            "name": "Joe",
+            "employer": "ModusBox"
+       },
+       {
+            "name": "Jane",
+            "school": "Elk Grove Middle School"
+       }
+    ]
+}
+--------------
+
+--------------
+package com.foo.bar;
+public class Household {
+    List<Person> family;
+...
+}
+--------------
+--------------
+package com.foo.bar;
+public abstract class Person {
+    String name;
+}
+--------------
+--------------
+package com.foo.bar;
+public class Adult extends Person {
+...
+    String employer;
+}
+--------------
+--------------
+package com.foo.bar;
+public class Child extends Person {
+...
+    String school;
+}
+--------------
+This mapping will fail, because Datasonnet doesn't know which classes it should instantiate for the elements of the `family` list.
+To fix this, first we need to create a mixin class, e.g.:
+
+--------------
+package com.foo.bar;
+
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Adult.class, name = "adult"),
+        @JsonSubTypes.Type(value = Child.class, name = "child") })
+public abstract class PersonMixIn {
+}
+--------------
+This class maps the value of the property `@type` in a JSON object to the class type to which it should be deserialized.
+
+Now change the mapping to the following:
+--------------
+/** DataSonnet
+version=2.0
+output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar.Household; mixins="{"com.foo.bar.Person":"com.foo.bar.PersonMixIn"}"
+*/
+{
+    family: [
+       {
+            "@type": "adult",
+            "name": "Joe",
+            "employer": "ModusBox"
+       },
+       {
+            "@type": "child",
+            "name": "Jane",
+            "school": "Elk Grove Middle School"
+       }
+    ]
+}
+--------------
+The value of the property `@type` will be matched to one of the annotations in the mix-in class.
+
+For the typical use case of an abstract class with concrete subtypes, where the type names are in a property on the JSON objects, you do not need to write your own Mixin, DataSonnet can handle it for you. In this case, the `PolymorphicTypes` header must be set, and optionally the `PolymorphicTypeIdProperty`, e.g.:
+
+--------------
+/** DataSonnet
+version=2.0
+output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar.Household; polymorphictypes=com.foo.bar.Person
+*/
+{
+    family: [
+       {
+            "@class": "com.foo.bar.Adult",
+            "name": "Joe",
+            "employer": "ModusBox"
+       },
+       {
+            "@class": "com.foo.bar.Child",
+            "name": "Jane",
+            "school": "Elk Grove Middle School"
+       }
+    ]
+}
+--------------
+--------------
+/** DataSonnet
+version=2.0
+output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar.Household; polymorphictypes=com.foo.bar.Person; polymorphictypeidproperty=__clazz
+*/
+{
+    family: [
+       {
+            "__clazz": "com.foo.bar.Adult",
+            "name": "Joe",
+            "employer": "ModusBox"
+       },
+       {
+            "__clazz": "com.foo.bar.Child",
+            "name": "Jane",
+            "school": "Elk Grove Middle School"
+       }
+    ]
+}
+--------------
 

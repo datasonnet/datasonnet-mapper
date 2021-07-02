@@ -1,4 +1,4 @@
-package com.datasonnet.spi;
+package com.datasonnet.javatest;
 
 /*-
  * Copyright 2019-2021 the original author or authors.
@@ -15,16 +15,6 @@ package com.datasonnet.spi;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class PluginException extends RuntimeException {
-    public PluginException(String message) {
-        super(message);
-    }
+public abstract class Animal {
 
-    public PluginException(Throwable e) {
-        super(e);
-    }
-
-    public PluginException(String message, Throwable e) {
-        super(message, e);
-    }
 }

@@ -15,6 +15,7 @@ package com.datasonnet.plugins;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import com.datasonnet.RecentsMap;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
@@ -24,6 +25,8 @@ import com.datasonnet.plugins.jackson.JAXBElementMixIn;
 import com.datasonnet.plugins.jackson.JAXBElementSerializer;
 import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.ujsonUtils;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,8 +39,8 @@ import ujson.Value;
 import javax.xml.bind.JAXBElement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
+
 
 
 public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
@@ -46,8 +49,11 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
     public static final String DS_PARAM_DATE_FORMAT = "dateformat";
     public static final String DS_PARAM_TYPE = "type";  // aligns with existing java object mimetypes
     public static final String DS_PARAM_OUTPUT_CLASS = "outputclass";  // supports legacy
+    public static final String DS_PARAM_MIXINS = "mixins";
+    public static final String DS_PARAM_POLYMORPHIC_TYPES = "polymorphictypes";
+    public static final String DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY = "polymorphictypeidproperty";
 
-    private static final Map<Integer, ObjectMapper> MAPPER_CACHE = new RecentsMap<>(64);
+    private static final Map<String, ObjectMapper> MAPPER_CACHE = new RecentsMap<>(64);
 
     static {
         SimpleModule module = new SimpleModule();
@@ -74,6 +80,9 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         readerParams.add(DS_PARAM_TYPE);
         readerParams.add(DS_PARAM_OUTPUT_CLASS);
         writerParams.addAll(readerParams);
+        writerParams.add(DS_PARAM_MIXINS);
+        writerParams.add(DS_PARAM_POLYMORPHIC_TYPES);
+        writerParams.add(DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY);
     }
 
     @Override
@@ -142,16 +151,74 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         }
     }
 
-    private ObjectMapper getObjectMapper(MediaType mediaType) {
-        ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
 
-        if (mediaType.getParameters().containsKey(DS_PARAM_DATE_FORMAT)) {
-            String dateFormat = mediaType.getParameter(DS_PARAM_DATE_FORMAT);
-            int cacheKey = dateFormat.hashCode();
-            mapper = MAPPER_CACHE.computeIfAbsent(cacheKey,
-                    integer -> new ObjectMapper().setDateFormat(makeDateFormat(dateFormat)));
+    private ObjectMapper adaptObjectMapper(Map<String, String> parameters) {
+        ObjectMapper mapper = DEFAULT_OBJECT_MAPPER.copy();
+
+        if (parameters.containsKey(DS_PARAM_DATE_FORMAT)) {
+            String dateFormat = parameters.get(DS_PARAM_DATE_FORMAT);
+            mapper.setDateFormat(makeDateFormat(dateFormat));
         }
+
+        if (parameters.containsKey(DS_PARAM_MIXINS)) {
+            try {
+                Map<String, String> mixinsMap = mapper.readValue(parameters.get(DS_PARAM_MIXINS), Map.class);
+                for (Map.Entry<String,String> entry : mixinsMap.entrySet()) {
+                    mapper.addMixIn(Class.forName(entry.getKey()), Class.forName(entry.getValue()));
+                }
+            } catch (JsonProcessingException jpe) {
+                throw new PluginException("Invalid 'mixins' header format, must be JSON object", jpe);
+            } catch (ClassNotFoundException cnfe) {
+                throw new PluginException("Unable to add mixin", cnfe);
+            }
+        }
+
+        if (parameters.containsKey(DS_PARAM_POLYMORPHIC_TYPES)) {
+            final Set<String> polymorphicTypes = new HashSet<>(Arrays.asList(parameters.get(DS_PARAM_POLYMORPHIC_TYPES).trim().split("\\s*,\\s*")));
+
+            // we use the deprecated constructor that is "unsafe" here, but safety is preserved
+            // because of the useForType check
+            ObjectMapper.DefaultTypeResolverBuilder resolver = new ObjectMapper.DefaultTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_FINAL) {
+                @Override
+                public boolean useForType(JavaType t) {
+                    // only use our new resolver when it is one of the indicated types
+                    return polymorphicTypes.contains(t.getRawClass().getTypeName());
+                }
+            };
+
+            // require fully identified type name
+            resolver.init(JsonTypeInfo.Id.CLASS, null);
+
+            // require it be a property value
+            resolver.inclusion(JsonTypeInfo.As.PROPERTY);
+
+            // determine which property value
+            if (parameters.containsKey(DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY)) {
+                resolver.typeProperty(parameters.get(DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY));
+            } else {
+                resolver.typeProperty("@class");  // already default, but be explicit
+            }
+            mapper.setDefaultTyping(resolver);
+        }
+
         return mapper;
+    }
+
+    private ObjectMapper getObjectMapper(MediaType mediaType) throws PluginException {
+        Map<String, String> parameters = mediaType.getParameters();
+
+        // for these keys we adapt the object mapper some, but we can keep reusing that every time the same collection
+        // of parameters comes up
+        // We have this check instead of just caching on every parameter combo
+        // because most parameters do not require object mapper changes
+        if (parameters.containsKey(DS_PARAM_DATE_FORMAT) || parameters.containsKey(DS_PARAM_MIXINS) || parameters.containsKey(DS_PARAM_POLYMORPHIC_TYPES)) {
+            String key = mediaType.toString();
+            return MAPPER_CACHE.computeIfAbsent(key, k -> {
+                return adaptObjectMapper(parameters);
+            });
+        }
+
+        return DEFAULT_OBJECT_MAPPER;
     }
 
     private String getJavaType(MediaType mediaType) {

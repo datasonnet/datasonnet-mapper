@@ -19,6 +19,7 @@ import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.javatest.Gizmo;
+import com.datasonnet.javatest.MixInTestClass;
 import com.datasonnet.javatest.WsdlGeneratedObj;
 import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.Test;
@@ -33,11 +34,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
-
 
 public class JavaWriterTest {
 
@@ -112,7 +113,7 @@ public class JavaWriterTest {
         Document<String> data = new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON);
         Mapper mapper = new Mapper("/** DataSonnet\n" +
                 "version=2.0\n" +
-                "output application/java; OutputClass=java.lang.Object\n" +
+                "output application/x-java-object; OutputClass=java.lang.Object\n" +
                 "*/\n" +
                 "{ a: 5 }");
         Document<Map> mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, Map.class);
@@ -155,6 +156,64 @@ public class JavaWriterTest {
     }
 
     @Test
+    void testMixIns() throws Exception {
+        Document<String> data = new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON);
+        String mapping = TestResourceReader.readFileAsString("mixInsTest.ds");
+        Mapper mapper = new Mapper(mapping);
+
+        // First try without any headers, it should fail
+        try {
+            mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, MixInTestClass.class);
+            fail("Should not succeed");
+        } catch (Exception e) {
+            // this error is now thrown by jackson as it _will_ try to write a String...
+            assertTrue(e.getMessage().contains("Unable to convert to target type"), "Failed with wrong message: " + e.getMessage());
+        }
+        //Now let's add mixins header
+        mapping = TestResourceReader.readFileAsString("mixInsTestWithHeader.ds");
+        mapper = new Mapper(mapping);
+        Document<MixInTestClass> objectMapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, MixInTestClass.class);
+        Object objectResult = objectMapped.getContent();
+        assertTrue(objectResult instanceof MixInTestClass);
+        MixInTestClass result = (MixInTestClass)objectResult;
+        assertTrue(result.getAnimal() instanceof com.datasonnet.javatest.Cat);
+    }
+
+    @Test
+    void testPolymorphicTypes() throws Exception {
+        Document<String> data = new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON);
+        String mapping = TestResourceReader.readFileAsString("mixInsTest.ds");
+        Mapper mapper = new Mapper(mapping);
+
+        // First try without any headers, it should fail
+        try {
+            mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, MixInTestClass.class);
+            fail("Should not succeed");
+        } catch (Exception e) {
+            // this error is now thrown by jackson as it _will_ try to write a String...
+            assertTrue(e.getMessage().contains("Unable to convert to target type"), "Failed with wrong message: " + e.getMessage());
+        }
+        //Now let's add polymorphic types header
+        mapping = TestResourceReader.readFileAsString("polymorphicTypesTest.ds");
+
+        mapper = new Mapper(mapping);
+        Document<MixInTestClass> objectMapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, MixInTestClass.class);
+        Object objectResult = objectMapped.getContent();
+        assertTrue(objectResult instanceof MixInTestClass);
+        MixInTestClass result = (MixInTestClass) objectResult;
+        assertTrue(result.getAnimal() instanceof com.datasonnet.javatest.Cat);
+
+        //Override polymorphic type property
+        mapping = TestResourceReader.readFileAsString("polymorphicTypePropertyTest.ds");
+
+        mapper = new Mapper(mapping);
+        Document<MixInTestClass> objectMapped1 = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, MixInTestClass.class);
+        Object objectResult1 = objectMapped1.getContent();
+        assertTrue(objectResult1 instanceof MixInTestClass);
+        MixInTestClass result1 = (MixInTestClass) objectResult1;
+        assertTrue(result1.getAnimal() instanceof com.datasonnet.javatest.Cat);
+    }
+     
     public void testNull() {
         Mapper mapper = new Mapper("null");
         Document<String> mapped = mapper.transform(DefaultDocument.NULL_INSTANCE, Collections.emptyMap(), MediaTypes.APPLICATION_JAVA);
