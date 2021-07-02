@@ -169,6 +169,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
 
     private ObjectMapper getObjectMapper(MediaType mediaType) throws PluginException {
         //I disabled the caching because it doesn't play well with manipulating mixins; instead, I clone the default mapper
+
 /*
         ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
 
