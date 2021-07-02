@@ -16,11 +16,9 @@ package com.datasonnet;
  * limitations under the License.
  */
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CryptoTest {
 
@@ -85,14 +83,107 @@ public class CryptoTest {
     }
 
     @Test
-    @Disabled
-    void testEncrypt() {
-        Mapper mapper = new Mapper("ds.crypto.encrypt(\"HelloWorld\", \"DataSonnet123\")");
+    void testEncryptDecrypt() {
+        String alg ="AES", mode="CBC", padding="PKCS5Padding";
+        Mapper mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
         String encrypted = mapper.transform("{}").replaceAll("\"", "");
-        assertTrue("HdK8opktKiK3ero0RJiYbA==".equals(encrypted));
 
-        mapper = new Mapper("ds.crypto.decrypt(\"HdK8opktKiK3ero0RJiYbA==\", \"DataSonnet123\")");
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
         String decrypted = mapper.transform("{}").replaceAll("\"", "");
-        assertTrue("HelloWorld".equals(decrypted));
+        assertEquals("Hello World", decrypted);
+
+        // 32 bits long
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonnet123456DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
+        encrypted = mapper.transform("{}").replaceAll("\"", "");
+
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'DataSonnet123456DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
+        decrypted = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("Hello World", decrypted);
+
+        //=============================ECB
+
+        mode="ECB";
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
+        encrypted = mapper.transform("{}").replaceAll("\"", "");
+
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
+        decrypted = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("Hello World", decrypted);
+
+        //========================================================================================
+
+        alg ="DES";
+        mode="CBC";
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonn', '" + alg + "/" + mode + "/" + padding + "')");
+        encrypted = mapper.transform("{}").replaceAll("\"", "");
+
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'DataSonn', '" + alg + "/" + mode + "/" + padding + "')");
+        decrypted = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("Hello World", decrypted);
+
+        //=============================ECB
+
+        mode="ECB";
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonn', '" + alg + "/" + mode + "/" + padding + "')");
+        encrypted = mapper.transform("{}").replaceAll("\"", "");
+
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'DataSonn', '" + alg + "/" + mode + "/" + padding + "')");
+        decrypted = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("Hello World", decrypted);
+
+        //========================================================================================
+
+        alg ="DESede";
+        mode="CBC";
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'Datasonnet123456XDatason', '" + alg + "/" + mode + "/" + padding + "')");
+        encrypted = mapper.transform("{}").replaceAll("\"", "");
+
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'Datasonnet123456XDatason', '" + alg + "/" + mode + "/" + padding + "')");
+        decrypted = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("Hello World", decrypted);
+
+        //=============================ECB
+
+        mode="ECB";
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'Datasonnet123456XDatason', '" + alg + "/" + mode + "/" + padding + "')");
+        encrypted = mapper.transform("{}").replaceAll("\"", "");
+
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'Datasonnet123456XDatason', '" + alg + "/" + mode + "/" + padding + "')");
+        decrypted = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("Hello World", decrypted);
+
+        //========================================================================================
+
+        /*alg ="RSA";
+        mode="ECB";
+        padding="PKCS1Padding";
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
+        encrypted = mapper.transform("{}").replaceAll("\"", "");
+
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
+        decrypted = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("Hello World", decrypted);*/
+
+        //========================================================================================
+
+        alg ="DUMMY"; mode="CBC"; padding="PKCS5Padding";
+        try {
+            mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
+            encrypted = mapper.transform("{}").replaceAll("\"", "");
+            fail("This should fail with NoSuchAlgorithmException");
+        } catch (Exception e) {
+            String msg = e.getMessage();
+            assertTrue(msg != null && msg.contains("Caused by: java.security.NoSuchAlgorithmException: Cannot find any provider supporting DUMMY/CBC/PKCS5Padding"));
+        }
+
+        alg ="AES"; mode="CBC"; padding="PKCS5Padding";
+        try {
+            mapper = new Mapper("ds.crypto.encrypt('Hello World', 'not-long-enough', '" + alg + "/" + mode + "/" + padding + "')");
+            encrypted = mapper.transform("{}").replaceAll("\"", "");
+            fail("This should fail with NoSuchAlgorithmException");
+        } catch (Exception e) {
+            String msg = e.getMessage();
+            assertTrue(msg != null && msg.contains("Caused by: java.security.InvalidKeyException: Invalid AES key length"));
+        }
     }
 }

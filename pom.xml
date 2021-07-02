@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2019-2020 the original author or authors.
+    Copyright 2019-2021 the original author or authors.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -16,17 +16,15 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.datasonnet</groupId>
     <artifactId>datasonnet-mapper</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.1.4-SNAPSHOT</version>
     <name>DataSonnet Mapper</name>
     <description>A transformation domain specific language</description>
-    <url>https://github.com/ms3inc/datasonnet-mapper</url>
+    <url>https://github.com/modusbox/datasonnet-mapper</url>
     <inceptionYear>2019</inceptionYear>
     <licenses>
         <license>
@@ -64,15 +62,15 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/MS3Inc/datasonnet-mapper.git</connection>
-        <developerConnection>scm:git:https://github.com/MS3Inc/datasonnet-mapper.git</developerConnection>
-        <url>https://github.com/MS3Inc/datasonnet-mapper</url>
-        <tag>HEAD</tag>
+        <connection>scm:git:https://github.com/modusbox/datasonnet-mapper.git</connection>
+        <developerConnection>scm:git:https://github.com/modusbox/datasonnet-mapper.git</developerConnection>
+        <url>https://github.com/modusbox/datasonnet-mapper</url>
+        <tag>2.0.0</tag>
     </scm>
     <distributionManagement>
         <repository>
             <id>sonatype-ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
         <snapshotRepository>
             <id>ms3-nexus</id>
@@ -85,7 +83,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <jackson.version>2.11.2</jackson.version>
         <junit.version>5.6.2</junit.version>
-        <bouncycastle.version>1.66</bouncycastle.version>
+        <bouncycastle.version>1.68</bouncycastle.version>
         <quickcheck.version>0.9.4</quickcheck.version>
         <xmlunit.version>2.7.0</xmlunit.version>
         <mycila.version>4.0.rc2</mycila.version>
@@ -416,8 +414,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>sonatype-ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    <nexusUrl>https://s01.oss.sonatype.org</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
         </plugins>

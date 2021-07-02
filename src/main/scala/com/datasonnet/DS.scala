@@ -1,7 +1,7 @@
 package com.datasonnet
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,21 @@ package com.datasonnet
 
 import java.math.{BigDecimal, RoundingMode}
 import java.net.URL
+import java.security.SecureRandom
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.time.{Duration, Instant, Period, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.{DateTimeException, Duration, Instant, LocalDateTime, Period, ZoneId, ZoneOffset, ZonedDateTime}
 import java.util.function.Function
 import java.util.{Base64, Scanner}
 
 import com.datasonnet
 import com.datasonnet.document.{DefaultDocument, MediaType}
 import com.datasonnet.header.Header
+import com.datasonnet.modules.{Crypto, JsonPath, Regex}
 import com.datasonnet.spi.{DataFormatService, Library, ujsonUtils}
+import javax.crypto.Cipher
+import javax.crypto.spec.{IvParameterSpec, SecretKeySpec}
 import sjsonnet.Expr.Member.Visibility
 import sjsonnet.ReadWriter.{ApplyerRead, ArrRead, StringRead}
 import sjsonnet.Std.{builtin, builtinWithDefaults, _}
@@ -37,14 +41,15 @@ import ujson.Value
 
 import scala.collection.mutable
 import scala.util.Random
+import scala.jdk.CollectionConverters._
 
 object DSLowercase extends Library {
 
   override def namespace() = "ds"
 
-  override def libsonnets(): Set[String] = Set("util")
+  override def libsonnets(): java.util.Set[String] = Set("util").asJava
 
-  override def functions(dataFormats: DataFormatService, header: Header): Map[String, Val.Func] = Map(
+  override def functions(dataFormats: DataFormatService, header: Header): java.util.Map[String, Val.Func] = Map(
     builtin("contains", "container", "value") {
       (_, _, container: Val, value: Val) =>
         container match {
@@ -381,7 +386,7 @@ object DSLowercase extends Library {
       val data = args("data").cast[Val.Str].value
       val mimeType = args("mimeType").cast[Val.Str].value
       val params = if (args("params") == Val.Null) {
-        Library.emptyObj
+        Library.EmptyObj
       } else {
         args("params").cast[Val.Obj]
       }
@@ -524,7 +529,7 @@ object DSLowercase extends Library {
       val data = args("data")
       val mimeType = args("mimeType").cast[Val.Str].value
       val params = if (args("params") == Val.Null) {
-        Library.emptyObj
+        Library.EmptyObj
       } else {
         args("params").cast[Val.Obj]
       }
@@ -757,14 +762,63 @@ object DSLowercase extends Library {
           case _ => first
         }
     }
-  )
+  ).asJava
 
-  override def modules(dataFormats: DataFormatService, header: Header): Map[String, Val.Obj] = Map(
+  override def modules(dataFormats: DataFormatService, header: Header): java.util.Map[String, Val.Obj] = Map(
+    "xml" -> moduleFrom(
+      builtinWithDefaults("flattenContents", "element" -> None, "namespaces" -> Some(Expr.Null(0))) {
+        (args, ev) =>
+          val element = args("element").cast[Val.Obj]
+          val namespaces = if (args("namespaces") == Val.Null) {
+            Library.EmptyObj
+          } else {
+            args("namespaces").cast[Val.Obj]
+          }
+
+          val wrapperName = "a"
+          val wrapperStop = s"</$wrapperName>"
+
+          val wrapperProperties = scala.collection.mutable.Map[String, Val.Obj.Member]()
+          wrapperProperties += ("a" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => element))
+          val wrapped = new Val.Obj(wrapperProperties, _ => (), None)
+
+          val xmlProperties = scala.collection.mutable.Map[String, Val.Obj.Member]()
+          xmlProperties += ("OmitXmlDeclaration" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => Val.Str("true")))
+          namespaces.foreachVisibleKey((key, _) => {
+            xmlProperties += ("NamespaceDeclarations." + key ->
+              Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) =>
+                namespaces.value(key, -1)(new FileScope(null, Map.empty), ev)))
+          })
+
+          val properties = new Val.Obj(xmlProperties, _ => (), None)
+
+          val written = write(dataFormats, wrapped, "application/xml", properties, ev)
+
+          written.substring(written.indexOf(">") + 1, written.length - wrapperStop.length)
+      },
+    ),
     "datetime" -> moduleFrom(
-      builtin0("now") { (vals, ev, fs) => ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) },
+      builtin0("now") { (_, _, _) => ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) },
 
-      builtin("parse", "datetime", "inputFormat") { (_, _, datetime: String, inputFormat: String) =>
-        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
+      builtin("parse", "datetime", "inputFormat") { (_, _, datetime: Val, inputFormat: String) =>
+        var datetimeObj : ZonedDateTime = null
+        inputFormat.toLowerCase match {
+          case "timestamp" | "epoch" =>
+            var inst : Instant = null
+            datetime match{
+              case Val.Str(item) => inst = Instant.ofEpochSecond(item.toInt.toLong)
+              case Val.Num(item) => inst = Instant.ofEpochSecond(item.toLong)
+              case _ => throw Error.Delegate("Expected datetime to be a string or number, got: " + datetime.prettyName)
+            }
+            datetimeObj = java.time.ZonedDateTime.ofInstant(inst, ZoneOffset.UTC)
+          case _ =>
+            datetimeObj = try{ //will catch any errors if zone data is missing and default to Z
+              java.time.ZonedDateTime.parse(datetime.cast[Val.Str].value, DateTimeFormatter.ofPattern(inputFormat))
+            } catch {
+              case e: DateTimeException =>
+                LocalDateTime.parse(datetime.cast[Val.Str].value, DateTimeFormatter.ofPattern(inputFormat)).atZone(ZoneId.of("Z"))
+            }
+        }
         datetimeObj.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
@@ -798,12 +852,6 @@ object DSLowercase extends Library {
         } else {
           datetime.minus(Period.parse(period)).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         }
-      },
-
-      builtin("daysBetween", "datetime1", "datetime2") { (_, _, datetime1: String, datetime2: String) =>
-          val datetimeObj1 = java.time.ZonedDateTime.parse(datetime1, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-          val datetimeObj2 = java.time.ZonedDateTime.parse(datetime2, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-          datetimeObj1.compareTo(datetimeObj2)
       },
 
       builtin("changeTimeZone", "datetime", "timezone") {
@@ -883,7 +931,6 @@ object DSLowercase extends Library {
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
             .parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-          System.out.println(date.getDayOfWeek.getValue)
 
           date.minusDays( if(date.getDayOfWeek.getValue == 7) 0 else date.getDayOfWeek.getValue  )
             .minusHours(date.getHour)
@@ -1025,7 +1072,120 @@ object DSLowercase extends Library {
 
       builtin("hmac", "value", "secret", "algorithm") {
         (_, _, value: String, secret: String, algorithm: String) =>
-          datasonnet.Crypto.hmac(value, secret, algorithm)
+          Crypto.hmac(value, secret, algorithm)
+      },
+
+      /**
+       * Encrypts the value with specified JDK Cipher Transformation and the provided secret. Converts the encryption
+       * to a readable format with Base64
+       *
+       * @builtinParam value The message to be encrypted.
+       *    @types [String]
+       * @builtinParam secret The secret used to encrypt the original messsage.
+       *    @types [String]
+       * @builtinParam transformation The string that describes the operation (or set of operations) to be performed on
+       * the given input, to produce some output. A transformation always includes the name of a cryptographic algorithm
+       * (e.g., AES), and may be followed by a feedback mode and padding scheme. A transformation is of the form:
+       * "algorithm/mode/padding" or "algorithm"
+       *    @types [String]
+       * @builtinReturn Base64 String value of the encrypted message
+       *    @types [String]
+       * @changed 2.0.3
+       */
+      builtin0[Val]("encrypt", "value", "secret", "transformation") {
+        (vals, ev, fs) =>
+          val valSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead))
+          val value = valSeq(0).asInstanceOf[String]
+          val secret = valSeq(1).asInstanceOf[String]
+          val transformation = valSeq(2).asInstanceOf[String]
+
+          val cipher = Cipher.getInstance(transformation)
+          val transformTokens = transformation.split("/")
+
+          // special case for ECB because of java.security.InvalidAlgorithmParameterException: ECB mode cannot use IV
+          if (transformTokens.length >= 2 && "ECB".equals(transformTokens(1))) {
+            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(secret.getBytes, transformTokens(0).toUpperCase))
+            Val.Str(Base64.getEncoder.encodeToString(cipher.doFinal(value.getBytes)))
+
+          } else {
+            // https://stackoverflow.com/a/52571774/4814697
+            val rand: SecureRandom = new SecureRandom()
+            val iv = new Array[Byte](cipher.getBlockSize)
+            rand.nextBytes(iv)
+
+            cipher.init(Cipher.ENCRYPT_MODE,
+              new SecretKeySpec(secret.getBytes, transformTokens(0).toUpperCase),
+              new IvParameterSpec(iv),
+              rand)
+
+            // encrypted data:
+            val encryptedBytes = cipher.doFinal(value.getBytes)
+
+            // append Initiation Vector as a prefix to use it during decryption:
+            val combinedPayload = new Array[Byte](iv.length + encryptedBytes.length)
+
+            // populate payload with prefix IV and encrypted data
+            System.arraycopy(iv, 0, combinedPayload, 0, iv.length)
+            System.arraycopy(encryptedBytes, 0, combinedPayload, iv.length, encryptedBytes.length)
+
+            Val.Str(Base64.getEncoder.encodeToString(combinedPayload))
+          }
+
+      },
+
+      /**
+       * Decrypts the Base64 value with specified JDK Cipher Transformation and the provided secret.
+       *
+       * @builtinParam value The encrypted message to be decrypted.
+       *    @types [String]
+       * @builtinParam secret The secret used to encrypt the original messsage.
+       *    @types [String]
+       * @builtinParam algorithm The algorithm used for the encryption.
+       *    @types [String]
+       * @builtinParam mode The encryption mode to be used.
+       *    @types [String]
+       * @builtinParam padding The encryption secret padding to be used
+       *    @types [String]
+       * @builtinReturn Base64 String value of the encrypted message
+       *    @types [String]
+       * @changed 2.0.3
+       */
+      builtin0[Val]("decrypt", "value", "secret", "transformation") {
+        (vals, ev,fs) =>
+          val valSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead))
+          val value = valSeq(0).asInstanceOf[String]
+          val secret = valSeq(1).asInstanceOf[String]
+          val transformation = valSeq(2).asInstanceOf[String]
+
+          val cipher = Cipher.getInstance(transformation)
+          val transformTokens = transformation.split("/")
+
+          // special case for ECB because of java.security.InvalidAlgorithmParameterException: ECB mode cannot use IV
+          if (transformTokens.length >= 2 && "ECB".equals(transformTokens(1))) {
+            cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(secret.getBytes, transformTokens(0).toUpperCase))
+            Val.Str(new String(cipher.doFinal(Base64.getDecoder.decode(value))))
+
+          } else {
+            // https://stackoverflow.com/a/52571774/4814697
+            // separate prefix with IV from the rest of encrypted data//separate prefix with IV from the rest of encrypted data
+            val encryptedPayload = Base64.getDecoder.decode(value)
+            val iv = new Array[Byte](cipher.getBlockSize)
+            val encryptedBytes = new Array[Byte](encryptedPayload.length - iv.length)
+            val rand: SecureRandom = new SecureRandom()
+
+            // populate iv with bytes:
+            System.arraycopy(encryptedPayload, 0, iv, 0, iv.length)
+
+            // populate encryptedBytes with bytes:
+            System.arraycopy(encryptedPayload, iv.length, encryptedBytes, 0, encryptedBytes.length)
+
+            cipher.init(Cipher.DECRYPT_MODE,
+              new SecretKeySpec(secret.getBytes, transformTokens(0).toUpperCase),
+              new IvParameterSpec(iv),
+              rand)
+
+            Val.Str(new String(cipher.doFinal(encryptedBytes)))
+          }
       }
     ),
 
@@ -2187,14 +2347,14 @@ object DSLowercase extends Library {
           }
       }
     )
-  )
+  ).asJava
 
   def read(dataFormats: DataFormatService, data: String, mimeType: String, params: Val.Obj, ev: EvalScope): Val = {
     val Array(supert, subt) = mimeType.split("/", 2)
     val paramsAsJava = ujsonUtils.javaObjectFrom(ujson.read(Materializer.apply(params)(ev)).obj).asInstanceOf[java.util.Map[String, String]]
     val doc = new DefaultDocument(data, new MediaType(supert, subt, paramsAsJava))
 
-    val plugin = dataFormats.thatAccepts(doc)
+    val plugin = dataFormats.thatCanRead(doc)
       .orElseThrow(() => Error.Delegate("No suitable plugin found for mime type: " + mimeType))
 
     Materializer.reverse(plugin.read(doc))
@@ -2205,7 +2365,7 @@ object DSLowercase extends Library {
     val paramsAsJava = ujsonUtils.javaObjectFrom(ujson.read(Materializer.apply(params)(ev)).obj).asInstanceOf[java.util.Map[String, String]]
     val mediaType = new MediaType(supert, subt, paramsAsJava)
 
-    val plugin = dataFormats.thatProduces(mediaType, classOf[String])
+    val plugin = dataFormats.thatCanWrite(mediaType, classOf[String])
       .orElseThrow(() => Error.Delegate("No suitable plugin found for mime type: " + mimeType))
 
     plugin.write(Materializer.apply(json)(ev), mediaType, classOf[String]).getContent
@@ -2568,12 +2728,12 @@ object ValOrdering extends Ordering[Val] {
 object DSUppercase extends Library {
   override def namespace() = "DS"
 
-  override def libsonnets(): Set[String] = Set("util")
+  override def libsonnets(): java.util.Set[String] = Set("util").asJava
 
   // no root functions in the old version
-  override def functions(dataFormats: DataFormatService, header: Header): Map[String, Val.Func] = Map()
+  override def functions(dataFormats: DataFormatService, header: Header): java.util.Map[String, Val.Func] = Map().asJava
 
-  override def modules(dataFormats: DataFormatService, header: Header): Map[String, Val.Obj] = Map(
+  override def modules(dataFormats: DataFormatService, header: Header): java.util.Map[String, Val.Obj] = Map(
     "ZonedDateTime" -> moduleFrom(
       builtin0("now") { (vals, ev, fs) => Instant.now().toString() },
 
@@ -2635,7 +2795,7 @@ object DSUppercase extends Library {
         val data = args("data").cast[Val.Str].value
         val mimeType = args("mimeType").cast[Val.Str].value
         val params = if (args("params") == Val.Null) {
-          Library.emptyObj
+          Library.EmptyObj
         } else {
           args("params").cast[Val.Obj]
         }
@@ -2648,7 +2808,7 @@ object DSUppercase extends Library {
         val data = args("data")
         val mimeType = args("mimeType").cast[Val.Str].value
         val params = if (args("params") == Val.Null) {
-          Library.emptyObj
+          Library.EmptyObj
         } else {
           args("params").cast[Val.Obj]
         }
@@ -2697,15 +2857,15 @@ object DSUppercase extends Library {
       },
       builtin("hmac", "value", "secret", "algorithm") {
         (ev, fs, value: String, secret: String, algorithm: String) =>
-          datasonnet.Crypto.hmac(value, secret, algorithm)
+          Crypto.hmac(value, secret, algorithm)
       },
       builtin("encrypt", "value", "password") {
         (ev, fs, value: String, password: String) =>
-          datasonnet.Crypto.encrypt(value, password)
+          Crypto.encrypt(value, password)
       },
       builtin("decrypt", "value", "password") {
         (ev, fs, value: String, password: String) =>
-          datasonnet.Crypto.decrypt(value, password)
+          Crypto.decrypt(value, password)
       },
     ),
 
@@ -2780,5 +2940,5 @@ object DSUppercase extends Library {
         java.net.URLDecoder.decode(data, encoding)
       },
     )
-  )
+  ).asJava
 }

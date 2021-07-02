@@ -67,8 +67,8 @@ public class XMLPropertyTest {
         try {
             String xml = mapper.transform(new DefaultDocument<String>(json, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
         } catch(Throwable t) {
+            t.printStackTrace();
             fail("Unable to convert to xml: " + json);
         }
     }
-
 }

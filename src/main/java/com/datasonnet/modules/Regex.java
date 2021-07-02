@@ -1,4 +1,4 @@
-package com.datasonnet;
+package com.datasonnet.modules;
 
 /*-
  * Copyright 2019-2020 the original author or authors.

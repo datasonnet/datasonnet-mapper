@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,26 +15,20 @@ package com.datasonnet;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.datasonnet.document.DefaultDocument;
+import com.datasonnet.document.Document;
+import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.TestResourceReader;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.xmlunit.matchers.CompareMatcher;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class XMLWriterTest {
 
@@ -93,9 +87,9 @@ public class XMLWriterTest {
 
         Mapper mapper = new Mapper(datasonnet);
 
-        String mappedXml = mapper.transform(new DefaultDocument<>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
-
-        assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
+        Document<String> mappedXml = mapper.transform(new DefaultDocument<>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML);
+        assertEquals(MediaTypes.APPLICATION_XML, mappedXml.getMediaType());
+        assertThat(mappedXml.getContent(), CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
     }
 
     @Test
@@ -122,7 +116,7 @@ public class XMLWriterTest {
         String expectedXml = TestResourceReader.readFileAsString("writeXMLEscapedTest.xml");
 
         Mapper mapper = new Mapper(datasonnet);
-        String mappedXml = mapper.transform(new DefaultDocument<>(null), Collections.emptyMap(), MediaTypes.APPLICATION_XML, String.class).getContent();
+        String mappedXml = mapper.transform(DefaultDocument.NULL_INSTANCE, Collections.emptyMap(), MediaTypes.APPLICATION_XML, String.class).getContent();
 
         assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
     }
@@ -219,6 +213,31 @@ public class XMLWriterTest {
         assertTrue(mappedXml.startsWith("<?xml"));
     }
 
+    // TODO add version using namespaces
+    @Test
+    void testFlattenMixedContent() throws Exception {
+        String xmlData = TestResourceReader.readFileAsString("xmlMixedContent.xml");
+        String expected = TestResourceReader.readFileAsString("xmlMixedContent.txt");
+
+        Mapper mapper = new Mapper("ds.xml.flattenContents(payload.letter)");
+
+        String mapped = mapper.transform(new DefaultDocument<>(xmlData, MediaType.valueOf(MediaTypes.APPLICATION_XML_VALUE)), Collections.emptyMap(), MediaTypes.TEXT_PLAIN).getContent();
+
+        assertEquals(expected, mapped);
+    }
+
+    @Test
+    void testFlattenMixedContentWithNamespaces() throws Exception {
+        String xmlData = TestResourceReader.readFileAsString("xmlMixedContentNamespaces.xml");
+        String expected = TestResourceReader.readFileAsString("xmlMixedContent.txt");
+
+        Mapper mapper = new Mapper("ds.xml.flattenContents(payload[\"ns:letter\"], {\"$\": \"https://example.com\"})");
+
+        String mapped = mapper.transform(new DefaultDocument<>(xmlData, MediaType.valueOf(MediaTypes.APPLICATION_XML_VALUE)), Collections.emptyMap(), MediaTypes.TEXT_PLAIN).getContent();
+
+        assertEquals(expected, mapped, "Expected " + expected + " but got " + mapped);
+    }
+
     @Test
     void testXMLRoot() throws Exception {
         String jsonData = TestResourceReader.readFileAsString("xmlRoot.json");
@@ -246,13 +265,26 @@ public class XMLWriterTest {
         }
     }
 
-    void simpleJsonTest() throws Exception {
-        String jsonData = TestResourceReader.readFileAsString("test.json");
+    @Test
+    void testNestedNamespaces() throws Exception {
+        String jsonData = TestResourceReader.readFileAsString("xmlNestedNamespaces.json");
+        String expectedXml = TestResourceReader.readFileAsString("xmlNestedNamespaces.xml");
 
-        Mapper mapper = new Mapper("ds.write(payload, \"application/xml\")");
+        Mapper mapper = new Mapper("payload");
 
         String mappedXml = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
+        assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
+    }
 
-        assertTrue(mappedXml.contains("<?xml"));
+    @Test
+    public void testNull() {
+        Mapper mapper = new Mapper("null");
+
+        try {
+            mapper.transform(DefaultDocument.NULL_INSTANCE, Collections.emptyMap(), MediaTypes.APPLICATION_XML);
+            fail("Should not succeed");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Input for XML writer must be an Object"), "Failed with wrong message: " + e.getMessage());
+        }
     }
 }

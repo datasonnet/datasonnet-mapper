@@ -24,11 +24,11 @@ import com.datasonnet.header.Header
 import com.datasonnet.spi.{DataFormatService, Library}
 import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
 import fastparse.Parsed
-import sjsonnet.{Evaluator, Error, Expr, FileScope, Materializer, Parser, Path, Std, Val}
 import sjsonnet.Expr.Params
 import sjsonnet.Val.{Func, Lazy, Obj}
-import ujson.Value
+import sjsonnet._
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters.{IterableHasAsScala, MapHasAsScala}
 import scala.util.{Failure, Success, Try}
 
@@ -183,7 +183,7 @@ class Mapper(var script: String,
   private def effectiveOutput(output: MediaType): MediaType = {
     if (output.equalsTypeAndSubtype(MediaTypes.ANY)) {
       val fromHeader = header.getDefaultOutput
-      if (fromHeader != null && !fromHeader.equalsTypeAndSubtype(MediaTypes.ANY)) header.combineOutputParams(fromHeader)
+      if (fromHeader.isPresent && !fromHeader.get.equalsTypeAndSubtype(MediaTypes.ANY)) header.combineOutputParams(fromHeader.get)
       else header.combineOutputParams(defaultOutput)
     } else {
       header.combineOutputParams(output)
@@ -194,11 +194,34 @@ class Mapper(var script: String,
   private def effectiveInput[T](name: String, input: Document[T]): Document[T] = {
     if (input.getMediaType.equalsTypeAndSubtype(MediaTypes.UNKNOWN)){
       val fromHeader = header.getDefaultNamedInput(name)
-      if (fromHeader != null) header.combineInputParams(name, input.withMediaType(fromHeader))
+      if (fromHeader.isPresent) header.combineInputParams(name, input.withMediaType(fromHeader.get))
       else header.combineInputParams(name, input.withMediaType(MediaTypes.APPLICATION_JAVA))
     } else {
       header.combineInputParams(name, input)
     }
+  }
+
+  // supports a Map[String, Document] to enable a scenario where documents are grouped into a single input
+  private def resolveInput(name: String, input: Document[_]): ujson.Value = {
+    if (!input.getContent.isInstanceOf[java.util.Map[_, _]]) return dataFormats.mandatoryRead(effectiveInput(name, input))
+
+    val entrySet = input.getContent.asInstanceOf[java.util.Map[_, _]].entrySet()
+    if (entrySet.isEmpty) return dataFormats.mandatoryRead(effectiveInput(name, input))
+
+    val it = entrySet.iterator
+    val firstEntry = it.next
+    if (!firstEntry.getKey.isInstanceOf[String] || !firstEntry.getValue.isInstanceOf[Document[_]])
+      return dataFormats.mandatoryRead(effectiveInput(name, input))
+
+    val builder = mutable.LinkedHashMap.newBuilder[String, ujson.Value]
+    val key = firstEntry.getKey.asInstanceOf[String]
+    builder.addOne((key, dataFormats.mandatoryRead(effectiveInput(name + "." + key, firstEntry.getValue.asInstanceOf[Document[_]]))))
+    while (it.hasNext) {
+      val entry = it.next
+      val key1 = entry.getKey.asInstanceOf[String]
+      builder.addOne((key1, dataFormats.mandatoryRead(effectiveInput(name + "." + key1, entry.getValue.asInstanceOf[Document[_]]))))
+    }
+    ujson.Obj(builder.result)
   }
 
   def transform(payload: String): String = {
@@ -219,15 +242,9 @@ class Mapper(var script: String,
                    inputs: java.util.Map[String, Document[_]],
                    output: MediaType,
                    target: Class[T]): Document[T] = {
-    def valueFrom(doc: Document[_]): Value = {
-      dataFormats.thatAccepts(doc)
-        .orElseThrow(() => new IllegalArgumentException("The input mime type " + payload.getMediaType + " is not supported"))
-        .read(doc)
-    }
-
-    val payloadExpr: Expr = Materializer.toExpr(valueFrom(effectiveInput("payload", payload)))
+    val payloadExpr: Expr = Materializer.toExpr(dataFormats.mandatoryRead(effectiveInput("payload", payload)))
     val inputExprs: Map[String, Expr] = inputs.asScala.view.toMap[String, Document[_]].map {
-      case (name, input) => (name, Materializer.toExpr(valueFrom(effectiveInput(name, input))))
+      case (name, input) => (name, Materializer.toExpr(resolveInput(name, input)))
     }
 
     val payloadArg +: inputArgs = function.params.args
@@ -251,8 +268,6 @@ class Mapper(var script: String,
     }
 
     val effectiveOut = effectiveOutput(output)
-    dataFormats.thatProduces(effectiveOut, target)
-      .orElseThrow(() => new IllegalArgumentException("The output mime type " + effectiveOut + " is not supported"))
-      .write(materialized, effectiveOut, target)
+    dataFormats.mandatoryWrite(materialized, effectiveOut, target)
   }
 }

@@ -39,7 +39,7 @@ public class DefaultPlainTextFormatPlugin extends AbstractDataFormatPlugin {
         }
 
         if (String.class.isAssignableFrom(doc.getContent().getClass())) {
-            return ujsonUtils.strOf((String) doc.getContent());
+            return ujsonUtils.strValueOf((String) doc.getContent());
         } else {
             throw new PluginException(new IllegalArgumentException("Unsupported document content class, use the test method canRead before invoking read"));
         }

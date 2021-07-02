@@ -1,4 +1,4 @@
-package com.datasonnet;
+package com.datasonnet.modules;
 
 /*-
  * Copyright 2019-2020 the original author or authors.
@@ -16,8 +16,10 @@ package com.datasonnet;
  * limitations under the License.
  */
 
-public class RegexException extends Exception {
-    public RegexException(String message, Throwable e) {
-        super(message, e);
+public class JsonPath {
+
+    public static String select(String json, String path) {
+        String selected = com.jayway.jsonpath.JsonPath.read(json, path).toString();
+        return selected;
     }
 }

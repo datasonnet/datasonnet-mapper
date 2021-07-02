@@ -16,9 +16,10 @@ package com.datasonnet;
  * limitations under the License.
  */
 
+import com.datasonnet.document.MediaTypes;
 import com.datasonnet.header.Header;
-import org.junit.jupiter.api.BeforeAll;
 import com.datasonnet.header.HeaderParseException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
@@ -26,8 +27,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -38,11 +39,13 @@ public class HeaderTest {
     String headerStr = "/** DataSonnet\n" +
             "version=2.0\n" +
             "preserveOrder=false\n" +
+            "  \n" +
+            "// comment\n" +
             "input payload application/xml;namespace-separator=\":\";text-value-key=__text\n" +
             "input * application/xml;text-value-key=__text\n" +
             "input myvar application/csv;separator=|\n" +
             "dataformat application/vnd.ms-excel;payload.param=xyz\n" +
-            "output application/csv;ds.csv.quote=\"\"\"\n" +
+            "  output application/csv;ds.csv.quote=\"\"\"\n" +
             "*/\n" +
             "[\n" +
             "    {\n" +
@@ -59,8 +62,30 @@ public class HeaderTest {
     }
 
     @Test
-    void testHeaderVersion() {
+    void testHeaderVersion() throws HeaderParseException {
         assertEquals(header.getVersion(), "2.0");
+        assertEquals(Header.parseHeader(
+                "/** DataSonnet\n" +
+                "version=2.1\n" +
+                "*/\n"
+        ).getVersion(), "2.1");
+        assertEquals(Header.parseHeader(
+                "/** DataSonnet\n" +
+                        "version=2.15678.45678\n" +
+                        "*/\n"
+        ).getVersion(), "2.15678.45678");
+        assertThrows(HeaderParseException.class,  ()  -> {
+            Header.parseHeader(
+                    "/** DataSonnet\n" +
+                            "version=1.1\n" +
+                            "*/\n"
+            );});
+        assertThrows(HeaderParseException.class,  ()  -> {
+            Header.parseHeader(
+                    "/** DataSonnet\n" +
+                    "version=3.2\n" +
+                    "*/\n"
+            );});
     }
 
     @Test
@@ -83,7 +108,7 @@ public class HeaderTest {
 
     @Test
     void testHeaderNamedInputCommaSeparated() {
-        Map<String, String> parameters = header.getDefaultNamedInput("payload").getParameters();
+        Map<String, String> parameters = header.getDefaultNamedInput("payload").orElseThrow(AssertionError::new).getParameters();
         assertTrue(parameters.containsKey("namespace-separator"));
         assertTrue(parameters.containsKey("text-value-key"));
     }
@@ -96,7 +121,7 @@ public class HeaderTest {
 
     @Test
     void testHeaderOutput() {
-        Set<String> keys = header.getDefaultOutput().getParameters().keySet();
+        Set<String> keys = header.getDefaultOutput().orElseThrow(AssertionError::new).getParameters().keySet();
         assertTrue(keys.contains("ds.csv.quote"));
     }
 
@@ -116,5 +141,29 @@ public class HeaderTest {
             Header.parseHeader("/** DataSonnet\n" +
                     "version=2.0\n");
         });
+    }
+
+    @Test
+    public void testDefaultOutput() throws HeaderParseException {
+        Header header1 = Header.parseHeader("/** DataSonnet\n" +
+                "version=2.0\n" +
+                "output application/x-java-object;q=0.9\n" +
+                "output application/json;q=1.0\n" +
+                "*/");
+
+        assertTrue(header1.getDefaultOutput().isPresent());
+        assertTrue(MediaTypes.APPLICATION_JSON.equalsTypeAndSubtype(header1.getDefaultOutput().get()));
+    }
+
+    @Test
+    public void testDefaultInput() throws HeaderParseException {
+        Header header1 = Header.parseHeader("/** DataSonnet\n" +
+                "version=2.0\n" +
+                "input payload application/x-java-object;q=1.0\n" +
+                "input payload application/json;q=0.9\n" +
+                "*/");
+
+        assertTrue(header1.getDefaultPayload().isPresent());
+        assertTrue(MediaTypes.APPLICATION_JAVA.equalsTypeAndSubtype(header1.getDefaultPayload().get()));
     }
 }

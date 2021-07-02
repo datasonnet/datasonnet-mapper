@@ -1,12 +1,15 @@
 {
   "nonAscii": {
+    "~": 1,
     "greek:xxxͰ": {
+      "~": 1,
       "$": "HelloWorld",
       "@xmlns": {
         "greek": "http://modusbox.com/1"
       }
     },
     "greekͰ:xxx": {
+      "~": 2,
       "$": "HelloAgain",
       "@xmlns": {
         "greekͰ": "http://modusbox.com/2"

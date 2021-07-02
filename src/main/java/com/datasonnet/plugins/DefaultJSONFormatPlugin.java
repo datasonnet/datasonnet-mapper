@@ -1,7 +1,7 @@
 package com.datasonnet.plugins;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -108,19 +108,19 @@ public class DefaultJSONFormatPlugin extends AbstractDataFormatPlugin {
             return new DefaultDocument<>((T) ujsonUtils.write(input, indent, false), MediaTypes.APPLICATION_JSON);
         }
 
+        if (targetType.isAssignableFrom(OutputStream.class)) {
+            BufferedOutputStream out = new BufferedOutputStream(new ByteArrayOutputStream());
+            ujsonUtils.writeTo(input, new OutputStreamWriter(out, charset), indent, false);
+
+            return new DefaultDocument<>((T) out, MediaTypes.APPLICATION_JSON);
+        }
+
         if (targetType.isAssignableFrom(ByteBuffer.class)) {
             return new DefaultDocument<>((T) ByteBuffer.wrap(ujsonUtils.write(input, indent, false).getBytes(charset)), MediaTypes.APPLICATION_JSON);
         }
 
         if (targetType.isAssignableFrom(byte[].class)) {
             return new DefaultDocument<>((T) ujsonUtils.write(input, indent, false).getBytes(charset), MediaTypes.APPLICATION_JSON);
-        }
-
-        if (targetType.isAssignableFrom(OutputStream.class)) {
-            BufferedOutputStream out = new BufferedOutputStream(new ByteArrayOutputStream());
-            ujsonUtils.writeTo(input, new OutputStreamWriter(out, charset), indent, false);
-
-            return new DefaultDocument<>((T) out, MediaTypes.APPLICATION_JSON);
         }
 
         throw new PluginException(new IllegalArgumentException("Unsupported document content class, use the test method canRead before invoking read"));

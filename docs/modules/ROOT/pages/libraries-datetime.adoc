@@ -1,25 +1,137 @@
 ## datetime
+This library uses Java's DateTimeFormatter library to format the date to a consistent value using ISO_OFFSET_DATE_TIME.
+If your datetime is not in this format, you can use the `parse` function to convert it. After you are finished executing your logic,
+you can use the `format` function to set the output format.
 
-### `now()`
-Returns the current date/time from the system UTC clock in ISO-8601 format.
+### `atBeginningOfDay(string datetime)`
+Returns the given datetime at midnight.
 
 *Example*
 
 ------------------------
-{
-    currentZuluTime: ds.datetime.now()
-}
+ds.datetime.atBeginningOfDay("2020-12-31T23:19:35Z")
 ------------------------
 
 .Result:
 ------------------------
+"2020-12-31T00:00:00Z"
+------------------------
+
+### `atBeginningOfHour(string datetime)`
+Returns the given datetime with the minutes and seconds set to zero.
+
+*Example*
+
+------------------------
+ds.datetime.atBeginningOfHour("2020-12-31T23:19:35Z")
+------------------------
+
+.Result:
+------------------------
+"2020-12-31T23:00:00Z"
+------------------------
+
+### `atBeginningOfMonth(string datetime)`
+Returns the given datetime with the day set to first of the month and the time set to midnight.
+
+*Example*
+
+------------------------
+ds.datetime.atBeginningOfMonth("2020-12-31T23:19:35Z")
+------------------------
+
+.Result:
+------------------------
+"2020-12-01T00:00:00Z"
+------------------------
+
+### `atBeginningOfWeek(string datetime)`
+Returns the given datetime at the first of the current week and the time set to midnight
+
+*Example*
+
+------------------------
+ds.datetime.atBeginningOfWeek("2020-12-31T23:19:35Z")
+------------------------
+
+.Result:
+------------------------
+"2020-12-27T00:00:00Z"
+------------------------
+
+### `atBeginningOfYear(string datetime)`
+Returns the given datetime at the first of the year
+
+*Example*
+
+------------------------
+ds.datetime.atBeginningOfYear("2020-12-31T23:19:35Z")
+------------------------
+
+.Result:
+------------------------
+"2020-01-01T00:00:00Z"
+------------------------
+
+### `changeTimeZone(string datetime, string timezone)`
+Changes the date timezone, retaining the instant. This normally results in a change to the local date-time.
+
+*Example*
+
+------------------------
+ds.datetime.changeTimeZone("2020-12-31T23:19:35Z", "America/Los_Angeles")
+------------------------
+.Result:
+------------------------
+"2020-12-31T15:19:35-08:00"
+------------------------
+
+### `compare(string datetime1, string datetime2)`
+Returns `1` if `datetime1 > datetime2`, `-1` if `datetime1 < datetime2`, and `0` if `datetime1 == datetime2`.
+
+*Example*
+
+------------------------
+ds.datetime.compare("2020-12-31T23:19:35Z","2020-01-01T00:00:00Z")
+------------------------
+.Result
+------------------------
+1
+------------------------
+
+### `date(object datetime)`
+This function uses a datetime object to generate a datetime in string format.
+Every key in the object is an optional number value, except the timezone which is an optional string.
+
+Example structure:
+------------------------
 {
-    "currentZuluTime": "2019-08-19T18:58:38.313Z"
+    "year": 0,
+    "month": 0,
+    "day": 0,
+    "hour": 0,
+    "minute": 0,
+    "second": 0,
+    "timezone": "Z"
 }
 ------------------------
 
+*Example*
+
+------------------------
+local datetime={
+    "year": 2021,
+    "timezone": "America/Los_Angeles"
+};
+ds.datetime.date(datetime)
+------------------------
+.Result
+------------------------
+"2021-01-01T00:00:00-08:00"
+------------------------
+
 ### `daysBetween(string datetime1, string datetime2)`
-Returns the number of days between `datetime1` and `datetime2`. Dates are in "yyyy-MM-dd'T'HH:mm:ss.SSSVV" format.
+Returns the number of days between `datetime1` and `datetime2`.
 
 *Example*
 
@@ -35,21 +147,22 @@ ds.datetime.daysBetween(date1, date2)
 6
 ------------------------
 
-### `format(string datetime, string inputFormat, string outputFormat)`
-Reformats `datetime` using `inputFormat` and `outputFormat`.
+### `format(string datetime, string outputFormat)`
+Given a datetime, will convert it to the specified output format.
 
 *Example*
 
+.DataSonnet map:
 ------------------------
-ds.datetime.format("2019-07-04T21:00:00Z", "yyyy-MM-dd'T'HH:mm:ssVV", "d MMM uuuu")
+ds.datetime.format("2019-09-20T18:53:41.425Z", "yyyy/MM/dd")
 ------------------------
-.Result:
+.Result
 ------------------------
-4 Jul 2019
+"2019/09/20"
 ------------------------
 
 ### `isLeapYear(string datetime)`
-Returns a boolean indicating if `datetime` is a leap year. Dates are in "yyyy-MM-dd'T'HH:mm:ss.SSSVV" format.
+Returns a boolean indicating if `datetime` is a leap year.
 
 *Example*
 
@@ -62,82 +175,140 @@ ds.datetime.isLeapYear("2019-09-14T18:53:41.425Z")
 false
 ------------------------
 
-### `compare(string datetime1, string format1, string datetime2, string format2)`
-Returns `1` if `datetime1 > datetime2`, `-1` if `datetime1 < datetime2`, and `0` if `datetime1 == datetime2`.
+### `minus(string datetime, string period)`
+Subtracts a `period` type from the given datetime.
 
 *Example*
 
+.DataSonnet map:
 ------------------------
-ds.datetime.compare("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ", "2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
+ds.datetime.minus("2019-09-20T18:53:41Z", "P2D")
 ------------------------
 .Result
 ------------------------
-0
+"2019-09-18T18:53:41Z"
 ------------------------
 
-### `changeTimeZone(string datetime, string format, string timezone)`
-Changes the date timezone, retaining the instant. This normally results in a change to the local date-time.
-The response is formatted using the same format as an input.
+### `now()`
+Returns the current datetime.
 
 *Example*
 
 ------------------------
-ds.datetime.changeTimeZone("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ", "America/Los_Angeles")
+ds.datetime.now()
 ------------------------
+
 .Result:
 ------------------------
-2019-07-04T19:00:00-0700
+"2021-01-05T13:09:45.476375-05:00"
 ------------------------
 
-### `toLocalDate(string datetime, string format)`
-Returns only local date part of the `datetime` parameter in the ISO-8601 format without the offset.
+### `parse(string|number datetime, string inputFormat)`
+Parses the datetime using the input format and returns the value in the default format.
+If an epoch or timestamp value is used as the datetime you can use `"epoch"` or `"timestamp"` as the inputFormat
 
 *Example*
 
 ------------------------
-ds.datetime.toLocalDate("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
+ds.datetime.parse("12/31/1990 10:10:10", "MM/dd/yyyy HH:mm:ss")
+------------------------
+
+.Result:
+------------------------
+"1990-12-31T10:10:10Z"
+------------------------
+
+### `plus(string datetime, string period)`
+Adds a `period` type to the given datetime.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.datetime.plus("2019-09-18T18:53:41Z", "P2D")
+------------------------
+.Result
+------------------------
+"2019-09-20T18:53:41Z"
+------------------------
+
+### `toLocalDate(string datetime)`
+Converts a zone datetime to a local date
+
+*Example*
+
+------------------------
+ds.datetime.toLocalDate("2019-07-04T18:53:41Z")
 ------------------------
 .Result:
 ------------------------
 2019-07-04
 ------------------------
 
-### `toLocalTime(string datetime, string format)`
-Returns only local time part of the `datetime` parameter in the ISO-8601 format without the offset.
+### `toLocalDateTime(string datetime)`
+Converts a zone datetime to a local datetime
 
 *Example*
 
 ------------------------
-ds.datetime.toLocalTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
-------------------------
-.Result:
-------------------------
-21:00:00
-------------------------
-
-### `toLocalDateTime(string datetime, string format)`
-Returns local datetime part of the `datetime` parameter in the ISO-8601 format without the offset.
-
-*Example*
-
-------------------------
-ds.datetime.toLocalDateTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
+ds.datetime.toLocalDateTime("2019-07-04T21:00:00Z")
 ------------------------
 .Result:
 ------------------------
 2019-07-04T21:00:00
 ------------------------
 
-### `offset(string datetime, string period)`
-Returns the local datetime part of the `datetime` parameter in the ISO-8601 format without the offset.
-The `period` is a string in the ISO-8601 period format.
+### `toLocalTime(string datetime, string format)`
+Converts a zone datetime to a local time.
 
 *Example*
 
 ------------------------
-ds.datetime.offset("2019-07-22T21:00:00Z", "P1Y1D")
+ds.datetime.toLocalTime("2019-07-04T21:00:00Z")
 ------------------------
 .Result:
 ------------------------
-2020-07-23T21:00:00Z
+21:00:00
+------------------------
+
+### `today()`
+Returns the datetime of the current day at midnight.
+
+*Example*
+
+------------------------
+ds.datetime.today
+------------------------
+
+.Result:
+------------------------
+"2021-01-05T00:00:00-05:00"
+------------------------
+
+### `tomorrow()`
+Returns the datetime of the next day at midnight.
+
+*Example*
+
+------------------------
+ds.datetime.tomorrow
+------------------------
+
+.Result:
+------------------------
+"2021-01-06T00:00:00-05:00"
+------------------------
+
+### `yesterday()`
+Returns the datetime of the previous day at midnight.
+
+*Example*
+
+------------------------
+ds.datetime.yesterday
+------------------------
+
+.Result:
+------------------------
+"2021-01-04T00:00:00-05:00"
 ------------------------

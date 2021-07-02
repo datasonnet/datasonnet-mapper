@@ -77,6 +77,11 @@ public class XMLReaderTest {
     }
 
     @Test
+    void nestedNamespaces() throws Exception {
+        mapAndAssert("xmlNestedNamespaces.xml", "xmlNestedNamespaces.json");
+    }
+
+    @Test
     void testMixedContent() throws Exception {
         mapAndAssert("xmlMixedContent.xml", "xmlMixedContent.json");
     }

@@ -1,7 +1,7 @@
 package com.datasonnet.plugins;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet.plugins;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.datasonnet.RecentsMap;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
@@ -124,15 +123,18 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         return ujsonFrom(inputAsNode);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> Document<T> write(Value input, MediaType mediaType, Class<T> targetType) throws PluginException {
         T converted = writeValue(input, mediaType, targetType);
-        return new DefaultDocument<>(converted);
+        return new DefaultDocument<>(converted, mediaType);
     }
 
     @Nullable
     private <T> T writeValue(Value input, MediaType mediaType, Class<T> targetType) throws PluginException {
+        if (input == ujson.Null$.MODULE$) {
+            return null;
+        }
+
         ObjectMapper mapper = getObjectMapper(mediaType);
 
         try {
@@ -154,7 +156,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
             }
 
             // fancier version of the Object.equals optimization
-            if(targetType.isAssignableFrom(inputAsJava.getClass())) {
+            if (targetType.isAssignableFrom(inputAsJava.getClass())) {
                 return (T) inputAsJava;
             } else {
                 return mapper.convertValue(inputAsJava, targetType);

@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaTypes;
@@ -30,12 +29,16 @@ import javax.xml.bind.Marshaller;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class JavaWriterTest {
 
@@ -50,6 +53,8 @@ public class JavaWriterTest {
         Mapper mapper = new Mapper(mapping);
 
         Document<Gizmo> mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, Gizmo.class);
+
+        assertTrue(MediaTypes.APPLICATION_JAVA.equalsTypeAndSubtype(mapped.getMediaType()));
 
         Object result = mapped.getContent();
         assertTrue(result instanceof Gizmo);
@@ -207,5 +212,12 @@ public class JavaWriterTest {
         assertTrue(objectResult1 instanceof MixInTestClass);
         MixInTestClass result1 = (MixInTestClass) objectResult1;
         assertTrue(result1.getAnimal() instanceof com.datasonnet.javatest.Cat);
+    }
+     
+    public void testNull() {
+        Mapper mapper = new Mapper("null");
+        Document<String> mapped = mapper.transform(DefaultDocument.NULL_INSTANCE, Collections.emptyMap(), MediaTypes.APPLICATION_JAVA);
+
+        assertNull(mapped.getContent());
     }
 }

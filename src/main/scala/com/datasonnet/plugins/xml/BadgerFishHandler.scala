@@ -128,14 +128,28 @@ class BadgerFishHandler(params: EffectiveParams) extends DefaultHandler2 {
     })
   }
 
-  def mixedNodes(children: List[Node]): IterableOnce[(String, Value)] = children.zipWithIndex.map {
-    case (node, index) =>
-      val index1 = index + 1
-      node match {
-        case Text(value) => (params.textKeyPrefix + index1 -> ujson.Str(value))
-        case CData(value) => (params.cdataKeyPrefix + index1 -> ujson.Str(value))
-        case Element(obj, name, _) => (params.textKeyPrefix + index1 -> ujson.Obj((name, obj)))
-      }
+  def mixedNodes(children: List[Node]): IterableOnce[(String, Value)] = {
+    val values = mutable.LinkedHashMap[String, Value]()
+    children.zipWithIndex.foreach {
+      case (node, index) =>
+        val index1 = index + 1
+        node match {
+          case Text(value) => values += (params.textKeyPrefix + index1 -> ujson.Str(value))
+          case CData(value) => values += (params.cdataKeyPrefix + index1 -> ujson.Str(value))
+          case Element(obj, name, _) => {
+            obj.value += (params.orderingKey -> index1)
+            if (values.contains(name)) {
+              (values(name): @unchecked) match {
+                case ujson.Arr(arr) => arr += obj
+                case ujson.Obj(existing) => values += (name -> ujson.Arr(existing, obj))
+              }
+            } else {
+              values += (name -> obj)
+            }
+          }
+        }
+    }
+    values
   }
 
   def combinedElements(children: List[Element]): IterableOnce[(String, Value)] = {
@@ -186,12 +200,6 @@ class BadgerFishHandler(params: EffectiveParams) extends DefaultHandler2 {
 
         // but also preserve them as individual nodes just in case that's of interest
         current.obj.value ++= mixedNodes(children)
-      }
-      case ChildrenCase.OUT_OF_ORDER_ELEMENTS if !params.preserveOrder => {
-        current.obj.value ++= combinedElements(children.asInstanceOf[List[Element]])
-      }
-      case ChildrenCase.STRUCTURED_CONTENT => {
-        current.obj.value ++= combinedElements(children.asInstanceOf[List[Element]])
       }
       case _ => current.obj.value ++= mixedNodes(children)
     }
