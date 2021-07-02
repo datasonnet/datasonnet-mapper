@@ -110,7 +110,7 @@ public class JavaWriterTest {
         Document<String> data = new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON);
         Mapper mapper = new Mapper("/** DataSonnet\n" +
                 "version=2.0\n" +
-                "output application/java; OutputClass=java.lang.Object\n" +
+                "output application/x-java-object; OutputClass=java.lang.Object\n" +
                 "*/\n" +
                 "{ a: 5 }");
         Document<Map> mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, Map.class);
