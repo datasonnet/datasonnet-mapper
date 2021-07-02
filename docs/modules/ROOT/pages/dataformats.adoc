@@ -705,7 +705,7 @@ output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar
 --------------
 The value of the property `@type` will be matched to one of the annotations in the mix-in class.
 
-A simpler implementation will make use of the provided Datasonnet mix-in class instead of a custom one. In this case, the `PolymorphicTypes` header must be set, and optionally the `PolymorphicTypeIdProperty`, e.g.:
+For the typical use case of an abstract class with concrete subtypes, where the type names are in a property on the JSON objects, you do not need to write your own Mixin, DataSonnet can handle it for you. In this case, the `PolymorphicTypes` header must be set, and optionally the `PolymorphicTypeIdProperty`, e.g.:
 
 --------------
 /** DataSonnet
