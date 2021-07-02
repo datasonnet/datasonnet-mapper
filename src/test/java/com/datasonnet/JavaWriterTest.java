@@ -34,9 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class JavaWriterTest {
@@ -203,13 +201,11 @@ public class JavaWriterTest {
         //Override polymorphic type property
         mapping = TestResourceReader.readFileAsString("polymorphicTypePropertyTest.ds");
 
-        try {
-            mapper = new Mapper(mapping);
-            Document<MixInTestClass> objectMapped1 = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, MixInTestClass.class);
-            Object objectResult1 = objectMapped1.getContent();
-            assertTrue(objectResult1 instanceof MixInTestClass);
-            MixInTestClass result1 = (MixInTestClass) objectResult1;
-            assertTrue(result1.getAnimal() instanceof com.datasonnet.javatest.Cat);
-        } catch (Exception e) { e.printStackTrace(); }
+        mapper = new Mapper(mapping);
+        Document<MixInTestClass> objectMapped1 = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, MixInTestClass.class);
+        Object objectResult1 = objectMapped1.getContent();
+        assertTrue(objectResult1 instanceof MixInTestClass);
+        MixInTestClass result1 = (MixInTestClass) objectResult1;
+        assertTrue(result1.getAnimal() instanceof com.datasonnet.javatest.Cat);
     }
 }
