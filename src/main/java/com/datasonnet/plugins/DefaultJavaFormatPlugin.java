@@ -203,9 +203,9 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
 
         if (mediaType.getParameters().containsKey(DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY)) {
             try {
+                //We use javassist to create a new mixin class with annotations at the runtime
                 ClassPool cp = ClassPool.getDefault();
                 CtClass cc = cp.get("com.datasonnet.plugins.jackson.PolymorphicTypesMixIn");
-                //cp.makePackage(cp.getClassLoader(), "com.datasonnet.plugins.jackson");
                 ClassFile cfile = cc.getClassFile();
                 ConstPool constPool = cfile.getConstPool();
                 AnnotationsAttribute attr = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
