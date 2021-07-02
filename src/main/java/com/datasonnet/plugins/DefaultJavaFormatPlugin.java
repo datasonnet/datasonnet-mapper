@@ -15,6 +15,7 @@ package com.datasonnet.plugins;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import com.datasonnet.RecentsMap;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
@@ -22,7 +23,6 @@ import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.plugins.jackson.JAXBElementMixIn;
 import com.datasonnet.plugins.jackson.JAXBElementSerializer;
-import com.datasonnet.plugins.jackson.PolymorphicTypesMixIn;
 import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.ujsonUtils;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -31,16 +31,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.introspect.SimpleMixInResolver;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.ClassFile;
-import javassist.bytecode.ConstPool;
-import javassist.bytecode.annotation.Annotation;
-import javassist.bytecode.annotation.EnumMemberValue;
-import javassist.bytecode.annotation.StringMemberValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ujson.Value;
@@ -48,14 +39,7 @@ import ujson.Value;
 import javax.xml.bind.JAXBElement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.UUID;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import java.util.*;
 
 
 
@@ -69,7 +53,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
     public static final String DS_PARAM_POLYMORPHIC_TYPES = "polymorphictypes";
     public static final String DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY = "polymorphictypeidproperty";
 
-    private static final Map<Integer, ObjectMapper> MAPPER_CACHE = new RecentsMap<>(64);
+    private static final Map<String, ObjectMapper> MAPPER_CACHE = new RecentsMap<>(64);
 
     static {
         SimpleModule module = new SimpleModule();
@@ -167,84 +151,74 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         }
     }
 
-    private ObjectMapper getObjectMapper(MediaType mediaType) throws PluginException {
-        //I disabled the caching because it doesn't play well with manipulating mixins; instead, I clone the default mapper
 
-/*
-        ObjectMapper mapper = DEFAULT_OBJECT_MAPPER;
-
-        if (mediaType.getParameters().containsKey(DS_PARAM_DATE_FORMAT)) {
-            String dateFormat = mediaType.getParameter(DS_PARAM_DATE_FORMAT);
-            int cacheKey = dateFormat.hashCode();
-            mapper = MAPPER_CACHE.computeIfAbsent(cacheKey,
-                    integer -> new ObjectMapper().setDateFormat(makeDateFormat(dateFormat)));
-        }
-*/
+    private ObjectMapper adaptObjectMapper(Map<String, String> parameters) {
         ObjectMapper mapper = DEFAULT_OBJECT_MAPPER.copy();
 
-        if (mediaType.getParameters().containsKey(DS_PARAM_DATE_FORMAT)) {
-            String dateFormat = mediaType.getParameter(DS_PARAM_DATE_FORMAT);
+        if (parameters.containsKey(DS_PARAM_DATE_FORMAT)) {
+            String dateFormat = parameters.get(DS_PARAM_DATE_FORMAT);
             mapper.setDateFormat(makeDateFormat(dateFormat));
         }
 
-        if (mediaType.getParameters().containsKey(DS_PARAM_MIXINS)) {
+        if (parameters.containsKey(DS_PARAM_MIXINS)) {
             try {
-                Map<String, String> mixinsMap = mapper.readValue(mediaType.getParameter(DS_PARAM_MIXINS), Map.class);
+                Map<String, String> mixinsMap = mapper.readValue(parameters.get(DS_PARAM_MIXINS), Map.class);
                 for (Map.Entry<String,String> entry : mixinsMap.entrySet()) {
                     mapper.addMixIn(Class.forName(entry.getKey()), Class.forName(entry.getValue()));
                 }
             } catch (JsonProcessingException jpe) {
                 throw new PluginException("Invalid 'mixins' header format, must be JSON object", jpe);
-            } catch (ClassNotFoundException cnfpe) {
-                throw new PluginException("Unable to add mixin", cnfpe);
+            } catch (ClassNotFoundException cnfe) {
+                throw new PluginException("Unable to add mixin", cnfe);
             }
         }
 
-        Class mixinClass = PolymorphicTypesMixIn.class;
+        if (parameters.containsKey(DS_PARAM_POLYMORPHIC_TYPES)) {
+            final Set<String> polymorphicTypes = new HashSet<>(Arrays.asList(parameters.get(DS_PARAM_POLYMORPHIC_TYPES).trim().split("\\s*,\\s*")));
 
-        if (mediaType.getParameters().containsKey(DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY)) {
-            try {
-                //We use javassist to create a new mixin class with annotations at the runtime
-                ClassPool cp = ClassPool.getDefault();
-                CtClass cc = cp.get("com.datasonnet.plugins.jackson.PolymorphicTypesMixIn");
-                ClassFile cfile = cc.getClassFile();
-                ConstPool constPool = cfile.getConstPool();
-                AnnotationsAttribute attr = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
-                Annotation a = new Annotation("com.fasterxml.jackson.annotation.JsonTypeInfo", constPool);
-                a.addMemberValue("property", new StringMemberValue(mediaType.getParameter(DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY), constPool));
-                EnumMemberValue jsonTypeInfoId = new EnumMemberValue(constPool);
-                jsonTypeInfoId.setType(JsonTypeInfo.Id.class.getName());
-                jsonTypeInfoId.setValue(JsonTypeInfo.Id.CLASS.name());
-                a.addMemberValue("use", jsonTypeInfoId);
-                EnumMemberValue jsonTypeInfoAs = new EnumMemberValue(constPool);
-                jsonTypeInfoAs.setType(JsonTypeInfo.As.class.getName());
-                jsonTypeInfoAs.setValue(com.fasterxml.jackson.annotation.JsonTypeInfo.As.PROPERTY.name());
-                a.addMemberValue("include", jsonTypeInfoAs);
-                attr.setAnnotation(a);
-
-                cfile.addAttribute(attr);
-                String newClassName = "com.datasonnet.plugins.jackson.MixIn" + UUID.randomUUID().toString();
-                cc.setName(newClassName);
-                cfile.setVersionToJava5();
-
-                mixinClass = cc.toClass();
-
-            } catch (Exception e) {
-                throw new PluginException("Unable to override polymorphic type property", e);
-            }
-        }
-
-        if (mediaType.getParameters().containsKey(DS_PARAM_POLYMORPHIC_TYPES)) {
-            try {
-                String[] polymorphicTypes = mediaType.getParameter(DS_PARAM_POLYMORPHIC_TYPES).split(",");
-                for (final String type : polymorphicTypes) {
-                    mapper.addMixIn(Class.forName(type), mixinClass);
+            // we use the deprecated constructor that is "unsafe" here, but safety is preserved
+            // because of the useForType check
+            ObjectMapper.DefaultTypeResolverBuilder resolver = new ObjectMapper.DefaultTypeResolverBuilder(ObjectMapper.DefaultTyping.NON_FINAL) {
+                @Override
+                public boolean useForType(JavaType t) {
+                    // only use our new resolver when it is one of the indicated types
+                    return polymorphicTypes.contains(t.getRawClass().getTypeName());
                 }
-            } catch (ClassNotFoundException cnfpe) {
-                throw new PluginException("Polymorphic type cannot be resolved", cnfpe);
+            };
+
+            // require fully identified type name
+            resolver.init(JsonTypeInfo.Id.CLASS, null);
+
+            // require it be a property value
+            resolver.inclusion(JsonTypeInfo.As.PROPERTY);
+
+            // determine which property value
+            if (parameters.containsKey(DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY)) {
+                resolver.typeProperty(parameters.get(DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY));
+            } else {
+                resolver.typeProperty("@class");  // already default, but be explicit
             }
+            mapper.setDefaultTyping(resolver);
         }
+
         return mapper;
+    }
+
+    private ObjectMapper getObjectMapper(MediaType mediaType) throws PluginException {
+        Map<String, String> parameters = mediaType.getParameters();
+
+        // for these keys we adapt the object mapper some, but we can keep reusing that every time the same collection
+        // of parameters comes up
+        // We have this check instead of just caching on every parameter combo
+        // because most parameters do not require object mapper changes
+        if (parameters.containsKey(DS_PARAM_DATE_FORMAT) || parameters.containsKey(DS_PARAM_MIXINS) || parameters.containsKey(DS_PARAM_POLYMORPHIC_TYPES)) {
+            String key = mediaType.toString();
+            return MAPPER_CACHE.computeIfAbsent(key, k -> {
+                return adaptObjectMapper(parameters);
+            });
+        }
+
+        return DEFAULT_OBJECT_MAPPER;
     }
 
     private String getJavaType(MediaType mediaType) {

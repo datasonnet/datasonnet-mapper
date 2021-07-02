@@ -16,7 +16,7 @@ package com.datasonnet.spi;
  * limitations under the License.
  */
 
-public class PluginException extends Exception {
+public class PluginException extends RuntimeException {
     public PluginException(String message) {
         super(message);
     }
