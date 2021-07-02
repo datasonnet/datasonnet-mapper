@@ -24,7 +24,7 @@
     <version>2.1.4-SNAPSHOT</version>
     <name>DataSonnet Mapper</name>
     <description>A transformation domain specific language</description>
-    <url>https://github.com/modusbox/datasonnet-mapper</url>
+    <url>https://github.com/datasonnet/datasonnet-mapper</url>
     <inceptionYear>2019</inceptionYear>
     <licenses>
         <license>
@@ -62,9 +62,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/modusbox/datasonnet-mapper.git</connection>
-        <developerConnection>scm:git:https://github.com/modusbox/datasonnet-mapper.git</developerConnection>
-        <url>https://github.com/modusbox/datasonnet-mapper</url>
+        <connection>scm:git:https://github.com/datasonnet/datasonnet-mapper.git</connection>
+        <developerConnection>scm:git:https://github.com/datasonnet/datasonnet-mapper.git</developerConnection>
+        <url>https://github.com/datasonnet/datasonnet-mapper</url>
         <tag>2.0.0</tag>
     </scm>
     <distributionManagement>
@@ -72,10 +72,6 @@
             <id>sonatype-ossrh</id>
             <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
-        <snapshotRepository>
-            <id>ms3-nexus</id>
-            <url>https://maven.ms3-inc.com/repository/maven-snapshots/</url>
-        </snapshotRepository>
     </distributionManagement>
 
     <properties>
