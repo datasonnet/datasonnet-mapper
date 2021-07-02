@@ -86,7 +86,7 @@
         <bouncycastle.version>1.68</bouncycastle.version>
         <quickcheck.version>0.9.4</quickcheck.version>
         <xmlunit.version>2.7.0</xmlunit.version>
-        <mycila.version>4.0.rc2</mycila.version>
+        <mycila.version>4.1</mycila.version>
     </properties>
 
     <dependencies>
