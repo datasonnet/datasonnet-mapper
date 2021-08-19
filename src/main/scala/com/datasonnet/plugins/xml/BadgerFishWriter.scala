@@ -16,14 +16,11 @@ package com.datasonnet.plugins.xml
  * limitations under the License.
  */
 
-import java.io.{StringWriter, Writer}
-
 import com.datasonnet.plugins.DefaultXMLFormatPlugin.EffectiveParams
 import org.xml.sax.helpers.NamespaceSupport
 import ujson.Value
 
-import scala.collection.immutable.TreeSet
-import scala.collection.mutable
+import java.io.{StringWriter, Writer}
 
 // See {@link scala.xml.Utility.serialize}
 class BadgerFishWriter(val params: EffectiveParams) {
@@ -51,40 +48,6 @@ class BadgerFishWriter(val params: EffectiveParams) {
 
   val namespaces: NamespaceSupport = new OverridingNamespaceTranslator(params.declarations)
   val namespaceParts = new Array[String](3)  // keep reusing a single array
-
-  def chooseIndex(key: String, value: Value, index: Int): Option[Int] = key match {
-    // if anything we expect to be a number fails, it'll just get sorted first due to the Option sorting, but still be handled
-    // if the string starts with the text prefix or cdata prefix and has a number after, use that
-    case s if s.startsWith(params.textKeyPrefix) && s.length > params.textKeyPrefix.length => s.substring(params.textKeyPrefix.length).toIntOption
-    case s if s.startsWith(params.cdataKeyPrefix) && s.length > params.cdataKeyPrefix.length => s.substring(params.cdataKeyPrefix.length).toIntOption
-    // NOTE: comments would go here as another line
-    case _ => value match {
-      // if the value is an object and has the ordering key, use the value there
-      case ujson.Obj(v) if v.contains(params.orderingKey) => v.get(params.orderingKey) match {
-        case Some(ujson.Str(s)) => s.toIntOption
-        case Some(ujson.Num(n)) => Some(n.round.toInt)
-        case _ => Some(index)
-      }
-      // otherwise, use the index, meaning the order the elements come in
-      case _ => Some(index)
-    }
-  }
-
-  def structureNodes(children: mutable.LinkedHashMap[String, Value]): Iterator[(String, Value)] = {
-    val sortables = children.zipWithIndex.flatMap{ case ((key, value), index) => {
-      val values = value match {
-        case ujson.Arr(arr) => arr.zipWithIndex.map{case (v, i) => (v, Some(i))}
-        case _ => Iterable((value, None))
-      }
-      values.map{ case (v, arrayIndex) => (chooseIndex(key, v, index), arrayIndex, key, v) }
-    } }
-
-    // this is needed because Value doesn't have an ordering. Since keys were originally unique,
-    // array position in key + key is enough to provide uniqueness in the flattened representation,
-    // with the first index representing the user-provided ordering (that might or might not be unique)
-    implicit val ordering: Ordering[(Option[Int], Option[Int], String, Value)] = Ordering.by{t => (t._1, t._2, t._3)}
-    TreeSet.from(sortables).iterator.map{ case (_, _, key, value) => (key, value) }
-  }
 
   def serialize(root: (String, ujson.Obj), sb: Writer = new StringWriter()): Writer = {
     // initialize namespaces for use in later writing
@@ -138,38 +101,48 @@ class BadgerFishWriter(val params: EffectiveParams) {
       // children, so use long form: <xyz ...>...</xyz>
       sb.append('>')
 
-      val nodes = structureNodes(children)
-
-      nodes.foreach {
-        case (key, value) =>
-          if (key.equals(params.xmlnsKey)) {
-            // no op
-          } else if (key.startsWith(params.textKeyPrefix)) {
-            if (key == params.textKeyPrefix) {
-              // if we encounter a bare $, it either represents all the text, so it should be written,
-              // or there are _also_ $1 or #1 (and maybe more) elements with the contents, and then only those should
-              // be written.
-              // NOTE: if comment support is added that will need to be checked here
-              if (!children.contains(params.textKeyPrefix + "1") && !children.contains(params.cdataKeyPrefix + "1")) {
-                escapeText(value.str, sb)
-              }
-            } else {
-              escapeText(value.str, sb)
+      children.toSeq
+        // selectively flatten arrays
+        .foldLeft(collection.mutable.Buffer.empty[(String, Value)])((acc, value) =>
+          if (!value._1.equals(params.orderingKey)) {
+            value._2 match {
+              case ujson.Arr(arr) => acc.addAll(arr.map(it => value._1 -> it))
+              case _ => acc.addOne(value)
             }
-          } else if (key.startsWith(params.cdataKeyPrefix)) {
-            // taken from scala.xml.PCData
-            sb append "<![CDATA[%s]]>".format(value.str.replaceAll("]]>", "]]]]><![CDATA[>"))
-          } else if (key.length > 0 && key.charAt(0).isLetter) value match {
-            case obj: ujson.Obj => serialize((key, obj), sb)
-            // note: case ujson.Arr should not happen with properly-written badgerfish any more
-            case ujson.Arr(arr) => arr.foreach(arrItm => serialize((key, arrItm.obj), sb))
-            case ujson.Null => if (params.nullAsEmpty) serialize((key, ujson.Obj((params.textKeyPrefix, ""))), sb)
-            case num: ujson.Num => serialize((key, ujson.Obj((params.textKeyPrefix, String.valueOf(num)))), sb)
-            case any: ujson.Value => serialize((key, ujson.Obj((params.textKeyPrefix, String.valueOf(any.value)))), sb)
-          } else {
-            // a special character we don't recognize is at the start; ignore this
-          }
-      }
+          } else acc)
+        // sort using ordering key in objects, and index substring in text and cdatas
+        .sortBy(entry => entry._2 match {
+          case ujson.Obj(inner) =>
+            val order = inner.get(params.orderingKey)
+            if (order.isEmpty) -1 else order.get.num.toInt
+          case _ =>
+            if (entry._1.last.isDigit) {
+              if (entry._1.startsWith(params.textKeyPrefix))
+                entry._1.substring(params.textKeyPrefix.length).toInt
+              else if (entry._1.startsWith(params.cdataKeyPrefix))
+                entry._1.substring(params.cdataKeyPrefix.length).toInt
+              else -1
+            }
+            else -1
+        })(Ordering[Int])
+        .foreach {
+          child =>
+            val (key, value) = child
+            if (key.equals(params.xmlnsKey)) {
+              // no op
+            } else if (key.startsWith(params.textKeyPrefix)) {
+              escapeText(value.str, sb)
+            } else if (key.startsWith(params.cdataKeyPrefix)) {
+              // taken from scala.xml.PCData
+              sb append "<![CDATA[%s]]>".format(value.str.replaceAll("]]>", "]]]]><![CDATA[>"))
+            } else value match {
+              case obj: ujson.Obj => serialize((key, obj), sb)
+              case ujson.Arr(arr) => arr.foreach(arrItm => serialize((key, arrItm.obj), sb))
+              case ujson.Null => if (params.nullAsEmpty) serialize((key, ujson.Obj((params.textKeyPrefix, ""))), sb)
+              case num: ujson.Num => serialize((key, ujson.Obj((params.textKeyPrefix, String.valueOf(num)))), sb)
+              case any: ujson.Value => serialize((key, ujson.Obj((params.textKeyPrefix, String.valueOf(any.value)))), sb)
+            }
+        }
 
       sb.append("</")
       sb.append(element)

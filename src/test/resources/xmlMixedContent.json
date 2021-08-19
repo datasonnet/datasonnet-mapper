@@ -3,20 +3,20 @@
     "~": 1,
     "$1": "\n    Dear Mr. ",
     "name": [{
-      "$": "John Smith",
+      "$1": "John Smith",
       "~": 2
     }, {
-      "$": "Sam Smith",
+      "$1": "Sam Smith",
       "~": 9
     }],
     "orderid": {
-      "$": "1032",
+      "$1": "1032",
       "~": 4
     },
     "#8": "PS Happy Holidays!",
     "$3": ".\n    Your order ",
     "shipdate": {
-      "$": "2001-07-13",
+      "$1": "2001-07-13",
       "~": 6
     },
     "$7": ".\n    ",

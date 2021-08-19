@@ -1,1 +1,12 @@
-{"datasonnet%root":{"*xmlns":{"datasonnet":"http://www.modusbox.com"},"datasonnet%datasonnet":{"*version":"1.0","__text1":"Hello World", "__text": "Hello World"}}}
+{
+  "datasonnet%root": {
+    "*xmlns": {
+      "datasonnet": "http://www.modusbox.com"
+    },
+    "datasonnet%datasonnet": {
+      "*version": "1.0",
+      "__text1": "Hello World",
+      "__text": "Hello World"
+    }
+  }
+}

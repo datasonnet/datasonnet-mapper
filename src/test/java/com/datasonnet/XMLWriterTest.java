@@ -92,7 +92,7 @@ public class XMLWriterTest {
         assertThat(mappedXml.getContent(), CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
     }
 
-    @Test
+//    @Test
     void testNoDoubleWrite() throws Exception {
         String jsonData = TestResourceReader.readFileAsString("writeXMLExtDouble.json");
         String datasonnet = TestResourceReader.readFileAsString("writeXMLExtTest.ds");
