@@ -77,7 +77,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <jackson.version>2.11.2</jackson.version>
+        <jackson.version>2.13.0</jackson.version>
         <junit.version>5.6.2</junit.version>
         <bouncycastle.version>1.68</bouncycastle.version>
         <quickcheck.version>0.9.4</quickcheck.version>
@@ -122,6 +122,11 @@
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-properties</artifactId>
             <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.sett4</groupId>
+            <artifactId>jackson-dataformat-xlsx-lite</artifactId>
+            <version>2.13.0</version>
         </dependency>
         <!-- plugin deps: end -->
 
@@ -512,4 +517,11 @@
             </build>
         </profile>
     </profiles>
+    
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
 </project>

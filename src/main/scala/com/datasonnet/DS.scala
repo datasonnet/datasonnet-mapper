@@ -398,7 +398,7 @@ object DSLowercase extends Library {
       (_, _, url: String) =>
         url match {
           case str if str.startsWith("classpath://") =>
-            val source = io.Source.fromInputStream(getClass.getClassLoader.getResourceAsStream(str.replaceFirst("classpath://", "")))
+            val source = scala.io.Source.fromInputStream(getClass.getClassLoader.getResourceAsStream(str.replaceFirst("classpath://", "")))
             val out =
               try {
                 source.mkString
