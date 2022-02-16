@@ -16,6 +16,7 @@ package com.datasonnet
  * limitations under the License.
  */
 
+
 import java.math.{BigDecimal, RoundingMode}
 import java.net.URL
 import java.security.SecureRandom
@@ -25,12 +26,11 @@ import java.time.temporal.ChronoUnit
 import java.time.{DateTimeException, Duration, Instant, LocalDateTime, Period, ZoneId, ZoneOffset, ZonedDateTime}
 import java.util.function.Function
 import java.util.{Base64, Scanner}
-
-import com.datasonnet
 import com.datasonnet.document.{DefaultDocument, MediaType}
 import com.datasonnet.header.Header
 import com.datasonnet.modules.{Crypto, JsonPath, Regex}
 import com.datasonnet.spi.{DataFormatService, Library, ujsonUtils}
+
 import javax.crypto.Cipher
 import javax.crypto.spec.{IvParameterSpec, SecretKeySpec}
 import sjsonnet.Expr.Member.Visibility
@@ -797,6 +797,7 @@ object DSLowercase extends Library {
           written.substring(written.indexOf(">") + 1, written.length - wrapperStop.length)
       },
     ),
+
     "datetime" -> moduleFrom(
       builtin0("now") { (_, _, _) => ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) },
 
@@ -999,6 +1000,39 @@ object DSLowercase extends Library {
             .minusNanos(date.getNano).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
+    ),
+
+    "localdatetime" -> moduleFrom(
+      builtin0("now") { (vs, extVars, wd) =>
+        val datetimeObj = java.time.LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
+        datetimeObj.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+      },
+
+      builtin("offset", "datetime", "period") { (ev, fs, v1: String, v2: String) =>
+        // NOTE: DEMO ONLY (in particular, missing proper error handling)
+        val datetime = java.time.LocalDateTime.parse(v1, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        val period = Period.parse(v2)
+        datetime.plus(period).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+      },
+
+      builtin("format", "datetime", "inputFormat", "outputFormat") {
+        (ev, fs, datetime: String, inputFormat: String, outputFormat: String) =>
+          val datetimeObj = java.time.LocalDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
+          datetimeObj.format(DateTimeFormatter.ofPattern(outputFormat))
+      },
+
+      builtin0("compare", "datetime1", "format1", "datetime2", "format2") {
+        (vals, ev, fs) =>
+          val strValSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead, StringRead))
+          val datetime1 = strValSeq(0).asInstanceOf[String]
+          val format1 = strValSeq(1).asInstanceOf[String]
+          val datetime2 = strValSeq(2).asInstanceOf[String]
+          val format2 = strValSeq(3).asInstanceOf[String]
+
+          val datetimeObj1 = java.time.LocalDateTime.parse(datetime1, DateTimeFormatter.ofPattern(format1))
+          val datetimeObj2 = java.time.LocalDateTime.parse(datetime2, DateTimeFormatter.ofPattern(format2))
+          datetimeObj1.compareTo(datetimeObj2)
+      }
     ),
 
     "period" -> moduleFrom(
