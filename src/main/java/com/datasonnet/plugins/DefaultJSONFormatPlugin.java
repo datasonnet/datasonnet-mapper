@@ -1,7 +1,7 @@
 package com.datasonnet.plugins;
 
 /*-
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet.plugins;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaType;
@@ -64,10 +63,18 @@ public class DefaultJSONFormatPlugin extends AbstractDataFormatPlugin {
         Class<?> targetType = doc.getContent().getClass();
 
         if (String.class.isAssignableFrom(targetType)) {
-            return ujsonUtils.read(ujson.Readable.fromString((String) doc.getContent()), false);
+            String content = (String)doc.getContent();
+            if ("".equals(content.trim())) {
+                return ujson.Null$.MODULE$;
+            }
+            return ujsonUtils.read(ujson.Readable.fromString(content), false);
         }
 
         if (CharSequence.class.isAssignableFrom(targetType)) {
+            CharSequence charSequence = (CharSequence) doc.getContent();
+            if ("".equals(charSequence.toString().trim())) {
+                return ujson.Null$.MODULE$;
+            }
             return ujsonUtils.read(ujson.Readable.fromCharSequence((CharSequence) doc.getContent()), false);
         }
 
