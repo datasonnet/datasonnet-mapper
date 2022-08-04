@@ -20,7 +20,6 @@ VOLUME /tmp
 ENV _JAVA_OPTIONS "-Djava.awt.headless=true"
 ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/opt/datasonnet/app.jar"]
 
-
 RUN addgroup datasonnet && \
     adduser -D -S -h /var/cache/datasonnet -s /sbin/nologin -G datasonnet datasonnet
 USER datasonnet
