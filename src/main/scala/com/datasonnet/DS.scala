@@ -1,7 +1,7 @@
 package com.datasonnet
 
 /*-
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import java.math.{BigDecimal, RoundingMode}
 import java.net.URL
 import java.security.SecureRandom
@@ -502,7 +501,7 @@ object DSLowercase extends Library {
       (_, _, _) =>
         val n = 36
         val AlphaNumericString = "0123456789" +
-          "abcdefghijklmnopqrstuvxyz"
+          "abcdef"
         val sb = new StringBuilder(n)
         for (i <- 0 until n) {
           if (i.equals(8) || i.equals(13) || i.equals(18) || i.equals(23)) {
