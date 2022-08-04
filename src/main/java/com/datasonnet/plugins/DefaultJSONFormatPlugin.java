@@ -75,7 +75,7 @@ public class DefaultJSONFormatPlugin extends AbstractDataFormatPlugin {
             if ("".equals(charSequence.toString().trim())) {
                 return ujson.Null$.MODULE$;
             }
-            return ujsonUtils.read(ujson.Readable.fromCharSequence((CharSequence) doc.getContent()), false);
+            return ujsonUtils.read(ujson.Readable.fromCharSequence(charSequence), false);
         }
 
         if (Path.class.isAssignableFrom(targetType)) {
