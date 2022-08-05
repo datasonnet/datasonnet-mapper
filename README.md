@@ -1,5 +1,7 @@
 # DataSonnet
 
+![Maven Central](https://img.shields.io/maven-central/v/com.datasonnet/datasonnet-mapper)
+
 ## Build and Versioning notes
 
 The version in the POM should always be a SNAPSHOT version. That is the version that will be published

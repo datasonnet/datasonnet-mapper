@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -23,8 +22,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CoreTest {
 
@@ -766,6 +769,9 @@ public class CoreTest {
         Mapper mapper = new Mapper(lib + ".uuid()\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals(5, value.split("-").length);
+        Pattern pattern = Pattern.compile("[^a-f0-9\\-]");
+        Matcher match = pattern.matcher(value.toLowerCase());
+        assertFalse(match.find());
 
         logger.info("UUID: " + value);
     }
