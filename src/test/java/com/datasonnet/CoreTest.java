@@ -25,9 +25,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CoreTest {
 
@@ -36,6 +34,7 @@ public class CoreTest {
     private final String lib = "ds";
     private final String mathPack = ".math";
     private final String datetimePack = ".datetime";
+    private final String localDateTimePack = ".localdatetime";
 
     @Test
     void test_abs() {
@@ -879,4 +878,29 @@ public class CoreTest {
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("abc", value);
     }
+
+    @Test
+    void localDateTime_now() {
+        Mapper mapper = new Mapper(lib + localDateTimePack + ".now()\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertNotNull(value);
+    }
+
+    @Test
+    void localDateTime_offset() {
+        Mapper mapper = new Mapper(lib + localDateTimePack + ".offset(\"2019-07-22T21:00:00\", \"P1Y1D\")\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2020-07-23T21:00:00", value);
+    }
+
+    @Test
+    void localDateTime_compare() {
+        Mapper mapper = new Mapper(lib + localDateTimePack + ".compare(\"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\", \"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\")\n",
+                new ArrayList<>(),
+                new HashMap<>(),
+                true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("0", value);
+    }
+
 }
