@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaTypes;
@@ -181,5 +180,21 @@ public class MapperTest {
         mapped = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), variables, MediaTypes.APPLICATION_JSON).getContent();
 
         assertEquals("{\"a\":\"a\",\"t\":\"t\",\"v1\":\"v1value\",\"v2\":\"v2value\",\"y\":\"y\",\"z\":\"z\"}", mapped.trim());
+    }
+
+    @Test
+    void testNullAndEmpty() {
+        Mapper mapper = new Mapper("{\"hello\":\"world\"}");
+        Document<String> mapped = mapper.transform(new DefaultDocument<String>("", MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_JSON);
+        assertEquals("{\"hello\":\"world\"}", mapped.getContent());
+        assertEquals(MediaTypes.APPLICATION_JSON, mapped.getMediaType());
+
+        mapped = mapper.transform(new DefaultDocument<String>(" ", MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_JSON);
+        assertEquals("{\"hello\":\"world\"}", mapped.getContent());
+        assertEquals(MediaTypes.APPLICATION_JSON, mapped.getMediaType());
+
+        mapped = mapper.transform(new DefaultDocument<String>(null, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_JSON);
+        assertEquals("{\"hello\":\"world\"}", mapped.getContent());
+        assertEquals(MediaTypes.APPLICATION_JSON, mapped.getMediaType());
     }
 }
