@@ -26,8 +26,13 @@ import java.util.stream.Stream;
 
 public class TestResourceReader {
     public static String readFileAsString(String filePath) throws URISyntaxException, IOException {
+        return new String(TestResourceReader.readFileAsBytes(filePath));
+    }
+
+    public static byte[] readFileAsBytes(String filePath) throws URISyntaxException, IOException {
         Path path = Paths.get(TestResourceReader.class.getClassLoader()
                 .getResource(filePath).toURI());
-        return new String(Files.readAllBytes(path));
+        return Files.readAllBytes(path);
     }
+
 }

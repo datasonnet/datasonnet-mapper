@@ -16,7 +16,8 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.datasonnet</groupId>
@@ -114,6 +115,19 @@
             <artifactId>jackson-dataformat-properties</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+
+        <!-- Multipart plugin dependencies -->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+
         <!-- plugin deps: end -->
 
         <dependency>
@@ -226,6 +240,13 @@
             <groupId>org.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
             <version>1.5.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.5.13</version>
             <scope>test</scope>
         </dependency>
         <!-- test deps: end -->
@@ -473,7 +494,8 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <sourcepath>${project.build.sourceDirectory}:${project.build.directory}/genjavadoc</sourcepath>
+                            <sourcepath>${project.build.sourceDirectory}:${project.build.directory}/genjavadoc
+                            </sourcepath>
                             <quiet>true</quiet>
                             <!-- genjavadoc is currently generating some invalid javadoc, but it's something -->
                             <failOnError>false</failOnError>

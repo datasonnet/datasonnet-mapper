@@ -18,11 +18,7 @@ package com.datasonnet.spi;
 
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaType;
-import com.datasonnet.plugins.DefaultCSVFormatPlugin;
-import com.datasonnet.plugins.DefaultJSONFormatPlugin;
-import com.datasonnet.plugins.DefaultJavaFormatPlugin;
-import com.datasonnet.plugins.DefaultPlainTextFormatPlugin;
-import com.datasonnet.plugins.DefaultXMLFormatPlugin$;
+import com.datasonnet.plugins.*;
 import ujson.Value;
 
 import java.util.Arrays;
@@ -38,7 +34,8 @@ public class DataFormatService {
                     new DefaultJavaFormatPlugin(),
                     DefaultXMLFormatPlugin$.MODULE$,
                     new DefaultCSVFormatPlugin(),
-                    new DefaultPlainTextFormatPlugin()));
+                    new DefaultPlainTextFormatPlugin(),
+                    new MimeMultipartPlugin()));
 
     public DataFormatService(List<DataFormatPlugin> plugins) {
         this.plugins = plugins;
