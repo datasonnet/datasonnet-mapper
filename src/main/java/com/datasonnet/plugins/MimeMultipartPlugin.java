@@ -27,6 +27,7 @@ public class MimeMultipartPlugin extends BaseJacksonDataFormatPlugin {
         supportedTypes.add(MediaTypes.MULTIPART_RELATED);
 
         writerParams.add(DS_PARAM_BOUNDARY);
+        readerParams.add(DS_PARAM_BOUNDARY);
 
         readerSupportedClasses.add(String.class);
         readerSupportedClasses.add(InputStream.class);
