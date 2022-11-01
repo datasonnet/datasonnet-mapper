@@ -515,6 +515,113 @@ local params = {
 }
 ------------------------
 
+## XLSX Format
+
+### MIME types and identifiers
+* `application/xlsx`
+### `write`
+
+Creates a XLSX out of an array of JSON objects. The keys of JSON object values are used as headers.
+
+*Example*
+
+.Payload
+------------------------
+[
+  {
+    "First Name": "William",
+    "Last Name": "Shakespeare",
+    "Phone": "(123)456-7890"
+  },
+  {
+    "First Name": "Christopher",
+    "Last Name": "Marlow",
+    "Phone": "(987)654-3210"
+  }
+]
+------------------------
+.DataSonnet map:
+------------------------
+ds.write(payload, "application/xlsx")
+------------------------
+
+.Result
+[%header,cols=3*a] 
+|===
+|First Name
+|Last Name
+|Phone
+
+|William
+|Shakespeare
+|(123)456-7890
+
+|Christopher
+|Marlow
+|(987)654-3210
+|===
+
+Providing an optional `params` object allows for more control over the format of the output XLSX. The XLSX can be created without headers - in this case the input can be an array of arrays. In addition, a list of columns can be specified to override the JSON object names. In addition to the parameters described in the `read` section, the following XLSX output-only parameters are supported:
+
+[%header, cols=3*a]
+|===
+|Parameter
+|Description
+|Default value
+
+|`UseHeader`
+|If set to `true`, the first row of XLSX will be a list of column headers and will mapped from the JSON object property   names or from `Headers`
+|`true`
+
+|`Headers`
+|an array of strings to use as column names (has no effect if `UseHeader` is set to `false`)
+|`"`
+
+|`UseTempFile`
+|If set to `true`, a temp file will be created hold the output instead of an byte[]
+|`false`
+|===
+
+
+
+*Example*
+
+.Payload
+------------------------
+[
+  [
+    "William",
+    "Shakespeare",
+    "(123)456-7890"
+  ],
+  [
+    "Christopher",
+    "Marlow",
+    "(987)654-3210"
+  ]
+]
+------------------------
+.DataSonnet map:
+------------------------
+local params = {
+    "UseHeader": false
+};
+
+ds.write(payload, "application/xlsx", params)
+
+------------------------
+.Result
+|===
+|William
+|Shakespeare
+|(123)456-7890
+
+|Christopher
+|Marlow
+|(987)654-3210
+|===
+
+
 ## Java Objects
 
 ### `read`

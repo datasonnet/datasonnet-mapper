@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import javax.xml.namespace.QName;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -52,6 +53,7 @@ public class JavaReaderTest {
         theGizmo.setManufacturer(manufacturer);
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
         theGizmo.setDate(df.parse("2020-01-06"));
 
         Document<Gizmo> data = new DefaultDocument<>(theGizmo, MediaTypes.APPLICATION_JAVA);
