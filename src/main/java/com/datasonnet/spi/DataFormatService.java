@@ -1,7 +1,7 @@
 package com.datasonnet.spi;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,9 @@ package com.datasonnet.spi;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaType;
-import com.datasonnet.plugins.DefaultCSVFormatPlugin;
-import com.datasonnet.plugins.DefaultJSONFormatPlugin;
-import com.datasonnet.plugins.DefaultJavaFormatPlugin;
-import com.datasonnet.plugins.DefaultPlainTextFormatPlugin;
-import com.datasonnet.plugins.DefaultXMLFormatPlugin$;
+import com.datasonnet.plugins.*;
 import ujson.Value;
 
 import java.util.Arrays;
@@ -38,7 +33,8 @@ public class DataFormatService {
                     new DefaultJavaFormatPlugin(),
                     DefaultXMLFormatPlugin$.MODULE$,
                     new DefaultCSVFormatPlugin(),
-                    new DefaultPlainTextFormatPlugin()));
+                    new DefaultPlainTextFormatPlugin(),
+                    new MimeMultipartPlugin()));
 
     public DataFormatService(List<DataFormatPlugin> plugins) {
         this.plugins = plugins;
