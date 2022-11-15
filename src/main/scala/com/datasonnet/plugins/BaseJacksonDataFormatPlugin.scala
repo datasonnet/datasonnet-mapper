@@ -1,7 +1,7 @@
 package com.datasonnet.plugins
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet.plugins
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.datasonnet.spi.AbstractDataFormatPlugin
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.{ArrayNode, BinaryNode, BooleanNode, NullNode, NumericNode, ObjectNode, TextNode}
