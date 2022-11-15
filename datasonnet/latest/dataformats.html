@@ -39,14 +39,6 @@
             <a class="navbar-item" href="#">Service C</a>
           </div>
         </div>
-        <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" href="#">Resources</a>
-          <div class="navbar-dropdown">
-            <a class="navbar-item" href="#">Resource A</a>
-            <a class="navbar-item" href="#">Resource B</a>
-            <a class="navbar-item" href="#">Resource C</a>
-          </div>
-        </div>
         <div class="navbar-item">
           <span class="control">
             <a class="button is-primary" href="#">Download</a>
@@ -200,6 +192,7 @@
 <li><a href="#_xml_format">XML Format</a></li>
 <li><a href="#_csv_format">CSV Format</a></li>
 <li><a href="#_java_objects">Java Objects</a></li>
+<li><a href="#_multipart_form_data">Multipart Form Data</a></li>
 </ul>
 </div>
 <div class="sect1">
@@ -1363,6 +1356,157 @@ output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_multipart_form_data"><a class="anchor" href="#_multipart_form_data"></a>Multipart Form Data</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_mime_types_and_identifiers_3"><a class="anchor" href="#_mime_types_and_identifiers_3"></a>MIME types and identifiers</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>multipart/form-data</code></p>
+</li>
+<li>
+<p><code>multipart/mixed</code></p>
+</li>
+<li>
+<p><code>multipart/related</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_read_4"><a class="anchor" href="#_read_4"></a><code>read</code></h3>
+<div class="paragraph">
+<p>Reads a byte array of multipart form data into an internal structure of array of objects. Each object represents a part and has a following properties:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>name</code> - the name of the part;</p>
+</li>
+<li>
+<p><code>contentType</code> - the part content type;</p>
+</li>
+<li>
+<p><code>content</code> - the content of the part. If part is binary, the content will be a byte array;</p>
+</li>
+<li>
+<p><code>fileName</code> (optional) - if the part is file attachment, this is a file name.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[
+  {
+    "name": "textPart",
+    "contentType": "text/plain; charset=UTF-8",
+    "content": "Hello World"
+  },
+  {
+    "name": "binaryPart",
+    "contentType": "image/png",
+    "fileName": "DataSonnet.png",
+    "content": [
+      -119,
+      80,
+      78,
+      71,
+      13,
+      10,
+      26,
+      ...
+    ]
+  }
+]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The following parameters are supported:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Boundary</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Explicitly sets the parts boundary (normally it&#8217;s automatically detected by the plugin itself)</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="_write_4"><a class="anchor" href="#_write_4"></a><code>write</code></h3>
+<div class="paragraph">
+<p>Creates a byte array containing multipart form data. The input structure must be in form of the array of objects each representing a part. For example, the following DataSonnet mapping will create a multipart data:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>[
+  {
+    name: "textPart",
+    contentType: "text/plain; charset=UTF-8",
+    content: "Hello World"
+  },
+  {
+    name: "binaryPart",
+    fileName: "DataSonnet.png",
+    contentType: "image/png",
+    content: payload.image
+  }
+]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The following parameters are supported:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter</th>
+<th class="tableblock halign-left valign-top">Description</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p><code>Boundary</code></p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>Explicitly sets the parts boundary (normally it&#8217;s automatically generated by the plugin itself)</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div class="content"></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 </article>
   </div>
 </main>
@@ -1371,7 +1515,7 @@ output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar
   <p>This page was built using the Antora default UI.</p>
   <p>The source code for this UI is licensed under the terms of the MPL-2.0 license.</p>
 </footer>
-<script src="../../_/js/site.js"></script>
+<script id="site-script" src="../../_/js/site.js" data-ui-root-path="../../_"></script>
 <script async src="../../_/js/vendor/highlight.js"></script>
   </body>
 </html>
