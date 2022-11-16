@@ -69,7 +69,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <jackson.version>2.11.2</jackson.version>
+        <jackson.version>2.12.7.1</jackson.version>
         <junit.version>5.6.2</junit.version>
         <bouncycastle.version>1.68</bouncycastle.version>
         <quickcheck.version>0.9.4</quickcheck.version>
