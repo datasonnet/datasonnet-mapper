@@ -19,10 +19,10 @@ package com.datasonnet.spi
 import com.datasonnet.Mapper
 import com.datasonnet.header.Header
 import fastparse.Parsed
-import sjsonnet.Expr.Member.Visibility
-import sjsonnet.Expr.Params
-import sjsonnet.Val.Obj
-import sjsonnet.{Evaluator, Expr, Val}
+import com.datasonnet.jsonnet.Expr.Member.Visibility
+import com.datasonnet.jsonnet.Expr.Params
+import com.datasonnet.jsonnet.Val.Obj
+import com.datasonnet.jsonnet.{Evaluator, Expr, Val}
 
 import scala.collection.mutable
 import scala.io.Source

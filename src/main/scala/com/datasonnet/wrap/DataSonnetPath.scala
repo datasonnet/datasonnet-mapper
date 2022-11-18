@@ -16,7 +16,7 @@ package com.datasonnet.wrap
  * limitations under the License.
  */
 
-import sjsonnet.Path
+import com.datasonnet.jsonnet.Path
 
 case class DataSonnetPath(path: String) extends Path {
   def relativeToString(p: Path): String = p match {

@@ -1,4 +1,5 @@
 ## localdatetime
+_**Deprecated**. Use xref:libraries-datetime.adoc[datetime] library instead._
 
 ### `now()`
 Returns the current date/time from the system UTC clock in ISO-8601 format without a time zone.

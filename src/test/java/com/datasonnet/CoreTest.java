@@ -74,6 +74,8 @@ public class CoreTest {
     }
 
     @Test
+    @Deprecated
+    @Disabled
     void test_daysBetween() {
         Mapper mapper = new Mapper(lib + datetimePack + ".daysBetween(\"2020-07-04T00:00:00.000Z\",\"2020-07-01T00:00:00.000Z\")\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
@@ -295,6 +297,8 @@ public class CoreTest {
     }
 
     @Test
+    @Deprecated
+    @Disabled
     void test_isLeapYear() {
         Mapper mapper = new Mapper(lib + datetimePack + ".isLeapYear(\"2020-07-04T21:00:00.000Z\")\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");

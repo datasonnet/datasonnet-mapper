@@ -16,7 +16,7 @@
 
 site:
   title: DataSonnet Mapper Documentation
-  url: https://MS3Inc.github.io/datasonnet-mapper
+  url: https://datasonnet.github.io/datasonnet-mapper
   start_page: datasonnet::index.adoc
 content:
   sources:
@@ -34,3 +34,5 @@ ui:
         contents: |
           static_files: [ .nojekyll ]
       - path: .nojekyll
+      - path: partials/header-content.hbs
+        contents: ./docs/supplemental-ui/partials/header-content.hbs
