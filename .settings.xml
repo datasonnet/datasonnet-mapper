@@ -19,7 +19,7 @@
                       http://maven.apache.org/xsd/settings-1.0.0.xsd">
     <servers>
         <server>
-            <id>ms3-nexus</id>
+            <id>portx</id>
             <username>${env.REPO_USER}</username>
             <password>${env.REPO_PASSWORD}</password>
         </server>
