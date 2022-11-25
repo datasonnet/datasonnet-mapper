@@ -1,7 +1,7 @@
 package com.datasonnet
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import java.io.{PrintWriter, StringWriter}
 import java.util.Collections
 
@@ -24,9 +23,9 @@ import com.datasonnet.header.Header
 import com.datasonnet.spi.{DataFormatService, Library}
 import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
 import fastparse.Parsed
-import sjsonnet.Expr.Params
-import sjsonnet.Val.{Func, Lazy, Obj}
-import sjsonnet._
+import com.datasonnet.jsonnet.Expr.Params
+import com.datasonnet.jsonnet.Val.{Func, Lazy, Obj}
+import com.datasonnet.jsonnet._
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.{IterableHasAsScala, MapHasAsScala}
@@ -150,7 +149,7 @@ class Mapper(var script: String,
   private val evaluator = new NoFileEvaluator(script, DataSonnetPath("."), parseCache, importer, header.isPreserveOrder)
 
   // using uppercase DS is deprecated, but will remain supported
-  private val defaultLibraries: Map[String, Obj] = DSLowercase.makeLib(dataFormats, header, evaluator, parseCache) concat DSUppercase.makeLib(dataFormats, header, evaluator, parseCache)
+  private val defaultLibraries: Map[String, Obj] = DSLowercase.makeLib(dataFormats, header, evaluator, parseCache)
   private val libraries = additionalLibs.asScala.foldLeft(defaultLibraries) {
     (acc, lib) => acc concat lib.makeLib(dataFormats, header, evaluator, parseCache)
   }

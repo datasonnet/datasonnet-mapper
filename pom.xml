@@ -69,14 +69,22 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
         <jackson.version>2.14.0</jackson.version>
         <junit.version>5.6.2</junit.version>
         <bouncycastle.version>1.68</bouncycastle.version>
         <quickcheck.version>0.9.4</quickcheck.version>
         <xmlunit.version>2.7.0</xmlunit.version>
-        <mycila.version>4.1</mycila.version>
-        <scala.library.version>2.13.10</scala.library.version>
         <json-path.version>2.7.0</json-path.version>
+
+        <mycila.version>4.1</mycila.version>
+
+        <scala.library.version>2.13.10</scala.library.version>
+
+        <ujson.version>1.2.0</ujson.version>
+        <fastparse.version>2.3.0</fastparse.version>
+        <pprint.version>0.5.9</pprint.version>
+        <scalatags.version>0.9.1</scalatags.version>
     </properties>
 
     <dependencies>
@@ -85,11 +93,29 @@
             <artifactId>scala-library</artifactId>
             <version>${scala.library.version}</version>
         </dependency>
+
+        <!-- DataBricks / LiHaoYi dependencies -->
         <dependency>
             <groupId>com.lihaoyi</groupId>
-            <artifactId>sjsonnet_2.13</artifactId>
-            <version>0.2.6</version>
+            <artifactId>ujson_2.13</artifactId>
+            <version>${ujson.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.lihaoyi</groupId>
+            <artifactId>fastparse_2.13</artifactId>
+            <version>${fastparse.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lihaoyi</groupId>
+            <artifactId>pprint_2.13</artifactId>
+            <version>${pprint.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lihaoyi</groupId>
+            <artifactId>scalatags_2.13</artifactId>
+            <version>${scalatags.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>

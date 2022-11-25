@@ -20,6 +20,7 @@ import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.TestResourceReader;
 import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -54,7 +55,7 @@ public class MultipartWriterTest {
 
         //Mimic servlet context here
         try {
-            List<FileItem> parts = new FileUpload(new DefaultFileItemFactory()).parseRequest(new RequestContext() {
+            List<FileItem> parts = new FileUpload(new DiskFileItemFactory()).parseRequest(new RequestContext() {
                 @Override
                 public String getCharacterEncoding() {
                     return "UTF-8";

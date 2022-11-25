@@ -1,0 +1,316 @@
+## zoneddatetime
+_**Deprecated**. Use xref:libraries-datetime.adoc[datetime] library instead._
+
+This library uses Java's DateTimeFormatter library to format the date to a consistent value using ISO_OFFSET_DATE_TIME.
+If your datetime is not in this format, you can use the `parse` function to convert it. After you are finished executing your logic,
+you can use the `format` function to set the output format.
+
+### `atBeginningOfDay(string datetime)`
+Returns the given datetime at midnight.
+
+*Example*
+
+------------------------
+ds.zoneddatetime.atBeginningOfDay("2020-12-31T23:19:35Z")
+------------------------
+
+.Result:
+------------------------
+"2020-12-31T00:00:00Z"
+------------------------
+
+### `atBeginningOfHour(string datetime)`
+Returns the given datetime with the minutes and seconds set to zero.
+
+*Example*
+
+------------------------
+ds.zoneddatetime.atBeginningOfHour("2020-12-31T23:19:35Z")
+------------------------
+
+.Result:
+------------------------
+"2020-12-31T23:00:00Z"
+------------------------
+
+### `atBeginningOfMonth(string datetime)`
+Returns the given datetime with the day set to first of the month and the time set to midnight.
+
+*Example*
+
+------------------------
+ds.zoneddatetime.atBeginningOfMonth("2020-12-31T23:19:35Z")
+------------------------
+
+.Result:
+------------------------
+"2020-12-01T00:00:00Z"
+------------------------
+
+### `atBeginningOfWeek(string datetime)`
+Returns the given datetime at the first of the current week and the time set to midnight
+
+*Example*
+
+------------------------
+ds.zoneddatetime.atBeginningOfWeek("2020-12-31T23:19:35Z")
+------------------------
+
+.Result:
+------------------------
+"2020-12-27T00:00:00Z"
+------------------------
+
+### `atBeginningOfYear(string datetime)`
+Returns the given datetime at the first of the year
+
+*Example*
+
+------------------------
+ds.zoneddatetime.atBeginningOfYear("2020-12-31T23:19:35Z")
+------------------------
+
+.Result:
+------------------------
+"2020-01-01T00:00:00Z"
+------------------------
+
+### `changeTimeZone(string datetime, string timezone)`
+Changes the date timezone, retaining the instant. This normally results in a change to the local date-time.
+
+*Example*
+
+------------------------
+ds.zoneddatetime.changeTimeZone("2020-12-31T23:19:35Z", "America/Los_Angeles")
+------------------------
+.Result:
+------------------------
+"2020-12-31T15:19:35-08:00"
+------------------------
+
+### `compare(string datetime1, string datetime2)`
+Returns `1` if `datetime1 > datetime2`, `-1` if `datetime1 < datetime2`, and `0` if `datetime1 == datetime2`.
+
+*Example*
+
+------------------------
+ds.zoneddatetime.compare("2020-12-31T23:19:35Z","2020-01-01T00:00:00Z")
+------------------------
+.Result
+------------------------
+1
+------------------------
+
+### `date(object datetime)`
+This function uses a datetime object to generate a datetime in string format.
+Every key in the object is an optional number value, except the timezone which is an optional string.
+
+Example structure:
+------------------------
+{
+    "year": 0,
+    "month": 0,
+    "day": 0,
+    "hour": 0,
+    "minute": 0,
+    "second": 0,
+    "timezone": "Z"
+}
+------------------------
+
+*Example*
+
+------------------------
+local datetime={
+    "year": 2021,
+    "timezone": "America/Los_Angeles"
+};
+ds.zoneddatetime.date(datetime)
+------------------------
+.Result
+------------------------
+"2021-01-01T00:00:00-08:00"
+------------------------
+
+### `daysBetween(string datetime1, string datetime2)`
+Returns the number of days between `datetime1` and `datetime2`.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+local date1 = "2019-09-20T18:53:41.425Z";
+local date2 = "2019-09-14T18:53:41.425Z";
+
+ds.zoneddatetime.daysBetween(date1, date2)
+------------------------
+.Result
+------------------------
+6
+------------------------
+
+### `format(string datetime, string outputFormat)`
+Given a datetime, will convert it to the specified output format.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.zoneddatetime.format("2019-09-20T18:53:41.425Z", "yyyy/MM/dd")
+------------------------
+.Result
+------------------------
+"2019/09/20"
+------------------------
+
+### `isLeapYear(string datetime)`
+Returns a boolean indicating if `datetime` is a leap year.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.zoneddatetime.isLeapYear("2019-09-14T18:53:41.425Z")
+------------------------
+.Result
+------------------------
+false
+------------------------
+
+### `minus(string datetime, string period)`
+Subtracts a `period` type from the given datetime.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.zoneddatetime.minus("2019-09-20T18:53:41Z", "P2D")
+------------------------
+.Result
+------------------------
+"2019-09-18T18:53:41Z"
+------------------------
+
+### `now()`
+Returns the current datetime.
+
+*Example*
+
+------------------------
+ds.zoneddatetime.now()
+------------------------
+
+.Result:
+------------------------
+"2021-01-05T13:09:45.476375-05:00"
+------------------------
+
+### `parse(string|number datetime, string inputFormat)`
+Parses the datetime using the input format and returns the value in the default format.
+If an epoch or timestamp value is used as the datetime you can use `"epoch"` or `"timestamp"` as the inputFormat
+
+*Example*
+
+------------------------
+ds.zoneddatetime.parse("12/31/1990 10:10:10", "MM/dd/yyyy HH:mm:ss")
+------------------------
+
+.Result:
+------------------------
+"1990-12-31T10:10:10Z"
+------------------------
+
+### `plus(string datetime, string period)`
+Adds a `period` type to the given datetime.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.zoneddatetime.plus("2019-09-18T18:53:41Z", "P2D")
+------------------------
+.Result
+------------------------
+"2019-09-20T18:53:41Z"
+------------------------
+
+### `toLocalDate(string datetime)`
+Converts a zone datetime to a local date
+
+*Example*
+
+------------------------
+ds.zoneddatetime.toLocalDate("2019-07-04T18:53:41Z")
+------------------------
+.Result:
+------------------------
+2019-07-04
+------------------------
+
+### `toLocalDateTime(string datetime)`
+Converts a zone datetime to a local datetime
+
+*Example*
+
+------------------------
+ds.zoneddatetime.toLocalDateTime("2019-07-04T21:00:00Z")
+------------------------
+.Result:
+------------------------
+2019-07-04T21:00:00
+------------------------
+
+### `toLocalTime(string datetime, string format)`
+Converts a zone datetime to a local time.
+
+*Example*
+
+------------------------
+ds.zoneddatetime.toLocalTime("2019-07-04T21:00:00Z")
+------------------------
+.Result:
+------------------------
+21:00:00
+------------------------
+
+### `today()`
+Returns the datetime of the current day at midnight.
+
+*Example*
+
+------------------------
+ds.zoneddatetime.today
+------------------------
+
+.Result:
+------------------------
+"2021-01-05T00:00:00-05:00"
+------------------------
+
+### `tomorrow()`
+Returns the datetime of the next day at midnight.
+
+*Example*
+
+------------------------
+ds.zoneddatetime.tomorrow
+------------------------
+
+.Result:
+------------------------
+"2021-01-06T00:00:00-05:00"
+------------------------
+
+### `yesterday()`
+Returns the datetime of the previous day at midnight.
+
+*Example*
+
+------------------------
+ds.zoneddatetime.yesterday
+------------------------
+
+.Result:
+------------------------
+"2021-01-04T00:00:00-05:00"
+------------------------

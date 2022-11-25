@@ -1,7 +1,7 @@
 package com.datasonnet.spi
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,13 @@ package com.datasonnet.spi
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.datasonnet.Mapper
 import com.datasonnet.header.Header
 import fastparse.Parsed
-import sjsonnet.Expr.Member.Visibility
-import sjsonnet.Expr.Params
-import sjsonnet.Val.Obj
-import sjsonnet.{Evaluator, Expr, Val}
+import com.datasonnet.jsonnet.Expr.Member.Visibility
+import com.datasonnet.jsonnet.Expr.Params
+import com.datasonnet.jsonnet.Val.Obj
+import com.datasonnet.jsonnet.{Evaluator, Expr, Val}
 
 import scala.collection.mutable
 import scala.io.Source

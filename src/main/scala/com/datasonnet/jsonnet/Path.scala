@@ -1,4 +1,4 @@
-package com.datasonnet.wrap
+package com.datasonnet.jsonnet
 
 /*-
  * Copyright 2019-2022 the original author or authors.
@@ -15,19 +15,17 @@ package com.datasonnet.wrap
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.datasonnet.jsonnet.Path
 
-case class DataSonnetPath(path: String) extends Path {
-  def relativeToString(p: Path): String = p match {
-    case other: DataSonnetPath if path.startsWith(other.path) => path.drop(other.path.length)
-    case _ => path
-  }
-
-  def parent(): Path = DataSonnetPath(path.split('/').dropRight(1).mkString("/"))
-
-  def segmentCount(): Int = path.split('/').length
-
-  def last: String = path.split('/').last
-
-  def /(s: String): Path = DataSonnetPath(path + "/" + s)
+/**
+  * [[Path]]s represent handles that Sjsonnet can use to resolve imports and
+  * load file contents. Abstracts away the filesystem access so import
+  * resolution can be customized, e.g. using a virtual filesystem when running
+  * in the browser.
+  */
+trait Path {
+  def relativeToString(p: Path): String
+  def parent(): Path
+  def segmentCount(): Int
+  def last: String
+  def /(s: String): Path
 }
