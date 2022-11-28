@@ -20,11 +20,13 @@ import com.datasonnet.document.Document;
 import com.datasonnet.document.InvalidMediaTypeException;
 import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
+import com.datasonnet.spi.ujsonUtils;
 import com.fasterxml.jackson.dataformat.javaprop.JavaPropsMapper;
 import com.fasterxml.jackson.dataformat.javaprop.JavaPropsSchema;
 import com.fasterxml.jackson.dataformat.javaprop.util.JPropNode;
 import com.fasterxml.jackson.dataformat.javaprop.util.JPropPathSplitter;
 import org.jetbrains.annotations.NotNull;
+import ujson.Value;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -43,7 +45,7 @@ public class Header {
     public static final String DATASONNET_HEADER = "/** DataSonnet";
     public static final String COMMENT_PREFIX = "//";
     public static final Pattern VERSION_LINE = Pattern.compile("^version *= *(?<version>[a-zA-Z0-9.+-]+) *(\\r?\\n|$)");
-    public static final String DATASONNET_DEFAULT_PREFIX = "default ";
+    public static final String DATASONNET_DEFAULT_PREFIX = "default";
     public static final String DATASONNET_INPUT = "input";
     public static final Pattern INPUT_LINE = Pattern.compile("^(?:input (?<name>\\w+)|input (?<all>\\*)) (?<mediatype>\\S.*)$");
     public static final String DATASONNET_OUTPUT = "output";
@@ -62,9 +64,20 @@ public class Header {
     private final Map<Integer, MediaType> dataFormats;
     private final HashMap<String, MediaType> defaultInputs;
     private final MediaType defaultOutput;
+    private final Value defaultValue;
 
     public Header(String version,
                   boolean preserveOrder,
+                  Map<String, Collection<MediaType>> namedInputs,
+                  List<MediaType> outputs,
+                  Iterable<MediaType> allInputs,
+                  Iterable<MediaType> dataFormats) {
+        this(version, preserveOrder, null, namedInputs, outputs, allInputs, dataFormats);
+    }
+
+    public Header(String version,
+                  boolean preserveOrder,
+                  Value defaultValue,
                   Map<String, Collection<MediaType>> namedInputs,
                   List<MediaType> outputs,
                   Iterable<MediaType> allInputs,
@@ -75,7 +88,7 @@ public class Header {
         this.preserveOrder = preserveOrder;
         this.defaultInputs = new HashMap<>();
         this.namedInputs = new HashMap<>();
-
+        this.defaultValue = defaultValue;
         for (Map.Entry<String, Collection<MediaType>> entry : namedInputs.entrySet()) {
             Collection<MediaType> types = entry.getValue();
             if (types.size() > 0) {
@@ -139,7 +152,7 @@ public class Header {
                 }
                 throw new HeaderParseException("Version must be 1.0 but is " + version);
             case "2":
-                if ("0".equals(splitVersion[1])) {
+                if ("0".equals(splitVersion[1]) || "5".equals(splitVersion[1])) {
                     return parseHeader20(headerWithoutVersion);
                 } else {
                     //not sure if a print out is a good enough warning or if we want to add loggers
@@ -255,6 +268,8 @@ public class Header {
     @NotNull
     private static Header parseHeader20(String headerSection, String version) throws HeaderParseException {
         boolean preserve = true;
+        Value defaultValue = null;
+
         List<MediaType> outputs = new ArrayList<>(4);
         Map<String, List<MediaType>> inputs = new HashMap<>(4);
         List<MediaType> allInputs = new ArrayList<>(4);
@@ -266,6 +281,9 @@ public class Header {
                 if (line.startsWith(DATASONNET_PRESERVE_ORDER)) {
                     String[] tokens = line.split("=", 2);
                     preserve = Boolean.parseBoolean(tokens[1]);
+                } else if (line.startsWith(DATASONNET_DEFAULT_PREFIX)) {
+                    String[] tokens = line.split("=", 2);
+                    defaultValue = ujsonUtils.read(ujson.Readable.fromString(tokens[1]), false);
                 } else if (line.startsWith(DATASONNET_INPUT)) {
                     Matcher matcher = INPUT_LINE.matcher(line);
                     if(!matcher.matches()) {
@@ -308,7 +326,7 @@ public class Header {
             }
         }
 
-        return new Header(version, preserve, Collections.unmodifiableMap(inputs), outputs, allInputs, dataformat);
+        return new Header(version, preserve, defaultValue, Collections.unmodifiableMap(inputs), outputs, allInputs, dataformat);
     }
 
     @NotNull
@@ -358,6 +376,10 @@ public class Header {
 
     public Collection<MediaType> getDataFormats() {
         return Collections.unmodifiableCollection(dataFormats.values());
+    }
+
+    public Value getDefaultValue() {
+        return defaultValue;
     }
 
     public boolean isPreserveOrder() {

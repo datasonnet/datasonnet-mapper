@@ -334,6 +334,8 @@ trait EvalScope extends EvalErrorScope{
   val emptyMaterializeFileScope = new FileScope(wd / "(materialize)", Map())
 
   val preserveOrder: Boolean = false
+
+  val defaultValue: ujson.Value = null
 }
 object ValScope{
   def empty(size: Int) = new ValScope(None, None, None, new Array(size))

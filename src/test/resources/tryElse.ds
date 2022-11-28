@@ -1,0 +1,5 @@
+{
+  tryNonexistent: try payload.doesntExist else "OK",
+  tryChain: try payload.doesntExist else try payload.missing else "OK",
+  tryNaN: try std.parseInt("NotANumber") else -1
+}

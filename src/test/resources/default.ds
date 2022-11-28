@@ -1,0 +1,5 @@
+{
+  tryNonexistent: payload.doesntExist default "OK",
+  tryChain: payload.doesntExist default payload.missing default "OK",
+  tryNaN: std.parseInt("NotANumber") default -1
+}

@@ -29,6 +29,7 @@ import scala.annotation.switch
   */
 object Parser{
   val precedenceTable = Seq(
+    Seq("default"),
     Seq("*", "/", "%"),
     Seq("+", "-"),
     Seq("<<", ">>"),
@@ -49,7 +50,7 @@ object Parser{
 
   val keywords = Set(
     "assert", "else", "error", "false", "for", "function", "if", "import", "importstr",
-    "in", "local", "null", "tailstrict", "then", "self", "super", "true"
+    "in", "local", "null", "tailstrict", "then", "self", "super", "true", "try"
   )
 
   def idStartChar(c: Char) = c == '_' || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z')
@@ -152,6 +153,9 @@ object Parser{
   def ifElse[_: P](index: Int): P[Expr] =
     P( Index ~~ expr ~ "then" ~~ break ~ expr ~ ("else" ~~ break ~ expr).? ).map(Expr.IfElse.tupled)
 
+  def tryElse[_: P](index: Int): P[Expr] =
+    P( Index ~~ expr ~ "else" ~~ break ~ expr).map(Expr.TryElse.tupled)
+
   def localExpr[_: P]: P[Expr] =
     P( Index ~~ bind.rep(min=1, sep = ","./) ~ ";" ~ expr ).map(Expr.LocalExpr.tupled)
 
@@ -189,6 +193,7 @@ object Parser{
                   case "|" => Expr.BinaryOp.`|`
                   case "&&" => Expr.BinaryOp.`&&`
                   case "||" => Expr.BinaryOp.`||`
+                  case "default" => Expr.BinaryOp.`default`
                 }
                 result = Expr.BinaryOp(offset, result, op1, rhs)
                 true
@@ -269,6 +274,7 @@ object Parser{
               case "self"      => Pass(Expr.Self(index))
               case "super"     => Pass(Expr.Super(index))
               case "if"        => Pass ~ ifElse(index)
+              case "try"       => Pass ~ tryElse(index)
               case "function"  => Pass ~ function(index)
               case "importstr" => Pass ~ importStr(index)
               case "import"    => Pass ~ `import`(index)
@@ -351,7 +357,7 @@ object Parser{
   def binaryop[_: P] = P(
     StringIn(
       "<<", ">>", "<=", ">=", "in", "==", "!=", "&&", "||",
-      "*", "/", "%", "+", "-", "<", ">", "&", "^", "|"
+      "*", "/", "%", "+", "-", "<", ">", "&", "^", "|", "default"
     )
 
   ).!

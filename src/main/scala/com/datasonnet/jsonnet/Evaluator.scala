@@ -22,6 +22,7 @@ import com.datasonnet.jsonnet.Expr.Member.Visibility
 import ujson.Value
 
 import scala.collection.mutable
+import scala.util.{Failure, Success, Try}
 
 /**
   * Recursively walks the [[Expr]] trees to convert them into into [[Val]]
@@ -36,7 +37,8 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
                 val extVars: Map[String, ujson.Value],
                 val wd: Path,
                 importer: (Path, String) => Option[(Path, String)],
-                override val preserveOrder: Boolean = false) extends EvalScope{
+                override val preserveOrder: Boolean = false,
+                override val defaultValue: Value = null) extends EvalScope{
   implicit def evalScope: EvalScope = this
 
   val loadedFileContents = mutable.Map.empty[Path, String]
@@ -45,7 +47,9 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
   val cachedImports = collection.mutable.Map.empty[Path, Val]
 
   val cachedImportedStrings = collection.mutable.Map.empty[Path, String]
-  def visitExpr(expr: Expr)
+
+  override def visitExpr(expr: Expr)(implicit scope: ValScope, fileScope: FileScope): Val = visitExpr(expr, false)
+  def visitExpr(expr: Expr, tryCatch: Boolean = false)
                (implicit scope: ValScope, fileScope: FileScope): Val = try expr match{
     case Null(offset) => Val.Null
     case Parened(offset, inner) => visitExpr(inner)
@@ -86,13 +90,14 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
     case Expr.Error(offset, value) => visitError(offset, value)
     case Apply(offset, value, Args(args)) => visitApply(offset, value, args)
 
-    case Select(offset, value, name) => visitSelect(offset, value, name)
+    case Select(offset, value, name) => visitSelect(offset, value, name, tryCatch)
 
     case Lookup(offset, value, index) => visitLookup(offset, value, index)
 
     case Slice(offset, value, start, end, stride) => visitSlice(offset, value, start, end, stride)
     case Function(offset, params, body) => visitMethod(body, params, offset)
     case IfElse(offset, cond, then, else0) => visitIfElse(offset, cond, then, else0)
+    case TryElse(offset, try0, else0) => visitTryElse(offset, try0, else0)
     case Comp(offset, value, first, rest) =>
       Val.Arr(visitComp(first :: rest.toList, Seq(scope)).map(s => Val.Lazy(visitExpr(value)(s, implicitly))))
     case ObjExtend(offset, value, ext) => {
@@ -128,6 +133,17 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
           case Some(v) => visitExpr(v)
         }
       case v => Error.fail("Need boolean, found " + v.prettyName, offset)
+    }
+  }
+
+  def visitTryElse(offset: Int,
+                   try0: Expr,
+                   else0: Expr)
+                 (implicit scope: ValScope,
+                  fileScope: FileScope): Val = {
+    try visitExpr(try0, true)
+    catch {
+      case err: Throwable => visitExpr(else0, true)
     }
   }
 
@@ -227,7 +243,7 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
     }
   }
 
-  def visitSelect(offset: Int, value: Expr, name: String)
+  def visitSelect(offset: Int, value: Expr, name: String, tryCatch: Boolean)
                  (implicit scope: ValScope, fileScope: FileScope): Val = {
     if (value.isInstanceOf[Super]) {
       scope.super0
@@ -235,7 +251,7 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
         .value(name, offset, scope.self0.get)
     } else visitExpr(value) match {
       case obj: Val.Obj => obj.value(name, offset)
-      case r => Error.fail(s"attempted to index a ${r.prettyName} with string ${name}", offset)
+      case r => if (defaultValue != null && !tryCatch) Materializer.reverse(defaultValue) else Error.fail(s"attempted to index a ${r.prettyName} with string ${name}", offset)
     }
   }
 
@@ -283,6 +299,9 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
   def visitBinaryOp(offset: Int, lhs: Expr, op: BinaryOp.Op, rhs: Expr)
                    (implicit scope: ValScope, fileScope: FileScope) = {
     op match {
+      case Expr.BinaryOp.`default` =>
+                try visitExpr(lhs, true)
+                catch { case e: Error => visitExpr(rhs, true) }
       // && and || are handled specially because unlike the other operators,
       // these short-circuit during evaluation in some cases when the LHS is known.
       case Expr.BinaryOp.`&&` | Expr.BinaryOp.`||` =>

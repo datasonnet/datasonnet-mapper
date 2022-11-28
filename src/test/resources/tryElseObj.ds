@@ -1,0 +1,12 @@
+try {
+    a: payload.invalidKey
+  } else {
+    a: "OK"
+  }
+
+
+//local test(x) = try { x: x.invalidKey } else "OK";
+//
+//{
+//  t: test(payload)
+//}

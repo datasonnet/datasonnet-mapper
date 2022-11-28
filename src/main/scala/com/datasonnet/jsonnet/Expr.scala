@@ -108,6 +108,7 @@ object Expr{
     case object `|` extends Op
     case object `&&` extends Op
     case object `||` extends Op
+    case object `default` extends Op
   }
   case class AssertExpr(offset: Int, asserted: Member.AssertStmt, returned: Expr) extends Expr
   case class LocalExpr(offset: Int, bindings: Seq[Bind], returned: Expr) extends Expr
@@ -126,6 +127,7 @@ object Expr{
                    stride: Option[Expr]) extends Expr
   case class Function(offset: Int, params: Params, body: Expr) extends Expr
   case class IfElse(offset: Int, cond: Expr, then: Expr, `else`: Option[Expr]) extends Expr
+  case class TryElse(offset: Int, cond: Expr, `else`: Expr) extends Expr
 
   sealed trait CompSpec extends Expr
   case class IfSpec(offset: Int, cond: Expr) extends CompSpec
