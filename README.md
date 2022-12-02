@@ -2,7 +2,7 @@
 
 ![Maven Central](https://img.shields.io/maven-central/v/com.datasonnet/datasonnet-mapper)
 
-##Documentation: 
+## Documentation: 
 https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/index.html
 
 ## Build and Versioning notes
