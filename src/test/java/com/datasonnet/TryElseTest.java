@@ -64,4 +64,12 @@ public class TryElseTest {
         JSONAssert.assertEquals("{\"tryNonexistent\":\"OK\",\"tryObj\":{\"x\":\"OK\"},\"tryOverride\":\"OverrideOK\",\"tryElseOverride\":\"OverrideOK\"}", response, true);
     }
 
+    @Test
+    void testDefaultHeaderPayloadAsDocument() throws IOException, URISyntaxException, JSONException {
+        Mapper mapper = new Mapper(TestResourceReader.readFileAsString("defaultHeader.ds"));
+        
+        Document<String>  response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
+        JSONAssert.assertEquals("{\"tryNonexistent\":\"OK\",\"tryObj\":{\"x\":\"OK\"},\"tryOverride\":\"OverrideOK\",\"tryElseOverride\":\"OverrideOK\"}", response.getContent(), true);
+    }
+
 }
