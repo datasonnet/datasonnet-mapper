@@ -248,9 +248,9 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
     if (value.isInstanceOf[Super]) {
       scope.super0
         .getOrElse(Error.fail("Cannot use `super` outside an object", offset))
-        .value(name, offset, scope.self0.get)
+        .value(name, offset, scope.self0.get, defaultValue)
     } else visitExpr(value) match {
-      case obj: Val.Obj => obj.value(name, offset)
+      case obj: Val.Obj => if (!tryCatch) obj.value(name, offset, obj, defaultValue) else Error.fail(s"Object does not have a field ${name}", offset)
       case r => if (defaultValue != null && !tryCatch) Materializer.reverse(defaultValue) else Error.fail(s"attempted to index a ${r.prettyName} with string ${name}", offset)
     }
   }

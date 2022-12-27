@@ -37,24 +37,27 @@ public class TryElseTest {
     @Test
     void testTryElse() throws IOException, URISyntaxException, JSONException {
         Mapper mapper = new Mapper(TestResourceReader.readFileAsString("tryElse.ds"));
-        String response = mapper.transform("{}");
-        JSONAssert.assertEquals("{\"tryNonexistent\":\"OK\",\"tryChain\":\"OK\",\"tryNaN\":-1}", response, true);
+        Document<String>  response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
+        JSONAssert.assertEquals("{\"tryNonexistent\":\"OK\",\"tryChain\":\"OK\",\"tryNaN\":-1,\"tryInIf\":\"OK\"}", response.getContent(), true);
     }
 
-    @Disabled
     @Test
-    void testTryElseObj() throws IOException, URISyntaxException, JSONException {
-        Mapper mapper = new Mapper(TestResourceReader.readFileAsString("tryElseObj.ds"));
-        String response = mapper.transform("{}");
-        System.out.println("**** RESPONSE IS " + response);
-        //JSONAssert.assertEquals("{\"tryNonexistent\":\"OK\",\"tryChain\":\"OK\",\"tryNaN\":-1}", response, true);
+    void testTryElseErrors() throws IOException, URISyntaxException, JSONException {
+        Mapper mapper = new Mapper(TestResourceReader.readFileAsString("tryElseError.ds"));
+        try {
+            String response = mapper.transform("{}");
+            fail("The transform should fail");
+        } catch (IllegalArgumentException e) {
+            String msg = e.getMessage();
+            assertTrue(msg != null && msg.contains("attempted to index a string with string doesntExist"));
+        }
     }
 
     @Test
     void testDefault() throws IOException, URISyntaxException, JSONException {
         Mapper mapper = new Mapper(TestResourceReader.readFileAsString("default.ds"));
-        String response = mapper.transform("{}");
-        JSONAssert.assertEquals("{\"tryNonexistent\":\"OK\",\"tryChain\":\"OK\",\"tryNaN\":-1}", response, true);
+        Document<String>  response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
+        JSONAssert.assertEquals("{\"tryNonexistent\":\"OK\",\"tryChain\":\"OK\",\"tryNaN\":-1}", response.getContent(), true);
     }
 
     @Test
@@ -64,4 +67,10 @@ public class TryElseTest {
         JSONAssert.assertEquals("{\"tryNonexistent\":\"OK\",\"tryObj\":{\"x\":\"OK\"},\"tryOverride\":\"OverrideOK\",\"tryElseOverride\":\"OverrideOK\"}", response, true);
     }
 
+    @Test
+    void testDefaultHeaderPayloadAsDocument() throws IOException, URISyntaxException, JSONException {
+        Mapper mapper = new Mapper(TestResourceReader.readFileAsString("defaultHeader.ds"));
+        Document<String>  response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
+        JSONAssert.assertEquals("{\"tryNonexistent\":\"OK\",\"tryObj\":{\"x\":\"OK\"},\"tryOverride\":\"OverrideOK\",\"tryElseOverride\":\"OverrideOK\"}", response.getContent(), true);
+    }
 }

@@ -18,6 +18,7 @@ package com.datasonnet.jsonnet
 
 import com.datasonnet.jsonnet.Expr.Member.Visibility
 import com.datasonnet.jsonnet.Expr.Params
+import ujson.Value
 
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -132,9 +133,17 @@ object Val{
       mapping
     }
     private[this] val valueCache = collection.mutable.Map.empty[Any, Val]
+
+    def value(k: String,
+              offset: Int)
+             (implicit fileScope: FileScope, evaluator: EvalScope): Val = {
+      value(k, offset, this, null)
+    }
+
     def value(k: String,
               offset: Int,
-              self: Obj = this)
+              self: Obj = this,
+              defaultValue: Value)
              (implicit fileScope: FileScope, evaluator: EvalScope): Val = {
 
       val cacheKey = if(self eq this) k else (k, self)
@@ -147,7 +156,8 @@ object Val{
               if (cached) valueCache(cacheKey) = x
               x
             case None =>
-              Error.fail("Field does not exist: " + k, offset)
+              if (defaultValue == null) Error.fail("Field does not exist: " + k, offset)
+              else Materializer.reverse(defaultValue)
           }
       }
     }
