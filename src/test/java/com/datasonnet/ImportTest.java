@@ -17,6 +17,7 @@ package com.datasonnet;
  */
 
 import com.datasonnet.util.TestResourceReader;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -83,5 +84,16 @@ public class ImportTest {
         } catch (IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("Unable to parse library: importTestFail.libsonnet"), "Found message: " + e.getMessage());
         }
+    }
+
+    @Disabled
+    @Test
+    void importDs() throws Exception {
+        final String lib = TestResourceReader.readFileAsString("importTest.ds");
+        String result = new MapperBuilder("local testlib = import 'importTest.ds'; testlib.uppercase('foo')")
+                .withImports(Collections.singletonMap("importTest.ds", lib))
+                .build()
+                .transform("{}");
+        assertEquals(result, "FOO");
     }
 }

@@ -25,7 +25,7 @@ import javax.xml.namespace.QName;
 /**
  * This object contains factory methods for each
  * Java content interface and Java element interface
- * generated in the com.clearxchange.release4_0 package.
+ * generated in the com.datasonnet.test package.
  * <p>An ObjectFactory allows you to programatically
  * construct new instances of the Java representation
  * for XML content. The Java representation of XML
