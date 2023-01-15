@@ -1,7 +1,7 @@
 package com.datasonnet.jsonnet
 
 /*-
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet.jsonnet
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import scala.collection.{BitSet, mutable}
 /**
   * [[Expr]]s are the parsed syntax trees of a Jsonnet program. They model the
@@ -108,7 +107,9 @@ object Expr{
     case object `|` extends Op
     case object `&&` extends Op
     case object `||` extends Op
-  }
+    case object `default` extends Op
+
+}
   case class AssertExpr(offset: Int, asserted: Member.AssertStmt, returned: Expr) extends Expr
   case class LocalExpr(offset: Int, bindings: Seq[Bind], returned: Expr) extends Expr
 
@@ -126,6 +127,7 @@ object Expr{
                    stride: Option[Expr]) extends Expr
   case class Function(offset: Int, params: Params, body: Expr) extends Expr
   case class IfElse(offset: Int, cond: Expr, then: Expr, `else`: Option[Expr]) extends Expr
+  case class TryElse(offset: Int, cond: Expr, `else`: Expr) extends Expr
 
   sealed trait CompSpec extends Expr
   case class IfSpec(offset: Int, cond: Expr) extends CompSpec

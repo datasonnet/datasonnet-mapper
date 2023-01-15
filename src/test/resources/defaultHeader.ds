@@ -1,0 +1,13 @@
+/** DataSonnet
+version=2.5
+default="OK"
+*/
+
+{
+  tryNonexistent: payload.doesntExist,
+  tryObj: {
+    x: payload.none
+  },
+  tryOverride: payload.override default "OverrideOK",
+  tryElseOverride: try payload.override else "OverrideOK",
+}

@@ -16,11 +16,13 @@ package com.datasonnet.wrap
  * limitations under the License.
  */
 import com.datasonnet.jsonnet.{Evaluator, Expr, Path}
+import ujson.Value
 
 class NoFileEvaluator(jsonnet: String,
                       path: Path,
                       parseCache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]],
                       importer: (Path, String) => Option[(Path, String)],
-                      preserveOrder: Boolean = true) extends Evaluator(parseCache, Map(), path, importer, preserveOrder) {
+                      preserveOrder: Boolean = true,
+                      defaultValue: Value) extends Evaluator(parseCache, Map(), path, importer, preserveOrder, defaultValue) {
   this.loadedFileContents(path) = jsonnet
 }

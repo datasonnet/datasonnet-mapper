@@ -92,6 +92,11 @@ For the list of the supported data formats and their configurable properties, se
 | no
 |`true`
 
+|`default`
+|Provides a default JSON value that will be returned when non-existent keys are selected.
+| no
+|
+
 |===
 
 
