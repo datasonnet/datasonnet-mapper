@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Using DataSonnet Programmatically :: DataSonnet Mapper Documentation</title>
-    <link rel="canonical" href="https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/jar-lib.html">
+    <title>Untitled :: DataSonnet Mapper Documentation</title>
+    <link rel="canonical" href="https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/libraries-random.html">
     <meta name="generator" content="Antora 2.3.3">
     <link rel="stylesheet" href="../../_/css/site.css">
     <script>var uiRootPath = '../../_'</script>
@@ -96,7 +96,7 @@
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="libraries-url.html">Url</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item is-current-page" data-depth="2">
     <a class="nav-link" href="libraries-random.html">Random</a>
   </li>
 </ul>
@@ -104,7 +104,7 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="cookbook.html">Cookbook</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <a class="nav-link" href="jar-lib.html">Using DataSonnet Programmatically</a>
   </li>
 </ul>
@@ -145,95 +145,63 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">DataSonnet</a></li>
-    <li><a href="jar-lib.html">Using DataSonnet Programmatically</a></li>
+    <li>Additional DataSonnet Libraries</li>
+    <li><a href="libraries-random.html">Random</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/jar-lib.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/libraries-random.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Using DataSonnet Programmatically</h1>
+<div class="sect1">
+<h2 id="_random"><a class="anchor" href="#_random"></a>random</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_uuid"><a class="anchor" href="#_uuid"></a><code>uuid()</code></h3>
 <div class="paragraph">
-<p>DataSonnet is distributed as a JAR which contains all necessary classes and dependencies to use DataSonnet programmatically embedded in your projects. Use the following Maven snippet to add DataSonnet as a dependency to your <code>pom.xml</code>:</p>
+<p>Generates a random Variant 2 UUID (see <a href="https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/util/UUID.html" class="bare">https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/util/UUID.html</a> for details).</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
 </div>
 <div class="listingblock">
+<div class="title">DataSonnet map:</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-xml hljs" data-lang="xml">&lt;dependency&gt;
-    &lt;groupId&gt;com.datasonnet&lt;/groupId&gt;
-    &lt;artifactId&gt;datasonnet-mapper&lt;/artifactId&gt;
-    &lt;version&gt;${datasonnet.version}&lt;/version&gt;
-&lt;/dependency&gt;</code></pre>
+<pre>ds.random.uuid()</pre>
 </div>
-</div>
-<div class="paragraph">
-<p>where <code>${datasonnet.version}</code> is the latest released version.</p>
-</div>
-<div class="paragraph">
-<p>The simplest scenario is mapping from JSON to JSON with no additional variables:</p>
 </div>
 <div class="listingblock">
+<div class="title">Result</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">String json = ...; //JSON object as string
-
-Mapper mapper = new Mapper(datasonnetScript);
-String transformedJson = mapper.transform(json)</code></pre>
+<pre>"addd286c-a04c-4493-b8a0-6466e9ff5050"</pre>
 </div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_encodestring_data_string_encodingutf_8"><a class="anchor" href="#_encodestring_data_string_encodingutf_8"></a><code>encode(string data, string encoding="UTF-8")</code></h3>
+<div class="paragraph">
+<p>Translates a string into <code>application/x-www-form-urlencoded</code> format using the supplied encoding scheme to obtain the bytes for unsafe characters. The default encoding is <code>UTF-8</code>.</p>
 </div>
 <div class="paragraph">
-<p>More complex scenarios may involve passing additional variables as well as <a href="dataformats.html" class="page">transforming to/from other supported data formats</a>:</p>
+<p><strong>Example</strong></p>
 </div>
 <div class="listingblock">
+<div class="title">DataSonnet map:</div>
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">String jsonData = ...;
-
-String jsonVar = ...;
-String xmlVar = ...;
-String textVar = ...;
-
-Map&lt;String, Document&gt; variables = new HashMap&lt;&gt;();
-variables.put("varJson", new StringDocument(jsonVar, "application/json"));
-variables.put("varXml", new StringDocument(xmlVar, "application/xml"));
-variables.put("varTxt", new StringDocument(textVar, "text/plain"));
-
-Mapper mapper = new Mapper(datasonnetScript, variables.keySet());
-Document transformedResult = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json");
-String jsonResult = transformedResult.getContentsAsString();</code></pre>
+<pre>ds.url.encode('Hello World')</pre>
 </div>
 </div>
-<div class="paragraph">
-<p>The <code>Mapper</code> constructor accepts the following arguments:</p>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"Hello+World"</pre>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>datasonnetScript</code> - the <code>String</code> which contains the mapping code;</p>
-</li>
-<li>
-<p><code>argumentNames</code> - the <code>java.util.Set</code> which contains the names of the additional variables</p>
-</li>
-</ul>
 </div>
-<div class="paragraph">
-<p>The <code>transform</code> method accepts the following arguments:</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p>payload - the instance of the <code>com.datasonnet.Document</code> which contains the data and the mime type;</p>
-</li>
-<li>
-<p>variables - the instance of the <code>Map&lt;String, com.datasonnet.Document&gt;</code> which contains the additional variables.</p>
-</li>
-</ul>
 </div>
-<div class="paragraph">
-<p>The result of the <code>transform</code> method invocation is the instance of the <code>com.datasonnet.Document</code> object which contains the result of the mapping and its mime type.</p>
-</div>
-<div class="paragraph">
-<p>There are overloaded <code>transform</code> methods which accept different sets of parameters; see the DataSonnet source code and documentation for details.</p>
 </div>
 </article>
   </div>

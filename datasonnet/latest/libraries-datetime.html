@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Untitled :: DataSonnet Mapper Documentation</title>
-    <link rel="canonical" href="https://MS3Inc.github.io/datasonnet-mapper/datasonnet/latest/libraries-datetime.html">
+    <link rel="canonical" href="https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/libraries-datetime.html">
     <meta name="generator" content="Antora 2.3.3">
     <link rel="stylesheet" href="../../_/css/site.css">
     <script>var uiRootPath = '../../_'</script>
@@ -13,38 +13,12 @@
 <header class="header">
   <nav class="navbar">
     <div class="navbar-brand">
-      <a class="navbar-item" href="https://MS3Inc.github.io/datasonnet-mapper">DataSonnet Mapper Documentation</a>
+      <a class="navbar-item" href="https://datasonnet.github.io/datasonnet-mapper">DataSonnet Mapper Documentation</a>
       <button class="navbar-burger" data-target="topbar-nav">
         <span></span>
         <span></span>
         <span></span>
       </button>
-    </div>
-    <div id="topbar-nav" class="navbar-menu">
-      <div class="navbar-end">
-        <a class="navbar-item" href="#">Home</a>
-        <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" href="#">Products</a>
-          <div class="navbar-dropdown">
-            <a class="navbar-item" href="#">Product A</a>
-            <a class="navbar-item" href="#">Product B</a>
-            <a class="navbar-item" href="#">Product C</a>
-          </div>
-        </div>
-        <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" href="#">Services</a>
-          <div class="navbar-dropdown">
-            <a class="navbar-item" href="#">Service A</a>
-            <a class="navbar-item" href="#">Service B</a>
-            <a class="navbar-item" href="#">Service C</a>
-          </div>
-        </div>
-        <div class="navbar-item">
-          <span class="control">
-            <a class="button is-primary" href="#">Download</a>
-          </span>
-        </div>
-      </div>
     </div>
   </nav>
 </header>
@@ -95,6 +69,12 @@
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="libraries-jsonpath.html">JsonPath</a>
   </li>
+  <li class="nav-item is-current-page" data-depth="2">
+    <a class="nav-link" href="libraries-datetime.html">DateTime</a>
+  </li>
+  <li class="nav-item" data-depth="2">
+    <a class="nav-link" href="libraries-zoneddatetime.html">ZonedDateTime</a>
+  </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="libraries-localdatetime.html">LocalDateTime</a>
   </li>
@@ -116,17 +96,8 @@
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="libraries-url.html">Url</a>
   </li>
-</ul>
-  </li>
-  <li class="nav-item" data-depth="1">
-    <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="cli.html">Command Line Interface</a>
-<ul class="nav-list">
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="jar-cli.html">Using the CLI via a Jar</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="docker-cli.html">Using the CLI via Docker</a>
+    <a class="nav-link" href="libraries-random.html">Random</a>
   </li>
 </ul>
   </li>
@@ -189,282 +160,12 @@
 <h2 id="_datetime"><a class="anchor" href="#_datetime"></a>datetime</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This library uses Java&#8217;s DateTimeFormatter library to format the date to a consistent value using ISO_OFFSET_DATE_TIME.
-If your datetime is not in this format, you can use the <code>parse</code> function to convert it. After you are finished executing your logic,
-you can use the <code>format</code> function to set the output format.</p>
-</div>
-<div class="sect2">
-<h3 id="_atbeginningofdaystring_datetime"><a class="anchor" href="#_atbeginningofdaystring_datetime"></a><code>atBeginningOfDay(string datetime)</code></h3>
-<div class="paragraph">
-<p>Returns the given datetime at midnight.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ds.datetime.atBeginningOfDay("2020-12-31T23:19:35Z")</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result:</div>
-<div class="content">
-<pre>"2020-12-31T00:00:00Z"</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_atbeginningofhourstring_datetime"><a class="anchor" href="#_atbeginningofhourstring_datetime"></a><code>atBeginningOfHour(string datetime)</code></h3>
-<div class="paragraph">
-<p>Returns the given datetime with the minutes and seconds set to zero.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ds.datetime.atBeginningOfHour("2020-12-31T23:19:35Z")</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result:</div>
-<div class="content">
-<pre>"2020-12-31T23:00:00Z"</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_atbeginningofmonthstring_datetime"><a class="anchor" href="#_atbeginningofmonthstring_datetime"></a><code>atBeginningOfMonth(string datetime)</code></h3>
-<div class="paragraph">
-<p>Returns the given datetime with the day set to first of the month and the time set to midnight.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ds.datetime.atBeginningOfMonth("2020-12-31T23:19:35Z")</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result:</div>
-<div class="content">
-<pre>"2020-12-01T00:00:00Z"</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_atbeginningofweekstring_datetime"><a class="anchor" href="#_atbeginningofweekstring_datetime"></a><code>atBeginningOfWeek(string datetime)</code></h3>
-<div class="paragraph">
-<p>Returns the given datetime at the first of the current week and the time set to midnight</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ds.datetime.atBeginningOfWeek("2020-12-31T23:19:35Z")</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result:</div>
-<div class="content">
-<pre>"2020-12-27T00:00:00Z"</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_atbeginningofyearstring_datetime"><a class="anchor" href="#_atbeginningofyearstring_datetime"></a><code>atBeginningOfYear(string datetime)</code></h3>
-<div class="paragraph">
-<p>Returns the given datetime at the first of the year</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ds.datetime.atBeginningOfYear("2020-12-31T23:19:35Z")</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result:</div>
-<div class="content">
-<pre>"2020-01-01T00:00:00Z"</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_changetimezonestring_datetime_string_timezone"><a class="anchor" href="#_changetimezonestring_datetime_string_timezone"></a><code>changeTimeZone(string datetime, string timezone)</code></h3>
-<div class="paragraph">
-<p>Changes the date timezone, retaining the instant. This normally results in a change to the local date-time.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ds.datetime.changeTimeZone("2020-12-31T23:19:35Z", "America/Los_Angeles")</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result:</div>
-<div class="content">
-<pre>"2020-12-31T15:19:35-08:00"</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_comparestring_datetime1_string_datetime2"><a class="anchor" href="#_comparestring_datetime1_string_datetime2"></a><code>compare(string datetime1, string datetime2)</code></h3>
-<div class="paragraph">
-<p>Returns <code>1</code> if <code>datetime1 &gt; datetime2</code>, <code>-1</code> if <code>datetime1 &lt; datetime2</code>, and <code>0</code> if <code>datetime1 == datetime2</code>.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ds.datetime.compare("2020-12-31T23:19:35Z","2020-01-01T00:00:00Z")</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>1</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_dateobject_datetime"><a class="anchor" href="#_dateobject_datetime"></a><code>date(object datetime)</code></h3>
-<div class="paragraph">
-<p>This function uses a datetime object to generate a datetime in string format.
-Every key in the object is an optional number value, except the timezone which is an optional string.</p>
-</div>
-<div class="paragraph">
-<p>Example structure:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>{
-    "year": 0,
-    "month": 0,
-    "day": 0,
-    "hour": 0,
-    "minute": 0,
-    "second": 0,
-    "timezone": "Z"
-}</pre>
-</div>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>local datetime={
-    "year": 2021,
-    "timezone": "America/Los_Angeles"
-};
-ds.datetime.date(datetime)</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>"2021-01-01T00:00:00-08:00"</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_daysbetweenstring_datetime1_string_datetime2"><a class="anchor" href="#_daysbetweenstring_datetime1_string_datetime2"></a><code>daysBetween(string datetime1, string datetime2)</code></h3>
-<div class="paragraph">
-<p>Returns the number of days between <code>datetime1</code> and <code>datetime2</code>.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>local date1 = "2019-09-20T18:53:41.425Z";
-local date2 = "2019-09-14T18:53:41.425Z";
-
-ds.datetime.daysBetween(date1, date2)</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>6</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_formatstring_datetime_string_outputformat"><a class="anchor" href="#_formatstring_datetime_string_outputformat"></a><code>format(string datetime, string outputFormat)</code></h3>
-<div class="paragraph">
-<p>Given a datetime, will convert it to the specified output format.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.datetime.format("2019-09-20T18:53:41.425Z", "yyyy/MM/dd")</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>"2019/09/20"</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_isleapyearstring_datetime"><a class="anchor" href="#_isleapyearstring_datetime"></a><code>isLeapYear(string datetime)</code></h3>
-<div class="paragraph">
-<p>Returns a boolean indicating if <code>datetime</code> is a leap year.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.datetime.isLeapYear("2019-09-14T18:53:41.425Z")</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>false</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_minusstring_datetime_string_period"><a class="anchor" href="#_minusstring_datetime_string_period"></a><code>minus(string datetime, string period)</code></h3>
-<div class="paragraph">
-<p>Subtracts a <code>period</code> type from the given datetime.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.datetime.minus("2019-09-20T18:53:41Z", "P2D")</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>"2019-09-18T18:53:41Z"</pre>
-</div>
-</div>
+<p>This library implements a DateTime object that contains all date and time fields as well as functions to manipulate the data. In addition, the library itself contains the following functions:</p>
 </div>
 <div class="sect2">
 <h3 id="_now"><a class="anchor" href="#_now"></a><code>now()</code></h3>
 <div class="paragraph">
-<p>Returns the current datetime.</p>
+<p>Returns the DateTime object that represents the current date-time from the system clock in the default time-zone.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
@@ -477,15 +178,54 @@ ds.datetime.daysBetween(date1, date2)</pre>
 <div class="listingblock">
 <div class="title">Result:</div>
 <div class="content">
-<pre>"2021-01-05T13:09:45.476375-05:00"</pre>
+<pre>{
+  "zoneOffset": "-07:00",
+  "year": 2022,
+  "nano": 478000000,
+  "minute": 9,
+  "second": 34,
+  "hour": 9,
+  "month": 11,
+  "zoneId": "America/Phoenix",
+  "day": 18
+}</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_parsestringnumber_datetime_string_inputformat"><a class="anchor" href="#_parsestringnumber_datetime_string_inputformat"></a><code>parse(string|number datetime, string inputFormat)</code></h3>
+<h3 id="_fromobjectobject_datetime"><a class="anchor" href="#_fromobjectobject_datetime"></a><code>fromObject(object datetime)</code></h3>
 <div class="paragraph">
-<p>Parses the datetime using the input format and returns the value in the default format.
-If an epoch or timestamp value is used as the datetime you can use <code>"epoch"</code> or <code>"timestamp"</code> as the inputFormat</p>
+<p>Creates a new DateTime object from values provided in the input object. The input object must contain at least one of the <code>day</code>, <code>month</code>, <code>year</code>, <code>hour</code>, <code>minute</code>, <code>second</code>, <code>nano</code>, <code>zoneId</code> or <code>zoneOffset</code> keys.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.datetime.fromObject({"year":2020})</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>{
+  "zoneOffset": "Z",
+  "year": 2020,
+  "nano": 0,
+  "minute": 0,
+  "second": 0,
+  "hour": 0,
+  "month": 1,
+  "zoneId": "Z",
+  "day": 1
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_parsestring_datetime_string_inputformat"><a class="anchor" href="#_parsestring_datetime_string_inputformat"></a><code>parse(string datetime, string inputformat)</code></h3>
+<div class="paragraph">
+<p>Creates a new DateTime object from a string representation of date-time in a given format. The <code>inputformat</code> string may be one of the <code>timestamp</code>, <code>epoch</code> or contain a pattern accepted by the <a href="https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/format/DateTimeFormatter.html#ofPattern(java.lang.String)"><code>java.time.format.DateTimeFormatter.ofPattern()</code> method</a>.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
@@ -498,148 +238,166 @@ If an epoch or timestamp value is used as the datetime you can use <code>"epoch"
 <div class="listingblock">
 <div class="title">Result:</div>
 <div class="content">
-<pre>"1990-12-31T10:10:10Z"</pre>
+<pre>{
+  "zoneOffset": "-07:00",
+  "year": 1990,
+  "nano": 0,
+  "minute": 10,
+  "second": 10,
+  "hour": 10,
+  "month": 12,
+  "zoneId": "America/Phoenix",
+  "day": 31
+}</pre>
 </div>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.datetime.parse("1577836800", "timestamp")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>{
+  "zoneOffset": "Z",
+  "year": 2020,
+  "nano": 0,
+  "minute": 0,
+  "second": 0,
+  "hour": 0,
+  "month": 1,
+  "zoneId": "Z",
+  "day": 1
+}</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_datetime_object"><a class="anchor" href="#_datetime_object"></a>DateTime object</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The DateTime object contains following functions:</p>
 </div>
 <div class="sect2">
-<h3 id="_plusstring_datetime_string_period"><a class="anchor" href="#_plusstring_datetime_string_period"></a><code>plus(string datetime, string period)</code></h3>
+<h3 id="_asmilliseconds"><a class="anchor" href="#_asmilliseconds"></a><code>asMilliseconds()</code></h3>
 <div class="paragraph">
-<p>Adds a <code>period</code> type to the given datetime.</p>
+<p>Returns the date-time value as the number of milliseconds from the epoch of 1970-01-01T00:00:00Z.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
 </div>
 <div class="listingblock">
-<div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.datetime.plus("2019-09-18T18:53:41Z", "P2D")</pre>
+<pre>ds.datetime.now().asMilliseconds()</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"1668789455520"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_formatstring_pattern"><a class="anchor" href="#_formatstring_pattern"></a><code>format(string pattern)</code></h3>
+<div class="paragraph">
+<p>Returns the date-time value as a string formatted using the provided pattern accepted by the <a href="https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/format/DateTimeFormatter.html#ofPattern(java.lang.String)"><code>java.time.format.DateTimeFormatter.ofPattern()</code> method</a>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.datetime.now().format("MM/dd/yyyy HH:mm:ss")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"11/18/2022 10:23:12"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_toiso"><a class="anchor" href="#_toiso"></a><code>toISO()</code></h3>
+<div class="paragraph">
+<p>Returns the date-time value as a string formatted using the <a href="https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/format/DateTimeFormatter.html#ISO_OFFSET_DATE_TIME">ISO-8601 extended offset date-time format.</a></p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.datetime.now().toISO()</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"2022-11-18T11:44:11.571-07:00"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_totimezone"><a class="anchor" href="#_totimezone"></a><code>toTimeZone()</code></h3>
+<div class="paragraph">
+<p>Returns a copy of this DateTime object with a different time-zone, retaining the instant.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.datetime.parse("2019-07-04T21:00:00Z", "yyyy-MM-dd'T'HH:mm:ssXXX").toTimeZone("America/Los_Angeles")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>{
+  "zoneOffset": "-07:00",
+  "year": 2019,
+  "nano": 0,
+  "minute": 0,
+  "second": 0,
+  "hour": 14,
+  "month": 7,
+  "zoneId": "America/Los_Angeles",
+  "day": 4
+}</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_plusstring_period"><a class="anchor" href="#_plusstring_period"></a><code>plus(string period)</code></h3>
+<div class="paragraph">
+<p>Adds a <code>period</code> type to the given datetime. Both <a href="https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/Period.html#parse(java.lang.CharSequence)">Period</a> and <a href="https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)">Duration</a> patterns are accepted.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.datetime.parse("2019-07-22", "yyyy-MM-dd").plus("P5D")</pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Result</div>
 <div class="content">
-<pre>"2019-09-20T18:53:41Z"</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_tolocaldatestring_datetime"><a class="anchor" href="#_tolocaldatestring_datetime"></a><code>toLocalDate(string datetime)</code></h3>
-<div class="paragraph">
-<p>Converts a zone datetime to a local date</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ds.datetime.toLocalDate("2019-07-04T18:53:41Z")</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result:</div>
-<div class="content">
-<pre>2019-07-04</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_tolocaldatetimestring_datetime"><a class="anchor" href="#_tolocaldatetimestring_datetime"></a><code>toLocalDateTime(string datetime)</code></h3>
-<div class="paragraph">
-<p>Converts a zone datetime to a local datetime</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ds.datetime.toLocalDateTime("2019-07-04T21:00:00Z")</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result:</div>
-<div class="content">
-<pre>2019-07-04T21:00:00</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_tolocaltimestring_datetime_string_format"><a class="anchor" href="#_tolocaltimestring_datetime_string_format"></a><code>toLocalTime(string datetime, string format)</code></h3>
-<div class="paragraph">
-<p>Converts a zone datetime to a local time.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ds.datetime.toLocalTime("2019-07-04T21:00:00Z")</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result:</div>
-<div class="content">
-<pre>21:00:00</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_today"><a class="anchor" href="#_today"></a><code>today()</code></h3>
-<div class="paragraph">
-<p>Returns the datetime of the current day at midnight.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ds.datetime.today</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result:</div>
-<div class="content">
-<pre>"2021-01-05T00:00:00-05:00"</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_tomorrow"><a class="anchor" href="#_tomorrow"></a><code>tomorrow()</code></h3>
-<div class="paragraph">
-<p>Returns the datetime of the next day at midnight.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ds.datetime.tomorrow</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result:</div>
-<div class="content">
-<pre>"2021-01-06T00:00:00-05:00"</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_yesterday"><a class="anchor" href="#_yesterday"></a><code>yesterday()</code></h3>
-<div class="paragraph">
-<p>Returns the datetime of the previous day at midnight.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ds.datetime.yesterday</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result:</div>
-<div class="content">
-<pre>"2021-01-04T00:00:00-05:00"</pre>
+<pre>{
+  "zoneOffset": "-07:00",
+  "year": 2019,
+  "nano": 0,
+  "minute": 0,
+  "second": 0,
+  "hour": 0,
+  "month": 7,
+  "zoneId": "America/Phoenix",
+  "day": 27
+}</pre>
 </div>
 </div>
 </div>

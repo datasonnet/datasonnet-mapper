@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Untitled :: DataSonnet Mapper Documentation</title>
-    <link rel="canonical" href="https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/libraries-math.html">
+    <link rel="canonical" href="https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/libraries-zoneddatetime.html">
     <meta name="generator" content="Antora 2.3.3">
     <link rel="stylesheet" href="../../_/css/site.css">
     <script>var uiRootPath = '../../_'</script>
@@ -72,13 +72,13 @@
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="libraries-datetime.html">DateTime</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item is-current-page" data-depth="2">
     <a class="nav-link" href="libraries-zoneddatetime.html">ZonedDateTime</a>
   </li>
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="libraries-localdatetime.html">LocalDateTime</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="2">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="libraries-math.html">Math</a>
   </li>
   <li class="nav-item" data-depth="2">
@@ -146,10 +146,10 @@
   <ul>
     <li><a href="index.html">DataSonnet</a></li>
     <li>Additional DataSonnet Libraries</li>
-    <li><a href="libraries-math.html">Math</a></li>
+    <li><a href="libraries-zoneddatetime.html">ZonedDateTime</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/libraries-math.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/libraries-zoneddatetime.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
@@ -157,20 +157,147 @@
 </aside>
 <article class="doc">
 <div class="sect1">
-<h2 id="_math"><a class="anchor" href="#_math"></a>math</h2>
+<h2 id="_zoneddatetime"><a class="anchor" href="#_zoneddatetime"></a>zoneddatetime</h2>
 <div class="sectionbody">
-<div class="sect2">
-<h3 id="_absnumber_num"><a class="anchor" href="#_absnumber_num"></a><code>abs(number num)</code></h3>
 <div class="paragraph">
-<p>Returns the absolute value of <code>num</code>.</p>
+<p><em><strong>Deprecated</strong>. Use <a href="libraries-datetime.html" class="page">datetime</a> library instead.</em></p>
+</div>
+<div class="paragraph">
+<p>This library uses Java&#8217;s DateTimeFormatter library to format the date to a consistent value using ISO_OFFSET_DATE_TIME.
+If your datetime is not in this format, you can use the <code>parse</code> function to convert it. After you are finished executing your logic,
+you can use the <code>format</code> function to set the output format.</p>
+</div>
+<div class="sect2">
+<h3 id="_atbeginningofdaystring_datetime"><a class="anchor" href="#_atbeginningofdaystring_datetime"></a><code>atBeginningOfDay(string datetime)</code></h3>
+<div class="paragraph">
+<p>Returns the given datetime at midnight.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
 </div>
 <div class="listingblock">
-<div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.abs(-1)</pre>
+<pre>ds.zoneddatetime.atBeginningOfDay("2020-12-31T23:19:35Z")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"2020-12-31T00:00:00Z"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_atbeginningofhourstring_datetime"><a class="anchor" href="#_atbeginningofhourstring_datetime"></a><code>atBeginningOfHour(string datetime)</code></h3>
+<div class="paragraph">
+<p>Returns the given datetime with the minutes and seconds set to zero.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.zoneddatetime.atBeginningOfHour("2020-12-31T23:19:35Z")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"2020-12-31T23:00:00Z"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_atbeginningofmonthstring_datetime"><a class="anchor" href="#_atbeginningofmonthstring_datetime"></a><code>atBeginningOfMonth(string datetime)</code></h3>
+<div class="paragraph">
+<p>Returns the given datetime with the day set to first of the month and the time set to midnight.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.zoneddatetime.atBeginningOfMonth("2020-12-31T23:19:35Z")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"2020-12-01T00:00:00Z"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_atbeginningofweekstring_datetime"><a class="anchor" href="#_atbeginningofweekstring_datetime"></a><code>atBeginningOfWeek(string datetime)</code></h3>
+<div class="paragraph">
+<p>Returns the given datetime at the first of the current week and the time set to midnight</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.zoneddatetime.atBeginningOfWeek("2020-12-31T23:19:35Z")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"2020-12-27T00:00:00Z"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_atbeginningofyearstring_datetime"><a class="anchor" href="#_atbeginningofyearstring_datetime"></a><code>atBeginningOfYear(string datetime)</code></h3>
+<div class="paragraph">
+<p>Returns the given datetime at the first of the year</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.zoneddatetime.atBeginningOfYear("2020-12-31T23:19:35Z")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"2020-01-01T00:00:00Z"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_changetimezonestring_datetime_string_timezone"><a class="anchor" href="#_changetimezonestring_datetime_string_timezone"></a><code>changeTimeZone(string datetime, string timezone)</code></h3>
+<div class="paragraph">
+<p>Changes the date timezone, retaining the instant. This normally results in a change to the local date-time.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.zoneddatetime.changeTimeZone("2020-12-31T23:19:35Z", "America/Los_Angeles")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"2020-12-31T15:19:35-08:00"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_comparestring_datetime1_string_datetime2"><a class="anchor" href="#_comparestring_datetime1_string_datetime2"></a><code>compare(string datetime1, string datetime2)</code></h3>
+<div class="paragraph">
+<p>Returns <code>1</code> if <code>datetime1 &gt; datetime2</code>, <code>-1</code> if <code>datetime1 &lt; datetime2</code>, and <code>0</code> if <code>datetime1 == datetime2</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.zoneddatetime.compare("2020-12-31T23:19:35Z","2020-01-01T00:00:00Z")</pre>
 </div>
 </div>
 <div class="listingblock">
@@ -181,30 +308,50 @@
 </div>
 </div>
 <div class="sect2">
-<h3 id="_acosnumber_num"><a class="anchor" href="#_acosnumber_num"></a><code>acos(number num)</code></h3>
+<h3 id="_dateobject_datetime"><a class="anchor" href="#_dateobject_datetime"></a><code>date(object datetime)</code></h3>
 <div class="paragraph">
-<p>Performs math acos operation on <code>num</code>.</p>
+<p>This function uses a datetime object to generate a datetime in string format.
+Every key in the object is an optional number value, except the timezone which is an optional string.</p>
+</div>
+<div class="paragraph">
+<p>Example structure:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+    "year": 0,
+    "month": 0,
+    "day": 0,
+    "hour": 0,
+    "minute": 0,
+    "second": 0,
+    "timezone": "Z"
+}</pre>
+</div>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
 </div>
 <div class="listingblock">
-<div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.acos(1)</pre>
+<pre>local datetime={
+    "year": 2021,
+    "timezone": "America/Los_Angeles"
+};
+ds.zoneddatetime.date(datetime)</pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Result</div>
 <div class="content">
-<pre>0</pre>
+<pre>"2021-01-01T00:00:00-08:00"</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_asinnumber_num"><a class="anchor" href="#_asinnumber_num"></a><code>asin(number num)</code></h3>
+<h3 id="_daysbetweenstring_datetime1_string_datetime2"><a class="anchor" href="#_daysbetweenstring_datetime1_string_datetime2"></a><code>daysBetween(string datetime1, string datetime2)</code></h3>
 <div class="paragraph">
-<p>Performs math asin operation on <code>num</code>.</p>
+<p>Returns the number of days between <code>datetime1</code> and <code>datetime2</code>.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
@@ -212,20 +359,23 @@
 <div class="listingblock">
 <div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.asin(1)</pre>
+<pre>local date1 = "2019-09-20T18:53:41.425Z";
+local date2 = "2019-09-14T18:53:41.425Z";
+
+ds.zoneddatetime.daysBetween(date1, date2)</pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Result</div>
 <div class="content">
-<pre>1.5707963267948966</pre>
+<pre>6</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_atannumber_num"><a class="anchor" href="#_atannumber_num"></a><code>atan(number num)</code></h3>
+<h3 id="_formatstring_datetime_string_outputformat"><a class="anchor" href="#_formatstring_datetime_string_outputformat"></a><code>format(string datetime, string outputFormat)</code></h3>
 <div class="paragraph">
-<p>Performs math atan operation on <code>num</code>.</p>
+<p>Given a datetime, will convert it to the specified output format.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
@@ -233,20 +383,20 @@
 <div class="listingblock">
 <div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.atan(1)</pre>
+<pre>ds.zoneddatetime.format("2019-09-20T18:53:41.425Z", "yyyy/MM/dd")</pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Result</div>
 <div class="content">
-<pre>0.7853981633974483</pre>
+<pre>"2019/09/20"</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_avgarray_arr"><a class="anchor" href="#_avgarray_arr"></a><code>avg(array arr)</code></h3>
+<h3 id="_isleapyearstring_datetime"><a class="anchor" href="#_isleapyearstring_datetime"></a><code>isLeapYear(string datetime)</code></h3>
 <div class="paragraph">
-<p>Returns the average value of <code>arr</code>.</p>
+<p>Returns a boolean indicating if <code>datetime</code> is a leap year.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
@@ -254,20 +404,20 @@
 <div class="listingblock">
 <div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.avg([1,2,3])</pre>
+<pre>ds.zoneddatetime.isLeapYear("2019-09-14T18:53:41.425Z")</pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Result</div>
 <div class="content">
-<pre>2</pre>
+<pre>false</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_ceilnumber_num"><a class="anchor" href="#_ceilnumber_num"></a><code>ceil(number num)</code></h3>
+<h3 id="_minusstring_datetime_string_period"><a class="anchor" href="#_minusstring_datetime_string_period"></a><code>minus(string datetime, string period)</code></h3>
 <div class="paragraph">
-<p>Rounds <code>num</code> up.</p>
+<p>Subtracts a <code>period</code> type from the given datetime.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
@@ -275,62 +425,61 @@
 <div class="listingblock">
 <div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.ceil(1.01)</pre>
+<pre>ds.zoneddatetime.minus("2019-09-20T18:53:41Z", "P2D")</pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Result</div>
 <div class="content">
-<pre>2</pre>
+<pre>"2019-09-18T18:53:41Z"</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_clampnumber_value_number_minval_number_maxval"><a class="anchor" href="#_clampnumber_value_number_minval_number_maxval"></a><code>clamp(number value, number minVal, number maxVal)</code></h3>
+<h3 id="_now"><a class="anchor" href="#_now"></a><code>now()</code></h3>
 <div class="paragraph">
-<p>Limits <code>value</code> to the range of <code>minVal</code> and <code>maxVal</code>.</p>
+<p>Returns the current datetime.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
 </div>
 <div class="listingblock">
-<div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.clamp(100, 0, 10)</pre>
+<pre>ds.zoneddatetime.now()</pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Result</div>
+<div class="title">Result:</div>
 <div class="content">
-<pre>10</pre>
+<pre>"2021-01-05T13:09:45.476375-05:00"</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_cosnumber_num"><a class="anchor" href="#_cosnumber_num"></a><code>cos(number num)</code></h3>
+<h3 id="_parsestringnumber_datetime_string_inputformat"><a class="anchor" href="#_parsestringnumber_datetime_string_inputformat"></a><code>parse(string|number datetime, string inputFormat)</code></h3>
 <div class="paragraph">
-<p>Performs math cos operation on <code>num</code>.</p>
+<p>Parses the datetime using the input format and returns the value in the default format.
+If an epoch or timestamp value is used as the datetime you can use <code>"epoch"</code> or <code>"timestamp"</code> as the inputFormat</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
 </div>
 <div class="listingblock">
-<div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.cos(0)</pre>
+<pre>ds.zoneddatetime.parse("12/31/1990 10:10:10", "MM/dd/yyyy HH:mm:ss")</pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Result</div>
+<div class="title">Result:</div>
 <div class="content">
-<pre>1</pre>
+<pre>"1990-12-31T10:10:10Z"</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_expnumber_num"><a class="anchor" href="#_expnumber_num"></a><code>exp(number num)</code></h3>
+<h3 id="_plusstring_datetime_string_period"><a class="anchor" href="#_plusstring_datetime_string_period"></a><code>plus(string datetime, string period)</code></h3>
 <div class="paragraph">
-<p>Returns the result of e to the power of <code>num</code>, in other words e<sup><code>num</code></sup>.</p>
+<p>Adds a <code>period</code> type to the given datetime.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
@@ -338,299 +487,133 @@
 <div class="listingblock">
 <div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.exp(2)</pre>
+<pre>ds.zoneddatetime.plus("2019-09-18T18:53:41Z", "P2D")</pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Result</div>
 <div class="content">
-<pre>7.38905609893065</pre>
+<pre>"2019-09-20T18:53:41Z"</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_exponentnumber_num"><a class="anchor" href="#_exponentnumber_num"></a><code>exponent(number num)</code></h3>
+<h3 id="_tolocaldatestring_datetime"><a class="anchor" href="#_tolocaldatestring_datetime"></a><code>toLocalDate(string datetime)</code></h3>
 <div class="paragraph">
-<p>Returns the non-decimal portion of a logarithmic operation.</p>
-</div>
-<div class="paragraph">
-<p>exponent = (log(<code>num</code>)/log(2)) + 1</p>
+<p>Converts a zone datetime to a local date</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
 </div>
 <div class="listingblock">
-<div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.exponent(2)</pre>
+<pre>ds.zoneddatetime.toLocalDate("2019-07-04T18:53:41Z")</pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Result</div>
+<div class="title">Result:</div>
 <div class="content">
-<pre>2</pre>
+<pre>2019-07-04</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_floornumber_num"><a class="anchor" href="#_floornumber_num"></a><code>floor(number num)</code></h3>
+<h3 id="_tolocaldatetimestring_datetime"><a class="anchor" href="#_tolocaldatetimestring_datetime"></a><code>toLocalDateTime(string datetime)</code></h3>
 <div class="paragraph">
-<p>Rounds <code>num</code> down.</p>
+<p>Converts a zone datetime to a local datetime</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
 </div>
 <div class="listingblock">
-<div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.floor(4.99)</pre>
+<pre>ds.zoneddatetime.toLocalDateTime("2019-07-04T21:00:00Z")</pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Result</div>
+<div class="title">Result:</div>
 <div class="content">
-<pre>4</pre>
+<pre>2019-07-04T21:00:00</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_lognumber_num"><a class="anchor" href="#_lognumber_num"></a><code>log(number num)</code></h3>
+<h3 id="_tolocaltimestring_datetime_string_format"><a class="anchor" href="#_tolocaltimestring_datetime_string_format"></a><code>toLocalTime(string datetime, string format)</code></h3>
 <div class="paragraph">
-<p>Performs math log operation. on <code>num</code>.</p>
+<p>Converts a zone datetime to a local time.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
 </div>
 <div class="listingblock">
-<div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.log(2)</pre>
+<pre>ds.zoneddatetime.toLocalTime("2019-07-04T21:00:00Z")</pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Result</div>
+<div class="title">Result:</div>
 <div class="content">
-<pre>0.6931471805599453</pre>
+<pre>21:00:00</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_mantissanumber_num"><a class="anchor" href="#_mantissanumber_num"></a><code>mantissa(number num)</code></h3>
+<h3 id="_today"><a class="anchor" href="#_today"></a><code>today()</code></h3>
 <div class="paragraph">
-<p>Returns the decimal portion of a logarithmic operation.</p>
-</div>
-<div class="paragraph">
-<p>exponent = (log(<code>num</code>)/log(2)) + 1
-mantissa = <code>num</code> * pow(2, -exponent)</p>
+<p>Returns the datetime of the current day at midnight.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
 </div>
 <div class="listingblock">
-<div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.mantissa(2)</pre>
+<pre>ds.zoneddatetime.today</pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Result</div>
+<div class="title">Result:</div>
 <div class="content">
-<pre>0.5</pre>
+<pre>"2021-01-05T00:00:00-05:00"</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_modnumber_num1_number_num2"><a class="anchor" href="#_modnumber_num1_number_num2"></a><code>mod(number num1, number num2)</code></h3>
+<h3 id="_tomorrow"><a class="anchor" href="#_tomorrow"></a><code>tomorrow()</code></h3>
 <div class="paragraph">
-<p>Performs modulo operation, returns how many times <code>num1</code> can go into <code>num2</code>.</p>
+<p>Returns the datetime of the next day at midnight.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
 </div>
 <div class="listingblock">
-<div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.mod(2,4)</pre>
+<pre>ds.zoneddatetime.tomorrow</pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Result</div>
+<div class="title">Result:</div>
 <div class="content">
-<pre>2</pre>
+<pre>"2021-01-06T00:00:00-05:00"</pre>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_pownumber_num1_number_num2"><a class="anchor" href="#_pownumber_num1_number_num2"></a><code>pow(number num1, number num2)</code></h3>
+<h3 id="_yesterday"><a class="anchor" href="#_yesterday"></a><code>yesterday()</code></h3>
 <div class="paragraph">
-<p>Returns the value of <code>num1</code> to the power of <code>num2</code>, in other words <code>num1</code><sup><code>num2</code></sup>.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.math.pow(2,2)</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>4</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_random"><a class="anchor" href="#_random"></a><code>random</code></h3>
-<div class="paragraph">
-<p>Returns a random float value between 0 and 1.</p>
+<p>Returns the datetime of the previous day at midnight.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
 </div>
 <div class="listingblock">
-<div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.math.random</pre>
+<pre>ds.zoneddatetime.yesterday</pre>
 </div>
 </div>
 <div class="listingblock">
-<div class="title">Result</div>
+<div class="title">Result:</div>
 <div class="content">
-<pre>0.5963038027787421</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_randomintnumber_num"><a class="anchor" href="#_randomintnumber_num"></a><code>randomInt(number num)</code></h3>
-<div class="paragraph">
-<p>Returns a random integer between 0 and the provided number inclusive.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.math.randomInt(500)</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>485</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_roundnumber_num"><a class="anchor" href="#_roundnumber_num"></a><code>round(number num)</code></h3>
-<div class="paragraph">
-<p>Rounds <code>num</code> to the nearest whole number.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.math.round(2.5)</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>3</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_sinnumber_num"><a class="anchor" href="#_sinnumber_num"></a><code>sin(number num)</code></h3>
-<div class="paragraph">
-<p>Performs math sin operation on <code>num</code>.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.math.sin(1)</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>0.8414709848078965</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_sqrtnumber_num"><a class="anchor" href="#_sqrtnumber_num"></a><code>sqrt(number num)</code></h3>
-<div class="paragraph">
-<p>Performs math square root operation on <code>num</code>.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.math.sqrt(4)</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>2</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_sumarray_arr"><a class="anchor" href="#_sumarray_arr"></a><code>sum(array arr)</code></h3>
-<div class="paragraph">
-<p>Returns sum of all elements in <code>arr</code>.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">Payload</div>
-<div class="content">
-<pre>[ 10, 20, 30 ]</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.math.sum(payload)</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>60</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_tannumber_num"><a class="anchor" href="#_tannumber_num"></a><code>tan(number num)</code></h3>
-<div class="paragraph">
-<p>Performs math tan operation on <code>num</code>.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.math.tan(1)</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>1.5574077246549023</pre>
+<pre>"2021-01-04T00:00:00-05:00"</pre>
 </div>
 </div>
 </div>
