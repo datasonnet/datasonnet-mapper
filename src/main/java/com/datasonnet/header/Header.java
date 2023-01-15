@@ -1,7 +1,7 @@
 package com.datasonnet.header;
 
 /*-
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ public class Header {
     public static final String DATASONNET_PRESERVE_ORDER = "preserveOrder";
     public static final String DATAFORMAT_PREFIX = "dataformat";
     public static final String DATAFORMAT_ALL = "*";
-    public static final String LATEST_RELEASE_VERSION = "2.0"; //update this as required
+    public static final String LATEST_RELEASE_VERSION = "2.5"; //update this as required
     private final String versionMajor;
     private final String versionMinor;
     private final boolean preserveOrder;
