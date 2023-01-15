@@ -47,7 +47,6 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
   val cachedImports = collection.mutable.Map.empty[Path, Val]
 
   val cachedImportedStrings = collection.mutable.Map.empty[Path, String]
-
   override def visitExpr(expr: Expr)(implicit scope: ValScope, fileScope: FileScope): Val = visitExpr(expr, false)
   def visitExpr(expr: Expr, tryCatch: Boolean = false)
                (implicit scope: ValScope, fileScope: FileScope): Val = try expr match{
@@ -98,6 +97,7 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
     case Function(offset, params, body) => visitMethod(body, params, offset)
     case IfElse(offset, cond, then, else0) => visitIfElse(offset, cond, then, else0)
     case TryElse(offset, try0, else0) => visitTryElse(offset, try0, else0)
+
     case Comp(offset, value, first, rest) =>
       Val.Arr(visitComp(first :: rest.toList, Seq(scope)).map(s => Val.Lazy(visitExpr(value)(s, implicitly))))
     case ObjExtend(offset, value, ext) => {

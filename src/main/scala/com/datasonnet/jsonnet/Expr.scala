@@ -109,7 +109,8 @@ object Expr{
     case object `&&` extends Op
     case object `||` extends Op
     case object `default` extends Op
-  }
+
+}
   case class AssertExpr(offset: Int, asserted: Member.AssertStmt, returned: Expr) extends Expr
   case class LocalExpr(offset: Int, bindings: Seq[Bind], returned: Expr) extends Expr
 
