@@ -1,7 +1,7 @@
 package com.datasonnet.jsonnet
 
 /*-
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet.jsonnet
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import java.io.StringWriter
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.Base64
@@ -63,6 +62,30 @@ object Std {
         case o: Val.Func => o.params.args.length
         case _ => throw new Error.Delegate("Cannot get length of " + v1.prettyName)
       }
+    },
+    builtinWithDefaults("get",
+      "o" -> None,
+      "f" -> None,
+      "default" -> Some(Expr.Null(0)),
+      "inc_hidden" -> Some(Expr.True(0))){ (args, ev) =>
+
+      val o: Val.Obj = args("o") match {
+        case obj: Val.Obj => args("o").cast[Val.Obj]
+        case _ => throw new Error.Delegate("Argument must be an object")
+      }
+      val f: Val.Str = args("f") match {
+        case str: Val.Str => args("f").cast[Val.Str]
+        case _ => throw new Error.Delegate("Argument must be an object")
+      }
+      val default = args("default")
+
+      val fieldValue = args("inc_hidden") match {
+        case Val.False => if (o.getVisibleKeys().get(f.value) == Some(false)) o.value(f.value, 0)(new FileScope(null, Map.empty), ev) else default
+        case Val.True => if (o.getVisibleKeys().get(f.value).isDefined) o.value(f.value, 0)(new FileScope(null, Map.empty), ev) else default
+        case _ => throw Error.Delegate("inc_hidden has to be a boolean, got" + args("inc_hidden").getClass)
+      }
+
+      fieldValue
     },
     builtin("objectHas", "o", "f"){ (ev, fs, v1: Val.Obj, v2: String) =>
       v1.getVisibleKeys().get(v2) == Some(false)
