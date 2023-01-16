@@ -18,19 +18,14 @@ package com.datasonnet.jsonnet
 import java.io.StringWriter
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.Base64
-import java.util.zip.GZIPOutputStream
-
 import com.datasonnet.jsonnet.Expr.Member.Visibility
 import com.datasonnet.jsonnet.Expr.{BinaryOp, False, Params}
 
 import scala.collection.mutable
-import scala.collection.compat._
-import com.datasonnet.jsonnet.Std.builtinWithDefaults
+import sourcecode.Text.generate
+import ujson.Bool
+
 import scala.util.matching.Regex
-
-import ujson.Value
-
-import util.control.Breaks._
 
 /**
   * The Jsonnet standard library, `std`, with each builtin function implemented
@@ -80,8 +75,8 @@ object Std {
       val default = args("default")
 
       val fieldValue = args("inc_hidden") match {
-        case Val.False => if (o.getVisibleKeys().get(f.value) == Some(false)) o.value(f.value, 0)(new FileScope(null, Map.empty), ev) else default
-        case Val.True => if (o.getVisibleKeys().get(f.value).isDefined) o.value(f.value, 0)(new FileScope(null, Map.empty), ev) else default
+        case Val.False => if (o.getVisibleKeys().get(f.value) == Some(false)) o.value(f.value, -1)(new FileScope(null, Map.empty), ev) else default
+        case Val.True => if (o.getVisibleKeys().get(f.value).isDefined) o.value(f.value, -1)(new FileScope(null, Map.empty), ev) else default
         case _ => throw Error.Delegate("inc_hidden has to be a boolean, got" + args("inc_hidden").getClass)
       }
 
@@ -114,6 +109,28 @@ object Std {
         keys.sorted
       }
       Val.Arr(maybeSorted.map(k => Val.Lazy(Val.Str(k))))
+    },
+    builtin("objectValues", "o"){ (ev, fs, v1: Val.Obj) =>
+      val keys = v1.getVisibleKeys()
+        .collect{case (k, false) => k}
+        .toSeq
+      val maybeSorted = if(ev.preserveOrder) {
+        keys
+      } else {
+        keys.sorted
+      }
+      Val.Arr(maybeSorted.map(k => Val.Lazy(v1.value(k, -1)(fs, ev))))
+    },
+    builtin("objectValuesAll", "o"){ (ev, fs, v1: Val.Obj) =>
+      val keys = v1.getVisibleKeys()
+        .collect{case (k, _) => k}
+        .toSeq
+      val maybeSorted = if(ev.preserveOrder) {
+        keys
+      } else {
+        keys.sorted
+      }
+      Val.Arr(maybeSorted.map(k => Val.Lazy(v1.value(k, -1)(fs, ev))))
     },
     builtin("type", "x"){ (ev, fs, v1: Val) =>
       v1 match{
@@ -487,6 +504,10 @@ object Std {
       Val.Arr(out.toSeq)
     },
 
+    builtin("reverse", "arr"){ (ev, fs, arr: Val.Arr) =>
+      Val.Arr(arr.value.reverse)
+    },
+
     builtin("manifestIni", "v"){ (ev, fs, v: Val) =>
       val materialized = Materializer(v)(ev)
       def render(x: ujson.Value) = x match{
@@ -601,6 +622,16 @@ object Std {
       rec(Materializer(value)(ev)).render
 
     },
+
+    builtin("manifestTomlEx", "toml", "indent") { (ev, fs, toml: Val, indent: Int) =>
+      throw new Error.Delegate("Function manifestTomlEx is not yet implemented")
+      false
+    },
+    builtin("parseYaml", "str") { (ev, fs, str: Val) =>
+      throw new Error.Delegate("Function parseYaml is not yet implemented")
+      false
+    },
+
     builtin("base64", "v"){ (ev, fs, v: Val) =>
       v match{
         case Val.Str(value) => Base64.getEncoder().encodeToString(value.getBytes)
@@ -781,6 +812,14 @@ object Std {
     builtin("splitLimit", "str", "c", "maxSplits"){ (ev, fs, str: String, c: String, maxSplits: Int) =>
       Val.Arr(str.split(java.util.regex.Pattern.quote(c), maxSplits + 1).map(s => Val.Lazy(Val.Str(s))))
     },
+    builtin("splitLimitR", "str", "c", "maxSplits"){ (ev, fs, str: String, c: String, maxSplits: Int) =>
+      if (maxSplits == -1) {
+        Val.Arr(str.split(java.util.regex.Pattern.quote(c), maxSplits + 1).map(s => Val.Lazy(Val.Str(s))))
+      } else {
+        val split = str.reverse.split(java.util.regex.Pattern.quote(c.reverse), maxSplits + 1)
+        Val.Arr(split.map(s => Val.Lazy(Val.Str(s.reverse))).reverse)
+      }
+    },
     builtin("stringChars", "str"){ (ev, fs, str: String) =>
       stringChars(str)
     },
@@ -852,7 +891,31 @@ object Std {
         scope.bindings(1).get.force
       }
     ),
-
+    builtin("slice", "indexable", "index", "end", "step") { (ev, fs, indexable: Val, index: Int, end: Int, step: Int) =>
+      val slice: Val = indexable match {
+        case Val.Arr(arr) =>
+          val a = arr.value
+          Val.Arr(List.tabulate(a.size) {i =>
+            if ((i+1) % step == 0 && i >= index && i < end) Some(a(i))
+            else None }.flatten)
+        case Val.Str(str) =>
+          val a = str.value
+          Val.Str(List.tabulate(a.size) {i =>
+            if ((i+1) % step == 0 && i >= index && i < end) Some(a(i))
+            else None }.flatten.mkString)
+        case i => throw Error.Delegate("Expected Array or String, got: " + i.prettyName)
+      }
+      slice
+    },
+    builtin("any", "arr") { (ev, fs, arr: Val.Arr) =>
+      val a = arr.value
+      //First see if all values are boolean
+      val allBool = a.find(b => !(Materializer.apply(b.force)(ev).isInstanceOf[Bool])) == None
+      if (!allBool) {
+        throw Error.Delegate("Array must contain only boolean values")
+      }
+      a.find(b => Materializer.apply(b.force)(ev).value == true) != None
+    },
     "extVar" -> Val.Func(
       None,
       Params(Array(("x", None, 0))),
@@ -928,6 +991,13 @@ object Std {
     val Seq(v1: T1, v2: T2, v3: T3) = validate(vs, ev, fs, Array(implicitly[ReadWriter[T1]], implicitly[ReadWriter[T2]], implicitly[ReadWriter[T3]]))
     eval(ev, fs, v1, v2, v3)
   }
+
+  def builtin[R: ReadWriter, T1: ReadWriter, T2: ReadWriter, T3: ReadWriter, T4: ReadWriter](name: String, p1: String, p2: String, p3: String, p4: String)
+                                                                            (eval: (EvalScope, FileScope, T1, T2, T3, T4) => R): (String, Val.Func) = builtin0(name, p1, p2, p3, p4){ (vs, ev, fs) =>
+    val Seq(v1: T1, v2: T2, v3: T3, v4: T4) = validate(vs, ev, fs, Array(implicitly[ReadWriter[T1]], implicitly[ReadWriter[T2]], implicitly[ReadWriter[T3]], implicitly[ReadWriter[T4]]))
+    eval(ev, fs, v1, v2, v3, v4)
+  }
+
   def builtin0[R: ReadWriter](name: String, params: String*)(eval: (Array[Val], EvalScope, FileScope) => R) = {
     val paramData = params.zipWithIndex.map{case (k, i) => (k, None, i)}.toArray
     val paramIndices = params.indices.toArray

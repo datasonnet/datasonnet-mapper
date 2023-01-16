@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2019-2022 the original author or authors.
+    Copyright 2019-2023 the original author or authors.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -85,6 +85,8 @@
         <fastparse.version>2.3.0</fastparse.version>
         <pprint.version>0.5.9</pprint.version>
         <scalatags.version>0.9.1</scalatags.version>
+
+        <jakarta-xml-bind-api-version>4.0.0</jakarta-xml-bind-api-version>
     </properties>
 
     <dependencies>
@@ -475,6 +477,7 @@
                 </dependency>
             </dependencies>
         </profile>
+
         <profile>
             <id>release</id>
             <build>
