@@ -622,7 +622,16 @@ object Std {
       rec(Materializer(value)(ev)).render
 
     },
-    //TODO manifestTomlEx
+
+    builtin("manifestTomlEx", "toml", "indent") { (ev, fs, toml: Val, indent: Int) =>
+      throw new Error.Delegate("Function manifestTomlEx is not yet implemented")
+      false
+    },
+    builtin("parseYaml", "str") { (ev, fs, str: Val) =>
+      throw new Error.Delegate("Function parseYaml is not yet implemented")
+      false
+    },
+
     builtin("base64", "v"){ (ev, fs, v: Val) =>
       v match{
         case Val.Str(value) => Base64.getEncoder().encodeToString(value.getBytes)
@@ -845,7 +854,6 @@ object Std {
       }
       recursiveTransform(ujson.read(str))
     },
-    //TODO parseYaml
     builtin("md5", "s"){ (ev, fs, s: String) =>
       Platform.md5(s)
     },

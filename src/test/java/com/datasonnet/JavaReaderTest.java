@@ -27,7 +27,7 @@ import com.datasonnet.util.TestResourceReader;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-import jakarta.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
