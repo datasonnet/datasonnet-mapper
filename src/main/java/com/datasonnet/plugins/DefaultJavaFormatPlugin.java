@@ -1,7 +1,7 @@
 package com.datasonnet.plugins;
 
 /*-
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet.plugins;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.datasonnet.RecentsMap;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
@@ -36,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ujson.Value;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;

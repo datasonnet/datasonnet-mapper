@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2019-2022 the original author or authors.
+    Copyright 2019-2023 the original author or authors.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -85,6 +85,8 @@
         <fastparse.version>2.3.0</fastparse.version>
         <pprint.version>0.5.9</pprint.version>
         <scalatags.version>0.9.1</scalatags.version>
+
+        <jakarta-xml-bind-api-version>4.0.0</jakarta-xml-bind-api-version>
     </properties>
 
     <dependencies>
@@ -455,7 +457,7 @@
         <profile>
             <id>jdk9+</id>
             <activation>
-                <jdk>[9,)</jdk>
+                <jdk>[9,11)</jdk>
             </activation>
             <dependencies>
                 <dependency>
@@ -472,6 +474,24 @@
                     <groupId>javax.activation</groupId>
                     <artifactId>activation</artifactId>
                     <version>1.1.1</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>jdk11+</id>
+            <activation>
+                <jdk>[11,)</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>jakarta.xml.bind</groupId>
+                    <artifactId>jakarta.xml.bind-api</artifactId>
+                    <version>${jakarta-xml-bind-api-version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.jaxb</groupId>
+                    <artifactId>jaxb-runtime</artifactId>
+                    <version>${jakarta-xml-bind-api-version}</version>
                 </dependency>
             </dependencies>
         </profile>
