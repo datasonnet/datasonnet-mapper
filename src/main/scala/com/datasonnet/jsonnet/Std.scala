@@ -916,6 +916,16 @@ object Std {
       }
       a.find(b => Materializer.apply(b.force)(ev).value == true) != None
     },
+    builtin("all", "arr") { (ev, fs, arr: Val.Arr) =>
+      val a = arr.value
+      //First see if all values are boolean
+      val allBool = a.find(b => !(Materializer.apply(b.force)(ev).isInstanceOf[Bool])) == None
+      if (!allBool) {
+        throw Error.Delegate("Array must contain only boolean values")
+      }
+      a.find(b => Materializer.apply(b.force)(ev).value == false) == None
+    },
+
     "extVar" -> Val.Func(
       None,
       Params(Array(("x", None, 0))),

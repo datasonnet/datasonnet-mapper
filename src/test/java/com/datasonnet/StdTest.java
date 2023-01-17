@@ -91,6 +91,10 @@ public class StdTest {
         response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
         assertEquals("false", response.getContent());
 
+        mapper = new Mapper("std.any([])");
+        response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
+        assertEquals("false", response.getContent());
+
         try {
             mapper = new Mapper("std.any([false, \"HELLO\", false])");
             response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
@@ -99,6 +103,33 @@ public class StdTest {
             String msg = e.getMessage();
             assertTrue(msg != null && msg.contains("Array must contain only boolean values"));
         }
+    }
 
+    @Test
+    void testStdAll() throws IOException, URISyntaxException, JSONException {
+        Mapper mapper = new Mapper("std.all([false, true, false])");
+        Document<String> response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
+        assertEquals("false", response.getContent());
+
+        mapper = new Mapper("std.all([false, false, false])");
+        response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
+        assertEquals("false", response.getContent());
+
+        mapper = new Mapper("std.all([true, true, true])");
+        response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
+        assertEquals("true", response.getContent());
+
+        mapper = new Mapper("std.all([])");
+        response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
+        assertEquals("true", response.getContent());
+
+        try {
+            mapper = new Mapper("std.all([false, \"HELLO\", false])");
+            response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
+            fail("This should fail with java.lang.IllegalArgumentException:");
+        } catch (Exception e) {
+            String msg = e.getMessage();
+            assertTrue(msg != null && msg.contains("Array must contain only boolean values"));
+        }
     }
 }
