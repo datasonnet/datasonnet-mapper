@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Untitled :: DataSonnet Mapper Documentation</title>
-    <link rel="canonical" href="https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/libraries-numbers.html">
+    <title>Language Enhancements :: DataSonnet Mapper Documentation</title>
+    <link rel="canonical" href="https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/language.html">
     <meta name="generator" content="Antora 2.3.3">
     <link rel="stylesheet" href="../../_/css/site.css">
     <script>var uiRootPath = '../../_'</script>
@@ -41,7 +41,7 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="dataformats.html">Data Formats</a>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <a class="nav-link" href="language.html">Language Enhancements</a>
   </li>
   <li class="nav-item" data-depth="1">
@@ -84,7 +84,7 @@
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="libraries-math.html">Math</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="2">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="libraries-numbers.html">Numbers</a>
   </li>
   <li class="nav-item" data-depth="2">
@@ -148,147 +148,55 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">DataSonnet</a></li>
-    <li>Additional DataSonnet Libraries</li>
-    <li><a href="libraries-numbers.html">Numbers</a></li>
+    <li><a href="language.html">Language Enhancements</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/libraries-numbers.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/language.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<div class="sect1">
-<h2 id="_numbers"><a class="anchor" href="#_numbers"></a>numbers</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_frombinarynumber_value"><a class="anchor" href="#_frombinarynumber_value"></a><code>fromBinary(number value)</code></h3>
+<h1 class="page">Language Enhancements</h1>
 <div class="paragraph">
-<p>Converts <code>value</code> from binary to decimal.</p>
+<p>In addition to the <a href="https://jsonnet.org/ref/language.html">Jsonnet language</a>, DataSonnet includes the following language enhancements:</p>
 </div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>try/else</code> statement. If the expression after <code>try</code> results in error, the expression after <code>else</code> will be evaluated. For example:</p>
+</li>
+</ul>
 </div>
 <div class="listingblock">
-<div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.numbers.fromBinary(1100100)</pre>
+<pre>    {
+        tryNonexistent: try payload.doesntExist else "OK",
+        tryChain: try payload.doesntExist else try payload.missing else "OK",
+        tryNaN: try std.parseInt("NotANumber") else -1,
+        tryInIf: if (try payload.doesntExist else "OK") == "OK" then "OK" else "NotOK"
+    }</pre>
 </div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>default</code> operator - this is a syntax sugar for <code>try/else</code>. For example:</p>
+</li>
+</ul>
 </div>
 <div class="listingblock">
-<div class="title">Result</div>
 <div class="content">
-<pre>100</pre>
+<pre>    {
+        tryNonexistent: payload.doesntExist default "OK",
+        tryChain: payload.doesntExist default payload.missing default "OK",
+        tryNaN: std.parseInt("NotANumber") default -1
+    }</pre>
 </div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_fromhexnumber_value"><a class="anchor" href="#_fromhexnumber_value"></a><code>fromHex(number value)</code></h3>
-<div class="paragraph">
-<p>Converts <code>value</code> from hex to decimal.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.numbers.fromHex(64)</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>100</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_fromradixnumbernumber_value_number_baseasbinary"><a class="anchor" href="#_fromradixnumbernumber_value_number_baseasbinary"></a><code>fromRadixNumber(number value, number baseAsBinary)</code></h3>
-<div class="paragraph">
-<p>Converts <code>value</code> to a decimal with the base <code>baseAsBinary</code>.</p>
 </div>
 <div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.numbers.fromRadixNumber(1101000, 2)</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>104</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_tobinarynumber_value"><a class="anchor" href="#_tobinarynumber_value"></a><code>toBinary(number value)</code></h3>
-<div class="paragraph">
-<p>Converts <code>value</code> from decimal to binary.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.numbers.toBinary(100)</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>"1100100"</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_tohexnumber_value"><a class="anchor" href="#_tohexnumber_value"></a><code>toHex(number value)</code></h3>
-<div class="paragraph">
-<p>Converts <code>value</code> from decimal to hex.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.numbers.toHex(100)</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>"64"</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_toradixnumbernumber_value_number_baseasdecimal"><a class="anchor" href="#_toradixnumbernumber_value_number_baseasdecimal"></a><code>toRadixNumber(number value, number baseAsDecimal)</code></h3>
-<div class="paragraph">
-<p>Converts <code>value</code> to a number with the base <code>baseAsDecimal</code>.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example</strong></p>
-</div>
-<div class="listingblock">
-<div class="title">DataSonnet map:</div>
-<div class="content">
-<pre>ds.numbers.toRadixNumber(104, 2)</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>"1101000"</pre>
-</div>
-</div>
-</div>
-</div>
+<p><strong>See Also:</strong> <a href="headers.html#_miscellaneous_properties" class="page"><code>default</code> header</a></p>
 </div>
 </article>
   </div>
