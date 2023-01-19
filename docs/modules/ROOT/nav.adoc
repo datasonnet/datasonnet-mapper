@@ -9,11 +9,11 @@
 ** xref:libraries-arrays.adoc[Arrays]
 ** xref:libraries-binaries.adoc[Binaries]
 ** xref:libraries-crypto.adoc[Crypto]
-** xref:libraries-datetime.adoc[Datetime]
 ** xref:libraries-jsonpath.adoc[JsonPath]
-** xref:libraries-datetime.adoc[DateTime]
+** xref:libraries-datetime.adoc[Datetime]
 ** xref:libraries-zoneddatetime.adoc[ZonedDateTime] _(Deprecated)_
 ** xref:libraries-localdatetime.adoc[LocalDateTime] _(Deprecated)_
+** xref:libraries-period.adoc[Period]
 ** xref:libraries-math.adoc[Math]
 ** xref:libraries-numbers.adoc[Numbers]
 ** xref:libraries-objects.adoc[Objects]

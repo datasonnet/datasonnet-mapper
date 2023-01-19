@@ -1,0 +1,130 @@
+## period
+
+### `between(string datetime1, string datetime2)`
+Returns the period between two datetime objects.
+
+*Example*
+
+------------------------
+ds.period.between(
+    ds.datetime.date({year:2020}),
+    ds.datetime.date({year:2019, month: 3})
+)
+------------------------
+
+.Result:
+------------------------
+"P-10M"
+------------------------
+
+### `days(number num)`
+Returns the number of given days in period format.
+
+*Example*
+
+------------------------
+ds.period.days(5)
+------------------------
+
+.Result:
+------------------------
+"P5D"
+------------------------
+
+### `duration(object time)`
+Returns the given time object in a Period of Time format
+
+*Example*
+
+------------------------
+ds.period.duration({days: 1, hours: 1, minutes: 1, seconds: 1})
+------------------------
+
+.Result:
+------------------------
+"PT25H1M1S"
+------------------------
+
+### `hours(number num)`
+Returns the number of given hours in a Period of Time format
+
+*Example*
+
+------------------------
+ds.period.hours(1)
+------------------------
+
+.Result:
+------------------------
+"PT1H"
+------------------------
+
+### `minutes(number num)`
+Returns the number of given minutes in a Period of Time format
+
+*Example*
+
+------------------------
+ds.period.hours(1)
+------------------------
+
+.Result:
+------------------------
+"PT1M"
+------------------------
+
+### `months(number num)`
+Returns the number of given months in a Period format
+
+*Example*
+
+------------------------
+ds.period.months(1)
+------------------------
+
+.Result:
+------------------------
+"P1M"
+------------------------
+
+### `period(object time)`
+Returns the given time object in a Period format
+
+*Example*
+
+------------------------
+ds.period.period({years: 1, months: 1, days: 1})
+------------------------
+
+.Result:
+------------------------
+"P1Y1M1D"
+------------------------
+
+### `seconds(number num)`
+Returns the number of given seconds in a Period of Time format
+
+*Example*
+
+------------------------
+ds.period.seconds(1)
+------------------------
+
+.Result:
+------------------------
+"PT1S"
+------------------------
+
+### `years(number num)`
+Returns the number of given years in a Period format
+
+*Example*
+
+------------------------
+ds.period.years(1)
+------------------------
+
+.Result:
+------------------------
+"P1Y"
+------------------------
