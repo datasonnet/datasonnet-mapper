@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Standard Library Documentation :: DataSonnet Mapper Documentation</title>
-    <link rel="canonical" href="https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/jsonnet-doc.html">
+    <title>Untitled :: DataSonnet Mapper Documentation</title>
+    <link rel="canonical" href="https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/libraries-period.html">
     <meta name="generator" content="Antora 2.3.3">
     <link rel="stylesheet" href="../../_/css/site.css">
     <script>var uiRootPath = '../../_'</script>
@@ -47,7 +47,7 @@
   <li class="nav-item" data-depth="1">
     <a class="nav-link" href="headers.html">DataSonnet Header</a>
   </li>
-  <li class="nav-item is-current-page" data-depth="1">
+  <li class="nav-item" data-depth="1">
     <a class="nav-link" href="jsonnet-doc.html">Standard Library Documentation</a>
   </li>
   <li class="nav-item" data-depth="1">
@@ -78,7 +78,7 @@
   <li class="nav-item" data-depth="2">
     <a class="nav-link" href="libraries-localdatetime.html">LocalDateTime</a>
   </li>
-  <li class="nav-item" data-depth="2">
+  <li class="nav-item is-current-page" data-depth="2">
     <a class="nav-link" href="libraries-period.html">Period</a>
   </li>
   <li class="nav-item" data-depth="2">
@@ -148,19 +148,204 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="index.html">DataSonnet</a></li>
-    <li><a href="jsonnet-doc.html">Standard Library Documentation</a></li>
+    <li>Additional DataSonnet Libraries</li>
+    <li><a href="libraries-period.html">Period</a></li>
   </ul>
 </nav>
-  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/jsonnet-doc.adoc">Edit this Page</a></div>
+  <div class="edit-this-page"><a href="https://github.com/datasonnet/datasonnet-mapper/edit/main/docs/modules/ROOT/pages/libraries-period.adoc">Edit this Page</a></div>
   </div>
   <div class="content">
 <aside class="toc sidebar" data-title="Contents" data-levels="2">
   <div class="toc-menu"></div>
 </aside>
 <article class="doc">
-<h1 class="page">Standard Library Documentation</h1>
+<div class="sect1">
+<h2 id="_period"><a class="anchor" href="#_period"></a>period</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_betweenstring_datetime1_string_datetime2"><a class="anchor" href="#_betweenstring_datetime1_string_datetime2"></a><code>between(string datetime1, string datetime2)</code></h3>
 <div class="paragraph">
-<p>There&#8217;s a core standard library that is shared by all JSonnet implementations, including DataSonnet, that has many useful functions. There are small differences in versions and the like, so eventually it will be completely documented here. But for now you can view that documentation on the JSonnet Website which can be found at this link: <a href="https://jsonnet.org/ref/stdlib.html">Standard Library Documentation</a>.</p>
+<p>Returns the period between two datetime objects.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.period.between(
+    ds.datetime.date({year:2020}),
+    ds.datetime.date({year:2019, month: 3})
+)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"P-10M"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_daysnumber_num"><a class="anchor" href="#_daysnumber_num"></a><code>days(number num)</code></h3>
+<div class="paragraph">
+<p>Returns the number of given days in period format.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.period.days(5)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"P5D"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_durationobject_time"><a class="anchor" href="#_durationobject_time"></a><code>duration(object time)</code></h3>
+<div class="paragraph">
+<p>Returns the given time object in a Period of Time format</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.period.duration({days: 1, hours: 1, minutes: 1, seconds: 1})</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"PT25H1M1S"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_hoursnumber_num"><a class="anchor" href="#_hoursnumber_num"></a><code>hours(number num)</code></h3>
+<div class="paragraph">
+<p>Returns the number of given hours in a Period of Time format</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.period.hours(1)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"PT1H"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_minutesnumber_num"><a class="anchor" href="#_minutesnumber_num"></a><code>minutes(number num)</code></h3>
+<div class="paragraph">
+<p>Returns the number of given minutes in a Period of Time format</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.period.hours(1)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"PT1M"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_monthsnumber_num"><a class="anchor" href="#_monthsnumber_num"></a><code>months(number num)</code></h3>
+<div class="paragraph">
+<p>Returns the number of given months in a Period format</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.period.months(1)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"P1M"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_periodobject_time"><a class="anchor" href="#_periodobject_time"></a><code>period(object time)</code></h3>
+<div class="paragraph">
+<p>Returns the given time object in a Period format</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.period.period({years: 1, months: 1, days: 1})</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"P1Y1M1D"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_secondsnumber_num"><a class="anchor" href="#_secondsnumber_num"></a><code>seconds(number num)</code></h3>
+<div class="paragraph">
+<p>Returns the number of given seconds in a Period of Time format</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.period.seconds(1)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"PT1S"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_yearsnumber_num"><a class="anchor" href="#_yearsnumber_num"></a><code>years(number num)</code></h3>
+<div class="paragraph">
+<p>Returns the number of given years in a Period format</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.period.years(1)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>"P1Y"</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </article>
   </div>
