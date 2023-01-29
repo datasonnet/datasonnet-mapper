@@ -31,6 +31,6 @@ abstract class BaseJacksonDataFormatPlugin extends AbstractDataFormatPlugin {
     case a: ArrayNode => ujson.Arr.from(a.elements.asScala.map(ujsonFrom))
     case b: BinaryNode => ujson.Arr.from(b.binaryValue())
     case _: NullNode => ujson.Null
-    case _ => throw new IllegalArgumentException("Jackson node " + jsonNode + " not supported!")
+    case _ => throw new IllegalArgumentException("Jackson node " + jsonNode + " of type " + jsonNode.getNodeType + "(" + jsonNode.getClass.getName + ") is not supported!")
   }
 }
