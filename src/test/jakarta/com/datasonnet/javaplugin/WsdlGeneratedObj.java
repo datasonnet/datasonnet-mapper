@@ -1,4 +1,4 @@
-package com.datasonnet.javatest;
+package com.datasonnet.javaplugin;
 
 /*-
  * Copyright 2019-2023 the original author or authors.
@@ -15,12 +15,9 @@ package com.datasonnet.javatest;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElementRef;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.*;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {

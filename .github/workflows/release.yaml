@@ -41,7 +41,7 @@ jobs:
         run: "./mvnw -V --no-transfer-progress --batch-mode --settings .settings.xml clean \
         -DreleaseVersion='${{ github.event.inputs.release_ver }}' \
         -DdevelopmentVersion='${{ github.event.inputs.snapshot_ver }}' \
-        release:prepare"
+        release:prepare -Pjavax"
       - id: install-secret-key
         name: Install gpg secret key
         run: |

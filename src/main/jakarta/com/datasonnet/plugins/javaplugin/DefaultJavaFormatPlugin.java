@@ -1,4 +1,4 @@
-package com.datasonnet.plugins;
+package com.datasonnet.plugins.javaplugin;
 
 /*-
  * Copyright 2019-2023 the original author or authors.
@@ -20,8 +20,7 @@ import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
-import com.datasonnet.plugins.jackson.JAXBElementMixIn;
-import com.datasonnet.plugins.jackson.JAXBElementSerializer;
+import com.datasonnet.plugins.BaseJacksonDataFormatPlugin;
 import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.ujsonUtils;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -49,6 +48,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
     public static final String DS_PARAM_MIXINS = "mixins";
     public static final String DS_PARAM_POLYMORPHIC_TYPES = "polymorphictypes";
     public static final String DS_PARAM_POLYMORPHIC_TYPE_ID_PROPERTY = "polymorphictypeidproperty";
+    public static final String DS_PARAM_FIND_AND_REGISTER_MODULES = "findandregistermodules";
 
     private static final Map<String, ObjectMapper> MAPPER_CACHE = new RecentsMap<>(64);
 
@@ -76,6 +76,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         readerParams.add(DS_PARAM_DATE_FORMAT);
         readerParams.add(DS_PARAM_TYPE);
         readerParams.add(DS_PARAM_OUTPUT_CLASS);
+        readerParams.add(DS_PARAM_FIND_AND_REGISTER_MODULES);
         writerParams.addAll(readerParams);
         writerParams.add(DS_PARAM_MIXINS);
         writerParams.add(DS_PARAM_POLYMORPHIC_TYPES);
@@ -151,6 +152,14 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
 
     private ObjectMapper adaptObjectMapper(Map<String, String> parameters) {
         ObjectMapper mapper = DEFAULT_OBJECT_MAPPER.copy();
+
+        if (parameters.containsKey(DS_PARAM_FIND_AND_REGISTER_MODULES)) {
+            String paramStr = parameters.get(DS_PARAM_FIND_AND_REGISTER_MODULES);
+            boolean findAndRegister = Boolean.parseBoolean(Optional.ofNullable(paramStr).orElse("false"));
+            if (findAndRegister) {
+                mapper.findAndRegisterModules();
+            }
+        }
 
         if (parameters.containsKey(DS_PARAM_DATE_FORMAT)) {
             String dateFormat = parameters.get(DS_PARAM_DATE_FORMAT);

@@ -1,4 +1,4 @@
-package com.datasonnet;
+package com.datasonnet.javaplugin;
 
 /*-
  * Copyright 2019-2023 the original author or authors.
@@ -15,30 +15,21 @@ package com.datasonnet;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import com.datasonnet.Mapper;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaTypes;
-import com.datasonnet.javatest.Gizmo;
-import com.datasonnet.javatest.MixInTestClass;
-import com.datasonnet.javatest.WsdlGeneratedObj;
 import com.datasonnet.util.TestResourceReader;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import org.junit.jupiter.api.Test;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.Marshaller;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class JavaWriterTest {
 
@@ -83,11 +74,11 @@ public class JavaWriterTest {
         Document<Map> mappedMap = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JAVA, Map.class);
 
         result = mappedMap.getContent();
-        assertTrue(result instanceof java.util.Map);
+        assertTrue(result instanceof Map);
 
         Map gizmoMap = (Map) result;
-        assertTrue(gizmoMap.get("colors") instanceof java.util.List);
-        assertTrue(gizmoMap.get("manufacturer") instanceof java.util.Map);
+        assertTrue(gizmoMap.get("colors") instanceof List);
+        assertTrue(gizmoMap.get("manufacturer") instanceof Map);
     }
 
     @Test
@@ -176,7 +167,7 @@ public class JavaWriterTest {
         Object objectResult = objectMapped.getContent();
         assertTrue(objectResult instanceof MixInTestClass);
         MixInTestClass result = (MixInTestClass)objectResult;
-        assertTrue(result.getAnimal() instanceof com.datasonnet.javatest.Cat);
+        assertTrue(result.getAnimal() instanceof Cat);
     }
 
     @Test
@@ -201,7 +192,7 @@ public class JavaWriterTest {
         Object objectResult = objectMapped.getContent();
         assertTrue(objectResult instanceof MixInTestClass);
         MixInTestClass result = (MixInTestClass) objectResult;
-        assertTrue(result.getAnimal() instanceof com.datasonnet.javatest.Cat);
+        assertTrue(result.getAnimal() instanceof Cat);
 
         //Override polymorphic type property
         mapping = TestResourceReader.readFileAsString("polymorphicTypePropertyTest.ds");
@@ -211,7 +202,7 @@ public class JavaWriterTest {
         Object objectResult1 = objectMapped1.getContent();
         assertTrue(objectResult1 instanceof MixInTestClass);
         MixInTestClass result1 = (MixInTestClass) objectResult1;
-        assertTrue(result1.getAnimal() instanceof com.datasonnet.javatest.Cat);
+        assertTrue(result1.getAnimal() instanceof Cat);
     }
      
     public void testNull() {

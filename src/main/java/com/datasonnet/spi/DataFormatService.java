@@ -1,7 +1,7 @@
 package com.datasonnet.spi;
 
 /*-
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.datasonnet.spi;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaType;
 import com.datasonnet.plugins.*;
+import com.datasonnet.plugins.javaplugin.DefaultJavaFormatPlugin;
 import ujson.Value;
 
 import java.util.Arrays;

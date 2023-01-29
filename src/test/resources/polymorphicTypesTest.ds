@@ -1,11 +1,11 @@
 /** DataSonnet
 version=2.0
-output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.datasonnet.javatest.MixInTestClass; polymorphicTypes=com.datasonnet.javatest.Animal
+output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.datasonnet.javaplugin.MixInTestClass; polymorphicTypes=com.datasonnet.javaplugin.Animal
 */
 {
   animal:
     {
-      "@class":"com.datasonnet.javatest.Cat",
+      "@class":"com.datasonnet.javaplugin.Cat",
       catsName: "Fritz"
     }
 }

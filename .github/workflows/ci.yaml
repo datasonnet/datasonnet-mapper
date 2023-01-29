@@ -20,7 +20,7 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
       - name: mvn clean verify
-        run: ./mvnw -V --no-transfer-progress --batch-mode clean verify
+        run: ./mvnw -V --no-transfer-progress --batch-mode clean verify -Pjavax
   deploy:
     if: github.ref == 'refs/heads/main'
     needs: [ build ]
@@ -36,4 +36,10 @@ jobs:
           REPO_USER: ${{ secrets.REPO_USER }}
           REPO_PASSWORD: ${{ secrets.REPO_PASSWORD }}
         run: "./mvnw -V --no-transfer-progress --batch-mode --settings .settings.xml clean \
-        -Dlicense.skip=true -DskipTests -Dmaven.install.skip=true deploy"
+        -Dlicense.skip=true -DskipTests -Dmaven.install.skip=true deploy -Pjavax"
+      - name: mvn clean deploy jakarta4
+        env:
+          REPO_USER: ${{ secrets.REPO_USER }}
+          REPO_PASSWORD: ${{ secrets.REPO_PASSWORD }}
+        run: "./mvnw -V --no-transfer-progress --batch-mode --settings .settings.xml clean \
+        -Dlicense.skip=true -DskipTests -Dmaven.install.skip=true deploy -Pjakarta"

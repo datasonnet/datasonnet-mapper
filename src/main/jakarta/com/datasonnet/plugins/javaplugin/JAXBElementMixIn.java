@@ -1,4 +1,4 @@
-package com.datasonnet.plugins.jackson;
+package com.datasonnet.plugins.javaplugin;
 
 /*-
  * Copyright 2019-2023 the original author or authors.
