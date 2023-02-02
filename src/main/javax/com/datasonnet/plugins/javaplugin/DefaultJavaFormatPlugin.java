@@ -34,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ujson.Value;
 
+import javax.swing.*;
 import javax.xml.bind.JAXBElement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -148,7 +149,6 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
             throw new PluginException("Unable to convert to target type", e);
         }
     }
-
 
     private ObjectMapper adaptObjectMapper(Map<String, String> parameters) {
         ObjectMapper mapper = DEFAULT_OBJECT_MAPPER.copy();

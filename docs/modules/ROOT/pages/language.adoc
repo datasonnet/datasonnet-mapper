@@ -1,0 +1,24 @@
+= Language Enhancements
+
+In addition to the https://jsonnet.org/ref/language.html[Jsonnet language], DataSonnet includes the following language enhancements:
+
+- `try/else` statement. If the expression after `try` results in error, the expression after `else` will be evaluated. For example:
+-------
+    {
+        tryNonexistent: try payload.doesntExist else "OK",
+        tryChain: try payload.doesntExist else try payload.missing else "OK",
+        tryNaN: try std.parseInt("NotANumber") else -1,
+        tryInIf: if (try payload.doesntExist else "OK") == "OK" then "OK" else "NotOK"
+    }
+-------
+
+- `default` operator - this is a syntax sugar for `try/else`. For example:
+-------
+    {
+        tryNonexistent: payload.doesntExist default "OK",
+        tryChain: payload.doesntExist default payload.missing default "OK",
+        tryNaN: std.parseInt("NotANumber") default -1
+    }
+-------
+
+*See Also:* xref:headers.adoc#_miscellaneous_properties[`default` header]

@@ -537,6 +537,10 @@ The following read parameters are supported:
 |If set to `true`, an exception is thrown if no serializer is found for a Java type. Setting it to `false` instructs DataSonnet to ignore the field that cannot be serialized. See https://github.com/FasterXML/jackson-databind/wiki/Serialization-Features[Jackson Serialization Features] for details.
 |`true`
 
+|`FindAndRegisterModules`
+|If set to `true`, any additional Jackson serialization modules classpath will be autodiscovered by Jackson. See https://github.com/FasterXML/jackson-databind/wiki/Serialization-Features[Jackson Serialization Features] for details.
+|`false`
+
 |===
 
 ### `write`
