@@ -1,4 +1,4 @@
-package com.datasonnet;
+package com.datasonnet.javaplugin;
 
 /*-
  * Copyright 2019-2023 the original author or authors.
@@ -15,19 +15,17 @@ package com.datasonnet;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import com.datasonnet.Mapper;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
-import com.datasonnet.javatest.Gizmo;
-import com.datasonnet.javatest.Manufacturer;
-import com.datasonnet.javatest.TestField;
-import com.datasonnet.javatest.WsdlGeneratedObj;
 import com.datasonnet.util.TestResourceReader;
+import javax.xml.bind.JAXBElement;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -79,7 +77,7 @@ public class JavaReaderTest {
         Document<String> mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JSON);
 
         String result = mapped.getContent();
-        JSONAssert.assertEquals("{\"testField\":{\"name\":\"{http://com.datasonnet.test}testField\",\"declaredType\":\"com.datasonnet.javatest.TestField\",\"value\":{\"test\":\"HelloWorld\"}}}", result, true);
+        JSONAssert.assertEquals("{\"testField\":{\"name\":\"{http://com.datasonnet.test}testField\",\"declaredType\":\"com.datasonnet.javaplugin.TestField\",\"value\":{\"test\":\"HelloWorld\"}}}", result, true);
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.datasonnet.plugins.jackson;
+package com.datasonnet.plugins.javaplugin;
 
 /*-
  * Copyright 2019-2023 the original author or authors.
@@ -19,7 +19,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import java.io.IOException;
 
 public class JAXBElementSerializer extends StdSerializer<JAXBElement> {

@@ -1,4 +1,4 @@
-package com.datasonnet.plugins;
+package com.datasonnet.plugins.javaplugin;
 
 /*-
  * Copyright 2019-2023 the original author or authors.
@@ -20,8 +20,7 @@ import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
-import com.datasonnet.plugins.jackson.JAXBElementMixIn;
-import com.datasonnet.plugins.jackson.JAXBElementSerializer;
+import com.datasonnet.plugins.BaseJacksonDataFormatPlugin;
 import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.ujsonUtils;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -35,7 +34,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ujson.Value;
 
-import javax.swing.*;
 import javax.xml.bind.JAXBElement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

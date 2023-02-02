@@ -1,4 +1,4 @@
-package com.datasonnet.plugins.jackson;
+package com.datasonnet.plugins.javaplugin;
 
 /*-
  * Copyright 2019-2023 the original author or authors.
@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 @JsonIgnoreProperties(value = {"globalScope", "typeSubstituted", "nil", "scope"})

@@ -1,7 +1,7 @@
-package com.datasonnet.javatest;
+package com.datasonnet.javaplugin;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@ package com.datasonnet.javatest;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-public class TestField {
-    private String test;
-
-    public String getTest() {
-        return test;
-    }
-
-    public void setTest(String test) {
-        this.test = test;
-    }
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Cat.class, name = "cat"),
+        @JsonSubTypes.Type(value = Dog.class, name = "dog") })
+public abstract class AnimalMixIn {
 }
