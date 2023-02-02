@@ -23,7 +23,7 @@ on:
 
 jobs:
   release:
-    if: github.ref == 'refs/heads/jakarta-4'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
