@@ -404,6 +404,29 @@
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_daysbetweendatetime_othedatetime"><a class="anchor" href="#_daysbetweendatetime_othedatetime"></a><code>daysBetween(DateTime otheDateTime)</code></h3>
+<div class="paragraph">
+<p>Returns the number of days between this DateTime object and the object provided as a parameter</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>local myDate = ds.datetime.parse("01/01/1990 10:10:10", "MM/dd/yyyy HH:mm:ss");
+local otherDate = ds.datetime.parse("12/31/1990 10:10:10", "MM/dd/yyyy HH:mm:ss");
+myDate.daysBetween(otherDate)"</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>364</pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 </article>
