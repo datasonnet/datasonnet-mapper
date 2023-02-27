@@ -151,7 +151,6 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
 
     private ObjectMapper adaptObjectMapper(Map<String, String> parameters) {
         ObjectMapper mapper = DEFAULT_OBJECT_MAPPER.copy();
-
         if (parameters.containsKey(DS_PARAM_FIND_AND_REGISTER_MODULES)) {
             String paramStr = parameters.get(DS_PARAM_FIND_AND_REGISTER_MODULES);
             boolean findAndRegister = Boolean.parseBoolean(Optional.ofNullable(paramStr).orElse("false"));
@@ -211,12 +210,14 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
 
     private ObjectMapper getObjectMapper(MediaType mediaType) throws PluginException {
         Map<String, String> parameters = mediaType.getParameters();
-
         // for these keys we adapt the object mapper some, but we can keep reusing that every time the same collection
         // of parameters comes up
         // We have this check instead of just caching on every parameter combo
         // because most parameters do not require object mapper changes
-        if (parameters.containsKey(DS_PARAM_DATE_FORMAT) || parameters.containsKey(DS_PARAM_MIXINS) || parameters.containsKey(DS_PARAM_POLYMORPHIC_TYPES)) {
+        if (parameters.containsKey(DS_PARAM_DATE_FORMAT) ||
+            parameters.containsKey(DS_PARAM_MIXINS) ||
+            parameters.containsKey(DS_PARAM_POLYMORPHIC_TYPES) ||
+            parameters.containsKey(DS_PARAM_FIND_AND_REGISTER_MODULES)) {
             String key = mediaType.toString();
             return MAPPER_CACHE.computeIfAbsent(key, k -> {
                 return adaptObjectMapper(parameters);

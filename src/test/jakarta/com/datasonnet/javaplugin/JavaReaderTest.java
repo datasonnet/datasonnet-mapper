@@ -28,11 +28,12 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 import javax.xml.namespace.QName;
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.TimeZone;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JavaReaderTest {
 
@@ -93,5 +94,29 @@ public class JavaReaderTest {
         Document<Object> object = new DefaultDocument<>("", MediaType.parseMediaType("application/java"));
         Mapper mapper = new Mapper("payload");
         Document<Object> mapped = mapper.transform(object, new HashMap<>(), MediaTypes.APPLICATION_JAVA, Object.class);
+    }
+
+    @Test
+    void testOffsetDateTime() {
+        OffsetDateTime dateTime = OffsetDateTime.now();
+        Document<OffsetDateTime> data = new DefaultDocument<>(dateTime, MediaTypes.APPLICATION_JAVA);
+        try {
+            Mapper mapper = new Mapper("payload");
+            Document<String> mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JSON);
+            fail("Import should fail");
+        } catch (IllegalArgumentException e) {
+            assertTrue(e.getMessage().contains("Java 8 date/time type `java.time.OffsetDateTime` not supported by default"), "Found message: " + e.getMessage());
+        }
+
+        String script = "/** DataSonnet\n" +
+                "version=2.5\n" +
+                "input payload application/x-java-object; FindAndRegisterModules=true\n" +
+                "*/\n" +
+                "\n" +
+                "payload";
+        Mapper mapper = new Mapper(script);
+        Document<String> mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JSON);
+        String result = mapped.getContent();
+        assertNotNull(result);
     }
 }
