@@ -120,4 +120,13 @@ public class DateTimeTest {
         newDate = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("1990-12-31T10:10:10", newDate);
     }
+
+    @Test
+    void testDaysBetween() {
+        Mapper mapper = new Mapper("local myDate = ds.datetime.parse(\"01/01/1990 10:10:10\", \"MM/dd/yyyy HH:mm:ss\");" +
+                "local otherDate = ds.datetime.parse(\"12/31/1990 10:10:10\", \"MM/dd/yyyy HH:mm:ss\");" +
+                "myDate.daysBetween(otherDate)");
+        String newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("364", newDate);
+    }
 }

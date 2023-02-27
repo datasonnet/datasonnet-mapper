@@ -184,3 +184,18 @@ ds.datetime.parse("2019-07-22", "yyyy-MM-dd").plus("P5D")
 }
 ------------------------
 
+### `daysBetween(DateTime otheDateTime)`
+Returns the number of days between this DateTime object and the object provided as a parameter
+
+*Example*
+
+.DataSonnet map:
+------------------------
+local myDate = ds.datetime.parse("01/01/1990 10:10:10", "MM/dd/yyyy HH:mm:ss");
+local otherDate = ds.datetime.parse("12/31/1990 10:10:10", "MM/dd/yyyy HH:mm:ss");
+myDate.daysBetween(otherDate)"
+------------------------
+.Result
+------------------------
+364
+------------------------

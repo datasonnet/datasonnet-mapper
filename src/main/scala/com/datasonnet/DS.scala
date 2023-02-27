@@ -798,9 +798,9 @@ object DSLowercase extends Library {
     ),
 
     "datetime" -> moduleFrom(
-      builtin0("now") { (_, _, _) =>
+      builtin0("now") { (_, ev, fs) =>
         val now = ZonedDateTime.now()
-        makeDateTimeObject(now)
+        makeDateTimeObject(now, ev, fs)
       },
 
       builtin("fromObject", "obj") {
@@ -827,10 +827,10 @@ object DSLowercase extends Library {
             ZoneId.of(zoneId.cast[Val.Str].value)
           )
 
-          makeDateTimeObject(datetimeObj)
+          makeDateTimeObject(datetimeObj, ev, fs)
       },
 
-      builtin("parse", "datetime", "inputFormat") { (_, _, datetime: Val, inputFormat: String) =>
+      builtin("parse", "datetime", "inputFormat") { (ev, fs, datetime: Val, inputFormat: String) =>
         var datetimeObj : ZonedDateTime = null
         inputFormat.toLowerCase match {
           case "timestamp" | "epoch" =>
@@ -854,7 +854,7 @@ object DSLowercase extends Library {
               case _ => throw Error.Delegate("Expected one of ZonedDateTime, LocalDateTime, LocalDate, got: " + accessor.getClass)
             }
         }
-        makeDateTimeObject(datetimeObj)
+        makeDateTimeObject(datetimeObj, ev, fs)
       }
     ),
 
@@ -2865,7 +2865,7 @@ object DSLowercase extends Library {
     }
   }
 
-  private def makeDateTimeObject(zdt: ZonedDateTime): Val.Obj = {
+  private def makeDateTimeObject(zdt: ZonedDateTime, ev: EvalScope, fs: FileScope): Val.Obj = {
     val dateTimeObj = scala.collection.mutable.Map[String, Val.Obj.Member]()
 
     dateTimeObj += ("year" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Num(zdt.getYear)))
@@ -2911,19 +2911,19 @@ object DSLowercase extends Library {
       )
     ))
 
-    dateTimeObj += ("toTimeZone"-> Val.Obj.Member(add = false, Visibility.Hidden, (_, _, _, _) =>
+    dateTimeObj += ("toTimeZone"-> Val.Obj.Member(add = false, Visibility.Hidden, (_, _, fs, ev) =>
       makeSimpleFunc(
         java.util.Collections.singletonList("timezone"),
         new Function[util.List[Val], Val] {
           override def apply(t: util.List[Val]): Val.Obj = {
             var newZone = convertToString(t.get(0))
-            makeDateTimeObject(zdt.withZoneSameInstant(ZoneId.of(newZone)))
+            makeDateTimeObject(zdt.withZoneSameInstant(ZoneId.of(newZone)), ev, fs)
           }
         }
       )
     ))
 
-    dateTimeObj += ("plus"-> Val.Obj.Member(add = false, Visibility.Hidden, (_, _, _, _) =>
+    dateTimeObj += ("plus"-> Val.Obj.Member(add = false, Visibility.Hidden, (_, _, fs, ev) =>
       makeSimpleFunc(
         java.util.Collections.singletonList("period"),
         new Function[util.List[Val], Val] {
@@ -2936,7 +2936,25 @@ object DSLowercase extends Library {
                 Period.parse(period)
               }
             var offsetZDT: ZonedDateTime = zdt.plus(offset)
-            makeDateTimeObject(offsetZDT)
+            makeDateTimeObject(offsetZDT, ev, fs)
+          }
+        }
+      )
+    ))
+
+    dateTimeObj += ("daysBetween"-> Val.Obj.Member(add = false, Visibility.Hidden, (_, _, fs, ev) =>
+      makeSimpleFunc(
+        java.util.Collections.singletonList("otherDate"),
+        new Function[util.List[Val], Val] {
+          override def apply(t: util.List[Val]): Val.Num = {
+            val myDateStr = zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+            val toISO = t.get(0).cast[Val.Obj].value("toISO", 0)(fs,ev)
+            val otherDateStr = toISO.cast[Val.Func].apply(Seq.empty, fs.currentFile.toString, 0)(fs, ev).cast[Val.Str].value
+            val dateone = java.time.ZonedDateTime
+              .parse(myDateStr, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+            val datetwo = java.time.ZonedDateTime
+              .parse(otherDateStr, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+            new Val.Num(ChronoUnit.DAYS.between(dateone, datetwo).abs.toDouble)
           }
         }
       )
