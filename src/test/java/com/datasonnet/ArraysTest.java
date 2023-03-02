@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -234,8 +234,6 @@ public class ArraysTest {
         mapper = new Mapper(lib + pack + ".slice([0,1,2,3,3,3], 1, 5)\n", new ArrayList<>(), new HashMap<>(), true);
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[1,2,3,3]", value);
-
-        System.out.println("Elapsed Time: " + (System.currentTimeMillis() - start));
     }
 
     @Test

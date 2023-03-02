@@ -1,7 +1,7 @@
 package com.datasonnet.plugins;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet.plugins;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaType;
@@ -64,11 +63,19 @@ public class DefaultJSONFormatPlugin extends AbstractDataFormatPlugin {
         Class<?> targetType = doc.getContent().getClass();
 
         if (String.class.isAssignableFrom(targetType)) {
-            return ujsonUtils.read(ujson.Readable.fromString((String) doc.getContent()), false);
+            String content = (String)doc.getContent();
+            if ("".equals(content.trim())) {
+                return ujson.Null$.MODULE$;
+            }
+            return ujsonUtils.read(ujson.Readable.fromString(content), false);
         }
 
         if (CharSequence.class.isAssignableFrom(targetType)) {
-            return ujsonUtils.read(ujson.Readable.fromCharSequence((CharSequence) doc.getContent()), false);
+            CharSequence charSequence = (CharSequence) doc.getContent();
+            if ("".equals(charSequence.toString().trim())) {
+                return ujson.Null$.MODULE$;
+            }
+            return ujsonUtils.read(ujson.Readable.fromCharSequence(charSequence), false);
         }
 
         if (Path.class.isAssignableFrom(targetType)) {
@@ -108,19 +115,19 @@ public class DefaultJSONFormatPlugin extends AbstractDataFormatPlugin {
             return new DefaultDocument<>((T) ujsonUtils.write(input, indent, false), MediaTypes.APPLICATION_JSON);
         }
 
+        if (targetType.isAssignableFrom(OutputStream.class)) {
+            BufferedOutputStream out = new BufferedOutputStream(new ByteArrayOutputStream());
+            ujsonUtils.writeTo(input, new OutputStreamWriter(out, charset), indent, false);
+
+            return new DefaultDocument<>((T) out, MediaTypes.APPLICATION_JSON);
+        }
+
         if (targetType.isAssignableFrom(ByteBuffer.class)) {
             return new DefaultDocument<>((T) ByteBuffer.wrap(ujsonUtils.write(input, indent, false).getBytes(charset)), MediaTypes.APPLICATION_JSON);
         }
 
         if (targetType.isAssignableFrom(byte[].class)) {
             return new DefaultDocument<>((T) ujsonUtils.write(input, indent, false).getBytes(charset), MediaTypes.APPLICATION_JSON);
-        }
-
-        if (targetType.isAssignableFrom(OutputStream.class)) {
-            BufferedOutputStream out = new BufferedOutputStream(new ByteArrayOutputStream());
-            ujsonUtils.writeTo(input, new OutputStreamWriter(out, charset), indent, false);
-
-            return new DefaultDocument<>((T) out, MediaTypes.APPLICATION_JSON);
         }
 
         throw new PluginException(new IllegalArgumentException("Unsupported document content class, use the test method canRead before invoking read"));

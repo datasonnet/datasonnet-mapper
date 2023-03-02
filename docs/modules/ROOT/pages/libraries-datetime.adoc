@@ -1,143 +1,201 @@
 ## datetime
 
+This library implements a DateTime object that contains all date and time fields as well as functions to manipulate the data. In addition, the library itself contains the following functions:
+
 ### `now()`
-Returns the current date/time from the system UTC clock in ISO-8601 format.
+Returns the DateTime object that represents the current date-time from the system clock in the default time-zone.
 
 *Example*
 
 ------------------------
-{
-    currentZuluTime: ds.datetime.now()
-}
+ds.datetime.now()
 ------------------------
 
 .Result:
 ------------------------
 {
-    "currentZuluTime": "2019-08-19T18:58:38.313Z"
+  "zoneOffset": "-07:00",
+  "year": 2022,
+  "nano": 478000000,
+  "minute": 9,
+  "second": 34,
+  "hour": 9,
+  "month": 11,
+  "zoneId": "America/Phoenix",
+  "day": 18
 }
 ------------------------
 
-### `daysBetween(string datetime1, string datetime2)`
-Returns the number of days between `datetime1` and `datetime2`. Dates are in "yyyy-MM-dd'T'HH:mm:ss.SSSVV" format.
+### `fromObject(object datetime)`
+Creates a new DateTime object from values provided in the input object. The input object must contain at least one of the `day`, `month`, `year`, `hour`, `minute`, `second`, `nano`, `zoneId` or `zoneOffset` keys.
+
+*Example*
+
+------------------------
+ds.datetime.fromObject({"year":2020})
+------------------------
+
+.Result:
+------------------------
+{
+  "zoneOffset": "Z",
+  "year": 2020,
+  "nano": 0,
+  "minute": 0,
+  "second": 0,
+  "hour": 0,
+  "month": 1,
+  "zoneId": "Z",
+  "day": 1
+}
+------------------------
+
+### `parse(string datetime, string inputformat)`
+Creates a new DateTime object from a string representation of date-time in a given format. The `inputformat` string may be one of the `timestamp`, `epoch` or contain a pattern accepted by the https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/format/DateTimeFormatter.html#ofPattern(java.lang.String)[`java.time.format.DateTimeFormatter.ofPattern()` method].
+
+*Example*
+
+------------------------
+ds.datetime.parse("12/31/1990 10:10:10", "MM/dd/yyyy HH:mm:ss")
+------------------------
+
+.Result:
+------------------------
+{
+  "zoneOffset": "-07:00",
+  "year": 1990,
+  "nano": 0,
+  "minute": 10,
+  "second": 10,
+  "hour": 10,
+  "month": 12,
+  "zoneId": "America/Phoenix",
+  "day": 31
+}
+------------------------
+
+------------------------
+ds.datetime.parse("1577836800", "timestamp")
+------------------------
+
+.Result:
+------------------------
+{
+  "zoneOffset": "Z",
+  "year": 2020,
+  "nano": 0,
+  "minute": 0,
+  "second": 0,
+  "hour": 0,
+  "month": 1,
+  "zoneId": "Z",
+  "day": 1
+}
+------------------------
+
+## DateTime object
+
+The DateTime object contains following functions:
+
+### `asMilliseconds()`
+Returns the date-time value as the number of milliseconds from the epoch of 1970-01-01T00:00:00Z.
+
+*Example*
+
+------------------------
+ds.datetime.now().asMilliseconds()
+------------------------
+
+.Result:
+------------------------
+"1668789455520"
+------------------------
+
+### `format(string pattern)`
+Returns the date-time value as a string formatted using the provided pattern accepted by the https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/format/DateTimeFormatter.html#ofPattern(java.lang.String)[`java.time.format.DateTimeFormatter.ofPattern()` method].
+
+*Example*
+
+------------------------
+ds.datetime.now().format("MM/dd/yyyy HH:mm:ss")
+------------------------
+
+.Result:
+------------------------
+"11/18/2022 10:23:12"
+------------------------
+
+### `toISO()`
+Returns the date-time value as a string formatted using the https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/format/DateTimeFormatter.html#ISO_OFFSET_DATE_TIME[ISO-8601 extended offset date-time format.]
+
+*Example*
+
+------------------------
+ds.datetime.now().toISO()
+------------------------
+.Result:
+------------------------
+"2022-11-18T11:44:11.571-07:00"
+------------------------
+
+### `toTimeZone()`
+Returns a copy of this DateTime object with a different time-zone, retaining the instant.
+
+*Example*
+
+------------------------
+ds.datetime.parse("2019-07-04T21:00:00Z", "yyyy-MM-dd'T'HH:mm:ssXXX").toTimeZone("America/Los_Angeles")
+------------------------
+.Result:
+------------------------
+{
+  "zoneOffset": "-07:00",
+  "year": 2019,
+  "nano": 0,
+  "minute": 0,
+  "second": 0,
+  "hour": 14,
+  "month": 7,
+  "zoneId": "America/Los_Angeles",
+  "day": 4
+}
+------------------------
+
+### `plus(string period)`
+Adds a `period` type to the given datetime. Both https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/Period.html#parse(java.lang.CharSequence)[Period] and https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/Duration.html#parse(java.lang.CharSequence)[Duration] patterns are accepted.
+
+*Example*
+
+------------------------
+ds.datetime.parse("2019-07-22", "yyyy-MM-dd").plus("P5D")
+------------------------
+.Result
+------------------------
+{
+  "zoneOffset": "-07:00",
+  "year": 2019,
+  "nano": 0,
+  "minute": 0,
+  "second": 0,
+  "hour": 0,
+  "month": 7,
+  "zoneId": "America/Phoenix",
+  "day": 27
+}
+------------------------
+
+### `daysBetween(DateTime otheDateTime)`
+Returns the number of days between this DateTime object and the object provided as a parameter
 
 *Example*
 
 .DataSonnet map:
 ------------------------
-local date1 = "2019-09-20T18:53:41.425Z";
-local date2 = "2019-09-14T18:53:41.425Z";
-
-ds.datetime.daysBetween(date1, date2)
+local myDate = ds.datetime.parse("01/01/1990 10:10:10", "MM/dd/yyyy HH:mm:ss");
+local otherDate = ds.datetime.parse("12/31/1990 10:10:10", "MM/dd/yyyy HH:mm:ss");
+myDate.daysBetween(otherDate)"
 ------------------------
 .Result
 ------------------------
-6
-------------------------
-
-### `format(string datetime, string inputFormat, string outputFormat)`
-Reformats `datetime` using `inputFormat` and `outputFormat`.
-
-*Example*
-
-------------------------
-ds.datetime.format("2019-07-04T21:00:00Z", "yyyy-MM-dd'T'HH:mm:ssVV", "d MMM uuuu")
-------------------------
-.Result:
-------------------------
-4 Jul 2019
-------------------------
-
-### `isLeapYear(string datetime)`
-Returns a boolean indicating if `datetime` is a leap year. Dates are in "yyyy-MM-dd'T'HH:mm:ss.SSSVV" format.
-
-*Example*
-
-.DataSonnet map:
-------------------------
-ds.datetime.isLeapYear("2019-09-14T18:53:41.425Z")
-------------------------
-.Result
-------------------------
-false
-------------------------
-
-### `compare(string datetime1, string format1, string datetime2, string format2)`
-Returns `1` if `datetime1 > datetime2`, `-1` if `datetime1 < datetime2`, and `0` if `datetime1 == datetime2`.
-
-*Example*
-
-------------------------
-ds.datetime.compare("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ", "2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
-------------------------
-.Result
-------------------------
-0
-------------------------
-
-### `changeTimeZone(string datetime, string format, string timezone)`
-Changes the date timezone, retaining the instant. This normally results in a change to the local date-time.
-The response is formatted using the same format as an input.
-
-*Example*
-
-------------------------
-ds.datetime.changeTimeZone("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ", "America/Los_Angeles")
-------------------------
-.Result:
-------------------------
-2019-07-04T19:00:00-0700
-------------------------
-
-### `toLocalDate(string datetime, string format)`
-Returns only local date part of the `datetime` parameter in the ISO-8601 format without the offset.
-
-*Example*
-
-------------------------
-ds.datetime.toLocalDate("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
-------------------------
-.Result:
-------------------------
-2019-07-04
-------------------------
-
-### `toLocalTime(string datetime, string format)`
-Returns only local time part of the `datetime` parameter in the ISO-8601 format without the offset.
-
-*Example*
-
-------------------------
-ds.datetime.toLocalTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
-------------------------
-.Result:
-------------------------
-21:00:00
-------------------------
-
-### `toLocalDateTime(string datetime, string format)`
-Returns local datetime part of the `datetime` parameter in the ISO-8601 format without the offset.
-
-*Example*
-
-------------------------
-ds.datetime.toLocalDateTime("2019-07-04T21:00:00-0500", "yyyy-MM-dd'T'HH:mm:ssZ")
-------------------------
-.Result:
-------------------------
-2019-07-04T21:00:00
-------------------------
-
-### `offset(string datetime, string period)`
-Returns the local datetime part of the `datetime` parameter in the ISO-8601 format without the offset.
-The `period` is a string in the ISO-8601 period format.
-
-*Example*
-
-------------------------
-ds.datetime.offset("2019-07-22T21:00:00Z", "P1Y1D")
-------------------------
-.Result:
-------------------------
-2020-07-23T21:00:00Z
+364
 ------------------------

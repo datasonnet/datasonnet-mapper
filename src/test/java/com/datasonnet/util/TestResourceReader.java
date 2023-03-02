@@ -1,7 +1,7 @@
 package com.datasonnet.util;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet.util;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -26,8 +25,13 @@ import java.util.stream.Stream;
 
 public class TestResourceReader {
     public static String readFileAsString(String filePath) throws URISyntaxException, IOException {
+        return new String(TestResourceReader.readFileAsBytes(filePath));
+    }
+
+    public static byte[] readFileAsBytes(String filePath) throws URISyntaxException, IOException {
         Path path = Paths.get(TestResourceReader.class.getClassLoader()
                 .getResource(filePath).toURI());
-        return new String(Files.readAllBytes(path));
+        return Files.readAllBytes(path);
     }
+
 }

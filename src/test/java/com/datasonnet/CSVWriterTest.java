@@ -41,9 +41,11 @@ public class CSVWriterTest {
         Mapper mapper = new Mapper("payload");
 
 
-        String mapped = mapper.transform(data, Collections.emptyMap(), MediaTypes.APPLICATION_CSV).getContent();
+        Document<String> mapped = mapper.transform(data, Collections.emptyMap(), MediaTypes.APPLICATION_CSV);
+        assertEquals(MediaTypes.APPLICATION_CSV, mapped.getMediaType());
+
         String expected = TestResourceReader.readFileAsString("writeCSVTest.csv");
-        assertEquals(expected.trim(), mapped.trim());
+        assertEquals(expected.trim(), mapped.getContent().trim());
     }
 
     @Test

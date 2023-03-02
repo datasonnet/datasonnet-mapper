@@ -13,7 +13,7 @@ DataSonnet is distributed as a JAR which contains all necessary classes and depe
 </dependency>
 ----------
 
-where `${datasonnet.version}` is the latest released version (currently 1.0.4).
+where `${datasonnet.version}` is the latest released version.
 
 The simplest scenario is mapping from JSON to JSON with no additional variables:
 

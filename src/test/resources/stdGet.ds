@@ -1,0 +1,20 @@
+local testObj = {
+  s: "Hello",
+  o: {
+    Hello: "World"
+  },
+  a: [1,2,3],
+  hidden:: "HiddenMessage"
+};
+
+{
+  hidden: std.get(testObj, "hidden", "NONE", true), //"HiddenMessage"
+  noHidden: std.get(testObj, "hidden", "NONE", false), //"NONE"
+  obj: std.get(testObj, "o"),
+  nonExistent: std.get(testObj, "NonExistent"), //null
+  nonExistentD: std.get(testObj, "NonExistent", "DefaultNonExistent"), //"DefaultNonExistent"
+  a: std.get(testObj, "a"),
+  b: std.get(testObj, "b", [9,8,7])
+}
+
+

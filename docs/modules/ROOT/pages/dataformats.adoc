@@ -537,6 +537,10 @@ The following read parameters are supported:
 |If set to `true`, an exception is thrown if no serializer is found for a Java type. Setting it to `false` instructs DataSonnet to ignore the field that cannot be serialized. See https://github.com/FasterXML/jackson-databind/wiki/Serialization-Features[Jackson Serialization Features] for details.
 |`true`
 
+|`FindAndRegisterModules`
+|If set to `true`, any additional Jackson serialization modules classpath will be autodiscovered by Jackson. See https://github.com/FasterXML/jackson-databind/wiki/Serialization-Features[Jackson Serialization Features] for details.
+|`false`
+
 |===
 
 ### `write`
@@ -565,6 +569,19 @@ The following write parameters are supported:
 - Numerical values -> `java.lang.Number`
 
 |
+|`MixIns`
+|Adds a map of classes and their mix-ins to customize the Datasonnet / Jackson deserialization behavior. See the example below for the
+example of polymorphic deserialization.
+|
+
+|`PolymorphicTypes`
+|A comma-separated list of abstract classes that have multiple sub-classes. See the example below for the
+example of polymorphic deserialization.
+|
+
+|`PolymorphicTypeIdProperty`
+|A property of the JSON object that contains the name of the deserialized class.
+|`@class`
 
 |===
 
@@ -599,3 +616,227 @@ output.application/java.OutputClass=com.datasonnet.javatest.WsdlGeneratedObj
 }
 -------------
 
+### Polymorphic deserialization
+
+In a situation where the property of the deserialized Java class is of an abstract type with multiple extending classes, it is necessary to provide an additional information so that Datasonnet can instantiate correct class. Consider the following mapping:
+--------------
+/** DataSonnet
+version=2.0
+output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar.Household;
+*/
+{
+    family: [
+       {
+            "name": "Joe",
+            "employer": "ModusBox"
+       },
+       {
+            "name": "Jane",
+            "school": "Elk Grove Middle School"
+       }
+    ]
+}
+--------------
+
+--------------
+package com.foo.bar;
+public class Household {
+    List<Person> family;
+...
+}
+--------------
+--------------
+package com.foo.bar;
+public abstract class Person {
+    String name;
+}
+--------------
+--------------
+package com.foo.bar;
+public class Adult extends Person {
+...
+    String employer;
+}
+--------------
+--------------
+package com.foo.bar;
+public class Child extends Person {
+...
+    String school;
+}
+--------------
+This mapping will fail, because Datasonnet doesn't know which classes it should instantiate for the elements of the `family` list.
+To fix this, first we need to create a mixin class, e.g.:
+
+--------------
+package com.foo.bar;
+
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Adult.class, name = "adult"),
+        @JsonSubTypes.Type(value = Child.class, name = "child") })
+public abstract class PersonMixIn {
+}
+--------------
+This class maps the value of the property `@type` in a JSON object to the class type to which it should be deserialized.
+
+Now change the mapping to the following:
+--------------
+/** DataSonnet
+version=2.0
+output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar.Household; mixins="{"com.foo.bar.Person":"com.foo.bar.PersonMixIn"}"
+*/
+{
+    family: [
+       {
+            "@type": "adult",
+            "name": "Joe",
+            "employer": "ModusBox"
+       },
+       {
+            "@type": "child",
+            "name": "Jane",
+            "school": "Elk Grove Middle School"
+       }
+    ]
+}
+--------------
+The value of the property `@type` will be matched to one of the annotations in the mix-in class.
+
+For the typical use case of an abstract class with concrete subtypes, where the type names are in a property on the JSON objects, you do not need to write your own Mixin, DataSonnet can handle it for you. In this case, the `PolymorphicTypes` header must be set, and optionally the `PolymorphicTypeIdProperty`, e.g.:
+
+--------------
+/** DataSonnet
+version=2.0
+output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar.Household; polymorphictypes=com.foo.bar.Person
+*/
+{
+    family: [
+       {
+            "@class": "com.foo.bar.Adult",
+            "name": "Joe",
+            "employer": "ModusBox"
+       },
+       {
+            "@class": "com.foo.bar.Child",
+            "name": "Jane",
+            "school": "Elk Grove Middle School"
+       }
+    ]
+}
+--------------
+--------------
+/** DataSonnet
+version=2.0
+output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar.Household; polymorphictypes=com.foo.bar.Person; polymorphictypeidproperty=__clazz
+*/
+{
+    family: [
+       {
+            "__clazz": "com.foo.bar.Adult",
+            "name": "Joe",
+            "employer": "ModusBox"
+       },
+       {
+            "__clazz": "com.foo.bar.Child",
+            "name": "Jane",
+            "school": "Elk Grove Middle School"
+       }
+    ]
+}
+--------------
+
+## Multipart Form Data
+### MIME types and identifiers
+* `multipart/form-data`
+* `multipart/mixed`
+* `multipart/related`
+
+### `read`
+
+Reads a byte array of multipart form data into an internal structure of array of objects. Each object represents a part and has a following properties:
+
+* `name` - the name of the part;
+* `contentType` - the part content type;
+* `content` - the content of the part. If part is binary, the content will be a byte array;
+* `fileName` (optional) - if the part is file attachment, this is a file name.
+
+For example:
+--------------
+[
+  {
+    "name": "textPart",
+    "contentType": "text/plain; charset=UTF-8",
+    "content": "Hello World"
+  },
+  {
+    "name": "binaryPart",
+    "contentType": "image/png",
+    "fileName": "DataSonnet.png",
+    "content": [
+      -119,
+      80,
+      78,
+      71,
+      13,
+      10,
+      26,
+      ...
+    ]
+  }
+]
+--------------
+
+The following parameters are supported:
+
+[%header, cols=3*a]
+|===
+|Parameter
+|Description
+|Default value
+
+|`Boundary`
+|Explicitly sets the parts boundary (normally it's automatically detected by the plugin itself)
+|
+
+|===
+
+### `write`
+
+Creates a byte array containing multipart form data. The input structure must be in form of the array of objects each representing a part. For example, the following DataSonnet mapping will create a multipart data:
+
+--------------
+[
+  {
+    name: "textPart",
+    contentType: "text/plain; charset=UTF-8",
+    content: "Hello World"
+  },
+  {
+    name: "binaryPart",
+    fileName: "DataSonnet.png",
+    contentType: "image/png",
+    content: payload.image
+  }
+]
+--------------
+
+The following parameters are supported:
+
+[%header, cols=3*a]
+|===
+|Parameter
+|Description
+|Default value
+
+|`Boundary`
+|Explicitly sets the parts boundary (normally it's automatically generated by the plugin itself)
+|
+
+|===

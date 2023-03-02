@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@ package com.datasonnet;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.datasonnet.util.TestResourceReader;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -83,5 +83,16 @@ public class ImportTest {
         } catch (IllegalArgumentException e) {
             assertTrue(e.getMessage().contains("Unable to parse library: importTestFail.libsonnet"), "Found message: " + e.getMessage());
         }
+    }
+
+    @Disabled
+    @Test
+    void importDs() throws Exception {
+        final String lib = TestResourceReader.readFileAsString("importTest.ds");
+        String result = new MapperBuilder("local testlib = import 'importTest.ds'; testlib.uppercase('foo')")
+                .withImports(Collections.singletonMap("importTest.ds", lib))
+                .build()
+                .transform("{}");
+        assertEquals(result, "FOO");
     }
 }

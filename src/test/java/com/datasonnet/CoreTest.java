@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -23,9 +22,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CoreTest {
 
@@ -34,6 +34,7 @@ public class CoreTest {
     private final String lib = "ds";
     private final String mathPack = ".math";
     private final String datetimePack = ".datetime";
+    private final String localDateTimePack = ".localdatetime";
 
     @Test
     void test_abs() {
@@ -73,6 +74,8 @@ public class CoreTest {
     }
 
     @Test
+    @Deprecated
+    @Disabled
     void test_daysBetween() {
         Mapper mapper = new Mapper(lib + datetimePack + ".daysBetween(\"2020-07-04T00:00:00.000Z\",\"2020-07-01T00:00:00.000Z\")\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
@@ -294,6 +297,8 @@ public class CoreTest {
     }
 
     @Test
+    @Deprecated
+    @Disabled
     void test_isLeapYear() {
         Mapper mapper = new Mapper(lib + datetimePack + ".isLeapYear(\"2020-07-04T21:00:00.000Z\")\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
@@ -766,6 +771,9 @@ public class CoreTest {
         Mapper mapper = new Mapper(lib + ".uuid()\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals(5, value.split("-").length);
+        Pattern pattern = Pattern.compile("[^a-f0-9\\-]");
+        Matcher match = pattern.matcher(value.toLowerCase());
+        assertFalse(match.find());
 
         logger.info("UUID: " + value);
     }
@@ -874,4 +882,29 @@ public class CoreTest {
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("abc", value);
     }
+
+    @Test
+    void localDateTime_now() {
+        Mapper mapper = new Mapper(lib + localDateTimePack + ".now()\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertNotNull(value);
+    }
+
+    @Test
+    void localDateTime_offset() {
+        Mapper mapper = new Mapper(lib + localDateTimePack + ".offset(\"2019-07-22T21:00:00\", \"P1Y1D\")\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2020-07-23T21:00:00", value);
+    }
+
+    @Test
+    void localDateTime_compare() {
+        Mapper mapper = new Mapper(lib + localDateTimePack + ".compare(\"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\", \"2019-07-04T21:00:00\", \"yyyy-MM-dd'T'HH:mm:ss\")\n",
+                new ArrayList<>(),
+                new HashMap<>(),
+                true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("0", value);
+    }
+
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2019-2021 the original author or authors.
+    Copyright 2019-2023 the original author or authors.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@
 
     <groupId>com.datasonnet</groupId>
     <artifactId>datasonnet-mapper</artifactId>
-    <version>2.1.1-SNAPSHOT</version>
+    <version>2.5.1-SNAPSHOT</version>
     <name>DataSonnet Mapper</name>
     <description>A transformation domain specific language</description>
-    <url>https://github.com/modusbox/datasonnet-mapper</url>
+    <url>https://github.com/datasonnet/datasonnet-mapper</url>
     <inceptionYear>2019</inceptionYear>
     <licenses>
         <license>
@@ -49,57 +49,75 @@
         </developer>
         <developer>
             <name>Jose Montoya</name>
-            <email>jmontoya@ms3-inc.com</email>
-            <organization>MS3</organization>
-            <organizationUrl>https://ms3-inc.com</organizationUrl>
-        </developer>
-        <developer>
-            <name>Jacob Hughes</name>
-            <email>jhughes@ms3-inc.com</email>
-            <organization>MS3</organization>
-            <organizationUrl>https://ms3-inc.com</organizationUrl>
+            <email>jam01@protonmail.com</email>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:https://github.com/modusbox/datasonnet-mapper.git</connection>
-        <developerConnection>scm:git:https://github.com/modusbox/datasonnet-mapper.git</developerConnection>
-        <url>https://github.com/modusbox/datasonnet-mapper</url>
-        <tag>2.0.0</tag>
-    </scm>
+        <connection>scm:git:https://github.com/datasonnet/datasonnet-mapper.git</connection>
+        <developerConnection>scm:git:https://github.com/datasonnet/datasonnet-mapper.git</developerConnection>
+        <url>https://github.com/datasonnet/datasonnet-mapper</url>
+      <tag>HEAD</tag>
+  </scm>
     <distributionManagement>
         <repository>
             <id>sonatype-ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
-        <snapshotRepository>
-            <id>ms3-nexus</id>
-            <url>https://maven.ms3-inc.com/repository/maven-snapshots/</url>
-        </snapshotRepository>
     </distributionManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <jackson.version>2.11.2</jackson.version>
+
+        <jackson.version>2.14.0</jackson.version>
         <junit.version>5.6.2</junit.version>
-        <bouncycastle.version>1.66</bouncycastle.version>
+        <bouncycastle.version>1.68</bouncycastle.version>
         <quickcheck.version>0.9.4</quickcheck.version>
         <xmlunit.version>2.7.0</xmlunit.version>
-        <mycila.version>4.0.rc2</mycila.version>
+        <json-path.version>2.7.0</json-path.version>
+
+        <mycila.version>4.1</mycila.version>
+
+        <scala.library.version>2.13.10</scala.library.version>
+
+        <ujson.version>1.2.0</ujson.version>
+        <fastparse.version>2.3.0</fastparse.version>
+        <pprint.version>0.5.9</pprint.version>
+        <scalatags.version>0.9.1</scalatags.version>
+
+        <jakarta-xml-bind-api-version>4.0.0</jakarta-xml-bind-api-version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
-            <version>2.13.3</version>
+            <version>${scala.library.version}</version>
+        </dependency>
+
+        <!-- DataBricks / LiHaoYi dependencies -->
+        <dependency>
+            <groupId>com.lihaoyi</groupId>
+            <artifactId>ujson_2.13</artifactId>
+            <version>${ujson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.lihaoyi</groupId>
-            <artifactId>sjsonnet_2.13</artifactId>
-            <version>0.2.6</version>
+            <artifactId>fastparse_2.13</artifactId>
+            <version>${fastparse.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.lihaoyi</groupId>
+            <artifactId>pprint_2.13</artifactId>
+            <version>${pprint.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lihaoyi</groupId>
+            <artifactId>scalatags_2.13</artifactId>
+            <version>${scalatags.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
@@ -132,12 +150,25 @@
             <artifactId>jackson-dataformat-properties</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+
+        <!-- Multipart plugin dependencies -->
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+
         <!-- plugin deps: end -->
 
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
-            <version>2.4.0</version>
+            <version>${json-path.version}</version>
         </dependency>
 
         <!-- crypto deps: start -->
@@ -246,11 +277,30 @@
             <version>1.5.0</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.5.13</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
+            <scope>test</scope>
+        </dependency>
         <!-- test deps: end -->
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.3.0</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -311,6 +361,7 @@
                         <id>scala-compile-first</id>
                         <phase>generate-sources</phase>
                         <goals>
+                            <goal>add-source</goal>
                             <goal>compile</goal>
                         </goals>
                     </execution>
@@ -318,6 +369,7 @@
                         <id>scala-test-compile</id>
                         <phase>generate-test-sources</phase>
                         <goals>
+                            <goal>add-source</goal>
                             <goal>testCompile</goal>
                         </goals>
                     </execution>
@@ -328,8 +380,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>8</source>
+                    <target>8</target>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>info.picocli</groupId>
@@ -353,7 +405,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -405,6 +457,20 @@
                     <releaseProfiles>release</releaseProfiles>
                     <tagNameFormat>@{project.version}</tagNameFormat>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>javax-jaxb</id>
+                        <configuration>
+                            <releaseProfiles>release,javax</releaseProfiles>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jakarta-jaxb</id>
+                        <configuration>
+                            <releaseProfiles>release,jakarta</releaseProfiles>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
@@ -413,7 +479,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>sonatype-ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <nexusUrl>https://s01.oss.sonatype.org</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
@@ -422,10 +488,7 @@
 
     <profiles>
         <profile>
-            <id>jdk9+</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
+            <id>javax</id>
             <dependencies>
                 <dependency>
                     <groupId>jakarta.xml.bind</groupId>
@@ -443,6 +506,115 @@
                     <version>1.1.1</version>
                 </dependency>
             </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>3.3.0</version>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>src/main/scala</source>
+                                        <source>src/main/java</source>
+                                        <source>src/main/javax</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>add-test-source</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>add-test-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>src/test/java</source>
+                                        <source>src/test/javax</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>jakarta</id>
+            <dependencies>
+                <dependency>
+                    <groupId>jakarta.xml.bind</groupId>
+                    <artifactId>jakarta.xml.bind-api</artifactId>
+                    <version>4.0.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-core</artifactId>
+                    <version>4.0.1</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.xml.bind</groupId>
+                    <artifactId>jaxb-impl</artifactId>
+                    <version>4.0.1</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <version>3.3.0</version>
+                        <executions>
+                            <execution>
+                                <id>add-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>src/main/scala</source>
+                                        <source>src/main/java</source>
+                                        <source>src/main/jakarta</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>add-test-source</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>add-test-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>src/test/java</source>
+                                        <source>src/test/jakarta</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <version>3.2.2</version>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>com.datasonnet.commands.Main</mainClass>
+                                </manifest>
+                            </archive>
+                            <classifier>jakarta4</classifier>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>release</id>
@@ -491,7 +663,8 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <sourcepath>${project.build.sourceDirectory}:${project.build.directory}/genjavadoc</sourcepath>
+                            <sourcepath>${project.build.sourceDirectory}:${project.build.directory}/genjavadoc
+                            </sourcepath>
                             <quiet>true</quiet>
                             <!-- genjavadoc is currently generating some invalid javadoc, but it's something -->
                             <failOnError>false</failOnError>

@@ -1,7 +1,7 @@
 package com.datasonnet.plugins
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,9 @@ package com.datasonnet.plugins
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.datasonnet.spi.AbstractDataFormatPlugin
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.{ArrayNode, BooleanNode, NullNode, NumericNode, ObjectNode, TextNode}
+import com.fasterxml.jackson.databind.node.{ArrayNode, BinaryNode, BooleanNode, NullNode, NumericNode, ObjectNode, TextNode}
 import ujson.Value
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
@@ -30,7 +29,8 @@ abstract class BaseJacksonDataFormatPlugin extends AbstractDataFormatPlugin {
     case s: TextNode => ujson.Str(s.textValue())
     case o: ObjectNode => ujson.Obj.from(o.fields.asScala.map(entry => (entry.getKey, ujsonFrom(entry.getValue))))
     case a: ArrayNode => ujson.Arr.from(a.elements.asScala.map(ujsonFrom))
+    case b: BinaryNode => ujson.Arr.from(b.binaryValue())
     case _: NullNode => ujson.Null
-    case _ => throw new IllegalArgumentException("Jackson node " + jsonNode + " not supported!")
+    case _ => throw new IllegalArgumentException("Jackson node " + jsonNode + " of type " + jsonNode.getNodeType + "(" + jsonNode.getClass.getName + ") is not supported!")
   }
 }

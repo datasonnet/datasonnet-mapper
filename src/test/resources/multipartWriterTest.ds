@@ -1,0 +1,13 @@
+[
+  {
+    name: "textPart",
+    contentType: "text/plain; charset=UTF-8",
+    content: "Hello World"
+  },
+  {
+    name: "binaryPart",
+    fileName: "DataSonnet.png",
+    contentType: "image/png",
+    content: image
+  }
+]

@@ -1,7 +1,7 @@
 package com.datasonnet
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,31 @@ package com.datasonnet
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.datasonnet.document.{DefaultDocument, MediaType}
+import com.datasonnet.header.Header
+import com.datasonnet.jsonnet.Expr.Member.Visibility
+import com.datasonnet.jsonnet.ReadWriter.{ApplyerRead, ArrRead, StringRead}
+import com.datasonnet.jsonnet.Std._
+import com.datasonnet.jsonnet.{Applyer, Error, EvalScope, Expr, FileScope, Materializer, Val}
+import com.datasonnet.modules.{Crypto, JsonPath, Regex}
+import com.datasonnet.spi.{DataFormatService, Library, ujsonUtils}
+import ujson.Value
 
 import java.math.{BigDecimal, RoundingMode}
 import java.net.URL
 import java.security.SecureRandom
 import java.text.DecimalFormat
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
-import java.time.{Duration, Instant, Period, ZoneId, ZoneOffset, ZonedDateTime}
+import java.time.temporal.{ChronoUnit, TemporalAccessor}
+import java.time._
+import java.util
 import java.util.function.Function
-import java.util.{Base64, Scanner}
-
-import com.datasonnet
-import com.datasonnet.document.{DefaultDocument, MediaType}
-import com.datasonnet.header.Header
-import com.datasonnet.modules.{Crypto, JsonPath, Regex}
-import com.datasonnet.spi.{DataFormatService, Library, ujsonUtils}
+import java.util.{Base64, Scanner, UUID}
 import javax.crypto.Cipher
 import javax.crypto.spec.{IvParameterSpec, SecretKeySpec}
-import sjsonnet.Expr.Member.Visibility
-import sjsonnet.ReadWriter.{ApplyerRead, ArrRead, StringRead}
-import sjsonnet.Std.{builtin, builtinWithDefaults, _}
-import sjsonnet.{Applyer, Error, EvalScope, Expr, FileScope, Materializer, Val}
-import ujson.Value
-
 import scala.collection.mutable
-import scala.util.Random
 import scala.jdk.CollectionConverters._
+import scala.util.Random
 
 object DSLowercase extends Library {
 
@@ -502,7 +500,7 @@ object DSLowercase extends Library {
       (_, _, _) =>
         val n = 36
         val AlphaNumericString = "0123456789" +
-          "abcdefghijklmnopqrstuvxyz"
+          "abcdef"
         val sb = new StringBuilder(n)
         for (i <- 0 until n) {
           if (i.equals(8) || i.equals(13) || i.equals(18) || i.equals(23)) {
@@ -797,11 +795,90 @@ object DSLowercase extends Library {
           written.substring(written.indexOf(">") + 1, written.length - wrapperStop.length)
       },
     ),
-    "datetime" -> moduleFrom(
-      builtin0("now") { (vals, ev, fs) => ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) },
 
-      builtin("parse", "datetime", "inputFormat") { (_, _, datetime: String, inputFormat: String) =>
-        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
+    "datetime" -> moduleFrom(
+      builtin0("now") { (_, ev, fs) =>
+        val now = ZonedDateTime.now()
+        makeDateTimeObject(now, ev, fs)
+      },
+
+      builtin("fromObject", "obj") {
+        (ev,fs,obj: Val.Obj) =>
+          //year, month, dayOfMonth, hour, minute, second, nanoSecond, zoneId
+          val out = mutable.Map[String, Val]()
+          obj.foreachVisibleKey( (key,_) => out.addOne(key, obj.value(key,-1)(fs,ev)))
+          /*
+            if both zoneId and zoneOffset are null - uze Z
+            if zoneId exists but zoneOffset doesn't - use zoneId
+            if zoneOffset exists but zoneId doesn't - use zoneOffset
+            if both zoneId and zoneOffset exist - use zoneId
+           */
+          val zoneId = out.getOrElse("zoneId",out.getOrElse("zoneOffset", Val.Lazy(Val.Str("Z")).force))
+
+          val datetimeObj = java.time.ZonedDateTime.of(
+            out.getOrElse("year",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toInt,
+            out.getOrElse("month",Val.Lazy(Val.Num(1)).force).cast[Val.Num].value.toInt,
+            out.getOrElse("day",Val.Lazy(Val.Num(1)).force).cast[Val.Num].value.toInt,
+            out.getOrElse("hour",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toInt,
+            out.getOrElse("minute",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toInt,
+            out.getOrElse("second",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toInt,
+            out.getOrElse("nano",Val.Lazy(Val.Num(0)).force).cast[Val.Num].value.toInt,
+            ZoneId.of(zoneId.cast[Val.Str].value)
+          )
+
+          makeDateTimeObject(datetimeObj, ev, fs)
+      },
+
+      builtin("parse", "datetime", "inputFormat") { (ev, fs, datetime: Val, inputFormat: String) =>
+        var datetimeObj : ZonedDateTime = null
+        inputFormat.toLowerCase match {
+          case "timestamp" | "epoch" =>
+            var inst : Instant = null
+            datetime match{
+              case Val.Str(item) => inst = Instant.ofEpochSecond(item.toInt.toLong)
+              case Val.Num(item) => inst = Instant.ofEpochSecond(item.toLong)
+              case _ => throw Error.Delegate("Expected datetime to be a string or number, got: " + datetime.prettyName)
+            }
+            datetimeObj = java.time.ZonedDateTime.ofInstant(inst, ZoneOffset.UTC)
+          case _ =>
+            var formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(inputFormat);
+            var accessor: TemporalAccessor = formatter.parseBest(datetime.cast[Val.Str].value, ZonedDateTime.from(_),
+              LocalDateTime.from(_),
+              LocalDate.from(_))
+
+            accessor match {
+              case z: ZonedDateTime => datetimeObj = ZonedDateTime.from(accessor)
+              case l: LocalDateTime  => datetimeObj = l.atZone(ZoneId.systemDefault())
+              case d: LocalDate => datetimeObj = d.atStartOfDay(ZoneId.systemDefault())
+              case _ => throw Error.Delegate("Expected one of ZonedDateTime, LocalDateTime, LocalDate, got: " + accessor.getClass)
+            }
+        }
+        makeDateTimeObject(datetimeObj, ev, fs)
+      }
+    ),
+
+    "zoneddatetime" -> moduleFrom(
+      builtin0("now") { (_, _, _) => ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME) },
+
+      builtin("parse", "datetime", "inputFormat") { (_, _, datetime: Val, inputFormat: String) =>
+        var datetimeObj : ZonedDateTime = null
+        inputFormat.toLowerCase match {
+          case "timestamp" | "epoch" =>
+            var inst : Instant = null
+            datetime match{
+              case Val.Str(item) => inst = Instant.ofEpochSecond(item.toInt.toLong)
+              case Val.Num(item) => inst = Instant.ofEpochSecond(item.toLong)
+              case _ => throw Error.Delegate("Expected datetime to be a string or number, got: " + datetime.prettyName)
+            }
+            datetimeObj = java.time.ZonedDateTime.ofInstant(inst, ZoneOffset.UTC)
+          case _ =>
+            datetimeObj = try{ //will catch any errors if zone data is missing and default to Z
+              java.time.ZonedDateTime.parse(datetime.cast[Val.Str].value, DateTimeFormatter.ofPattern(inputFormat))
+            } catch {
+              case e: DateTimeException =>
+                LocalDateTime.parse(datetime.cast[Val.Str].value, DateTimeFormatter.ofPattern(inputFormat)).atZone(ZoneId.of("Z"))
+            }
+        }
         datetimeObj.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
@@ -835,12 +912,6 @@ object DSLowercase extends Library {
         } else {
           datetime.minus(Period.parse(period)).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         }
-      },
-
-      builtin("daysBetween", "datetime1", "datetime2") { (_, _, datetime1: String, datetime2: String) =>
-          val datetimeObj1 = java.time.ZonedDateTime.parse(datetime1, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-          val datetimeObj2 = java.time.ZonedDateTime.parse(datetime2, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-          datetimeObj1.compareTo(datetimeObj2)
       },
 
       builtin("changeTimeZone", "datetime", "timezone") {
@@ -920,7 +991,6 @@ object DSLowercase extends Library {
         (_,_,datetime: String) =>
           val date = java.time.ZonedDateTime
             .parse(datetime, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-          System.out.println(date.getDayOfWeek.getValue)
 
           date.minusDays( if(date.getDayOfWeek.getValue == 7) 0 else date.getDayOfWeek.getValue  )
             .minusHours(date.getHour)
@@ -989,6 +1059,39 @@ object DSLowercase extends Library {
             .minusNanos(date.getNano).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
       },
 
+    ),
+
+    "localdatetime" -> moduleFrom(
+      builtin0("now") { (vs, extVars, wd) =>
+        val datetimeObj = java.time.LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
+        datetimeObj.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+      },
+
+      builtin("offset", "datetime", "period") { (ev, fs, v1: String, v2: String) =>
+        // NOTE: DEMO ONLY (in particular, missing proper error handling)
+        val datetime = java.time.LocalDateTime.parse(v1, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        val period = Period.parse(v2)
+        datetime.plus(period).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+      },
+
+      builtin("format", "datetime", "inputFormat", "outputFormat") {
+        (ev, fs, datetime: String, inputFormat: String, outputFormat: String) =>
+          val datetimeObj = java.time.LocalDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
+          datetimeObj.format(DateTimeFormatter.ofPattern(outputFormat))
+      },
+
+      builtin0("compare", "datetime1", "format1", "datetime2", "format2") {
+        (vals, ev, fs) =>
+          val strValSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead, StringRead))
+          val datetime1 = strValSeq(0).asInstanceOf[String]
+          val format1 = strValSeq(1).asInstanceOf[String]
+          val datetime2 = strValSeq(2).asInstanceOf[String]
+          val format2 = strValSeq(3).asInstanceOf[String]
+
+          val datetimeObj1 = java.time.LocalDateTime.parse(datetime1, DateTimeFormatter.ofPattern(format1))
+          val datetimeObj2 = java.time.LocalDateTime.parse(datetime2, DateTimeFormatter.ofPattern(format2))
+          datetimeObj1.compareTo(datetimeObj2)
+      }
     ),
 
     "period" -> moduleFrom(
@@ -2336,6 +2439,67 @@ object DSLowercase extends Library {
             case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
       }
+    ),
+
+    "random" -> moduleFrom(
+      builtin0("uuid") {
+        (_, _, _) =>
+          Val.Lazy(Val.Str(UUID.randomUUID().toString)).force
+      },
+      builtinWithDefaults("randomInt",
+        "min" -> Some(Expr.Num(0, Int.MinValue)),
+        "max" -> Some(Expr.Num(0, Int.MaxValue))) { (args, ev) =>
+        val min = args("min").cast[Val.Num].value.asInstanceOf[Int]
+        val max = args("max").cast[Val.Num].value.asInstanceOf[Int]
+
+        Random.between(min, max)
+      },
+      builtinWithDefaults("randomDouble",
+        "min" -> Some(Expr.Num(0, Double.MinValue)),
+        "max" -> Some(Expr.Num(0, Double.MaxValue))) { (args, ev) =>
+        val min = args("min").cast[Val.Num].value.asInstanceOf[Double]
+        val max = args("max").cast[Val.Num].value.asInstanceOf[Double]
+
+        val sample = Random.nextDouble()
+        (max * sample) + (min * (1d - sample))
+      },
+
+      builtinWithDefaults("randomString",
+        "length" -> None,
+        "includeAlpha" -> Some(Expr.True(0)),
+        "includeNumbers" -> Some(Expr.True(0)),
+        "includeOther" -> Some(Expr.True(0))) { (args, ev) =>
+        val length = args("length").cast[Val.Num].value.asInstanceOf[Int]
+        val includeAlpha = args("includeAlpha") match {
+          case Val.False => false
+          case Val.True => true
+          case _ => throw Error.Delegate("includeAlpha has to be a boolean, got" + args("includeAlpha").getClass)
+        }
+        val includeNumbers = args("includeNumbers") match {
+          case Val.False => false
+          case Val.True => true
+          case _ => throw Error.Delegate("includeNumbers has to be a boolean, got" + args("includeNumbers").getClass)
+        }
+        val includeOther = args("includeOther") match {
+          case Val.False => false
+          case Val.True => true
+          case _ => throw Error.Delegate("includeOther has to be a boolean, got" + args("includeOther").getClass)
+        }
+        val alpha: Seq[Char] = ('a' to 'z') ++ ('A' to 'Z')
+        val num: Seq[Char] = ('0' to '9')
+        val other: Seq[Char] = ((' ' to '~') diff alpha) diff num
+
+        val charsList: Seq[Char] = (if (includeAlpha) alpha else Seq.empty[Char]) ++
+          (if (includeNumbers) num else Seq.empty[Char]) ++
+          (if (includeOther) other else Seq.empty[Char])
+
+        val sb = new StringBuilder
+        for (i <- 1 to length) {
+          val randomNum = Random.nextInt(charsList.length)
+          sb.append(charsList(randomNum))
+        }
+        sb.toString
+      },
     )
   ).asJava
 
@@ -2699,6 +2863,104 @@ object DSLowercase extends Library {
       case Val.False => "false"
     }
   }
+
+  private def makeDateTimeObject(zdt: ZonedDateTime, ev: EvalScope, fs: FileScope): Val.Obj = {
+    val dateTimeObj = scala.collection.mutable.Map[String, Val.Obj.Member]()
+
+    dateTimeObj += ("year" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Num(zdt.getYear)))
+    dateTimeObj += ("month" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Num(zdt.getMonthValue)))
+    dateTimeObj += ("day" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Num(zdt.getDayOfMonth)))
+    dateTimeObj += ("hour" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Num(zdt.getHour)))
+    dateTimeObj += ("minute" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Num(zdt.getMinute)))
+    dateTimeObj += ("second" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Num(zdt.getSecond)))
+    dateTimeObj += ("nano" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Num(zdt.getNano)))
+    dateTimeObj += ("zoneId" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Str(zdt.getZone.getId)))
+    dateTimeObj += ("zoneOffset" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Str(zdt.getOffset.getId)))
+
+    dateTimeObj += ("asMilliseconds"-> Val.Obj.Member(add = false, Visibility.Hidden, (_, _, _, _) =>
+      makeSimpleFunc(
+        java.util.Collections.emptyList(),
+        new Function[util.List[Val], Val] {
+          override def apply(t: util.List[Val]): Val.Num = {
+            new Val.Num(zdt.toInstant.toEpochMilli)
+          }
+        }
+      )
+    ))
+
+    dateTimeObj += ("format"-> Val.Obj.Member(add = false, Visibility.Hidden, (_, _, _, _) =>
+      makeSimpleFunc(
+        java.util.Collections.singletonList("format"),
+        new Function[util.List[Val], Val] {
+          override def apply(t: util.List[Val]): Val.Str = {
+            new Val.Str(zdt.format(DateTimeFormatter.ofPattern(convertToString(t.get(0)))))
+          }
+        }
+      )
+    ))
+
+    dateTimeObj += ("toISO"-> Val.Obj.Member(add = false, Visibility.Hidden, (_, _, _, _) =>
+      makeSimpleFunc(
+        java.util.Collections.emptyList(),
+        new Function[util.List[Val], Val] {
+          override def apply(t: util.List[Val]): Val.Str = {
+            new Val.Str(zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+          }
+        }
+      )
+    ))
+
+    dateTimeObj += ("toTimeZone"-> Val.Obj.Member(add = false, Visibility.Hidden, (_, _, fs, ev) =>
+      makeSimpleFunc(
+        java.util.Collections.singletonList("timezone"),
+        new Function[util.List[Val], Val] {
+          override def apply(t: util.List[Val]): Val.Obj = {
+            var newZone = convertToString(t.get(0))
+            makeDateTimeObject(zdt.withZoneSameInstant(ZoneId.of(newZone)), ev, fs)
+          }
+        }
+      )
+    ))
+
+    dateTimeObj += ("plus"-> Val.Obj.Member(add = false, Visibility.Hidden, (_, _, fs, ev) =>
+      makeSimpleFunc(
+        java.util.Collections.singletonList("period"),
+        new Function[util.List[Val], Val] {
+          override def apply(t: util.List[Val]): Val.Obj = {
+            val period = convertToString(t.get(0))
+            var offset =
+              if (period.contains("T")) {
+                Duration.parse(period)
+              } else {
+                Period.parse(period)
+              }
+            var offsetZDT: ZonedDateTime = zdt.plus(offset)
+            makeDateTimeObject(offsetZDT, ev, fs)
+          }
+        }
+      )
+    ))
+
+    dateTimeObj += ("daysBetween"-> Val.Obj.Member(add = false, Visibility.Hidden, (_, _, fs, ev) =>
+      makeSimpleFunc(
+        java.util.Collections.singletonList("otherDate"),
+        new Function[util.List[Val], Val] {
+          override def apply(t: util.List[Val]): Val.Num = {
+            val myDateStr = zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+            val toISO = t.get(0).cast[Val.Obj].value("toISO", 0)(fs,ev)
+            val otherDateStr = toISO.cast[Val.Func].apply(Seq.empty, fs.currentFile.toString, 0)(fs, ev).cast[Val.Str].value
+            val dateone = java.time.ZonedDateTime
+              .parse(myDateStr, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+            val datetwo = java.time.ZonedDateTime
+              .parse(otherDateStr, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+            new Val.Num(ChronoUnit.DAYS.between(dateone, datetwo).abs.toDouble)
+          }
+        }
+      )
+    ))
+
+    new Val.Obj(dateTimeObj, _ => (), None)
+  }
 }
 
 // this assumes that we're comparing same Vals of the same type
@@ -2711,224 +2973,4 @@ object ValOrdering extends Ordering[Val] {
       case bool: Val.Bool => Ordering.Boolean.compare(x.asInstanceOf, y.asInstanceOf)
       case unsupported: Val => throw Error.Delegate("Expected embedded function to return a String, Number, or Boolean, received: " + unsupported.prettyName)
   }
-}
-
-
-// DEPRECATED
-object DSUppercase extends Library {
-  override def namespace() = "DS"
-
-  override def libsonnets(): java.util.Set[String] = Set("util").asJava
-
-  // no root functions in the old version
-  override def functions(dataFormats: DataFormatService, header: Header): java.util.Map[String, Val.Func] = Map().asJava
-
-  override def modules(dataFormats: DataFormatService, header: Header): java.util.Map[String, Val.Obj] = Map(
-    "ZonedDateTime" -> moduleFrom(
-      builtin0("now") { (vals, ev, fs) => Instant.now().toString() },
-
-      builtin("offset", "datetime", "period") { (ev, fs, v1: String, v2: String) =>
-        // NOTE: DEMO ONLY (in particular, missing proper error handling)
-        val datetime = java.time.ZonedDateTime.parse(v1, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-        val period = Period.parse(v2)
-        datetime.plus(period).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
-      },
-
-      builtin("format", "datetime", "inputFormat", "outputFormat") {
-        (ev, fs, datetime: String, inputFormat: String, outputFormat: String) =>
-          val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
-          datetimeObj.format(DateTimeFormatter.ofPattern(outputFormat))
-      },
-
-      builtin0("compare", "datetime1", "format1", "datetime2", "format2") {
-        (vals, ev, fs) =>
-          val strValSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead, StringRead))
-          val datetime1 = strValSeq(0).asInstanceOf[String]
-          val format1 = strValSeq(1).asInstanceOf[String]
-          val datetime2 = strValSeq(2).asInstanceOf[String]
-          val format2 = strValSeq(3).asInstanceOf[String]
-
-          val datetimeObj1 = java.time.ZonedDateTime.parse(datetime1, DateTimeFormatter.ofPattern(format1))
-          val datetimeObj2 = java.time.ZonedDateTime.parse(datetime2, DateTimeFormatter.ofPattern(format2))
-          datetimeObj1.compareTo(datetimeObj2)
-      },
-
-      builtin("changeTimeZone", "datetime", "format", "timezone") {
-        (ev, fs, datetime: String, format: String, timezone: String) =>
-          val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
-          val zoneId = ZoneId.of(timezone)
-          val newDateTimeObj = datetimeObj.withZoneSameInstant(zoneId)
-          newDateTimeObj.format(DateTimeFormatter.ofPattern(format))
-      },
-
-      builtin("toLocalDate", "datetime", "format") { (ev, fs, datetime: String, format: String) =>
-        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
-        datetimeObj.toLocalDate().format(DateTimeFormatter.ISO_LOCAL_DATE)
-      },
-
-      builtin("toLocalTime", "datetime", "format") { (ev, fs, datetime: String, format: String) =>
-        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
-        datetimeObj.toLocalTime().format(DateTimeFormatter.ISO_LOCAL_TIME)
-      },
-
-      builtin("toLocalDateTime", "datetime", "format") { (ev, fs, datetime: String, format: String) =>
-        val datetimeObj = java.time.ZonedDateTime.parse(datetime, DateTimeFormatter.ofPattern(format))
-        datetimeObj.toLocalDateTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-      }
-    ),
-
-    "Formats" -> moduleFrom(
-      builtinWithDefaults("read",
-        "data" -> None,
-        "mimeType" -> None,
-        "params" -> Some(Expr.Null(0))) { (args, ev) =>
-        val data = args("data").cast[Val.Str].value
-        val mimeType = args("mimeType").cast[Val.Str].value
-        val params = if (args("params") == Val.Null) {
-          Library.EmptyObj
-        } else {
-          args("params").cast[Val.Obj]
-        }
-        DSLowercase.read(dataFormats, data, mimeType, params, ev)
-      },
-      builtinWithDefaults("write",
-        "data" -> None,
-        "mimeType" -> None,
-        "params" -> Some(Expr.Null(0))) { (args, ev) =>
-        val data = args("data")
-        val mimeType = args("mimeType").cast[Val.Str].value
-        val params = if (args("params") == Val.Null) {
-          Library.EmptyObj
-        } else {
-          args("params").cast[Val.Obj]
-        }
-        DSLowercase.write(dataFormats, data, mimeType, params, ev)
-      },
-
-    ),
-
-    "LocalDateTime" -> moduleFrom(
-      builtin0("now") { (vs, extVars, wd) =>
-        val datetimeObj = java.time.LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC)
-        datetimeObj.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-      },
-
-      builtin("offset", "datetime", "period") { (ev, fs, v1: String, v2: String) =>
-        // NOTE: DEMO ONLY (in particular, missing proper error handling)
-        val datetime = java.time.LocalDateTime.parse(v1, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-        val period = Period.parse(v2)
-        datetime.plus(period).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-      },
-
-      builtin("format", "datetime", "inputFormat", "outputFormat") {
-        (ev, fs, datetime: String, inputFormat: String, outputFormat: String) =>
-          val datetimeObj = java.time.LocalDateTime.parse(datetime, DateTimeFormatter.ofPattern(inputFormat))
-          datetimeObj.format(DateTimeFormatter.ofPattern(outputFormat))
-      },
-
-      builtin0("compare", "datetime1", "format1", "datetime2", "format2") {
-        (vals, ev, fs) =>
-          val strValSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead, StringRead))
-          val datetime1 = strValSeq(0).asInstanceOf[String]
-          val format1 = strValSeq(1).asInstanceOf[String]
-          val datetime2 = strValSeq(2).asInstanceOf[String]
-          val format2 = strValSeq(3).asInstanceOf[String]
-
-          val datetimeObj1 = java.time.LocalDateTime.parse(datetime1, DateTimeFormatter.ofPattern(format1))
-          val datetimeObj2 = java.time.LocalDateTime.parse(datetime2, DateTimeFormatter.ofPattern(format2))
-          datetimeObj1.compareTo(datetimeObj2)
-      }
-    ),
-
-    "Crypto" -> moduleFrom(
-      builtin("hash", "value", "algorithm") {
-        (ev, fs, value: String, algorithm: String) =>
-          Crypto.hash(value, algorithm)
-      },
-      builtin("hmac", "value", "secret", "algorithm") {
-        (ev, fs, value: String, secret: String, algorithm: String) =>
-          Crypto.hmac(value, secret, algorithm)
-      },
-      builtin("encrypt", "value", "password") {
-        (ev, fs, value: String, password: String) =>
-          Crypto.encrypt(value, password)
-      },
-      builtin("decrypt", "value", "password") {
-        (ev, fs, value: String, password: String) =>
-          Crypto.decrypt(value, password)
-      },
-    ),
-
-    "JsonPath" -> moduleFrom(
-      builtin("select", "json", "path") {
-        (ev, fs, json: Val, path: String) =>
-          Materializer.reverse(ujson.read(JsonPath.select(ujson.write(Materializer.apply(json)(ev)), path)))
-      },
-    ),
-
-    "Regex" -> moduleFrom(
-      builtin("regexFullMatch", "expr", "str") {
-        (ev, fs, expr: String, str: String) =>
-          Materializer.reverse(Regex.regexFullMatch(expr, str))
-      },
-      builtin("regexPartialMatch", "expr", "str") {
-        (ev, fs, expr: String, str: String) =>
-          Materializer.reverse(Regex.regexPartialMatch(expr, str))
-      },
-      builtin("regexScan", "expr", "str") {
-        (ev, fs, expr: String, str: String) =>
-          Materializer.reverse(Regex.regexScan(expr, str))
-      },
-      builtin("regexQuoteMeta", "str") {
-        (ev, fs, str: String) =>
-          Regex.regexQuoteMeta(str)
-      },
-      builtin("regexReplace", "str", "pattern", "replace") {
-        (ev, fs, str: String, pattern: String, replace: String) =>
-          Regex.regexReplace(str, pattern, replace)
-      },
-      builtinWithDefaults("regexGlobalReplace", "str" -> None, "pattern" -> None, "replace" -> None) { (args, ev) =>
-        val replace = args("replace")
-        val str = args("str").asInstanceOf[Val.Str].value
-        val pattern = args("pattern").asInstanceOf[Val.Str].value
-
-        replace match {
-          case replaceStr: Val.Str => Regex.regexGlobalReplace(str, pattern, replaceStr.value)
-          case replaceF: Val.Func => {
-            val func = new Function[Value, String] {
-              override def apply(t: Value): String = {
-                val v = Materializer.reverse(t)
-                Applyer(replaceF, ev, null).apply(Val.Lazy(v)) match {
-                  case resultStr: Val.Str => resultStr.value
-                  case _ => throw new Error.Delegate("The result of the replacement function must be a String")
-                }
-              }
-            }
-            Regex.regexGlobalReplace(str, pattern, func)
-          }
-
-          case _ => throw new Error.Delegate("'replace' parameter must be either String or Function")
-        }
-      },
-    ),
-
-    "URL" -> moduleFrom(
-      builtinWithDefaults("encode",
-        "data" -> None,
-        "encoding" -> Some(Expr.Str(0, "UTF-8"))) { (args, ev) =>
-        val data = args("data").cast[Val.Str].value
-        val encoding = args("encoding").cast[Val.Str].value
-
-        java.net.URLEncoder.encode(data, encoding)
-      },
-      builtinWithDefaults("decode",
-        "data" -> None,
-        "encoding" -> Some(Expr.Str(0, "UTF-8"))) { (args, ev) =>
-        val data = args("data").cast[Val.Str].value
-        val encoding = args("encoding").cast[Val.Str].value
-
-        java.net.URLDecoder.decode(data, encoding)
-      },
-    )
-  ).asJava
 }

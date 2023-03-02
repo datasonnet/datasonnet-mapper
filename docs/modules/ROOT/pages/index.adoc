@@ -3,6 +3,8 @@ Russell Duhon <fugu13@gmail.com>
 
 _Powerful, portable data transformation_
 
+Latest version: 2.5
+
 == Introduction
 
 Welcome to the documentation for https://datasonnet.com[DataSonnet].
@@ -15,3 +17,5 @@ DataSonnet repurposes JSonnet for data transformation by providing
 - conventions for executing JSonnet for transformations,
 - tooling,
 - and documentation focused on data transformation.
+
+
