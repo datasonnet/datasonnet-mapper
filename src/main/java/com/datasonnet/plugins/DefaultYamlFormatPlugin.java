@@ -34,18 +34,19 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Optional;
 
 public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
 
     private static final ObjectMapper DEFAULT_OBJECT_MAPPER = new ObjectMapper();
     private static final YAMLFactory DEFAULT_YAML_FACTORY = new YAMLFactory();
 
-    public static final String DS_PARAM_YAML_HEADER = "removehead";
+    public static final String DS_PARAM_MARKER_LINE = "markerline";
     // this may break some things like reading 3.0.0 as a number,
     // would need to specify this in docs
     public static final String DS_PARAM_DISABLE_QUOTES = "disablequotes";
 
-    public DefaultYamlFormatPlugin(){
+    public DefaultYamlFormatPlugin() {
         supportedTypes.add(MediaTypes.APPLICATION_YAML);
 
         readerSupportedClasses.add(java.lang.String.class);
@@ -58,10 +59,9 @@ public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
         writerSupportedClasses.add(java.nio.ByteBuffer.class);
         writerSupportedClasses.add(byte[].class);
 
-        readerParams.add(DS_PARAM_YAML_HEADER);
+        readerParams.add(DS_PARAM_MARKER_LINE);
         writerParams.addAll(readerParams);
         writerParams.add(DS_PARAM_DISABLE_QUOTES);
-
     }
 
     @Override
@@ -72,9 +72,10 @@ public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
 
         try {
             YAMLParser yamlParser = DEFAULT_YAML_FACTORY.createParser((String) doc.getContent());
-            List<JsonNode> docs = DEFAULT_OBJECT_MAPPER.readValues(yamlParser, new TypeReference<JsonNode>() {}).readAll();
+            List<JsonNode> docs = DEFAULT_OBJECT_MAPPER.readValues(yamlParser, new TypeReference<JsonNode>() {
+            }).readAll();
 
-            if(docs.size()<=1){ //if only one node, only one object so dont return the list
+            if (docs.size() <= 1) { //if only one node, only one object so dont return the list
                 return ujsonFrom(DEFAULT_OBJECT_MAPPER.valueToTree(docs.get(0)));
             }
             return ujsonFrom(DEFAULT_OBJECT_MAPPER.valueToTree(docs));
@@ -98,25 +99,29 @@ public class DefaultYamlFormatPlugin extends BaseJacksonDataFormatPlugin {
             StringBuilder value = null;
 
             //if instance of list, it is multiple docs in one.
-            if(inputAsJava instanceof List){
+            if (inputAsJava instanceof List) {
                 List<Object> listInputAsJava = (List<Object>) inputAsJava;
                 value = new StringBuilder();
-                for(Object obj : listInputAsJava){
+                for (Object obj : listInputAsJava) {
                     value.append(yamlMapper.writeValueAsString(obj));
                 }
-            }else{ //single document
+            } else { //single document
                 //remove the beginning '---' if specified
                 //only available for single docs
-                if(mediaType.getParameters().containsKey(DS_PARAM_YAML_HEADER)){
-                    value = new StringBuilder(yamlMapper.writeValueAsString(inputAsJava).replaceFirst("---(\\n| )", ""));
-                }else{
-                    value = new StringBuilder(yamlMapper.writeValueAsString(inputAsJava));
+                String yaml = yamlMapper.writeValueAsString(inputAsJava);
+                if (mediaType.getParameters().containsKey(DS_PARAM_MARKER_LINE)) {
+                    String paramStr = mediaType.getParameters().get(DS_PARAM_MARKER_LINE);
+                    boolean disableMarkerLines = Boolean.parseBoolean(Optional.ofNullable(paramStr).orElse("true"));
+                    if (!disableMarkerLines) {
+                        yaml = yaml.replaceFirst("---(\\n| )", "");
+                    }
                 }
+                value = new StringBuilder(yaml);
             }
 
             String output = value.toString();
-            if(mediaType.getParameters().containsKey(DS_PARAM_DISABLE_QUOTES)){
-                output = output.replaceAll("\"","");
+            if (mediaType.getParameters().containsKey(DS_PARAM_DISABLE_QUOTES)) {
+                output = output.replaceAll("\"", "");
             }
 
             if (targetType.isAssignableFrom(String.class)) {

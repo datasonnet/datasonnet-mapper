@@ -59,7 +59,7 @@ public class YamlWriterTest {
 
         String mapping = "/** DataSonnet\n" +
                 "version=2.0\n" +
-                "output application/x-yaml; RemoveHead=true\n" +
+                "output application/x-yaml; MarkerLine=false\n" +
                 "input payload application/json\n" +
                 "*/\n" +
                 "payload";
@@ -78,7 +78,7 @@ public class YamlWriterTest {
 
         mapping = "/** DataSonnet\n" +
                 "version=2.0\n" +
-                "output application/x-yaml; RemoveHead=true\n" +
+                "output application/x-yaml; MarkerLine=false\n" +
                 "input payload application/json\n" +
                 "*/\n" +
                 "payload.message";
@@ -128,7 +128,7 @@ public class YamlWriterTest {
 
         String mapping = "/** DataSonnet\n" +
                 "version=2.0\n" +
-                "output application/x-yaml; RemoveHead=true\n" +
+                "output application/x-yaml; MarkerLine=false\n" +
                 "input payload application/yaml\n" +
                 "*/\n" +
                 "payload";

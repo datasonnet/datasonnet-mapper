@@ -840,3 +840,35 @@ The following parameters are supported:
 |
 
 |===
+
+## YAML Format
+### MIME types and identifiers
+* `application/x-yaml`
+
+### `read`
+
+Reads input YAML structure and converts it to the internal DataSonnet representation.
+
+No additional `read` parameters are supported.
+
+### `write`
+
+Creates YAML structure from the provided input.
+
+The following write parameters are supported:
+
+[%header, cols=3*a]
+|===
+|Parameter
+|Description
+|Default value
+
+|`MarkerLine`
+|If set to `false`, the resulting YAML will not contain the three-dashes boundary markers (`---`)
+|`true`
+
+|`DisableQuotes`
+|If set to `true`, output values will be unquoted, i.e. will not be wrapped in quote characters
+|`false`
+
+|===
