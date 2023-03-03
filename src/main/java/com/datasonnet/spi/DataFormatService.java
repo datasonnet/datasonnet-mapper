@@ -35,6 +35,7 @@ public class DataFormatService {
                     DefaultXMLFormatPlugin$.MODULE$,
                     new DefaultCSVFormatPlugin(),
                     new DefaultPlainTextFormatPlugin(),
+                    new DefaultYamlFormatPlugin(),
                     new MimeMultipartPlugin()));
 
     public DataFormatService(List<DataFormatPlugin> plugins) {

@@ -1,7 +1,7 @@
 package com.datasonnet.document;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -348,6 +348,16 @@ public class MediaTypes {
 
     public static final String APPLICATION_CSV_VALUE = "application/csv";
 
+    /**
+     * Public constant media type for {@code application/yaml}.
+     */
+    public static final MediaType APPLICATION_YAML;
+
+    /**
+     * A String equivalent of {@link MediaTypes#APPLICATION_YAML}.
+     */
+    public static final String APPLICATION_YAML_VALUE = "application/x-yaml";
+
     // See Null Object pattern
     /**
      * Public constant media type for representing an unknown content type. This is meant to used to signal to Datasonnet
@@ -391,6 +401,7 @@ public class MediaTypes {
         APPLICATION_JAVA = new MediaType("application", "x-java-object");
         APPLICATION_CSV = new MediaType("application", "csv");
         UNKNOWN = new MediaType("unknown", "unknown");
+        APPLICATION_YAML = new MediaType("application", "x-yaml");
     }
 
     // TODO: 8/11/20 add explicit file extension support to MediaType class
@@ -404,6 +415,9 @@ public class MediaTypes {
                 return Optional.of(APPLICATION_CSV);
             case "txt":
                 return Optional.of(TEXT_PLAIN);
+            case "yml":
+            case "yaml":
+                return Optional.of(APPLICATION_YAML);
             default:
                 return Optional.empty();
         }
