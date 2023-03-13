@@ -454,18 +454,26 @@
                 <version>3.0.0-M1</version>
                 <configuration>
                     <localCheckout>true</localCheckout>
-                    <releaseProfiles>release</releaseProfiles>
+<!--                    <releaseProfiles>release</releaseProfiles>-->
                     <tagNameFormat>@{project.version}</tagNameFormat>
                 </configuration>
                 <executions>
                     <execution>
                         <id>javax-jaxb</id>
+                        <goals>
+                            <goal>prepare</goal>
+                            <goal>perform</goal>
+                        </goals>
                         <configuration>
                             <releaseProfiles>release,javax</releaseProfiles>
                         </configuration>
                     </execution>
                     <execution>
                         <id>jakarta-jaxb</id>
+                        <goals>
+                            <goal>prepare</goal>
+                            <goal>perform</goal>
+                        </goals>
                         <configuration>
                             <releaseProfiles>release,jakarta</releaseProfiles>
                         </configuration>
