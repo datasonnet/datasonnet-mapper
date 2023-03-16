@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -185,5 +184,18 @@ public class CryptoTest {
             String msg = e.getMessage();
             assertTrue(msg != null && msg.contains("Caused by: java.security.InvalidKeyException: Invalid AES key length"));
         }
+
+        //Encrypt / decrypt with provided IV
+        alg ="AES"; mode="CBC"; padding="PKCS5Padding";
+        mapper = new Mapper("ds.crypto.encrypt('Hello World', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "', 's9X([cZ{#W{(x6Y7')");
+        encrypted = mapper.transform("{}").replaceAll("\"", "");
+
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "', 's9X([cZ{#W{(x6Y7')");
+        decrypted = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("Hello World", decrypted);
+
+        mapper = new Mapper("ds.crypto.decrypt('" + encrypted + "', 'DataSonnet123456', '" + alg + "/" + mode + "/" + padding + "')");
+        decrypted = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("Hello World", decrypted);
     }
 }

@@ -1181,16 +1181,17 @@ object DSLowercase extends Library {
        * (e.g., AES), and may be followed by a feedback mode and padding scheme. A transformation is of the form:
        * "algorithm/mode/padding" or "algorithm"
        *    @types [String]
+       * @builtinParam iv Optional initialization vector.
+       *    @types [String]
        * @builtinReturn Base64 String value of the encrypted message
        *    @types [String]
        * @changed 2.0.3
        */
-      builtin0[Val]("encrypt", "value", "secret", "transformation") {
-        (vals, ev, fs) =>
-          val valSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead))
-          val value = valSeq(0).asInstanceOf[String]
-          val secret = valSeq(1).asInstanceOf[String]
-          val transformation = valSeq(2).asInstanceOf[String]
+      builtinWithDefaults[Val]("encrypt", "value" -> None, "secret" -> None, "transformation" -> None, "iv" -> Some(Expr.Null(0))) {
+        (args, ev) =>
+          val value = args("value").asInstanceOf[Val.Str].value
+          val secret = args("secret").asInstanceOf[Val.Str].value
+          val transformation = args("transformation").asInstanceOf[Val.Str].value
 
           val cipher = Cipher.getInstance(transformation)
           val transformTokens = transformation.split("/")
@@ -1203,8 +1204,14 @@ object DSLowercase extends Library {
           } else {
             // https://stackoverflow.com/a/52571774/4814697
             val rand: SecureRandom = new SecureRandom()
-            val iv = new Array[Byte](cipher.getBlockSize)
-            rand.nextBytes(iv)
+
+            val iv: Array[Byte] = if (args("iv") == Val.Null) {
+              val newIV = new Array[Byte](cipher.getBlockSize)
+              rand.nextBytes(newIV)
+              newIV
+            } else {
+              args("iv").asInstanceOf[Val.Str].value.getBytes
+            }
 
             cipher.init(Cipher.ENCRYPT_MODE,
               new SecretKeySpec(secret.getBytes, transformTokens(0).toUpperCase),
@@ -1233,22 +1240,22 @@ object DSLowercase extends Library {
        *    @types [String]
        * @builtinParam secret The secret used to encrypt the original messsage.
        *    @types [String]
-       * @builtinParam algorithm The algorithm used for the encryption.
+       * @builtinParam transformation The string that describes the operation (or set of operations) to be performed on
+       * the given input, to produce some output. A transformation always includes the name of a cryptographic algorithm
+       * (e.g., AES), and may be followed by a feedback mode and padding scheme. A transformation is of the form:
+       * "algorithm/mode/padding" or "algorithm"
        *    @types [String]
-       * @builtinParam mode The encryption mode to be used.
+       * @builtinParam iv Optional initialization vector.
        *    @types [String]
-       * @builtinParam padding The encryption secret padding to be used
-       *    @types [String]
-       * @builtinReturn Base64 String value of the encrypted message
+       * @builtinReturn String value of the decrypted message
        *    @types [String]
        * @changed 2.0.3
        */
-      builtin0[Val]("decrypt", "value", "secret", "transformation") {
-        (vals, ev,fs) =>
-          val valSeq = validate(vals, ev, fs, Array(StringRead, StringRead, StringRead))
-          val value = valSeq(0).asInstanceOf[String]
-          val secret = valSeq(1).asInstanceOf[String]
-          val transformation = valSeq(2).asInstanceOf[String]
+      builtinWithDefaults[Val]("decrypt", "value" -> None, "secret" -> None, "transformation" -> None, "iv" -> Some(Expr.Null(0))) {
+        (args, ev) =>
+          val value = args("value").asInstanceOf[Val.Str].value
+          val secret = args("secret").asInstanceOf[Val.Str].value
+          val transformation = args("transformation").asInstanceOf[Val.Str].value
 
           val cipher = Cipher.getInstance(transformation)
           val transformTokens = transformation.split("/")
@@ -1262,9 +1269,17 @@ object DSLowercase extends Library {
             // https://stackoverflow.com/a/52571774/4814697
             // separate prefix with IV from the rest of encrypted data//separate prefix with IV from the rest of encrypted data
             val encryptedPayload = Base64.getDecoder.decode(value)
-            val iv = new Array[Byte](cipher.getBlockSize)
-            val encryptedBytes = new Array[Byte](encryptedPayload.length - iv.length)
             val rand: SecureRandom = new SecureRandom()
+
+            val iv: Array[Byte] = if (args("iv")  == Val.Null) {
+              val newIV = new Array[Byte](cipher.getBlockSize)
+              rand.nextBytes(newIV)
+              newIV
+            } else {
+              args("iv").asInstanceOf[Val.Str].value.getBytes
+            }
+
+            val encryptedBytes = new Array[Byte](encryptedPayload.length - iv.length)
 
             // populate iv with bytes:
             System.arraycopy(encryptedPayload, 0, iv, 0, iv.length)
