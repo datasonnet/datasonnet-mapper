@@ -1,24 +1,10 @@
 ## crypto
 
-### `decrypt(string value, string secret, string algorithm, string mode, string padding)`
+### `decrypt(string value, string secret, string transformation, string iv = null)`
 Decrypts the Base64 value with specified JDK Cipher Transformation string and the provided secret.
 
 The transformation string describes the operation (or set of operations) to be performed on the given input, to produce some output. A transformation always includes the name of a cryptographic algorithm (e.g., AES), and may be followed by a feedback mode and padding scheme. A transformation is of the form: "algorithm/mode/padding" or "algorithm". See https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html[Java Cipher] for more information.
-
-*Example:*
-
-------------------------
-ds.crypto.decrypt("Hello World", "DataSonnet123456", "AES/ECB/PKCS5Padding")
-------------------------
-.Result
-------------------------
-"HrkF1grBXCtATMLxh1gZVA=="
-------------------------
-
-### `encrypt(string value, string secret, string transformation)`
-Encrypts the value with specified JDK Cipher Transformation and the provided secret. Converts the encryption to a readable format with Base64.
-
-The transformation string describes the operation (or set of operations) to be performed on the given input, to produce some output. A transformation always includes the name of a cryptographic algorithm (e.g., AES), and may be followed by a feedback mode and padding scheme. A transformation is of the form: "algorithm/mode/padding" or "algorithm". See https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html[Java Cipher] for more information.
+The optional IV parameter sets the initialization vector, if null or not specified, a random one will be generated.
 
 *Example:*
 
@@ -28,6 +14,22 @@ ds.crypto.decrypt("HrkF1grBXCtATMLxh1gZVA==", "DataSonnet123456", "AES/ECB/PKCS5
 .Result
 ------------------------
 "Hello World"
+------------------------
+
+### `encrypt(string value, string secret, string transformation, string iv = null)`
+Encrypts the value with specified JDK Cipher Transformation and the provided secret. Converts the encryption to a readable format with Base64.
+
+The transformation string describes the operation (or set of operations) to be performed on the given input, to produce some output. A transformation always includes the name of a cryptographic algorithm (e.g., AES), and may be followed by a feedback mode and padding scheme. A transformation is of the form: "algorithm/mode/padding" or "algorithm". See https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html[Java Cipher] for more information.
+The optional IV parameter sets the initialization vector, if null or not specified, a random one will be generated.
+
+*Example:*
+
+------------------------
+ds.crypto.encrypt("Hello World", "DataSonnet123456", "AES/ECB/PKCS5Padding")
+------------------------
+.Result
+------------------------
+"HrkF1grBXCtATMLxh1gZVA=="
 ------------------------
 
 ### `hash(string value, string algorithm)`
