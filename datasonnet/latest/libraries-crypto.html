@@ -163,35 +163,13 @@
 <h2 id="_crypto"><a class="anchor" href="#_crypto"></a>crypto</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_decryptstring_value_string_secret_string_algorithm_string_mode_string_padding"><a class="anchor" href="#_decryptstring_value_string_secret_string_algorithm_string_mode_string_padding"></a><code>decrypt(string value, string secret, string algorithm, string mode, string padding)</code></h3>
+<h3 id="_decryptstring_value_string_secret_string_transformation_string_iv_null"><a class="anchor" href="#_decryptstring_value_string_secret_string_transformation_string_iv_null"></a><code>decrypt(string value, string secret, string transformation, string iv = null)</code></h3>
 <div class="paragraph">
 <p>Decrypts the Base64 value with specified JDK Cipher Transformation string and the provided secret.</p>
 </div>
 <div class="paragraph">
-<p>The transformation string describes the operation (or set of operations) to be performed on the given input, to produce some output. A transformation always includes the name of a cryptographic algorithm (e.g., AES), and may be followed by a feedback mode and padding scheme. A transformation is of the form: "algorithm/mode/padding" or "algorithm". See <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html">Java Cipher</a> for more information.</p>
-</div>
-<div class="paragraph">
-<p><strong>Example:</strong></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>ds.crypto.decrypt("Hello World", "DataSonnet123456", "AES/ECB/PKCS5Padding")</pre>
-</div>
-</div>
-<div class="listingblock">
-<div class="title">Result</div>
-<div class="content">
-<pre>"HrkF1grBXCtATMLxh1gZVA=="</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_encryptstring_value_string_secret_string_transformation"><a class="anchor" href="#_encryptstring_value_string_secret_string_transformation"></a><code>encrypt(string value, string secret, string transformation)</code></h3>
-<div class="paragraph">
-<p>Encrypts the value with specified JDK Cipher Transformation and the provided secret. Converts the encryption to a readable format with Base64.</p>
-</div>
-<div class="paragraph">
-<p>The transformation string describes the operation (or set of operations) to be performed on the given input, to produce some output. A transformation always includes the name of a cryptographic algorithm (e.g., AES), and may be followed by a feedback mode and padding scheme. A transformation is of the form: "algorithm/mode/padding" or "algorithm". See <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html">Java Cipher</a> for more information.</p>
+<p>The transformation string describes the operation (or set of operations) to be performed on the given input, to produce some output. A transformation always includes the name of a cryptographic algorithm (e.g., AES), and may be followed by a feedback mode and padding scheme. A transformation is of the form: "algorithm/mode/padding" or "algorithm". See <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html">Java Cipher</a> for more information.
+The optional IV parameter sets the initialization vector, if null or not specified, a random one will be generated.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example:</strong></p>
@@ -205,6 +183,30 @@
 <div class="title">Result</div>
 <div class="content">
 <pre>"Hello World"</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_encryptstring_value_string_secret_string_transformation_string_iv_null"><a class="anchor" href="#_encryptstring_value_string_secret_string_transformation_string_iv_null"></a><code>encrypt(string value, string secret, string transformation, string iv = null)</code></h3>
+<div class="paragraph">
+<p>Encrypts the value with specified JDK Cipher Transformation and the provided secret. Converts the encryption to a readable format with Base64.</p>
+</div>
+<div class="paragraph">
+<p>The transformation string describes the operation (or set of operations) to be performed on the given input, to produce some output. A transformation always includes the name of a cryptographic algorithm (e.g., AES), and may be followed by a feedback mode and padding scheme. A transformation is of the form: "algorithm/mode/padding" or "algorithm". See <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.base/javax/crypto/Cipher.html">Java Cipher</a> for more information.
+The optional IV parameter sets the initialization vector, if null or not specified, a random one will be generated.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example:</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.crypto.encrypt("Hello World", "DataSonnet123456", "AES/ECB/PKCS5Padding")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>"HrkF1grBXCtATMLxh1gZVA=="</pre>
 </div>
 </div>
 </div>
