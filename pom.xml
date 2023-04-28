@@ -21,7 +21,7 @@
 
     <groupId>com.datasonnet</groupId>
     <artifactId>datasonnet-mapper</artifactId>
-    <version>2.5.2-SNAPSHOT</version>
+    <version>2.5.3-SNAPSHOT</version>
     <name>DataSonnet Mapper</name>
     <description>A transformation domain specific language</description>
     <url>https://github.com/datasonnet/datasonnet-mapper</url>
