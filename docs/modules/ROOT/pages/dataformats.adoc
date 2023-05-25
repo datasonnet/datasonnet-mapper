@@ -516,10 +516,13 @@ local params = {
 ------------------------
 
 ## Java Objects
+### MIME types and identifiers
+* `application/x-java-object`
+* `application/octet-stream`
 
 ### `read`
 
-Converts POJO to JSON format using https://github.com/FasterXML/jackson[Jackson ObjectMapper].
+Converts POJO to JSON format using https://github.com/FasterXML/jackson[Jackson ObjectMapper]. Also reads binary data into a byte array (if the input MIME type is `application/octet-stream`)
 
 The following read parameters are supported:
 

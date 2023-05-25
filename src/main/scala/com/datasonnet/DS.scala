@@ -1812,6 +1812,9 @@ object DSLowercase extends Library {
             case Val.Num(x) =>
               if (x % 1 == 0) Val.Lazy(Val.Str(new String(Base64.getEncoder.encode(x.toInt.toString.getBytes())))).force
               else Val.Lazy(Val.Str(new String(Base64.getEncoder.encode(x.toString.getBytes())))).force
+            case Val.Arr(x) =>
+              val bytes = x.map(vl => vl.force.cast[Val.Num].value.toByte)
+              Val.Lazy(Val.Str(new String(Base64.getEncoder.encode(bytes.toArray)))).force
             case Val.Str(x) => Val.Lazy(Val.Str(new String(Base64.getEncoder.encode(x.getBytes())))).force
             case i => throw Error.Delegate("Expected String, got: " + i.prettyName)
           }
