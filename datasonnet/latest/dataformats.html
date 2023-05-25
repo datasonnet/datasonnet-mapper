@@ -991,9 +991,22 @@ local csvInput = ds.read(payload.embeddedCSVValue, "application/csv", params);
 <h2 id="_java_objects"><a class="anchor" href="#_java_objects"></a>Java Objects</h2>
 <div class="sectionbody">
 <div class="sect2">
+<h3 id="_mime_types_and_identifiers_3"><a class="anchor" href="#_mime_types_and_identifiers_3"></a>MIME types and identifiers</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code>application/x-java-object</code></p>
+</li>
+<li>
+<p><code>application/octet-stream</code></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
 <h3 id="_read_3"><a class="anchor" href="#_read_3"></a><code>read</code></h3>
 <div class="paragraph">
-<p>Converts POJO to JSON format using <a href="https://github.com/FasterXML/jackson">Jackson ObjectMapper</a>.</p>
+<p>Converts POJO to JSON format using <a href="https://github.com/FasterXML/jackson">Jackson ObjectMapper</a>. Also reads binary data into a byte array (if the input MIME type is <code>application/octet-stream</code>)</p>
 </div>
 <div class="paragraph">
 <p>The following read parameters are supported:</p>
@@ -1346,7 +1359,7 @@ output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar
 <h2 id="_multipart_form_data"><a class="anchor" href="#_multipart_form_data"></a>Multipart Form Data</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_mime_types_and_identifiers_3"><a class="anchor" href="#_mime_types_and_identifiers_3"></a>MIME types and identifiers</h3>
+<h3 id="_mime_types_and_identifiers_4"><a class="anchor" href="#_mime_types_and_identifiers_4"></a>MIME types and identifiers</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -1497,7 +1510,7 @@ output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar
 <h2 id="_yaml_format"><a class="anchor" href="#_yaml_format"></a>YAML Format</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_mime_types_and_identifiers_4"><a class="anchor" href="#_mime_types_and_identifiers_4"></a>MIME types and identifiers</h3>
+<h3 id="_mime_types_and_identifiers_5"><a class="anchor" href="#_mime_types_and_identifiers_5"></a>MIME types and identifiers</h3>
 <div class="ulist">
 <ul>
 <li>
