@@ -16,6 +16,10 @@ package com.datasonnet;
  * limitations under the License.
  */
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaTypes;
@@ -23,6 +27,7 @@ import com.datasonnet.util.TestResourceReader;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -131,5 +136,24 @@ public class StdTest {
             String msg = e.getMessage();
             assertTrue(msg != null && msg.contains("Array must contain only boolean values"));
         }
+    }
+
+    @Test
+    void testTrace() throws IOException, URISyntaxException, JSONException {
+        ListAppender<ILoggingEvent> appender;
+        Logger mapperLogger = (Logger) LoggerFactory.getLogger(Mapper.class);
+        appender = new ListAppender<>();
+        appender.start();
+        mapperLogger.setLevel(Level.ALL);
+        mapperLogger.addAppender(appender);
+
+        Mapper mapper = new Mapper("local myCond = false; { condition: std.trace(\"Condition is \" + myCond, myCond) }");
+        Document<String> response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
+        JSONAssert.assertEquals("{\"condition\":false}", response.getContent(), false);
+
+        assertNotNull(appender.list);
+        assertTrue(appender.list.size() == 1);
+        String message = appender.list.get(0).getFormattedMessage();
+        assertEquals("Condition is false", message);
     }
 }

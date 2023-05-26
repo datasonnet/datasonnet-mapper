@@ -15,6 +15,8 @@ package com.datasonnet.jsonnet
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.datasonnet.Mapper
+
 import java.io.StringWriter
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.Base64
@@ -26,6 +28,7 @@ import sourcecode.Text.generate
 import ujson.Bool
 
 import scala.util.matching.Regex
+import com.typesafe.scalalogging.Logger
 
 /**
   * The Jsonnet standard library, `std`, with each builtin function implemented
@@ -886,8 +889,10 @@ object Std {
       None,
       Params(Array(("str", None, 0), ("rest", None, 1))),
       { (scope, thisFile, ev, fs, outerOffset) =>
+        val logger = Logger(Mapper.getClass)
         val Val.Str(msg) = scope.bindings(0).get.force
-        System.err.println(s"TRACE: $thisFile " + msg)
+        //System.err.println(s"TRACE: $thisFile " + msg)
+        logger.trace(msg)
         scope.bindings(1).get.force
       }
     ),

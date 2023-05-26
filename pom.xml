@@ -80,6 +80,7 @@
         <mycila.version>4.1</mycila.version>
 
         <scala.library.version>2.13.10</scala.library.version>
+        <scala-logging.version>3.9.5</scala-logging.version>
 
         <ujson.version>1.2.0</ujson.version>
         <fastparse.version>2.3.0</fastparse.version>
@@ -94,6 +95,12 @@
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.library.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.typesafe.scala-logging</groupId>
+            <artifactId>scala-logging_2.13</artifactId>
+            <version>${scala-logging.version}</version>
         </dependency>
 
         <!-- DataBricks / LiHaoYi dependencies -->
@@ -289,6 +296,13 @@
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>${jackson.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.12</version>
             <scope>test</scope>
         </dependency>
         <!-- test deps: end -->
