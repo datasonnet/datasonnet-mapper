@@ -54,4 +54,12 @@ public class DefaultDocument<T> implements Document<T> {
     public MediaType getMediaType() {
         return mediaType;
     }
+
+    @Override
+    public String toString() {
+        return "DefaultDocument{" +
+                "content=" + content.toString() +
+                ", mediaType=" + mediaType +
+                '}';
+    }
 }
