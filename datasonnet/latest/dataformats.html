@@ -1353,6 +1353,12 @@ output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_binary_data"><a class="anchor" href="#_binary_data"></a>Binary data</h3>
+<div class="paragraph">
+<p>To read a binary data, set input type as <code>application/octet-stream</code>. The resulting payload will be an array of integers representing the bytes of the input, e.g. <code>[-119,80,78,71,13,10,26,10,0,0,0,13,73 &#8230;&#8203;etc&#8230;&#8203; ]</code>. Writing the above array as <code>application/octet-stream</code> will produce a byte array.</p>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
