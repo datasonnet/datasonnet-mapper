@@ -754,6 +754,8 @@ output application/x-java-object; dateformat=yyyy-MM-dd; outputclass=com.foo.bar
     ]
 }
 --------------
+### Binary data
+To read a binary data, set input type as `application/octet-stream`. The resulting payload will be an array of integers representing the bytes of the input, e.g. `[-119,80,78,71,13,10,26,10,0,0,0,13,73 ...etc... ]`. Writing the above array as `application/octet-stream` will produce a byte array.
 
 ## Multipart Form Data
 ### MIME types and identifiers

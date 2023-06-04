@@ -53,4 +53,21 @@ public class OctetStreamTest {
 
         assertArrayEquals(binaryFile, resultBytes);
     }
+
+    @Test
+    void testWriteData() throws URISyntaxException, IOException, JSONException {
+        byte[] binaryFile = TestResourceReader.readFileAsBytes("DataSonnet.png");
+        String jsonFile = TestResourceReader.readFileAsString("binaryFile.json");
+
+        Document<String> data = new DefaultDocument<>(
+                jsonFile,
+                MediaTypes.APPLICATION_JSON
+        );
+
+        Mapper mapper = new Mapper("payload");
+
+        byte[] resultBytes = mapper.transform(data, Collections.emptyMap(), MediaTypes.APPLICATION_OCTET_STREAM, byte[].class).getContent();
+        assertArrayEquals(binaryFile, resultBytes);
+    }
+
 }
