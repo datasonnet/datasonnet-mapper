@@ -50,8 +50,8 @@ ds.datetime.fromObject({"year":2020})
 }
 ------------------------
 
-### `parse(string datetime, string inputformat)`
-Creates a new DateTime object from a string representation of date-time in a given format. The `inputformat` string may be one of the `timestamp`, `epoch` or contain a pattern accepted by the https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/format/DateTimeFormatter.html#ofPattern(java.lang.String)[`java.time.format.DateTimeFormatter.ofPattern()` method].
+### `parse(string datetime, string inputformat = "iso")`
+Creates a new DateTime object from a string representation of date-time in a given format. The optional `inputformat` string may be one of the `timestamp`, `epoch`, `iso` or contain a pattern accepted by the https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/format/DateTimeFormatter.html#ofPattern(java.lang.String)[`java.time.format.DateTimeFormatter.ofPattern()` method]. If the input format is not specified, the `datetime` parameter is expected to be in the https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/format/DateTimeFormatter.html#ISO_OFFSET_DATE_TIME[`java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME` format]
 
 *Example*
 
@@ -90,6 +90,25 @@ ds.datetime.parse("1577836800", "timestamp")
   "month": 1,
   "zoneId": "Z",
   "day": 1
+}
+------------------------
+
+------------------------
+ds.datetime.parse("2011-12-03T10:15:30+01:00")
+------------------------
+
+.Result:
+------------------------
+{
+  "zoneOffset": "+01:00",
+  "year": 2011,
+  "nano": 0,
+  "minute": 15,
+  "second": 30,
+  "hour": 10,
+  "month": 12,
+  "zoneId": "+01:00",
+  "day": 3
 }
 ------------------------
 
@@ -138,7 +157,7 @@ ds.datetime.now().toISO()
 "2022-11-18T11:44:11.571-07:00"
 ------------------------
 
-### `toTimeZone()`
+### `toTimeZone(string zoneId)`
 Returns a copy of this DateTime object with a different time-zone, retaining the instant.
 
 *Example*
@@ -184,7 +203,7 @@ ds.datetime.parse("2019-07-22", "yyyy-MM-dd").plus("P5D")
 }
 ------------------------
 
-### `daysBetween(DateTime otheDateTime)`
+### `daysBetween(DateTime otherDateTime)`
 Returns the number of days between this DateTime object and the object provided as a parameter
 
 *Example*
@@ -198,4 +217,20 @@ myDate.daysBetween(otherDate)"
 .Result
 ------------------------
 364
+------------------------
+
+### `compare(DateTime otherDateTime)`
+Returns the value 0 if the argument DateTime is equal to this DateTime; a value less than 0 if this DateTime is before the DateTime argument; and a value greater than 0 if this DateTime is after the DateTime argument.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+local myDate = ds.datetime.parse("01/01/1990 10:10:10", "MM/dd/yyyy HH:mm:ss");
+local otherDate = ds.datetime.parse("12/31/1990 10:10:10", "MM/dd/yyyy HH:mm:ss");
+myDate.compare(otherDate)"
+------------------------
+.Result
+------------------------
+-1
 ------------------------

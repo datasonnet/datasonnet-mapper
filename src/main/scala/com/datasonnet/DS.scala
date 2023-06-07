@@ -799,7 +799,7 @@ object DSLowercase extends Library {
     "datetime" -> moduleFrom(
       builtin0("now") { (_, ev, fs) =>
         val now = ZonedDateTime.now()
-        makeDateTimeObject(now, ev, fs)
+        makeDateTimeObject(now, ev)
       },
 
       builtin("fromObject", "obj") {
@@ -826,22 +826,26 @@ object DSLowercase extends Library {
             ZoneId.of(zoneId.cast[Val.Str].value)
           )
 
-          makeDateTimeObject(datetimeObj, ev, fs)
+          makeDateTimeObject(datetimeObj, ev)
       },
 
-      builtin("parse", "datetime", "inputFormat") { (ev, fs, datetime: Val, inputFormat: String) =>
+      builtinWithDefaults("parse", "datetime" -> None, "inputFormat" -> Some(Expr.Str(0, "iso"))) { (args, ev) =>
+
+        val inputFormat = args("inputFormat").cast[Val.Str].value
+        val datetime = args("datetime")
+
         var datetimeObj : ZonedDateTime = null
         inputFormat.toLowerCase match {
           case "timestamp" | "epoch" =>
             var inst : Instant = null
-            datetime match{
+            datetime match {
               case Val.Str(item) => inst = Instant.ofEpochSecond(item.toInt.toLong)
               case Val.Num(item) => inst = Instant.ofEpochSecond(item.toLong)
               case _ => throw Error.Delegate("Expected datetime to be a string or number, got: " + datetime.prettyName)
             }
             datetimeObj = java.time.ZonedDateTime.ofInstant(inst, ZoneOffset.UTC)
           case _ =>
-            var formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(inputFormat);
+            var formatter: DateTimeFormatter = if ("iso" == inputFormat) DateTimeFormatter.ISO_OFFSET_DATE_TIME else DateTimeFormatter.ofPattern(inputFormat)
             var accessor: TemporalAccessor = formatter.parseBest(datetime.cast[Val.Str].value, ZonedDateTime.from(_),
               LocalDateTime.from(_),
               LocalDate.from(_))
@@ -853,7 +857,7 @@ object DSLowercase extends Library {
               case _ => throw Error.Delegate("Expected one of ZonedDateTime, LocalDateTime, LocalDate, got: " + accessor.getClass)
             }
         }
-        makeDateTimeObject(datetimeObj, ev, fs)
+        makeDateTimeObject(datetimeObj, ev)
       }
     ),
 
@@ -2882,7 +2886,7 @@ object DSLowercase extends Library {
     }
   }
 
-  private def makeDateTimeObject(zdt: ZonedDateTime, ev: EvalScope, fs: FileScope): Val.Obj = {
+  private def makeDateTimeObject(zdt: ZonedDateTime, ev: EvalScope): Val.Obj = {
     val dateTimeObj = scala.collection.mutable.Map[String, Val.Obj.Member]()
 
     dateTimeObj += ("year" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => new Val.Num(zdt.getYear)))
@@ -2934,7 +2938,7 @@ object DSLowercase extends Library {
         new Function[util.List[Val], Val] {
           override def apply(t: util.List[Val]): Val.Obj = {
             var newZone = convertToString(t.get(0))
-            makeDateTimeObject(zdt.withZoneSameInstant(ZoneId.of(newZone)), ev, fs)
+            makeDateTimeObject(zdt.withZoneSameInstant(ZoneId.of(newZone)), ev)
           }
         }
       )
@@ -2953,7 +2957,7 @@ object DSLowercase extends Library {
                 Period.parse(period)
               }
             var offsetZDT: ZonedDateTime = zdt.plus(offset)
-            makeDateTimeObject(offsetZDT, ev, fs)
+            makeDateTimeObject(offsetZDT, ev)
           }
         }
       )
@@ -2972,6 +2976,21 @@ object DSLowercase extends Library {
             val datetwo = java.time.ZonedDateTime
               .parse(otherDateStr, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
             new Val.Num(ChronoUnit.DAYS.between(dateone, datetwo).abs.toDouble)
+          }
+        }
+      )
+    ))
+
+    dateTimeObj += ("compare" -> Val.Obj.Member(add = false, Visibility.Hidden, (_, _, fs, ev) =>
+      makeSimpleFunc(
+        java.util.Collections.singletonList("otherDateTimeObj"),
+        new Function[util.List[Val], Val] {
+          override def apply(t: util.List[Val]): Val.Num = {
+            val asMilliseconds = t.get(0).cast[Val.Obj].value("asMilliseconds", 0)(fs, ev)
+            val otherMillis = asMilliseconds.cast[Val.Func].apply(Seq.empty, fs.currentFile.toString, 0)(fs, ev).cast[Val.Num].value
+            val thisMillis = zdt.toInstant.toEpochMilli
+
+            new Val.Num(if (thisMillis < otherMillis) -1 else if (thisMillis > otherMillis) 1 else 0)
           }
         }
       )

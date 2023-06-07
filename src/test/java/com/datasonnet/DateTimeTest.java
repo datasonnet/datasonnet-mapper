@@ -119,6 +119,14 @@ public class DateTimeTest {
         mapper = new Mapper("ds.datetime.parse(\"12/31/1990 10:10:10\", \"MM/dd/yyyy HH:mm:ss\").format(\"yyyy-MM-dd'T'HH:mm:ss\")");
         newDate = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("1990-12-31T10:10:10", newDate);
+
+        mapper = new Mapper("ds.datetime.parse(\"2011-12-03T10:15:30+01:00\", \"iso\").format(\"yyyy-MM-dd\")");
+        newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2011-12-03", newDate);
+
+        mapper = new Mapper("ds.datetime.parse(\"2011-12-03T10:15:30.123Z\").format(\"yyyy-MM-dd\")");
+        newDate = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("2011-12-03", newDate);
     }
 
     @Test
@@ -128,5 +136,23 @@ public class DateTimeTest {
                 "myDate.daysBetween(otherDate)");
         String newDate = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("364", newDate);
+    }
+
+    @Test
+    void testCompare() {
+        Mapper mapper = new Mapper("local myDate = ds.datetime.parse(\"01/01/1990 10:10:10\", \"MM/dd/yyyy HH:mm:ss\");" +
+                "local otherDate = ds.datetime.parse(\"12/31/1990 10:10:10\", \"MM/dd/yyyy HH:mm:ss\");" +
+                "myDate.compare(otherDate)");
+        assertEquals("-1", mapper.transform("{}"));
+
+        mapper = new Mapper("local myDate = ds.datetime.parse(\"01/01/1990 10:10:10\", \"MM/dd/yyyy HH:mm:ss\");" +
+                "local otherDate = ds.datetime.parse(\"12/31/1980 10:10:10\", \"MM/dd/yyyy HH:mm:ss\");" +
+                "myDate.compare(otherDate)");
+        assertEquals("1", mapper.transform("{}"));
+
+        mapper = new Mapper("local myDate = ds.datetime.parse(\"01/01/1990 10:10:10\", \"MM/dd/yyyy HH:mm:ss\");" +
+                "local otherDate = ds.datetime.parse(\"01/01/1990 10:10:10\", \"MM/dd/yyyy HH:mm:ss\");" +
+                "myDate.compare(otherDate)");
+        assertEquals("0", mapper.transform("{}"));
     }
 }
