@@ -226,9 +226,9 @@
 </div>
 </div>
 <div class="sect2">
-<h3 id="_parsestring_datetime_string_inputformat"><a class="anchor" href="#_parsestring_datetime_string_inputformat"></a><code>parse(string datetime, string inputformat)</code></h3>
+<h3 id="_parsestring_datetime_string_inputformat_iso"><a class="anchor" href="#_parsestring_datetime_string_inputformat_iso"></a><code>parse(string datetime, string inputformat = "iso")</code></h3>
 <div class="paragraph">
-<p>Creates a new DateTime object from a string representation of date-time in a given format. The <code>inputformat</code> string may be one of the <code>timestamp</code>, <code>epoch</code> or contain a pattern accepted by the <a href="https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/format/DateTimeFormatter.html#ofPattern(java.lang.String)"><code>java.time.format.DateTimeFormatter.ofPattern()</code> method</a>.</p>
+<p>Creates a new DateTime object from a string representation of date-time in a given format. The optional <code>inputformat</code> string may be one of the <code>timestamp</code>, <code>epoch</code>, <code>iso</code> or contain a pattern accepted by the <a href="https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/format/DateTimeFormatter.html#ofPattern(java.lang.String)"><code>java.time.format.DateTimeFormatter.ofPattern()</code> method</a>. If the input format is not specified, the <code>datetime</code> parameter is expected to be in the <a href="https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/time/format/DateTimeFormatter.html#ISO_OFFSET_DATE_TIME"><code>java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME</code> format</a></p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
@@ -272,6 +272,27 @@
   "month": 1,
   "zoneId": "Z",
   "day": 1
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>ds.datetime.parse("2011-12-03T10:15:30+01:00")</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result:</div>
+<div class="content">
+<pre>{
+  "zoneOffset": "+01:00",
+  "year": 2011,
+  "nano": 0,
+  "minute": 15,
+  "second": 30,
+  "hour": 10,
+  "month": 12,
+  "zoneId": "+01:00",
+  "day": 3
 }</pre>
 </div>
 </div>
@@ -345,7 +366,7 @@
 </div>
 </div>
 <div class="sect2">
-<h3 id="_totimezone"><a class="anchor" href="#_totimezone"></a><code>toTimeZone()</code></h3>
+<h3 id="_totimezonestring_zoneid"><a class="anchor" href="#_totimezonestring_zoneid"></a><code>toTimeZone(string zoneId)</code></h3>
 <div class="paragraph">
 <p>Returns a copy of this DateTime object with a different time-zone, retaining the instant.</p>
 </div>
@@ -405,7 +426,7 @@
 </div>
 </div>
 <div class="sect2">
-<h3 id="_daysbetweendatetime_othedatetime"><a class="anchor" href="#_daysbetweendatetime_othedatetime"></a><code>daysBetween(DateTime otheDateTime)</code></h3>
+<h3 id="_daysbetweendatetime_otherdatetime"><a class="anchor" href="#_daysbetweendatetime_otherdatetime"></a><code>daysBetween(DateTime otherDateTime)</code></h3>
 <div class="paragraph">
 <p>Returns the number of days between this DateTime object and the object provided as a parameter</p>
 </div>
@@ -424,6 +445,29 @@ myDate.daysBetween(otherDate)"</pre>
 <div class="title">Result</div>
 <div class="content">
 <pre>364</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_comparedatetime_otherdatetime"><a class="anchor" href="#_comparedatetime_otherdatetime"></a><code>compare(DateTime otherDateTime)</code></h3>
+<div class="paragraph">
+<p>Returns the value 0 if the argument DateTime is equal to this DateTime; a value less than 0 if this DateTime is before the DateTime argument; and a value greater than 0 if this DateTime is after the DateTime argument.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>local myDate = ds.datetime.parse("01/01/1990 10:10:10", "MM/dd/yyyy HH:mm:ss");
+local otherDate = ds.datetime.parse("12/31/1990 10:10:10", "MM/dd/yyyy HH:mm:ss");
+myDate.compare(otherDate)"</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>-1</pre>
 </div>
 </div>
 </div>
