@@ -1,0 +1,13 @@
+= IntelliJ Plugin
+
+The latest version of the IntelliJ plugin is available at https://github.com/datasonnet/datasonnet-intellij-plugin/releases
+
+== Installing the plugin
+
+- Download the plugin archive (ZIP or JAR) from the https://github.com/datasonnet/datasonnet-intellij-plugin/releases[Releases page].
+- Press `⌘ Comma` to open the IDE settings and select *Plugins*.
+- On the *Plugins* page, click the *Settings* button and then click *Install Plugin from Disk…*.
+- Select the plugin archive file and click *OK*.
+- Click *OK* to apply the changes and restart the IDE if prompted.
+
+See the https://www.jetbrains.com/help/idea/managing-plugins.html[JetBrains documentation] for more information.

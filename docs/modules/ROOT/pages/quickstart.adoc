@@ -28,7 +28,7 @@ If a pop-up appears (usually in the lower right) saying "Maven projects need to 
 
 // hmm, with the single repo docs approach now we'll need to reorganize things
 
-Now, follow the directions for installing the plugin at xref:intellij:ROOT:index.adoc[IntelliJ Plugin].
+Now, follow the directions for installing the plugin at xref:intellij.adoc[IntelliJ Plugin].
 
 ### Creating your working files
 
