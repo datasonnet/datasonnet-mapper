@@ -74,7 +74,7 @@ public class Run implements Callable<Void> {
     public Void call() throws Exception {
         Mapper mapper = new Mapper(Main.readFile(datasonnet), combinedArguments().keySet(), imports(), !alreadyWrapped);
         Document<String> result = mapper
-                .transform(new DefaultDocument<>(payload(), MediaTypes.forExtension(suffix(datasonnet)).get()),
+                .transform(new DefaultDocument<>(payload(), MediaTypes.forExtension(suffix(input)).get()),
                         combinedArguments(), MediaType.valueOf(outputType));
         String contents = result.getContent();
         System.out.println(contents);
@@ -83,7 +83,7 @@ public class Run implements Callable<Void> {
     }
 
     private String suffix(File file) {
-        String[] parts = file.getName().split(".");
+        String[] parts = file.getName().split("\\.");
         if (parts.length > 1) {
             return parts[parts.length - 1];
         } else {
