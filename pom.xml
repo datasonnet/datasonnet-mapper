@@ -570,6 +570,9 @@
         </profile>
         <profile>
             <id>jakarta</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <dependencies>
                 <dependency>
                     <groupId>jakarta.xml.bind</groupId>

@@ -41,6 +41,6 @@ public class Main implements Runnable {
     }
 
     static String readFile(File file) throws IOException {
-        return Files.lines(file.toPath()).collect(Collectors.joining());
+        return Files.lines(file.toPath()).collect(Collectors.joining("\n"));
     }
 }
