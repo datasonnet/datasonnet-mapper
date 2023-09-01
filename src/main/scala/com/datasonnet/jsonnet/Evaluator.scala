@@ -16,7 +16,8 @@ package com.datasonnet.jsonnet
  * limitations under the License.
  */
 import Expr.{Error => _, _}
-import fastparse.Parsed
+import com.datasonnet.debugger.DataSonnetDebugger
+import fastparse.{IndexedParserInput, Parsed}
 import com.datasonnet.jsonnet.Expr.Member.Visibility
 import ujson.Value
 
@@ -48,63 +49,76 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
   val cachedImportedStrings = collection.mutable.Map.empty[Path, String]
   override def visitExpr(expr: Expr)(implicit scope: ValScope, fileScope: FileScope): Val = visitExpr(expr, false)
   def visitExpr(expr: Expr, tryCatch: Boolean = false)
-               (implicit scope: ValScope, fileScope: FileScope): Val = try expr match{
-    case Null(offset) => Val.Null
-    case Parened(offset, inner) => visitExpr(inner)
-    case True(offset) => Val.True
-    case False(offset) => Val.False
-    case Self(offset) => scope.self0.getOrElse(Error.fail("Cannot use `self` outside an object", offset))
+               (implicit scope: ValScope, fileScope: FileScope): Val = {
+    /*
+      if in debug mode - check if needs to stop at the offset
+     */
+    val line = offsetToLine(fileScope.currentFile, expr.offset)
 
-    case BinaryOp(offset, lhs, Expr.BinaryOp.`in`, Super(_)) =>
-      scope.super0 match{
-        case None => Val.False
-        case Some(sup) =>
-          val key = visitExpr(lhs).cast[Val.Str]
-          Val.bool(sup.containsKey(key.value))
+    System.out.println("Next line is " + line);
+
+    if (DataSonnetDebugger.getDebugger.isAttached) {
+      DataSonnetDebugger.getDebugger.probeExpr(line)
+    }
+
+    try expr match {
+      case Null(offset) => Val.Null
+      case Parened(offset, inner) => visitExpr(inner)
+      case True(offset) => Val.True
+      case False(offset) => Val.False
+      case Self(offset) => scope.self0.getOrElse(Error.fail("Cannot use `self` outside an object", offset))
+
+      case BinaryOp(offset, lhs, Expr.BinaryOp.`in`, Super(_)) =>
+        scope.super0 match{
+          case None => Val.False
+          case Some(sup) =>
+            val key = visitExpr(lhs).cast[Val.Str]
+            Val.bool(sup.containsKey(key.value))
+        }
+
+      case $(offset) => scope.dollar0.getOrElse(Error.fail("Cannot use `$` outside an object", offset))
+      case Str(offset, value) => Val.Str(value)
+      case Num(offset, value) => Val.Num(value)
+      case Id(offset, value) => visitId(offset, value)
+
+      case Arr(offset, value) => Val.Arr(value.map(v => Val.Lazy(visitExpr(v))))
+      case Obj(offset, value) => visitObjBody(value)
+
+      case UnaryOp(offset, op, value) => visitUnaryOp(op, value)
+
+      case BinaryOp(offset, lhs, op, rhs) => {
+        visitBinaryOp(offset, lhs, op, rhs)
       }
+      case AssertExpr(offset, Member.AssertStmt(value, msg), returned) =>
+        visitAssert(offset, value, msg, returned)
 
-    case $(offset) => scope.dollar0.getOrElse(Error.fail("Cannot use `$` outside an object", offset))
-    case Str(offset, value) => Val.Str(value)
-    case Num(offset, value) => Val.Num(value)
-    case Id(offset, value) => visitId(offset, value)
+      case LocalExpr(offset, bindings, returned) =>
+        lazy val newScope: ValScope = scope.extend(visitBindings(bindings.iterator, (self, sup) => newScope))
+        visitExpr(returned)(newScope, implicitly)
 
-    case Arr(offset, value) => Val.Arr(value.map(v => Val.Lazy(visitExpr(v))))
-    case Obj(offset, value) => visitObjBody(value)
+      case Import(offset, value) => visitImport(offset, value)
+      case ImportStr(offset, value) => visitImportStr(offset, value)
+      case Expr.Error(offset, value) => visitError(offset, value)
+      case Apply(offset, value, Args(args)) => visitApply(offset, value, args)
 
-    case UnaryOp(offset, op, value) => visitUnaryOp(op, value)
+      case Select(offset, value, name) => visitSelect(offset, value, name, tryCatch)
 
-    case BinaryOp(offset, lhs, op, rhs) => {
-      visitBinaryOp(offset, lhs, op, rhs)
-    }
-    case AssertExpr(offset, Member.AssertStmt(value, msg), returned) =>
-      visitAssert(offset, value, msg, returned)
+      case Lookup(offset, value, index) => visitLookup(offset, value, index)
 
-    case LocalExpr(offset, bindings, returned) =>
-      lazy val newScope: ValScope = scope.extend(visitBindings(bindings.iterator, (self, sup) => newScope))
-      visitExpr(returned)(newScope, implicitly)
+      case Slice(offset, value, start, end, stride) => visitSlice(offset, value, start, end, stride)
+      case Function(offset, params, body) => visitMethod(body, params, offset)
+      case IfElse(offset, cond, then, else0) => visitIfElse(offset, cond, then, else0)
+      case TryElse(offset, try0, else0) => visitTryElse(offset, try0, else0)
 
-    case Import(offset, value) => visitImport(offset, value)
-    case ImportStr(offset, value) => visitImportStr(offset, value)
-    case Expr.Error(offset, value) => visitError(offset, value)
-    case Apply(offset, value, Args(args)) => visitApply(offset, value, args)
-
-    case Select(offset, value, name) => visitSelect(offset, value, name, tryCatch)
-
-    case Lookup(offset, value, index) => visitLookup(offset, value, index)
-
-    case Slice(offset, value, start, end, stride) => visitSlice(offset, value, start, end, stride)
-    case Function(offset, params, body) => visitMethod(body, params, offset)
-    case IfElse(offset, cond, then, else0) => visitIfElse(offset, cond, then, else0)
-    case TryElse(offset, try0, else0) => visitTryElse(offset, try0, else0)
-
-    case Comp(offset, value, first, rest) =>
-      Val.Arr(visitComp(first :: rest.toList, Seq(scope)).map(s => Val.Lazy(visitExpr(value)(s, implicitly))))
-    case ObjExtend(offset, value, ext) => {
-      val original = visitExpr(value).cast[Val.Obj]
-      val extension = visitObjBody(ext)
-      extension.addSuper(original)
-    }
-  } catch Error.tryCatch(expr.offset)
+      case Comp(offset, value, first, rest) =>
+        Val.Arr(visitComp(first :: rest.toList, Seq(scope)).map(s => Val.Lazy(visitExpr(value)(s, implicitly))))
+      case ObjExtend(offset, value, ext) => {
+        val original = visitExpr(value).cast[Val.Obj]
+        val extension = visitObjBody(ext)
+        extension.addSuper(original)
+      }
+    } catch Error.tryCatch(expr.offset)
+  }
 
   def visitId(offset: Int, value: Int)(implicit scope: ValScope, fileScope: FileScope): Val = {
     val ref = scope.bindings(value)
@@ -557,6 +571,16 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
         )
       }))
     case Nil => scopes
+  }
+
+  def offsetToLine(path: Path, offset: Int): Int = {
+    loadCachedSource(path) match {
+      case None => -1
+      case Some(resolved) =>
+        val Array(line, col) =
+          new IndexedParserInput(resolved).prettyIndex(offset).split(':')
+        line.toInt
+    }
   }
 }
 
