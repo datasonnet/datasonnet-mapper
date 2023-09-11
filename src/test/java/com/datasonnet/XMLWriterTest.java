@@ -287,4 +287,22 @@ public class XMLWriterTest {
             assertTrue(e.getMessage().contains("Input for XML writer must be an Object"), "Failed with wrong message: " + e.getMessage());
         }
     }
+
+    @Test
+    public void testNonString() {
+        Mapper mapper = new Mapper("{\n" +
+                "  myxml: {\n" +
+                "    param: {\n" +
+                "      \"$\": 123,\n" +
+                "    },\n" +
+                "    nullParam: {\n" +
+                "      \"$\": null\n" +
+                "    }\n" +
+                "  }\n" +
+                "}");
+
+        Document<String> doc = mapper.transform(DefaultDocument.NULL_INSTANCE, Collections.emptyMap(), MediaTypes.APPLICATION_XML);
+        assertEquals("<?xml version='1.0' encoding='UTF-8'?><myxml><param>123</param><nullParam>null</nullParam></myxml>", doc.getContent());
+    }
+
 }

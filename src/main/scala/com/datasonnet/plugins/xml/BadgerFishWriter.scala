@@ -145,16 +145,25 @@ class BadgerFishWriter(val params: EffectiveParams) {
           if (key.equals(params.xmlnsKey)) {
             // no op
           } else if (key.startsWith(params.textKeyPrefix)) {
+            var textValue = value match {
+              case str: ujson.Str => str.str
+              case num: ujson.Num => {
+                var numberStr = num.value.toString
+                if (numberStr.endsWith(".0")) numberStr = numberStr.stripSuffix(".0")
+                numberStr
+              }
+              case ujson.Null => "null"
+            }
             if (key == params.textKeyPrefix) {
               // if we encounter a bare $, it either represents all the text, so it should be written,
               // or there are _also_ $1 or #1 (and maybe more) elements with the contents, and then only those should
               // be written.
               // NOTE: if comment support is added that will need to be checked here
               if (!children.contains(params.textKeyPrefix + "1") && !children.contains(params.cdataKeyPrefix + "1")) {
-                escapeText(value.str, sb)
+                escapeText(textValue, sb)
               }
             } else {
-              escapeText(value.str, sb)
+              escapeText(textValue, sb)
             }
           } else if (key.startsWith(params.cdataKeyPrefix)) {
             // taken from scala.xml.PCData
