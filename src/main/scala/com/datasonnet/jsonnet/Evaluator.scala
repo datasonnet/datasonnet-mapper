@@ -55,7 +55,7 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
      */
     val line = offsetToLine(fileScope.currentFile, expr.offset)
 
-    System.out.println("Next line is " + line);
+    //System.out.println("Next line is " + line);
 
     if (DataSonnetDebugger.getDebugger.isAttached) {
       DataSonnetDebugger.getDebugger.probeExpr(line)
