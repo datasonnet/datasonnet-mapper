@@ -53,7 +53,14 @@ object Val{
     * are all wrapped in [[Lazy]] and only truly evaluated on-demand
     */
   class Lazy(calc0: => Val){
-    lazy val force = calc0
+    def force =
+      if (sys.props.getOrElse("debug", "false") == "true") {
+        val forceE = calc0
+        forceE
+      } else {
+        lazy val forceL = calc0
+        forceL
+      }
   }
   object Lazy{
     def apply(calc0: => Val) = new Lazy(calc0)
