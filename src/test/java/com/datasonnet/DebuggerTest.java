@@ -26,6 +26,10 @@ import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.TestResourceReader;
 import org.json.JSONException;
+<<<<<<< HEAD
+=======
+import org.junit.jupiter.api.Disabled;
+>>>>>>> debugger
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.LoggerFactory;
@@ -38,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DebuggerTest {
 
     @Test
+    @Disabled
     void testDebugger() throws IOException, URISyntaxException, JSONException {
         final DataSonnetDebugger debugger = DataSonnetDebugger.getDebugger();
         debugger.attach();

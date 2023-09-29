@@ -55,12 +55,15 @@ object Val{
   class Lazy(calc0: => Val){
     // WIP debugger support. This flags can be used to show on the client whether the value is now present or has not been evaluated lazily
     var isSet = false;
-    var value : Val = null;
-    lazy val force: Val = {
-      isSet = true;
-      value = calc0;
-      calc0;
-    }
+    def force =
+      if (sys.props.getOrElse("debug", "false") == "true") {
+        isSet = true;
+        val forceE = calc0
+        forceE
+      } else {
+        lazy val forceL = calc0
+        forceL
+      }
   }
   object Lazy{
     def apply(calc0: => Val) = new Lazy(calc0)

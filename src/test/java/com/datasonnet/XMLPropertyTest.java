@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@ package com.datasonnet;
  * limitations under the License.
  */
 
-
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.Dictionary;
@@ -27,6 +26,7 @@ import com.pholser.junit.quickcheck.From;
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.When;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import jdk.nashorn.internal.runtime.logging.Logger;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
@@ -42,7 +42,6 @@ import static org.junit.Assert.fail;
 
 @RunWith(JUnitQuickcheck.class)
 public class XMLPropertyTest {
-
 
     @Property
     public void reversible(@From(XMLGenerator.class) @Dictionary("xml.dict") Document dom) throws Exception {
