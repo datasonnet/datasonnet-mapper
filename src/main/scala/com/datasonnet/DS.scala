@@ -45,7 +45,7 @@ object DSLowercase extends Library {
 
   override def namespace() = "ds"
 
-  override def libsonnets(): java.util.Set[String] = Set("util").asJava
+  override def libsonnets(): java.util.Set[String] = java.util.Collections.emptySet()
 
   override def functions(dataFormats: DataFormatService, header: Header): java.util.Map[String, Val.Func] = Map(
     builtin("contains", "container", "value") {

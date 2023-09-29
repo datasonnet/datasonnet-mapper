@@ -61,7 +61,7 @@ object Mapper {
       evaluated <-
         try Success(evaluator.visitExpr(parsed)(
           Mapper.scope(indices, libraries),
-          new FileScope(DataSonnetPath("."), indices)
+          new FileScope(DataSonnetPath(".", script), indices)
         ))
         catch {
           case e: Throwable =>
@@ -133,8 +133,8 @@ class Mapper(var script: String,
 
   private def importer(parent: Path, path: String): Option[(Path, String)] = for {
     resolved <- parent match {
-      case DataSonnetPath("") => Some(path)
-      case DataSonnetPath(p) => Some(p + "/" + path)
+      case DataSonnetPath("", _) => Some(path)
+      case DataSonnetPath(p, _) => Some(p + "/" + path)
       case _ => None
     }
     contents <- imports.get(resolved) match {

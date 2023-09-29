@@ -45,7 +45,7 @@ public class Validate implements Callable<Void> {
         Mapper mapper = new MapperBuilder(Main.readFile(datasonnet))
                 .wrapAsFunction(!includesFunction)
                 .build();
-        System.out.println("Validates!");
+//        System.out.println("Validates!");
         return null;
     }
 }

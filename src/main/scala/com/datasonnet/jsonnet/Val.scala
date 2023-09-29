@@ -53,7 +53,14 @@ object Val{
     * are all wrapped in [[Lazy]] and only truly evaluated on-demand
     */
   class Lazy(calc0: => Val){
-    lazy val force = calc0
+    // WIP debugger support. This flags can be used to show on the client whether the value is now present or has not been evaluated lazily
+    var isSet = false;
+    var value : Val = null;
+    lazy val force: Val = {
+      isSet = true;
+      value = calc0;
+      calc0;
+    }
   }
   object Lazy{
     def apply(calc0: => Val) = new Lazy(calc0)
@@ -131,7 +138,9 @@ object Val{
       }
       mapping
     }
-    private[this] val valueCache = collection.mutable.Map.empty[Any, Val]
+    // made accessible to the Debugger
+    //    private[this]
+    val valueCache = collection.mutable.Map.empty[Any, Val]
 
     def value(k: String,
               offset: Int)
@@ -373,6 +382,11 @@ class ValScope(val dollar0: Option[Val.Obj],
   def bindings(k: Int): Option[Val.Lazy] = bindings0(k) match{
     case null => None
     case v => Some(v)
+  }
+
+  // WIP made accessible to the Debugger
+  def getBindings : Array[Val.Lazy] = {
+    bindings0;
   }
 
   def extend(newBindings: TraversableOnce[(Int, (Option[Val.Obj], Option[Val.Obj]) => Val.Lazy)] = Nil,

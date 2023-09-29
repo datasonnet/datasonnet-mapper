@@ -106,6 +106,7 @@ class FileScope(val currentFile: Path,
                 val nameIndices: Map[String, Int]){
   // Only used for error messages, so in the common case
   // where nothing blows up this does not need to be allocated
+  // ( And also for debugger support )
   lazy val indexNames = nameIndices.map(_.swap)
 }
 
