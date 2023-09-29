@@ -16,11 +16,7 @@ package com.datasonnet.jsonnet
  * limitations under the License.
  */
 import Expr.{Error => _, _}
-<<<<<<< HEAD
-import com.datasonnet.debugger.{AutoTracer, DataSonnetDebugger}
-=======
 import com.datasonnet.debugger.DataSonnetDebugger
->>>>>>> debugger
 import fastparse.{IndexedParserInput, Parsed}
 import com.datasonnet.jsonnet.Expr.Member.Visibility
 import com.datasonnet.wrap.DataSonnetPath
