@@ -24,10 +24,7 @@ import com.datasonnet.util.XMLGenerator;
 import com.datasonnet.util.XMLJsonGenerator;
 import com.pholser.junit.quickcheck.From;
 import com.pholser.junit.quickcheck.Property;
-import com.pholser.junit.quickcheck.When;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
-import jdk.nashorn.internal.runtime.logging.Logger;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.w3c.dom.Document;
 
