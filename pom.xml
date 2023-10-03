@@ -52,6 +52,12 @@
       <name>Jose Montoya</name>
       <email>jam01@protonmail.com</email>
     </developer>
+    <developer>
+      <name>Ramiro González Maciel</name>
+      <email>ramiro.maciel@portx.io</email>
+      <organization>PortX</organization>
+      <organizationUrl>https://portx.io</organizationUrl>
+    </developer>
   </developers>
 
   <scm>
