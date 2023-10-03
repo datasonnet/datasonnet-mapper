@@ -17,9 +17,7 @@ package com.datasonnet.wrap
  */
 import com.datasonnet.jsonnet.Path
 
-case class DataSonnetPath(path: String, psource: String = "") extends Path {
-
-  lazy val source = psource
+case class DataSonnetPath(path: String) extends Path {
 
   def relativeToString(p: Path): String = p match {
     case other: DataSonnetPath if path.startsWith(other.path) => path.drop(other.path.length)

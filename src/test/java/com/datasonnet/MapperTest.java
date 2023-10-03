@@ -100,7 +100,6 @@ public class MapperTest {
             mapper.transform("{}");
             fail("Must fail to execute");
         } catch(IllegalArgumentException e) {
-            // Test fails because the message says "    at .( offset::25)"
             assertTrue(e.getMessage().contains("at line 1 column 26"), "Found message: " + e.getMessage());
         }
     }
@@ -112,7 +111,6 @@ public class MapperTest {
             mapper.transform("{}");
             fail("Must fail to execute");
         } catch(IllegalArgumentException e) {
-            // Test fails because the message says "attempted to index a string with string foo\n    at .( offset::25)"
             assertTrue(e.getMessage().contains("at line 1 column 8"), "Found message: " + e.getMessage());
         }
     }

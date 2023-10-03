@@ -180,8 +180,8 @@ public class DataSonnetDebugger {
    * @return
    */
   private SourcePos getSourcePos(Expr expr, FileScope fileScope) {
-    if (fileScope.currentFile() instanceof DataSonnetPath) {
-      String sourceCode = ((DataSonnetPath) fileScope.currentFile()).source();
+    if (fileScope.source() != null) {
+      String sourceCode = fileScope.source();
       int caretPos = expr.offset();
       if (caretPos > sourceCode.length()) {
         logger.error("caretPos: " + caretPos + " > sourceCode.length() " + sourceCode.length());
@@ -231,8 +231,8 @@ public class DataSonnetDebugger {
     return attached;
   }
 
-  public void setAutoStepping(boolean sm) {
-    this.autoStepping = sm;
+  public void setAutoStepping(boolean autoStepping) {
+    this.autoStepping = autoStepping;
   }
 
   public boolean isAutoStepping() {
