@@ -16,12 +16,11 @@ package com.datasonnet.debugger;
  * limitations under the License.
  */
 
-import com.datasonnet.debugger.da.DataSonnetDebugAdapterServer;
+import com.datasonnet.debugger.da.DataSonnetDebugListener;
 import com.datasonnet.jsonnet.Expr;
 import com.datasonnet.jsonnet.FileScope;
 import com.datasonnet.jsonnet.Val;
 import com.datasonnet.jsonnet.ValScope;
-import com.datasonnet.wrap.DataSonnetPath;
 import scala.Option;
 
 import java.util.HashMap;
@@ -55,7 +54,7 @@ public class DataSonnetDebugger {
   /**
    * DAP server; receives notifications and sets breakpoints
    */
-  private DataSonnetDebugAdapterServer dapServer;
+  private DataSonnetDebugListener debugListener;
 
   /**
    * Is the dapServer attached?
@@ -102,8 +101,8 @@ public class DataSonnetDebugger {
     Breakpoint breakpoint = sourcePos != null ? breakpoints.get(sourcePos.getLine()) : null;
     if (this.isAutoStepping() || (breakpoint != null && breakpoint.isEnabled())) {
       this.saveContext(expr, valScope, fileScope, sourcePos);
-      if (this.dapServer != null) {
-        this.dapServer.stopped(this.spc);
+      if (this.debugListener != null) {
+        this.debugListener.stopped(this.spc);
       }
       latch = new CountDownLatch(1);
       try {
@@ -239,7 +238,7 @@ public class DataSonnetDebugger {
     return this.autoStepping;
   }
 
-  public void setDebuggerAdapter(DataSonnetDebugAdapterServer dataSonnetDebugAdapterServer) {
-    this.dapServer = dataSonnetDebugAdapterServer;
+  public void setDebuggerAdapter(DataSonnetDebugListener dataSonnetDebugListener) {
+    this.debugListener = dataSonnetDebugListener;
   }
 }

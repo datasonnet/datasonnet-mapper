@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
  * to receive debugging events
  *
  */
-public class DataSonnetDebugAdapterServer implements IDebugProtocolServer {
+public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataSonnetDebugListener {
 
   private static final Logger logger = LoggerFactory.getLogger(DataSonnetDebugAdapterServer.class);
 
@@ -356,6 +356,7 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer {
    *
    * @param stoppedProgramContext
    */
+  @Override
   public void stopped(StoppedProgramContext stoppedProgramContext) {
       logger.info("DatasonnetDebugger callback. stoppedProgramContext: " + stoppedProgramContext);
       this.resetVariablesCache();

@@ -98,6 +98,8 @@
       <groupId>org.eclipse.lsp4j</groupId>
       <artifactId>org.eclipse.lsp4j.debug</artifactId>
       <version>0.21.1</version>
+      <!-- provided because the jar is unpacked below, see the maven-dependency-plugin -->
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.awaitility</groupId>
@@ -347,6 +349,45 @@
 
   <build>
     <plugins>
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-dependency-plugin</artifactId>
+         <version>3.6.0</version>
+         <executions>
+           <execution>
+             <id>unpack-lsp4j</id>
+             <!--
+             We have to unpack the org.eclipse.lsp4j.debug jar to remove the signatures to avoid
+             > Caused by: java.lang.SecurityException: class "org.eclipse.lsp4j.debug.ExceptionInfoArguments"'s signer
+             > information does not match signer information of other classes in the same package
+             That is caused because the jar includes a) source files ( .java ) and b) signature.
+             The scala compiler compiles the .java files into target/classes but then they don't match the signature
+             that other files on the jar have, so that triggers the exception.
+
+             -->
+             <phase>validate</phase>
+             <goals>
+               <goal>unpack</goal>
+             </goals>
+             <configuration>
+               <artifactItems>
+                 <artifactItem>
+                   <groupId>org.eclipse.lsp4j</groupId>
+                   <artifactId>org.eclipse.lsp4j.debug</artifactId>
+                   <version>0.21.1</version>
+                   <type>jar</type>
+                   <overWrite>true</overWrite>
+                   <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                   <includes>**/*.class</includes>
+                   <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
+                 </artifactItem>
+               </artifactItems>
+             </configuration>
+           </execution>
+         </executions>
+       </plugin>
+
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>

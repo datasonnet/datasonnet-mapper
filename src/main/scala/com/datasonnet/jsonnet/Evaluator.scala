@@ -19,11 +19,9 @@ import Expr.{Error => _, _}
 import com.datasonnet.debugger.DataSonnetDebugger
 import fastparse.{IndexedParserInput, Parsed}
 import com.datasonnet.jsonnet.Expr.Member.Visibility
-import com.datasonnet.wrap.DataSonnetPath
 import ujson.Value
 
 import scala.collection.mutable
-import scala.util.{Failure, Success, Try}
 
 /**
   * Recursively walks the [[Expr]] trees to convert them into into [[Val]]
