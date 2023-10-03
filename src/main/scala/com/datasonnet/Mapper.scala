@@ -61,7 +61,8 @@ object Mapper {
       evaluated <-
         try Success(evaluator.visitExpr(parsed)(
           Mapper.scope(indices, libraries),
-          new FileScope(DataSonnetPath("."), indices)
+          // TODO Saving the script source could be enabled only when debugging
+          new FileScope(DataSonnetPath("."), indices, script)
         ))
         catch {
           case e: Throwable =>

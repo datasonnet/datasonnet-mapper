@@ -22,7 +22,6 @@ import com.datasonnet.jsonnet.Expr.Member.Visibility
 import ujson.Value
 
 import scala.collection.mutable
-import scala.util.{Failure, Success, Try}
 
 /**
   * Recursively walks the [[Expr]] trees to convert them into into [[Val]]
@@ -50,15 +49,9 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
   override def visitExpr(expr: Expr)(implicit scope: ValScope, fileScope: FileScope): Val = visitExpr(expr, false)
   def visitExpr(expr: Expr, tryCatch: Boolean = false)
                (implicit scope: ValScope, fileScope: FileScope): Val = {
-    /*
-      if in debug mode - check if needs to stop at the offset
-     */
-    val line = offsetToLine(fileScope.currentFile, expr.offset)
-
-    //System.out.println("Next line is " + line);
 
     if (DataSonnetDebugger.getDebugger.isAttached) {
-      DataSonnetDebugger.getDebugger.probeExpr(line)
+      DataSonnetDebugger.getDebugger.probeExpr(expr, scope, fileScope)
     }
 
     try expr match {

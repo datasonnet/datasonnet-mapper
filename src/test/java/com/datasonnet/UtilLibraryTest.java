@@ -30,7 +30,11 @@ public class UtilLibraryTest {
     @Test
     @Disabled
     void testMapToObject() throws Exception {
-        testDS("utilLibMapToObjectTest.ds", "{}");
+        testDS("git .ds", "{}");
+        // Test fails with:
+//java.lang.IllegalArgumentException: Problem executing script: com.datasonnet.jsonnet.Error: Field does not exist: util
+//    at .( offset::672)
+//    at .( offset::775)
     }
 
     private void testDS(String dsFileName, String input) throws Exception {

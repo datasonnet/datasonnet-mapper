@@ -1,7 +1,7 @@
 package com.datasonnet.commands;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet.commands;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import com.datasonnet.Mapper;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
@@ -34,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 
 @CommandLine.Command(
         name = "run",
@@ -67,19 +67,35 @@ public class Run implements Callable<Void> {
     @CommandLine.Option(names = {"-n", "--no-wrap"}, description = "Do not wrap in a function call. Only use this if your transformation is already a top-level function.")
     boolean alreadyWrapped = false;
 
+    @CommandLine.Option(names = {"-d", "--debug"}, description = "Run the mapper in debug mode, waiting for a debugger to connect.")
+    boolean debugMode = false;
+
     @CommandLine.Option(names = {"-o", "--output-type"}, description = "Handle the output as this format. Defaults to JSON.")
     String outputType = "application/json";
 
     @Override
     public Void call() throws Exception {
-        Mapper mapper = new Mapper(Main.readFile(datasonnet), combinedArguments().keySet(), imports(), !alreadyWrapped);
-        Document<String> result = mapper
-                .transform(new DefaultDocument<>(payload(), MediaTypes.forExtension(suffix(datasonnet)).get()),
-                        combinedArguments(), MediaType.valueOf(outputType));
-        String contents = result.getContent();
-        System.out.println(contents);
-
+        if ( debugMode ) {
+            this.startDAPServer();
+            // don't exit when debugging
+            new CountDownLatch(1).await();
+        } else {
+            Mapper mapper = new Mapper(Main.readFile(datasonnet), combinedArguments().keySet(), imports(), !alreadyWrapped);
+            Document<String> result = mapper
+                    .transform(new DefaultDocument<>(payload(), MediaTypes.forExtension(suffix(datasonnet)).get()),
+                            combinedArguments(), MediaType.valueOf(outputType));
+            String contents = result.getContent();
+            System.out.println(contents);
+        }
         return null;
+    }
+
+    private void startDAPServer() throws IOException {
+      DebugAdapterLauncher launcher = new DebugAdapterLauncher();
+        // FIXME pass params: arguments, argumentFiles, importFiles, alreadyWrapped, outputType
+        // OR
+        // pass a configured Mapper as done on the call() method
+      launcher.start();
     }
 
     private String suffix(File file) {
