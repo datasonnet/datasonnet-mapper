@@ -17,20 +17,35 @@ package com.datasonnet.debugger;
  */
 
 public class Breakpoint {
-
     private boolean enabled;
-    private int line;
+    private final int line;
+
+    //This is used for step functionality
+    private final boolean temporary;
 
     public Breakpoint(int line) {
         this.line = line;
-        enabled = true;
+        this.enabled = true;
+        this.temporary = false;
+    }
+    public Breakpoint(int line, boolean temporary) {
+        this.line = line;
+        this.enabled = true;
+        this.temporary = temporary;
     }
 
     public boolean isEnabled() {
         return enabled;
     }
-
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isTemporary() {
+        return temporary;
+    }
+
+    public int getLine() {
+        return line;
     }
 }

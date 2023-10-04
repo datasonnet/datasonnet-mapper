@@ -44,13 +44,19 @@
     </developer>
     <developer>
       <name>Eugene Berman</name>
-      <email>eugene.berman@modusbox.com</email>
-      <organization>ModusBox</organization>
-      <organizationUrl>https://modusbox.com</organizationUrl>
+      <email>eugene.berman@portx.io</email>
+      <organization>PortX</organization>
+      <organizationUrl>https://portx.io</organizationUrl>
     </developer>
     <developer>
       <name>Jose Montoya</name>
       <email>jam01@protonmail.com</email>
+    </developer>
+    <developer>
+      <name>Ramiro González Maciel</name>
+      <email>ramiro.maciel@portx.io</email>
+      <organization>PortX</organization>
+      <organizationUrl>https://portx.io</organizationUrl>
     </developer>
   </developers>
 

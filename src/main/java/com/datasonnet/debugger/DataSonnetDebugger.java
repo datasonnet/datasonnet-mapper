@@ -23,6 +23,7 @@ import com.datasonnet.jsonnet.Val;
 import com.datasonnet.jsonnet.ValScope;
 import scala.Option;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,11 +46,8 @@ public class DataSonnetDebugger {
 
   /**
    * Key is line number
-   * <p>
-   * TODO
-   * 1) why String and not Integer as a key?
    */
-  private final ConcurrentMap<String, Breakpoint> breakpoints = new ConcurrentHashMap<>();
+  private final ConcurrentMap<Integer, Breakpoint> breakpoints = new ConcurrentHashMap<>();
 
   /**
    * DAP server; receives notifications and sets breakpoints
@@ -76,6 +74,8 @@ public class DataSonnetDebugger {
    */
   private StoppedProgramContext spc;
 
+  private int lineCount = -1;
+
   public static DataSonnetDebugger getDebugger() {
     if (DEBUGGER == null) {
       DEBUGGER = new DataSonnetDebugger();
@@ -84,21 +84,29 @@ public class DataSonnetDebugger {
   }
 
   public void addBreakpoint(int line) {
-    breakpoints.put(String.valueOf(line), new Breakpoint(line));
+    addBreakpoint(line, false);
+  }
+
+  public void addBreakpoint(int line, boolean temporary) {
+    breakpoints.put(line, new Breakpoint(line, temporary));
   }
 
   public Breakpoint getBreakpoint(int line) {
-    return breakpoints.get(String.valueOf(line));
+    return breakpoints.get(line);
   }
 
   public void removeBreakpoint(int line) {
-    breakpoints.remove(String.valueOf(line));
+    breakpoints.remove(line);
   }
 
   public void probeExpr(Expr expr, ValScope valScope, FileScope fileScope) {
-
     SourcePos sourcePos = this.getSourcePos(expr, fileScope);
-    Breakpoint breakpoint = sourcePos != null ? breakpoints.get(sourcePos.getLine()) : null;
+    if (sourcePos == null) {
+      logger.debug("sourcePos is null, returning");
+      return;
+    }
+    int line = sourcePos.getLine();
+    Breakpoint breakpoint = sourcePos != null ? breakpoints.get(line) : null;
     if (this.isAutoStepping() || (breakpoint != null && breakpoint.isEnabled())) {
       this.saveContext(expr, valScope, fileScope, sourcePos);
       if (this.debugListener != null) {
@@ -113,6 +121,9 @@ public class DataSonnetDebugger {
       }
       logger.info("Resuming after await");
       this.cleanContext();
+      if (breakpoint.isTemporary()) {
+        breakpoints.remove(line);
+      }
     }
   }
 
@@ -139,7 +150,7 @@ public class DataSonnetDebugger {
     // FIXME Need to not save the string representation but the composed object, so that it can be expanded on the client
     namedVariables.put("self", this.valToString(valScope.self0()));
     namedVariables.put("super", this.valToString(valScope.super0()));
-    namedVariables.put("dollar", this.valToString(valScope.dollar0()));
+    namedVariables.put("$", this.valToString(valScope.dollar0()));
 
     scala.collection.immutable.Map<String, Object> nameIndices = fileScope.nameIndices();
 
@@ -181,23 +192,46 @@ public class DataSonnetDebugger {
   private SourcePos getSourcePos(Expr expr, FileScope fileScope) {
     if (fileScope.source() != null) {
       String sourceCode = fileScope.source();
-      int caretPos = expr.offset();
+      String visibleCode = sourceCode;
+
+      int diffLinesNumber = 0;
+      int diffCaretPos = 0;
+
+      if (lineCount != -1) { // If the code is wrapped by ID, remove auto-generated lines
+        String[] sourceLines = sourceCode.split("\r\n|\r|\n");
+        diffLinesNumber = sourceLines.length - lineCount;
+
+        String[] diffLines = Arrays.copyOfRange(sourceLines, 0, diffLinesNumber);
+        diffCaretPos = String.join(System.lineSeparator(), diffLines).length();
+
+        sourceLines = Arrays.copyOfRange(sourceLines, diffLinesNumber, sourceLines.length);
+        visibleCode = String.join(System.lineSeparator(), sourceLines);
+      }
+
+      int caretPos = expr.offset() - diffCaretPos - 1;
+      if (caretPos < 0) {
+        logger.debug("caretPos is in invisible code");
+        return null;
+      }
       if (caretPos > sourceCode.length()) {
         logger.error("caretPos: " + caretPos + " > sourceCode.length() " + sourceCode.length());
         return null;
       }
-      String preface = sourceCode.substring(0, expr.offset());
 
-      String[] lines = preface.split("\n");
+      String preface = visibleCode.substring(0, caretPos);
+      String[] lines = preface.split("\r\n|\r|\n");
+
       SourcePos sourcePos = new SourcePos();
+      sourcePos.setCurrentFile(fileScope.currentFile().toString());
       sourcePos.setCaretPos(caretPos);
-      sourcePos.setLine(lines.length); // lines are 0-based, and this counts the number of previous lines
+      sourcePos.setLine(lines.length - diffLinesNumber + 1); // lines are 0-based, and this counts the number of previous lines
       sourcePos.setCaretPosInLine(caretPos - preface.lastIndexOf("\n"));
 
       // Mapper.asFunction wraps the script with `function (payload) {` as the first line, and `}` at the end.
       // so here we add need so subtract 1 to the line
       // TODO Also see Run::alreadyWrapped, that's a parameter to avoid adding this wrapping function
-      sourcePos.setLine(sourcePos.getLine() - 1);
+      //sourcePos.setLine(sourcePos.getLine() - 1);
+
       return sourcePos;
     }
     return null;
@@ -216,6 +250,8 @@ public class DataSonnetDebugger {
 
   public void attach() {
     attached = true;
+    System.setProperty("debug", "true");
+    breakpoints.clear();
   }
 
   /**
@@ -223,6 +259,8 @@ public class DataSonnetDebugger {
    */
   public void detach() {
     attached = false;
+    System.setProperty("debug", "false");
+    breakpoints.clear();
     this.resume();
   }
 
@@ -240,5 +278,13 @@ public class DataSonnetDebugger {
 
   public void setDebuggerAdapter(DataSonnetDebugListener dataSonnetDebugListener) {
     this.debugListener = dataSonnetDebugListener;
+  }
+
+  public int getLineCount() {
+    return lineCount;
+  }
+
+  public void setLineCount(int lineCount) {
+    this.lineCount = lineCount;
   }
 }
