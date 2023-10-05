@@ -51,7 +51,7 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
                (implicit scope: ValScope, fileScope: FileScope): Val = {
 
     if (DataSonnetDebugger.getDebugger.isAttached) {
-      DataSonnetDebugger.getDebugger.probeExpr(expr, scope, fileScope)
+      DataSonnetDebugger.getDebugger.probeExpr(expr, scope, fileScope, evalScope)
     }
 
     try expr match {

@@ -17,10 +17,7 @@ package com.datasonnet.debugger;
  */
 
 import com.datasonnet.debugger.da.DataSonnetDebugListener;
-import com.datasonnet.jsonnet.Expr;
-import com.datasonnet.jsonnet.FileScope;
-import com.datasonnet.jsonnet.Val;
-import com.datasonnet.jsonnet.ValScope;
+import com.datasonnet.jsonnet.*;
 import scala.Option;
 
 import java.util.Arrays;
@@ -99,7 +96,7 @@ public class DataSonnetDebugger {
     breakpoints.remove(line);
   }
 
-  public void probeExpr(Expr expr, ValScope valScope, FileScope fileScope) {
+  public void probeExpr(Expr expr, ValScope valScope, FileScope fileScope, EvalScope evalScope) {
     SourcePos sourcePos = this.getSourcePos(expr, fileScope);
     if (sourcePos == null) {
       logger.debug("sourcePos is null, returning");
@@ -108,7 +105,7 @@ public class DataSonnetDebugger {
     int line = sourcePos.getLine();
     Breakpoint breakpoint = sourcePos != null ? breakpoints.get(line) : null;
     if (this.isAutoStepping() || (breakpoint != null && breakpoint.isEnabled())) {
-      this.saveContext(expr, valScope, fileScope, sourcePos);
+      this.saveContext(expr, valScope, fileScope, evalScope, sourcePos);
       if (this.debugListener != null) {
         this.debugListener.stopped(this.spc);
       }
@@ -119,7 +116,7 @@ public class DataSonnetDebugger {
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
       }
-      logger.info("Resuming after await");
+      logger.debug("Resuming after await");
       this.cleanContext();
       if (breakpoint.isTemporary()) {
         breakpoints.remove(line);
@@ -143,14 +140,14 @@ public class DataSonnetDebugger {
    * @param fileScope
    * @param sourcePos
    */
-  private void saveContext(Expr expr, ValScope valScope, FileScope fileScope, SourcePos sourcePos) {
+  private void saveContext(Expr expr, ValScope valScope, FileScope fileScope, EvalScope evalScope, SourcePos sourcePos) {
     StoppedProgramContext spc = new StoppedProgramContext();
     spc.setSourcePos(sourcePos);
     Map<String, String> namedVariables = new HashMap<>();
     // FIXME Need to not save the string representation but the composed object, so that it can be expanded on the client
-    namedVariables.put("self", this.valToString(valScope.self0()));
-    namedVariables.put("super", this.valToString(valScope.super0()));
-    namedVariables.put("$", this.valToString(valScope.dollar0()));
+    namedVariables.put("self", this.valToString(valScope.self0(), evalScope));
+    namedVariables.put("super", this.valToString(valScope.super0(), evalScope));
+    namedVariables.put("$", this.valToString(valScope.dollar0(), evalScope));
 
     scala.collection.immutable.Map<String, Object> nameIndices = fileScope.nameIndices();
 
@@ -162,7 +159,7 @@ public class DataSonnetDebugger {
     this.spc = spc;
   }
 
-  private String valToString(Option<Val.Obj> optVal) {
+  private String valToString(Option<Val.Obj> optVal, EvalScope evalScope) {
     if (optVal.isEmpty()) return "null";
     Val.Obj vo = optVal.get();
 
@@ -171,7 +168,7 @@ public class DataSonnetDebugger {
     vo.foreachVisibleKey((key, visibility) -> {
       // Accessing the cache to avoid running into a computation while debugging
       Option<Val> member = vo.valueCache().get(key);
-      str.append("" + key + ": " + (member.isEmpty() ? "null" : member.get()) + ", ");
+      str.append("\"" + key + "\": " + (member.isEmpty() ? "null" : Materializer.apply(member.get(), evalScope)) + ", ");
       if (member.nonEmpty()) {
         // FIXME could do a recursive valToString on this member too
       }
@@ -249,9 +246,11 @@ public class DataSonnetDebugger {
   }
 
   public void attach() {
-    attached = true;
-    System.setProperty("debug", "true");
-    breakpoints.clear();
+    if (!attached) {
+      attached = true;
+      System.setProperty("debug", "true");
+      breakpoints.clear();
+    }
   }
 
   /**
