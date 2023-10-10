@@ -18,14 +18,18 @@ package com.datasonnet.debugger;
 
 import com.datasonnet.debugger.da.DataSonnetDebugListener;
 import com.datasonnet.jsonnet.*;
+import org.jetbrains.annotations.Nullable;
 import scala.Option;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,257 +37,316 @@ import org.slf4j.LoggerFactory;
  * Singleton that enables debugging features on an Evaluator.
  */
 public class DataSonnetDebugger {
+    private static final Logger logger = LoggerFactory.getLogger(DataSonnetDebugger.class);
+    /**
+     * Instance
+     */
+    private static DataSonnetDebugger DEBUGGER;
 
-  private static final Logger logger = LoggerFactory.getLogger(DataSonnetDebugger.class);
+    /**
+     * Key is line number
+     */
+    private final ConcurrentMap<Integer, Breakpoint> breakpoints = new ConcurrentHashMap<>();
 
-  /**
-   * Instance
-   */
-  private static DataSonnetDebugger DEBUGGER;
+    /**
+     * DAP server; receives notifications and sets breakpoints
+     */
+    private DataSonnetDebugListener debugListener;
 
-  /**
-   * Key is line number
-   */
-  private final ConcurrentMap<Integer, Breakpoint> breakpoints = new ConcurrentHashMap<>();
+    /**
+     * Is the dapServer attached?
+     */
+    private boolean attached = false;
 
-  /**
-   * DAP server; receives notifications and sets breakpoints
-   */
-  private DataSonnetDebugListener debugListener;
+    /**
+     * Synchronization latch between dapServer and this debugger
+     */
+    private CountDownLatch latch;
 
-  /**
-   * Is the dapServer attached?
-   */
-  private boolean attached = false;
+    /**
+     * Forces a stopped event on every evaluation step
+     */
+    private boolean stepMode = false;
 
-  /**
-   * Synchronization latch between dapServer and this debugger
-   */
-  private CountDownLatch latch;
+    /**
+     * Holds information, mainly around the variables and caret pos, when the program stops
+     */
+    private StoppedProgramContext spc;
 
-  /**
-   * Forces a stopped event on every evaluation step
-   */
-  private boolean autoStepping = false;
+    private int lineCount = -1;
+    private int diffOffset = -1;
+    private int diffLinesCount = -1;
 
-  /**
-   * Holds information, mainly around the variables and caret pos, when the program stops
-   */
-  private StoppedProgramContext spc;
-
-  private int lineCount = -1;
-
-  public static DataSonnetDebugger getDebugger() {
-    if (DEBUGGER == null) {
-      DEBUGGER = new DataSonnetDebugger();
+    public static DataSonnetDebugger getDebugger() {
+        if (DEBUGGER == null) {
+            DEBUGGER = new DataSonnetDebugger();
+        }
+        return DEBUGGER;
     }
-    return DEBUGGER;
-  }
 
-  public void addBreakpoint(int line) {
-    addBreakpoint(line, false);
-  }
-
-  public void addBreakpoint(int line, boolean temporary) {
-    breakpoints.put(line, new Breakpoint(line, temporary));
-  }
-
-  public Breakpoint getBreakpoint(int line) {
-    return breakpoints.get(line);
-  }
-
-  public void removeBreakpoint(int line) {
-    breakpoints.remove(line);
-  }
-
-  public void probeExpr(Expr expr, ValScope valScope, FileScope fileScope, EvalScope evalScope) {
-    SourcePos sourcePos = this.getSourcePos(expr, fileScope);
-    if (sourcePos == null) {
-      logger.debug("sourcePos is null, returning");
-      return;
+    public void addBreakpoint(int line) {
+        addBreakpoint(line, false);
     }
-    int line = sourcePos.getLine();
-    Breakpoint breakpoint = sourcePos != null ? breakpoints.get(line) : null;
-    if (this.isAutoStepping() || (breakpoint != null && breakpoint.isEnabled())) {
-      this.saveContext(expr, valScope, fileScope, evalScope, sourcePos);
-      if (this.debugListener != null) {
-        this.debugListener.stopped(this.spc);
-      }
-      latch = new CountDownLatch(1);
-      try {
-        // Waits for another thread - the DAP - to resume
-        latch.await();
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
-      logger.debug("Resuming after await");
-      this.cleanContext();
-      if (breakpoint.isTemporary()) {
+
+    public void addBreakpoint(int line, boolean temporary) {
+        breakpoints.put(line, new Breakpoint(line, temporary));
+    }
+
+    public Breakpoint getBreakpoint(int line) {
+        return breakpoints.get(line);
+    }
+
+    public void removeBreakpoint(int line) {
         breakpoints.remove(line);
-      }
     }
-  }
 
-  private void cleanContext() {
-    this.spc = null;
-  }
+    public void probeExpr(Expr expr, ValScope valScope, FileScope fileScope, EvalScope evalScope) {
+        SourcePos sourcePos = this.getSourcePos(expr, fileScope);
+        if (sourcePos == null) {
+            logger.debug("sourcePos is null, returning");
+            return;
+        }
+        int line = sourcePos.getLine();
+        Breakpoint breakpoint = sourcePos != null ? breakpoints.get(line) : null;
+        if (this.isStepMode() || (breakpoint != null && breakpoint.isEnabled())) {
+            this.saveContext(expr, valScope, fileScope, evalScope, sourcePos);
+            if (this.debugListener != null) {
+                this.debugListener.stopped(this.spc);
+            }
+            //We are going to stop at the breakpoint so enter the auto-stepping mode
+            setStepMode(true);
+            latch = new CountDownLatch(1);
+            try {
+                // Waits for another thread - the DAP - to resume
+                latch.await();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            logger.debug("Resuming after await");
+            this.cleanContext();
+            if (breakpoint != null && breakpoint.isTemporary()) {
+                breakpoints.remove(line);
+            }
+        }
+    }
 
-  public StoppedProgramContext getStoppedProgramContext() {
-    return this.spc;
-  }
+    private void cleanContext() {
+        this.spc = null;
+    }
 
-  /**
-   * Saves the execution context, so that it can later be retrieved from the DAP server while the evaluator is paused
-   *
-   * @param expr
-   * @param valScope
-   * @param fileScope
-   * @param sourcePos
-   */
-  private void saveContext(Expr expr, ValScope valScope, FileScope fileScope, EvalScope evalScope, SourcePos sourcePos) {
-    StoppedProgramContext spc = new StoppedProgramContext();
-    spc.setSourcePos(sourcePos);
-    Map<String, String> namedVariables = new HashMap<>();
-    // FIXME Need to not save the string representation but the composed object, so that it can be expanded on the client
-    namedVariables.put("self", this.valToString(valScope.self0(), evalScope));
-    namedVariables.put("super", this.valToString(valScope.super0(), evalScope));
-    namedVariables.put("$", this.valToString(valScope.dollar0(), evalScope));
+    public StoppedProgramContext getStoppedProgramContext() {
+        return this.spc;
+    }
 
-    scala.collection.immutable.Map<String, Object> nameIndices = fileScope.nameIndices();
+    /**
+     * Saves the execution context, so that it can later be retrieved from the DAP server while the evaluator is paused
+     *
+     * @param expr
+     * @param valScope
+     * @param fileScope
+     * @param sourcePos
+     */
+    private void saveContext(Expr expr, ValScope valScope, FileScope fileScope, EvalScope evalScope, SourcePos sourcePos) {
+        StoppedProgramContext spc = new StoppedProgramContext();
+        spc.setSourcePos(sourcePos);
+        Map<String, Map<String, ValueInfo>> namedVariables = new HashMap<>();
 
-    spc.setNamedVariables(namedVariables);
-    // FIXME is there a way to get the local variables as bindings? The parser removes the local variables names
-    // when processing `local` declarations, replacing them with indexes
-    // Also can we get the value? They're instances of com.datasonnet.jsonnet.Val$Lazy
+        namedVariables.put("self", valScope.self0().nonEmpty() ? this.mapObject(valScope.self0().get(), evalScope) : null);
+        namedVariables.put("super", valScope.super0().nonEmpty() ? this.mapObject(valScope.super0().get(), evalScope) : null);
+        namedVariables.put("$", valScope.dollar0().nonEmpty() ? this.mapObject(valScope.dollar0().get(), evalScope) : null);
+
+        scala.collection.immutable.Map<String, Object> nameIndices = fileScope.nameIndices();
+
+        spc.setNamedVariables(namedVariables);
+        // FIXME is there a way to get the local variables as bindings? The parser removes the local variables names
+        // when processing `local` declarations, replacing them with indexes
+        // Also can we get the value? They're instances of com.datasonnet.jsonnet.Val$Lazy
 //        spc.setBidings();
-    this.spc = spc;
-  }
+        this.spc = spc;
+    }
 
-  private String valToString(Option<Val.Obj> optVal, EvalScope evalScope) {
-    if (optVal.isEmpty()) return "null";
-    Val.Obj vo = optVal.get();
+    private List<ValueInfo> mapArr(@Nullable Val.Arr arrValue, EvalScope evalScope) {
+        if (this.attached) {
+            this.detach(false);//We must detach the debugger while forcing the lazy value, to avoid deadlocks
+        }
 
-    StringBuffer str = new StringBuffer();
-    str.append("{ ");
-    vo.foreachVisibleKey((key, visibility) -> {
-      // Accessing the cache to avoid running into a computation while debugging
-      Option<Val> member = vo.valueCache().get(key);
-      str.append("\"" + key + "\": " + (member.isEmpty() ? "null" : Materializer.apply(member.get(), evalScope)) + ", ");
-      if (member.nonEmpty()) {
-        // FIXME could do a recursive valToString on this member too
-      }
-      // FIXME print arrays too
-      return null;
-    });
-    str.append("}");
-    return str.toString();
-  }
+        List<ValueInfo> mappedArr = new CopyOnWriteArrayList<>();
 
-  /**
-   * Return a SourcePos for the expr on the fileScope
-   *
-   * @param expr
-   * @param fileScope
-   * @return
-   */
-  private SourcePos getSourcePos(Expr expr, FileScope fileScope) {
-    if (fileScope.source() != null) {
-      String sourceCode = fileScope.source();
-      String visibleCode = sourceCode;
+        arrValue.value().foreach(member -> {
+/*
+            Val memberVal = member.force();
+            if (memberVal instanceof Val.Obj) {
+                Object mappedMember = mapObject((Val.Obj) memberVal, evalScope);
+                mappedArr.add(new ValueInfo(0, "", mappedMember));
+            } else if (memberVal instanceof Val.Arr) {
+                Object mappedArray = mapArr((Val.Arr) memberVal, evalScope);
+                mappedArr.add(new ValueInfo(0, "", mappedArray));
+            } else {
+                mappedArr.add(new ValueInfo(0, "", Materializer.apply(memberVal, evalScope)));
+            }
+*/
 
-      int diffLinesNumber = 0;
-      int diffCaretPos = 0;
+            return null;
+        });
 
-      if (lineCount != -1) { // If the code is wrapped by ID, remove auto-generated lines
-        String[] sourceLines = sourceCode.split("\r\n|\r|\n");
-        diffLinesNumber = sourceLines.length - lineCount;
+        if (!this.attached) {
+            this.attach(false);
+        }
 
-        String[] diffLines = Arrays.copyOfRange(sourceLines, 0, diffLinesNumber);
-        diffCaretPos = String.join(System.lineSeparator(), diffLines).length();
+        return mappedArr;
+    }
 
-        sourceLines = Arrays.copyOfRange(sourceLines, diffLinesNumber, sourceLines.length);
-        visibleCode = String.join(System.lineSeparator(), sourceLines);
-      }
+    private Map<String, ValueInfo> mapObject(@Nullable Val.Obj objectValue, EvalScope evalScope) {
+        if (objectValue == null) {
+            return null;
+        }
 
-      int caretPos = expr.offset() - diffCaretPos - 1;
-      if (caretPos < 0) {
-        logger.debug("caretPos is in invisible code");
+        if (this.attached) {
+            this.detach(false);//We must detach the debugger while forcing the lazy value, to avoid deadlocks
+        }
+
+        Map<String, ValueInfo> mappedObject = new ConcurrentHashMap<>();
+
+        objectValue.foreachVisibleKey((key, visibility) -> { //TODO Only visible keys?
+            Option<Val> member = objectValue.valueCache().get(key);
+            if (member.nonEmpty()) {
+                Val memberVal = member.get();
+                if (memberVal instanceof Val.Obj) {
+                    Object mappedMember = mapObject((Val.Obj) memberVal, evalScope);
+                    mappedObject.put(key, new ValueInfo(0, key, mappedMember));
+                } else if (memberVal instanceof Val.Arr) {
+                    Object mappedArr = mapArr((Val.Arr) memberVal, evalScope);
+                    mappedObject.put(key, new ValueInfo(0, key, mappedArr));
+                } else {
+                    mappedObject.put(key, new ValueInfo(0, key, Materializer.apply(memberVal, evalScope)));
+                }
+            } else {
+                mappedObject.put(key, new ValueInfo(0, key, null));
+            }
+            return null;
+        });
+
+        if (!this.attached) {
+            this.attach(false);
+        }
+
+        return mappedObject;
+    }
+
+    /**
+     * Return a SourcePos for the expr on the fileScope
+     *
+     * @param expr
+     * @param fileScope
+     * @return
+     */
+    private SourcePos getSourcePos(Expr expr, FileScope fileScope) {
+        if (fileScope.source() != null) {
+            String sourceCode = fileScope.source();
+            String visibleCode = sourceCode;
+
+            if (lineCount != -1) { // If the code is wrapped by ID, remove auto-generated lines
+                String[] sourceLines = sourceCode.split("\r\n|\r|\n");
+
+                if (diffLinesCount == -1 && diffOffset == -1) {
+                    diffLinesCount = sourceLines.length - lineCount;
+                    String[] diffLines = Arrays.copyOfRange(sourceLines, 0, diffLinesCount);
+                    diffOffset = String.join(System.lineSeparator(), diffLines).length();
+                }
+
+                sourceLines = Arrays.copyOfRange(sourceLines, diffLinesCount, sourceLines.length);
+                visibleCode = String.join(System.lineSeparator(), sourceLines);
+            }
+
+            int caretPos = expr.offset() - (diffOffset != -1 ? diffOffset : 0) - 1;
+            if (caretPos < 0) {
+                logger.debug("caretPos is in invisible code");
+                return null;
+            }
+            if (caretPos > sourceCode.length()) {
+                logger.error("caretPos: " + caretPos + " > sourceCode.length() " + sourceCode.length());
+                return null;
+            }
+
+            String preface = visibleCode.substring(0, caretPos);
+            String[] lines = preface.split("\r\n|\r|\n");
+
+            SourcePos sourcePos = new SourcePos();
+            sourcePos.setCurrentFile(fileScope.currentFile().toString());
+            sourcePos.setCaretPos(caretPos);
+            sourcePos.setLine(lines.length - (diffLinesCount != -1 ? diffLinesCount : 0) + 1); // lines are 0-based, and this counts the number of previous lines
+            sourcePos.setCaretPosInLine(caretPos - preface.lastIndexOf("\n"));
+
+            // Mapper.asFunction wraps the script with `function (payload) {` as the first line, and `}` at the end.
+            // so here we add need so subtract 1 to the line
+            // TODO Also see Run::alreadyWrapped, that's a parameter to avoid adding this wrapping function
+            //sourcePos.setLine(sourcePos.getLine() - 1);
+
+            return sourcePos;
+        }
         return null;
-      }
-      if (caretPos > sourceCode.length()) {
-        logger.error("caretPos: " + caretPos + " > sourceCode.length() " + sourceCode.length());
-        return null;
-      }
-
-      String preface = visibleCode.substring(0, caretPos);
-      String[] lines = preface.split("\r\n|\r|\n");
-
-      SourcePos sourcePos = new SourcePos();
-      sourcePos.setCurrentFile(fileScope.currentFile().toString());
-      sourcePos.setCaretPos(caretPos);
-      sourcePos.setLine(lines.length - diffLinesNumber + 1); // lines are 0-based, and this counts the number of previous lines
-      sourcePos.setCaretPosInLine(caretPos - preface.lastIndexOf("\n"));
-
-      // Mapper.asFunction wraps the script with `function (payload) {` as the first line, and `}` at the end.
-      // so here we add need so subtract 1 to the line
-      // TODO Also see Run::alreadyWrapped, that's a parameter to avoid adding this wrapping function
-      //sourcePos.setLine(sourcePos.getLine() - 1);
-
-      return sourcePos;
     }
-    return null;
-  }
 
-  /**
-   * resume execution
-   */
-  public void resume() {
-    logger.debug("resume");
-    if (latch != null && latch.getCount() > 0) {
-      logger.debug("latch.countDown");
-      latch.countDown();
+    /**
+     * resume execution
+     */
+    public void resume() {
+        logger.debug("resume");
+        if (latch != null && latch.getCount() > 0) {
+            logger.debug("latch.countDown");
+            latch.countDown();
+        }
     }
-  }
 
-  public void attach() {
-    if (!attached) {
-      attached = true;
-      System.setProperty("debug", "true");
-      breakpoints.clear();
+    public void attach() {
+        this.attach(true);
     }
-  }
+    public void attach(boolean clear) {
+        if (!attached) {
+            attached = true;
+            System.setProperty("debug", "true");
+            if (clear) {
+                breakpoints.clear();
+            }
+        }
+    }
 
-  /**
-   * detach and resume
-   */
-  public void detach() {
-    attached = false;
-    System.setProperty("debug", "false");
-    breakpoints.clear();
-    this.resume();
-  }
+    /**
+     * detach and resume
+     */
+    public void detach() {
+        this.detach(true);
+    }
+    public void detach(boolean clear) {
+        attached = false;
+        System.setProperty("debug", "false");
+        if (clear) {
+            breakpoints.clear();
+        }
+        this.resume();
+    }
 
-  public boolean isAttached() {
-    return attached;
-  }
+    public boolean isAttached() {
+        return attached;
+    }
 
-  public void setAutoStepping(boolean autoStepping) {
-    this.autoStepping = autoStepping;
-  }
+    public void setStepMode(boolean stepMode) {
+        this.stepMode = stepMode;
+    }
 
-  public boolean isAutoStepping() {
-    return this.autoStepping;
-  }
+    public boolean isStepMode() {
+        return this.stepMode;
+    }
 
-  public void setDebuggerAdapter(DataSonnetDebugListener dataSonnetDebugListener) {
-    this.debugListener = dataSonnetDebugListener;
-  }
+    public void setDebuggerAdapter(DataSonnetDebugListener dataSonnetDebugListener) {
+        this.debugListener = dataSonnetDebugListener;
+    }
 
-  public int getLineCount() {
-    return lineCount;
-  }
+    public int getLineCount() {
+        return lineCount;
+    }
 
-  public void setLineCount(int lineCount) {
-    this.lineCount = lineCount;
-  }
+    public void setLineCount(int lineCount) {
+        this.lineCount = lineCount;
+    }
 }

@@ -340,7 +340,7 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
             logger.info("Running mapper for script: " + this.script);
             mapper = new Mapper(this.script);
             DataSonnetDebugger debugger = DataSonnetDebugger.getDebugger();
-            debugger.setAutoStepping(true);
+            debugger.setStepMode(true);
             // don't start it yet!
 
             boolean launched = true;
@@ -884,15 +884,15 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
   }
 
   private List<Variable> getRefVariables() {
-
+    //FIXME this needs to be reworked to support object structures
     StoppedProgramContext spc = DataSonnetDebugger.getDebugger().getStoppedProgramContext();
-    String selfValue = spc.getNamedVariables().get("self");
+    String selfValue = spc.getNamedVariables().get("self").toString();
     Variable self_ = this.createRefVariable("self", "Object", selfValue, SELF_VAR_REF);
 
-    String superValue = spc.getNamedVariables().get("super");
+    String superValue = spc.getNamedVariables().get("super").toString();
     Variable super_ = this.createRefVariable("super", "Object", superValue, SUPER_VAR_REF);
 
-    String dollarValue = spc.getNamedVariables().get("dollar");
+    String dollarValue = spc.getNamedVariables().get("dollar").toString();
     Variable dollar_ = this.createRefVariable("dollar", "Object", dollarValue, DOLLAR_VAR_REF);
 
     return List.of(self_, super_, dollar_);
@@ -963,7 +963,7 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
           ContinueResponse response = new ContinueResponse();
           int threadId = args.getThreadId();
           if (threadId == 0) {
-            DataSonnetDebugger.getDebugger().setAutoStepping(false);
+            DataSonnetDebugger.getDebugger().setStepMode(false);
             response.setAllThreadsContinued(Boolean.TRUE);
             return response;
           } else {
