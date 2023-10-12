@@ -101,11 +101,19 @@ public class DataSonnetDebugger {
     }
 
     public void probeExpr(Expr expr, ValScope valScope, FileScope fileScope, EvalScope evalScope) {
+        if (this.attached) {
+            this.detach(false);//We must detach the debugger while probing the expression, to avoid stack overflow
+        }
+
         SourcePos sourcePos = this.getSourcePos(expr, fileScope);
         if (sourcePos == null) {
             logger.debug("sourcePos is null, returning");
+            if (!this.attached) {
+                this.attach(false);
+            }
             return;
         }
+
         int line = sourcePos.getLine();
         Breakpoint breakpoint = sourcePos != null ? breakpoints.get(line) : null;
         if (this.isStepMode() || (breakpoint != null && breakpoint.isEnabled())) {
@@ -127,6 +135,10 @@ public class DataSonnetDebugger {
             if (breakpoint != null && breakpoint.isTemporary()) {
                 breakpoints.remove(line);
             }
+        }
+
+        if (!this.attached) {
+            this.attach(false);
         }
     }
 
@@ -166,32 +178,25 @@ public class DataSonnetDebugger {
     }
 
     private List<ValueInfo> mapArr(@Nullable Val.Arr arrValue, EvalScope evalScope) {
-        if (this.attached) {
-            this.detach(false);//We must detach the debugger while forcing the lazy value, to avoid deadlocks
-        }
 
         List<ValueInfo> mappedArr = new CopyOnWriteArrayList<>();
 
         arrValue.value().foreach(member -> {
-/*
             Val memberVal = member.force();
+            //FIXME
+            Materializer.apply(memberVal, evalScope);//TODO we need to review this - it works but it calculates values of ALL objects, not just previously evaluated ones
             if (memberVal instanceof Val.Obj) {
                 Object mappedMember = mapObject((Val.Obj) memberVal, evalScope);
-                mappedArr.add(new ValueInfo(0, "", mappedMember));
+                mappedArr.add(new ValueInfo(memberVal.sourcePosition(), "", mappedMember));
             } else if (memberVal instanceof Val.Arr) {
                 Object mappedArray = mapArr((Val.Arr) memberVal, evalScope);
-                mappedArr.add(new ValueInfo(0, "", mappedArray));
+                mappedArr.add(new ValueInfo(memberVal.sourcePosition(), "", mappedArray));
             } else {
-                mappedArr.add(new ValueInfo(0, "", Materializer.apply(memberVal, evalScope)));
+                mappedArr.add(new ValueInfo(memberVal.sourcePosition(), "", Materializer.apply(memberVal, evalScope)));
             }
-*/
 
             return null;
         });
-
-        if (!this.attached) {
-            this.attach(false);
-        }
 
         return mappedArr;
     }
@@ -201,24 +206,20 @@ public class DataSonnetDebugger {
             return null;
         }
 
-        if (this.attached) {
-            this.detach(false);//We must detach the debugger while forcing the lazy value, to avoid deadlocks
-        }
-
         Map<String, ValueInfo> mappedObject = new ConcurrentHashMap<>();
 
         objectValue.foreachVisibleKey((key, visibility) -> { //TODO Only visible keys?
             Option<Val> member = objectValue.valueCache().get(key);
-            if (member.nonEmpty()) {
+            if (member.nonEmpty() && !"self".equals(key) && !"$".equals(key) && !"super".equals(key)) {
                 Val memberVal = member.get();
                 if (memberVal instanceof Val.Obj) {
                     Object mappedMember = mapObject((Val.Obj) memberVal, evalScope);
-                    mappedObject.put(key, new ValueInfo(0, key, mappedMember));
+                    mappedObject.put(key, new ValueInfo(memberVal.sourcePosition(), key, mappedMember));
                 } else if (memberVal instanceof Val.Arr) {
                     Object mappedArr = mapArr((Val.Arr) memberVal, evalScope);
-                    mappedObject.put(key, new ValueInfo(0, key, mappedArr));
+                    mappedObject.put(key, new ValueInfo(memberVal.sourcePosition(), key, mappedArr));
                 } else {
-                    mappedObject.put(key, new ValueInfo(0, key, Materializer.apply(memberVal, evalScope)));
+                    mappedObject.put(key, new ValueInfo(memberVal.sourcePosition(), key, Materializer.apply(memberVal, evalScope)));
                 }
             } else {
                 mappedObject.put(key, new ValueInfo(0, key, null));
@@ -226,13 +227,12 @@ public class DataSonnetDebugger {
             return null;
         });
 
-        if (!this.attached) {
-            this.attach(false);
-        }
-
         return mappedObject;
     }
 
+    public int getDiffOffset() {
+        return diffOffset;
+    }
     /**
      * Return a SourcePos for the expr on the fileScope
      *

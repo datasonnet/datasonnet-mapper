@@ -54,7 +54,7 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
       DataSonnetDebugger.getDebugger.probeExpr(expr, scope, fileScope, evalScope)
     }
 
-    try expr match {
+    val evaluatedVal = try expr match {
       case Null(offset) => Val.Null
       case Parened(offset, inner) => visitExpr(inner)
       case True(offset) => Val.True
@@ -111,6 +111,10 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
         extension.addSuper(original)
       }
     } catch Error.tryCatch(expr.offset)
+    //Remember the source position of the expression
+    val diffOffset = if (DataSonnetDebugger.getDebugger.getDiffOffset != - 1) DataSonnetDebugger.getDebugger.getDiffOffset - 1 else 0
+    evaluatedVal.setSourcePosition(expr.offset - diffOffset)
+    evaluatedVal
   }
 
   def visitId(offset: Int, value: Int)(implicit scope: ValScope, fileScope: FileScope): Val = {
