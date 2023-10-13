@@ -112,7 +112,7 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
       }
     } catch Error.tryCatch(expr.offset)
     //Remember the source position of the expression
-    val diffOffset = if (DataSonnetDebugger.getDebugger.getDiffOffset != - 1) DataSonnetDebugger.getDebugger.getDiffOffset - 1 else 0
+    val diffOffset = if (DataSonnetDebugger.getDebugger.getDiffOffset != - 1) DataSonnetDebugger.getDebugger.getDiffOffset + 1 else 0
     evaluatedVal.setSourcePosition(expr.offset - diffOffset)
     evaluatedVal
   }

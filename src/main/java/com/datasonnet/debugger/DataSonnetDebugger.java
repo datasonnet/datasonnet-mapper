@@ -245,7 +245,7 @@ public class DataSonnetDebugger {
             String sourceCode = fileScope.source();
             String visibleCode = sourceCode;
 
-            if (lineCount != -1) { // If the code is wrapped by ID, remove auto-generated lines
+            if (lineCount != -1) { // If the code is wrapped, remove auto-generated lines
                 String[] sourceLines = sourceCode.split("\r\n|\r|\n");
 
                 if (diffLinesCount == -1 && diffOffset == -1) {
@@ -276,11 +276,6 @@ public class DataSonnetDebugger {
             sourcePos.setCaretPos(caretPos);
             sourcePos.setLine(lines.length - (diffLinesCount != -1 ? diffLinesCount : 0) + 1); // lines are 0-based, and this counts the number of previous lines
             sourcePos.setCaretPosInLine(caretPos - preface.lastIndexOf("\n"));
-
-            // Mapper.asFunction wraps the script with `function (payload) {` as the first line, and `}` at the end.
-            // so here we add need so subtract 1 to the line
-            // TODO Also see Run::alreadyWrapped, that's a parameter to avoid adding this wrapping function
-            //sourcePos.setLine(sourcePos.getLine() - 1);
 
             return sourcePos;
         }
