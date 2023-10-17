@@ -32,6 +32,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.util.Either;
 
 /**
  * Singleton that enables debugging features on an Evaluator.
@@ -76,6 +77,10 @@ public class DataSonnetDebugger {
     private int lineCount = -1;
     private int diffOffset = -1;
     private int diffLinesCount = -1;
+
+    private ValScope currentValScope;
+    private FileScope currentFileScope;
+    private EvalScope currentEvalScope;
 
     public static DataSonnetDebugger getDebugger() {
         if (DEBUGGER == null) {
@@ -142,6 +147,32 @@ public class DataSonnetDebugger {
         }
     }
 
+    public Object evaluateExpression(String expression) {
+        if (this.attached) {
+            this.detach(false);//We must detach the debugger while probing the expression, to avoid stack overflow
+        }
+
+        Interpreter interpreter = new Interpreter((Evaluator) currentEvalScope);
+        Either either = interpreter.parse(expression, currentFileScope.currentFile());
+        if (either.isLeft()) {
+            return either.left().get();
+        }
+        Expr expr = (Expr) either.right().get();
+        Object value = "";
+        try {
+            Val exprVal = currentEvalScope.visitExpr(expr, currentValScope, currentFileScope);
+            value = Materializer.apply(exprVal, currentEvalScope);
+        } catch (Exception e) {
+            value = e;
+        }
+
+        if (!this.attached) {
+            this.attach(false);
+        }
+
+        return value;
+    }
+
     private void cleanContext() {
         this.spc = null;
     }
@@ -159,13 +190,17 @@ public class DataSonnetDebugger {
      * @param sourcePos
      */
     private void saveContext(Expr expr, ValScope valScope, FileScope fileScope, EvalScope evalScope, SourcePos sourcePos) {
+        currentFileScope = fileScope;
+        currentValScope = valScope;
+        currentEvalScope = evalScope;
+
         StoppedProgramContext spc = new StoppedProgramContext();
         spc.setSourcePos(sourcePos);
         Map<String, Map<String, ValueInfo>> namedVariables = new HashMap<>();
 
-        namedVariables.put("self", valScope.self0().nonEmpty() ? this.mapObject(valScope.self0().get(), evalScope) : null);
-        namedVariables.put("super", valScope.super0().nonEmpty() ? this.mapObject(valScope.super0().get(), evalScope) : null);
-        namedVariables.put("$", valScope.dollar0().nonEmpty() ? this.mapObject(valScope.dollar0().get(), evalScope) : null);
+        namedVariables.put("self", valScope.self0().nonEmpty() ? (Map<String, ValueInfo>)this.mapValue(valScope.self0().get(), evalScope) : null);
+        namedVariables.put("super", valScope.super0().nonEmpty() ? (Map<String, ValueInfo>)this.mapValue(valScope.super0().get(), evalScope) : null);
+        namedVariables.put("$", valScope.dollar0().nonEmpty() ? (Map<String, ValueInfo>)this.mapValue(valScope.dollar0().get(), evalScope) : null);
 
         scala.collection.immutable.Map<String, Object> nameIndices = fileScope.nameIndices();
 
@@ -177,57 +212,41 @@ public class DataSonnetDebugger {
         this.spc = spc;
     }
 
-    private List<ValueInfo> mapArr(@Nullable Val.Arr arrValue, EvalScope evalScope) {
+    private Object mapValue(@Nullable Val theVal, EvalScope evalScope) {
+        Object mapped = null;
+        if (theVal instanceof Val.Obj) {
+            Val.Obj objectValue = (Val.Obj)theVal;
+            Map<String, ValueInfo> mappedObject = new ConcurrentHashMap<>();
 
-        List<ValueInfo> mappedArr = new CopyOnWriteArrayList<>();
-
-        arrValue.value().foreach(member -> {
-            Val memberVal = member.force();
-            //FIXME
-            Materializer.apply(memberVal, evalScope);//TODO we need to review this - it works but it calculates values of ALL objects, not just previously evaluated ones
-            if (memberVal instanceof Val.Obj) {
-                Object mappedMember = mapObject((Val.Obj) memberVal, evalScope);
-                mappedArr.add(new ValueInfo(memberVal.sourcePosition(), "", mappedMember));
-            } else if (memberVal instanceof Val.Arr) {
-                Object mappedArray = mapArr((Val.Arr) memberVal, evalScope);
-                mappedArr.add(new ValueInfo(memberVal.sourcePosition(), "", mappedArray));
-            } else {
-                mappedArr.add(new ValueInfo(memberVal.sourcePosition(), "", Materializer.apply(memberVal, evalScope)));
-            }
-
-            return null;
-        });
-
-        return mappedArr;
-    }
-
-    private Map<String, ValueInfo> mapObject(@Nullable Val.Obj objectValue, EvalScope evalScope) {
-        if (objectValue == null) {
-            return null;
-        }
-
-        Map<String, ValueInfo> mappedObject = new ConcurrentHashMap<>();
-
-        objectValue.foreachVisibleKey((key, visibility) -> { //TODO Only visible keys?
-            Option<Val> member = objectValue.valueCache().get(key);
-            if (member.nonEmpty() && !"self".equals(key) && !"$".equals(key) && !"super".equals(key)) {
-                Val memberVal = member.get();
-                if (memberVal instanceof Val.Obj) {
-                    Object mappedMember = mapObject((Val.Obj) memberVal, evalScope);
-                    mappedObject.put(key, new ValueInfo(memberVal.sourcePosition(), key, mappedMember));
-                } else if (memberVal instanceof Val.Arr) {
-                    Object mappedArr = mapArr((Val.Arr) memberVal, evalScope);
-                    mappedObject.put(key, new ValueInfo(memberVal.sourcePosition(), key, mappedArr));
+            objectValue.foreachVisibleKey((key, visibility) -> { //TODO Only visible keys?
+                Option<Val> member = objectValue.valueCache().get(key);
+                if (member.nonEmpty() && !"self".equals(key) && !"$".equals(key) && !"super".equals(key)) {
+                    Val memberVal = member.get();
+                    mappedObject.put(key, new ValueInfo(memberVal.sourcePosition(), key, mapValue(memberVal, evalScope)));
                 } else {
-                    mappedObject.put(key, new ValueInfo(memberVal.sourcePosition(), key, Materializer.apply(memberVal, evalScope)));
+                    mappedObject.put(key, new ValueInfo(0, key, null));
                 }
-            } else {
-                mappedObject.put(key, new ValueInfo(0, key, null));
-            }
-            return null;
-        });
+                return null;
+            });
 
-        return mappedObject;
+            mapped = mappedObject;
+        } else if (theVal instanceof Val.Arr) {
+            Val.Arr arrValue = (Val.Arr)theVal;
+            List<ValueInfo> mappedArr = new CopyOnWriteArrayList<>();
+
+            arrValue.value().foreach(member -> {
+                Val memberVal = member.force();
+                //FIXME
+                Materializer.apply(memberVal, evalScope);//TODO we need to review this - it works but it calculates values of ALL objects, not just previously evaluated ones
+                mappedArr.add(new ValueInfo(memberVal.sourcePosition(), "", mapValue(memberVal, evalScope)));
+                return null;
+            });
+
+            mapped = mappedArr;
+        } else {
+            mapped = Materializer.apply(theVal, evalScope);
+        }
+        return mapped;
     }
 
     public int getDiffOffset() {

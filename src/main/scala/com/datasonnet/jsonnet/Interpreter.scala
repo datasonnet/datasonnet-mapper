@@ -1,7 +1,7 @@
 package com.datasonnet.jsonnet
 
 /*-
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,40 +15,57 @@ package com.datasonnet.jsonnet
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.datasonnet.jsonnet.Expr.Params
+import fastparse.Parsed
 
 import java.io.{PrintWriter, StringWriter}
-
-import fastparse.Parsed
-import com.datasonnet.jsonnet.Expr.Params
+import scala.collection.{immutable}
 
 /**
-  * Wraps all the machinery of evaluating Jsonnet source code, from parsing to
-  * evaluation to materialization, into a convenient wrapper class.
-  */
-class Interpreter(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]],
-                  extVars: Map[String, ujson.Value],
-                  tlaVars: Map[String, ujson.Value],
-                  wd: Path,
-                  importer: (Path, String) => Option[(Path, String)],
-                  preserveOrder: Boolean = false) {
+ * Wraps all the machinery of evaluating Jsonnet source code, from parsing to
+ * evaluation to materialization, into a convenient wrapper class.
+ */
+class Interpreter(eval: Evaluator) {
+  var evaluator = eval
+  var parseCache = eval.parseCache
+  var tlaVars: Map[String, ujson.Value] = new immutable.HashMap[String, ujson.Value]
 
-  val evaluator = new Evaluator(
-    parseCache,
-    extVars,
-    wd,
-    importer,
-    preserveOrder
-  )
+  def this(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]],
+           extVars: Map[String, ujson.Value],
+           tlaVars: Map[String, ujson.Value],
+           wd: Path,
+           importer: (Path, String) => Option[(Path, String)],
+           preserveOrder: Boolean = false) {
+
+    this(new Evaluator(
+      parseCache,
+      extVars,
+      wd,
+      importer,
+      preserveOrder
+    ))
+    this.tlaVars = tlaVars
+    this.parseCache = parseCache
+  }
+
+  def parse(txt: String, path: Path): Either[String, Expr] = {
+    val res = parseCache.getOrElseUpdate(txt, fastparse.parse(txt, Parser.document(_))) match {
+      case f@Parsed.Failure(l, i, e) => Left("Parse error: " + f.trace().msg)
+      case Parsed.Success(r, index) => Right(r._1)
+    }
+    res
+  }
 
   def interpret(txt: String, path: Path): Either[String, ujson.Value] = {
     interpret0(txt, path, ujson.Value)
   }
+
   def interpret0[T](txt: String,
                     path: Path,
                     visitor: upickle.core.Visitor[T, T]): Either[String, T] = {
-    for{
-      res <- parseCache.getOrElseUpdate(txt, fastparse.parse(txt, Parser.document(_))) match{
-        case f @ Parsed.Failure(l, i, e) => Left("Parse error: " + f.trace().msg)
+    for {
+      res <- parseCache.getOrElseUpdate(txt, fastparse.parse(txt, Parser.document(_))) match {
+        case f@Parsed.Failure(l, i, e) => Left("Parse error: " + f.trace().msg)
         case Parsed.Success(r, index) => Right(r)
       }
       (parsed, nameIndices) = res
@@ -60,17 +77,18 @@ class Interpreter(parseCache: collection.mutable.Map[String, fastparse.Parsed[(E
             new FileScope(path, nameIndices)
           )
         )
-        catch{case e: Throwable =>
-          val s = new StringWriter()
-          val p = new PrintWriter(s)
-          e.printStackTrace(p)
-          p.close()
-          Left(s.toString.replace("\t", "    "))
+        catch {
+          case e: Throwable =>
+            val s = new StringWriter()
+            val p = new PrintWriter(s)
+            e.printStackTrace(p)
+            p.close()
+            Left(s.toString.replace("\t", "    "))
         }
-      res = res0 match{
+      res = res0 match {
         case f: Val.Func =>
-          f.copy(params = Params(f.params.args.map{ case (k, default, i) =>
-            (k, tlaVars.get(k) match{
+          f.copy(params = Params(f.params.args.map { case (k, default, i) =>
+            (k, tlaVars.get(k) match {
               case None => default
               case Some(v) => Some(Materializer.toExpr(v))
             }, i)
@@ -79,7 +97,7 @@ class Interpreter(parseCache: collection.mutable.Map[String, fastparse.Parsed[(E
       }
       json <-
         try Right(Materializer.apply0(res, visitor)(evaluator))
-        catch{
+        catch {
           case Error.Delegate(msg) => Left(msg)
           case e: Throwable =>
             val s = new StringWriter()

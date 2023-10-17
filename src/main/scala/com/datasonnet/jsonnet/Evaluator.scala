@@ -32,13 +32,15 @@ import scala.collection.mutable
   * imported module to be re-used. Parsing is cached separatedly by an external
   * `parseCache`.
   */
-class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]],
+class Evaluator(parseCacheP: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]],
                 val extVars: Map[String, ujson.Value],
                 val wd: Path,
                 importer: (Path, String) => Option[(Path, String)],
                 override val preserveOrder: Boolean = false,
                 override val defaultValue: Value = null) extends EvalScope{
   implicit def evalScope: EvalScope = this
+
+  val parseCache = parseCacheP
 
   val loadedFileContents = mutable.Map.empty[Path, String]
   def loadCachedSource(p: Path) = loadedFileContents.get(p)
