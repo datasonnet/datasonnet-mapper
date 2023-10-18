@@ -17,6 +17,7 @@ package com.datasonnet.debugger;
  */
 
 import java.util.Map;
+import java.util.Objects;
 
 public class ValueInfo {
     private int offset;
@@ -55,5 +56,10 @@ public class ValueInfo {
 
     public boolean isObject() {
         return value instanceof Map;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toString(this.value);
     }
 }

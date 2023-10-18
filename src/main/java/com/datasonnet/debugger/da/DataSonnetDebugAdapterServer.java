@@ -33,6 +33,7 @@ import com.datasonnet.Mapper;
 import com.datasonnet.debugger.DataSonnetDebugger;
 import com.datasonnet.debugger.SourcePos;
 import com.datasonnet.debugger.StoppedProgramContext;
+import com.datasonnet.debugger.ValueInfo;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.MediaTypes;
 import org.eclipse.lsp4j.debug.Breakpoint;
@@ -886,14 +887,14 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
   private List<Variable> getRefVariables() {
     //FIXME this needs to be reworked to support object structures
     StoppedProgramContext spc = DataSonnetDebugger.getDebugger().getStoppedProgramContext();
-    String selfValue = spc.getNamedVariables().get("self").toString();
-    Variable self_ = this.createRefVariable("self", "Object", selfValue, SELF_VAR_REF);
+    Map<String, ValueInfo> selfValue = spc.getNamedVariables().get(DataSonnetDebugger.SELF_VAR_NAME);
+    Variable self_ = this.createRefVariable(DataSonnetDebugger.SELF_VAR_NAME, "Object", selfValue == null ? "null" : selfValue.toString(), SELF_VAR_REF);
 
-    String superValue = spc.getNamedVariables().get("super").toString();
-    Variable super_ = this.createRefVariable("super", "Object", superValue, SUPER_VAR_REF);
+    Map<String, ValueInfo> superValue = spc.getNamedVariables().get(DataSonnetDebugger.SUPER_VAR_NAME);
+    Variable super_ = this.createRefVariable(DataSonnetDebugger.SUPER_VAR_NAME, "Object", superValue == null ? "null" : superValue.toString(), SUPER_VAR_REF);
 
-    String dollarValue = spc.getNamedVariables().get("dollar").toString();
-    Variable dollar_ = this.createRefVariable("dollar", "Object", dollarValue, DOLLAR_VAR_REF);
+    Map<String, ValueInfo> dollarValue = spc.getNamedVariables().get(DataSonnetDebugger.DOLLAR_VAR_NAME);
+    Variable dollar_ = this.createRefVariable(DataSonnetDebugger.DOLLAR_VAR_NAME, "Object", dollarValue == null ? "null" : dollarValue.toString(), DOLLAR_VAR_REF);
 
     return List.of(self_, super_, dollar_);
   }

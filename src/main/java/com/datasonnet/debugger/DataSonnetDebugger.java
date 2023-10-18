@@ -37,6 +37,9 @@ import org.slf4j.LoggerFactory;
  * Singleton that enables debugging features on an Evaluator.
  */
 public class DataSonnetDebugger {
+    public static final String SELF_VAR_NAME = "self";
+    public static final String SUPER_VAR_NAME = "super";
+    public static final String DOLLAR_VAR_NAME = "$";
     private static final Logger logger = LoggerFactory.getLogger(DataSonnetDebugger.class);
     /**
      * Instance
@@ -151,9 +154,10 @@ public class DataSonnetDebugger {
         spc.setSourcePos(sourcePos);
         Map<String, Map<String, ValueInfo>> namedVariables = new HashMap<>();
 
-        namedVariables.put("self", valScope.self0().nonEmpty() ? this.mapObject(valScope.self0().get(), evalScope) : null);
-        namedVariables.put("super", valScope.super0().nonEmpty() ? this.mapObject(valScope.super0().get(), evalScope) : null);
-        namedVariables.put("$", valScope.dollar0().nonEmpty() ? this.mapObject(valScope.dollar0().get(), evalScope) : null);
+        namedVariables.put(SELF_VAR_NAME, valScope.self0().nonEmpty() ? this.mapObject(valScope.self0().get(), evalScope) : null);
+        namedVariables.put(SUPER_VAR_NAME, valScope.super0().nonEmpty() ? this.mapObject(valScope.super0().get(), evalScope) : null);
+        namedVariables.put(DOLLAR_VAR_NAME, valScope.dollar0().nonEmpty() ? this.mapObject(valScope.dollar0().get(), evalScope) : null);
+        logger.debug("saveContext. namedVariables is: " + namedVariables);
 
         scala.collection.immutable.Map<String, Object> nameIndices = fileScope.nameIndices();
 
