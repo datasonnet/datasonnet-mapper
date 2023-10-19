@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -238,7 +239,12 @@ public class DataSonnetDebugger {
     }
 
     /**
-     * Return a SourcePos for the expr on the fileScope
+     * Return a SourcePos for the expr on the fileScope<br/>
+     *
+     * SourcePos contains:<br/>
+     *  <li>caretPos: 0-based index, points to the pos of the current position ( first character of the term )</li>
+     *  <li>line: 0-based index, line where the caret is</li>
+     *  <li>caretPosInLine: 0-based index; caret position within the current line ( count from the left )</li>
      *
      * @param expr
      * @param fileScope
@@ -247,22 +253,27 @@ public class DataSonnetDebugger {
     private SourcePos getSourcePos(Expr expr, FileScope fileScope) {
         if (fileScope.source() != null) {
             String sourceCode = fileScope.source();
+            // offset points to the first character of the expressions. Offsets are zero based.
             String visibleCode = sourceCode;
 
-            if (lineCount != -1) { // If the code is wrapped by ID, remove auto-generated lines
-                String[] sourceLines = sourceCode.split("\r\n|\r|\n");
+            if (lineCount != -1) { // If the code is wrapped by IDE, remove auto-generated lines
+                String[] sourceLines = sourceCode.split("\\R");
+                logger.debug("sourceLines: " + sourceLines);
 
                 if (diffLinesCount == -1 && diffOffset == -1) {
                     diffLinesCount = sourceLines.length - lineCount;
                     String[] diffLines = Arrays.copyOfRange(sourceLines, 0, diffLinesCount);
+                    logger.debug("diffLines: " + diffLines);
                     diffOffset = String.join(System.lineSeparator(), diffLines).length();
+                    logger.debug("diffOffset: " + diffOffset);
                 }
 
                 sourceLines = Arrays.copyOfRange(sourceLines, diffLinesCount, sourceLines.length);
                 visibleCode = String.join(System.lineSeparator(), sourceLines);
             }
 
-            int caretPos = expr.offset() - (diffOffset != -1 ? diffOffset : 0) - 1;
+            int caretPos = expr.offset() - (diffOffset != -1 ? diffOffset : 0);
+            logger.debug("caretPos: " + caretPos);
             if (caretPos < 0) {
                 logger.debug("caretPos is in invisible code");
                 return null;
@@ -272,20 +283,15 @@ public class DataSonnetDebugger {
                 return null;
             }
 
-            String preface = visibleCode.substring(0, caretPos);
-            String[] lines = preface.split("\r\n|\r|\n");
+            String prefaceIncludingCurrent = visibleCode.substring(0, caretPos + 1);
+            String[] lines = prefaceIncludingCurrent.split("\\R");
 
             SourcePos sourcePos = new SourcePos();
-            sourcePos.setCurrentFile(fileScope.currentFile().toString());
+            sourcePos.setCurrentFile(Objects.toString(fileScope.currentFile()));
             sourcePos.setCaretPos(caretPos);
-            sourcePos.setLine(lines.length - (diffLinesCount != -1 ? diffLinesCount : 0) + 1); // lines are 0-based, and this counts the number of previous lines
-            sourcePos.setCaretPosInLine(caretPos - preface.lastIndexOf("\n"));
-
-            // Mapper.asFunction wraps the script with `function (payload) {` as the first line, and `}` at the end.
-            // so here we add need so subtract 1 to the line
-            // TODO Also see Run::alreadyWrapped, that's a parameter to avoid adding this wrapping function
-            //sourcePos.setLine(sourcePos.getLine() - 1);
-
+            // Lines are zero-based, and the caret is on the last line of the array
+            sourcePos.setLine(lines.length - (diffLinesCount != -1 ? diffLinesCount : 0) - 1);
+            sourcePos.setCaretPosInLine(caretPos - ( prefaceIncludingCurrent.lastIndexOf("\n") + 1 ));
             return sourcePos;
         }
         return null;

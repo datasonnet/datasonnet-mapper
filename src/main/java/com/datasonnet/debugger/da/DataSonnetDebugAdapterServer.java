@@ -184,6 +184,11 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
   private String resultVariable;
 
   /**
+   * Loaded on the initialize command
+   */
+  private InitializeRequestArguments initializeRequestArguments;
+
+  /**
    * Save the proxy to be used to send events to the client
    *
    * @param clientProxy
@@ -231,7 +236,7 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
 //    "seq": 1
 //}
 
-          // FIXME we're assuming columns start at 1; should save the value from the args
+          this.initializeRequestArguments = args;
 
           Capabilities capabilities = new Capabilities();
           // Disabled until we found out how to set a variable on the Evaluator Scope
@@ -619,16 +624,31 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
 
 //   * The line within the source of the frame. If the source attribute is missing
 //   * or doesn't exist, `line` is 0 and should be ignored by the client.
-            sf0.setLine(this.getStoppedAtSourcePos().getLine());
+
+
+            int sourcePosLine = this.getStoppedAtSourcePos().getLine();
+            if ( this.initializeRequestArguments.getLinesStartAt1() ) {
+              sourcePosLine++;
+            }
+            // Mapper.asFunction wraps the script with `function (payload) {` as the first line, and `}` at the end.
+            // so here we need so subtract 1 to the line
+            // TODO Also see Run::alreadyWrapped, that's a parameter to avoid adding the wrapping function
+            sourcePosLine--;
+
+            sf0.setLine(sourcePosLine);
 
 //   * Start position of the range covered by the stack frame. It is measured in
 //   * UTF-16 code units and the client capability `columnsStartAt1` determines
 //   * whether it is 0- or 1-based. If attribute `source` is missing or doesn't
 //   * exist, `column` is 0 and should be ignored by the client.
-            sf0.setColumn(this.getStoppedAtSourcePos().getCaretPosInLine());
+            int sourcePosCaretInLine = this.getStoppedAtSourcePos().getCaretPosInLine();
+            if ( this.initializeRequestArguments.getColumnsStartAt1() ) {
+              sourcePosCaretInLine++;
+            }
+            sf0.setColumn(sourcePosCaretInLine);
 
 //   * The end line of the range covered by the stack frame.
-            sf0.setEndLine(this.getStoppedAtSourcePos().getLine());
+            sf0.setEndLine(sourcePosLine);
 
 //   * End position of the range covered by the stack frame. It is measured in
 //   * UTF-16 code units and the client capability `columnsStartAt1` determines

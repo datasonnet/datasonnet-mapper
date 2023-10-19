@@ -16,6 +16,7 @@ package com.datasonnet.debugger;
  */
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 public class SourcePos {
 
@@ -27,7 +28,7 @@ public class SourcePos {
     @Override
     public String toString() {
         return "SourcePos{" +
-                "file : " + getCurrentFile().toString() + ", " +
+                "file : " + Objects.toString(getCurrentFile()) + ", " +
                 "line : " + getLine() + ", " +
                 "caretPos : " + getCaretPos() + ", " +
                 "caretLinePos : " + getCaretPosInLine() + ", " +
