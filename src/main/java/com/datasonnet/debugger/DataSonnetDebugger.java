@@ -190,6 +190,10 @@ public class DataSonnetDebugger {
      * @param sourcePos
      */
     private void saveContext(Expr expr, ValScope valScope, FileScope fileScope, EvalScope evalScope, SourcePos sourcePos) {
+        if (this.attached) {
+            this.detach(false);//We must detach the debugger while probing the expression, to avoid stack overflow
+        }
+
         currentFileScope = fileScope;
         currentValScope = valScope;
         currentEvalScope = evalScope;
@@ -211,9 +215,12 @@ public class DataSonnetDebugger {
             if (nextBinding != null) {
                 Option<String> name = fileScope.getNameByIndex(idx);
                 if (name.nonEmpty()) {
-                    Val forced = nextBinding.force();
-                    Object mapped = this.mapValue(forced, evalScope);
-                    namedVariables.put(name.get(), mapped);
+                    String nameStr = name.get();
+                    if (!nameStr.equals("std") && !nameStr.equals("cml")) { //TODO we don't need to show them or do we?
+                        Val forced = nextBinding.force();
+                        Object mapped = this.mapValue(forced, evalScope);
+                        namedVariables.put(name.get(), mapped);
+                    }
                 }
             }
         }
@@ -224,6 +231,10 @@ public class DataSonnetDebugger {
         // Also can we get the value? They're instances of com.datasonnet.jsonnet.Val$Lazy
 //        spc.setBidings();
         this.spc = spc;
+
+        if (!this.attached) {
+            this.attach(false);
+        }
     }
 
     private Object mapValue(@Nullable Val theVal, EvalScope evalScope) {
@@ -236,7 +247,8 @@ public class DataSonnetDebugger {
                 Option<Val> member = objectValue.valueCache().get(key);
                 if (member.nonEmpty() && !"self".equals(key) && !"$".equals(key) && !"super".equals(key)) {
                     Val memberVal = member.get();
-                    mappedObject.put(key, new ValueInfo(memberVal.sourcePosition(), key, mapValue(memberVal, evalScope)));
+                    Object mappedVal = mapValue(memberVal, evalScope);
+                    mappedObject.put(key, mappedVal instanceof ValueInfo ? (ValueInfo)mappedVal : new ValueInfo(memberVal.sourcePosition(), key, mappedVal));
                 } else {
                     mappedObject.put(key, new ValueInfo(0, key, null));
                 }
@@ -252,13 +264,14 @@ public class DataSonnetDebugger {
                 Val memberVal = member.force();
                 //FIXME
                 Materializer.apply(memberVal, evalScope);//TODO we need to review this - it works but it calculates values of ALL objects, not just previously evaluated ones
-                mappedArr.add(new ValueInfo(memberVal.sourcePosition(), "", mapValue(memberVal, evalScope)));
+                Object mappedVal = mapValue(memberVal, evalScope);
+                mappedArr.add(mappedVal instanceof ValueInfo ? (ValueInfo)mappedVal : new ValueInfo(memberVal.sourcePosition(), "", mapValue(memberVal, evalScope)));
                 return null;
             });
 
             mapped = mappedArr;
         } else {
-            mapped = Materializer.apply(theVal, evalScope);
+            mapped = new ValueInfo(theVal.sourcePosition(), "", Materializer.apply(theVal, evalScope));
         }
         return mapped;
     }
