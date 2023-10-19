@@ -33,6 +33,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.util.Either;
 
 /**
  * Singleton that enables debugging features on an Evaluator.
@@ -81,6 +82,10 @@ public class DataSonnetDebugger {
     private int diffOffset = -1;
     private int diffLinesCount = -1;
 
+    private ValScope currentValScope;
+    private FileScope currentFileScope;
+    private EvalScope currentEvalScope;
+
     public static DataSonnetDebugger getDebugger() {
         if (DEBUGGER == null) {
             DEBUGGER = new DataSonnetDebugger();
@@ -105,11 +110,19 @@ public class DataSonnetDebugger {
     }
 
     public void probeExpr(Expr expr, ValScope valScope, FileScope fileScope, EvalScope evalScope) {
+        if (this.attached) {
+            this.detach(false);//We must detach the debugger while probing the expression, to avoid stack overflow
+        }
+
         SourcePos sourcePos = this.getSourcePos(expr, fileScope);
         if (sourcePos == null) {
             logger.debug("sourcePos is null, returning");
+            if (!this.attached) {
+                this.attach(false);
+            }
             return;
         }
+
         int line = sourcePos.getLine();
         Breakpoint breakpoint = sourcePos != null ? breakpoints.get(line) : null;
         if (this.isStepMode() || (breakpoint != null && breakpoint.isEnabled())) {
@@ -132,6 +145,36 @@ public class DataSonnetDebugger {
                 breakpoints.remove(line);
             }
         }
+
+        if (!this.attached) {
+            this.attach(false);
+        }
+    }
+
+    public Object evaluateExpression(String expression) {
+        if (this.attached) {
+            this.detach(false);//We must detach the debugger while probing the expression, to avoid stack overflow
+        }
+
+        Interpreter interpreter = new Interpreter((Evaluator) currentEvalScope);
+        Either either = interpreter.parse(expression, currentFileScope.currentFile());
+        if (either.isLeft()) {
+            return either.left().get();
+        }
+        Expr expr = (Expr) either.right().get();
+        Object value = "";
+        try {
+            Val exprVal = currentEvalScope.visitExpr(expr, currentValScope, currentFileScope);
+            value = Materializer.apply(exprVal, currentEvalScope);
+        } catch (Exception e) {
+            value = e;
+        }
+
+        if (!this.attached) {
+            this.attach(false);
+        }
+
+        return value;
     }
 
     private void cleanContext() {
@@ -151,16 +194,41 @@ public class DataSonnetDebugger {
      * @param sourcePos
      */
     private void saveContext(Expr expr, ValScope valScope, FileScope fileScope, EvalScope evalScope, SourcePos sourcePos) {
+        if (this.attached) {
+            this.detach(false);//We must detach the debugger while probing the expression, to avoid stack overflow
+        }
+
+        currentFileScope = fileScope;
+        currentValScope = valScope;
+        currentEvalScope = evalScope;
+
         StoppedProgramContext spc = new StoppedProgramContext();
         spc.setSourcePos(sourcePos);
-        Map<String, Map<String, ValueInfo>> namedVariables = new HashMap<>();
+        Map<String, Object> namedVariables = new HashMap<>();
 
-        namedVariables.put(SELF_VAR_NAME, valScope.self0().nonEmpty() ? this.mapObject(valScope.self0().get(), evalScope) : null);
-        namedVariables.put(SUPER_VAR_NAME, valScope.super0().nonEmpty() ? this.mapObject(valScope.super0().get(), evalScope) : null);
-        namedVariables.put(DOLLAR_VAR_NAME, valScope.dollar0().nonEmpty() ? this.mapObject(valScope.dollar0().get(), evalScope) : null);
+        namedVariables.put(SELF_VAR_NAME, valScope.self0().nonEmpty() ? (Map<String, ValueInfo>)this.mapValue(valScope.self0().get(), evalScope) : null);
+        namedVariables.put(SUPER_VAR_NAME, valScope.super0().nonEmpty() ? (Map<String, ValueInfo>)this.mapValue(valScope.super0().get(), evalScope) : null);
+        namedVariables.put(DOLLAR_VAR_NAME, valScope.dollar0().nonEmpty() ? (Map<String, ValueInfo>)this.mapValue(valScope.dollar0().get(), evalScope) : null);
         logger.debug("saveContext. namedVariables is: " + namedVariables);
 
         scala.collection.immutable.Map<String, Object> nameIndices = fileScope.nameIndices();
+
+        Val.Lazy[] bindings = valScope.getBindings();
+
+        for (int idx = 0; idx < bindings.length; idx++) {
+            Val.Lazy nextBinding = bindings[idx];
+            if (nextBinding != null) {
+                Option<String> name = fileScope.getNameByIndex(idx);
+                if (name.nonEmpty()) {
+                    String nameStr = name.get();
+                    if (!nameStr.equals("std") && !nameStr.equals("cml")) { //TODO we don't need to show them or do we?
+                        Val forced = nextBinding.force();
+                        Object mapped = this.mapValue(forced, evalScope);
+                        namedVariables.put(name.get(), mapped);
+                    }
+                }
+            }
+        }
 
         spc.setNamedVariables(namedVariables);
         // FIXME is there a way to get the local variables as bindings? The parser removes the local variables names
@@ -168,76 +236,54 @@ public class DataSonnetDebugger {
         // Also can we get the value? They're instances of com.datasonnet.jsonnet.Val$Lazy
 //        spc.setBidings();
         this.spc = spc;
-    }
-
-    private List<ValueInfo> mapArr(@Nullable Val.Arr arrValue, EvalScope evalScope) {
-        if (this.attached) {
-            this.detach(false);//We must detach the debugger while forcing the lazy value, to avoid deadlocks
-        }
-
-        List<ValueInfo> mappedArr = new CopyOnWriteArrayList<>();
-
-        arrValue.value().foreach(member -> {
-/*
-            Val memberVal = member.force();
-            if (memberVal instanceof Val.Obj) {
-                Object mappedMember = mapObject((Val.Obj) memberVal, evalScope);
-                mappedArr.add(new ValueInfo(0, "", mappedMember));
-            } else if (memberVal instanceof Val.Arr) {
-                Object mappedArray = mapArr((Val.Arr) memberVal, evalScope);
-                mappedArr.add(new ValueInfo(0, "", mappedArray));
-            } else {
-                mappedArr.add(new ValueInfo(0, "", Materializer.apply(memberVal, evalScope)));
-            }
-*/
-
-            return null;
-        });
 
         if (!this.attached) {
             this.attach(false);
         }
-
-        return mappedArr;
     }
 
-    private Map<String, ValueInfo> mapObject(@Nullable Val.Obj objectValue, EvalScope evalScope) {
-        if (objectValue == null) {
-            return null;
-        }
+    private Object mapValue(@Nullable Val theVal, EvalScope evalScope) {
+        Object mapped = null;
+        if (theVal instanceof Val.Obj) {
+            Val.Obj objectValue = (Val.Obj)theVal;
+            Map<String, ValueInfo> mappedObject = new ConcurrentHashMap<>();
 
-        if (this.attached) {
-            this.detach(false);//We must detach the debugger while forcing the lazy value, to avoid deadlocks
-        }
-
-        Map<String, ValueInfo> mappedObject = new ConcurrentHashMap<>();
-
-        objectValue.foreachVisibleKey((key, visibility) -> { //TODO Only visible keys?
-            Option<Val> member = objectValue.valueCache().get(key);
-            if (member.nonEmpty()) {
-                Val memberVal = member.get();
-                if (memberVal instanceof Val.Obj) {
-                    Object mappedMember = mapObject((Val.Obj) memberVal, evalScope);
-                    mappedObject.put(key, new ValueInfo(0, key, mappedMember));
-                } else if (memberVal instanceof Val.Arr) {
-                    Object mappedArr = mapArr((Val.Arr) memberVal, evalScope);
-                    mappedObject.put(key, new ValueInfo(0, key, mappedArr));
+            objectValue.foreachVisibleKey((key, visibility) -> { //TODO Only visible keys?
+                Option<Val> member = objectValue.valueCache().get(key);
+                if (member.nonEmpty() && !"self".equals(key) && !"$".equals(key) && !"super".equals(key)) {
+                    Val memberVal = member.get();
+                    Object mappedVal = mapValue(memberVal, evalScope);
+                    mappedObject.put(key, mappedVal instanceof ValueInfo ? (ValueInfo)mappedVal : new ValueInfo(memberVal.sourcePosition(), key, mappedVal));
                 } else {
-                    mappedObject.put(key, new ValueInfo(0, key, Materializer.apply(memberVal, evalScope)));
+                    mappedObject.put(key, new ValueInfo(0, key, null));
                 }
-            } else {
-                mappedObject.put(key, new ValueInfo(0, key, null));
-            }
-            return null;
-        });
+                return null;
+            });
 
-        if (!this.attached) {
-            this.attach(false);
+            mapped = mappedObject;
+        } else if (theVal instanceof Val.Arr) {
+            Val.Arr arrValue = (Val.Arr)theVal;
+            List<ValueInfo> mappedArr = new CopyOnWriteArrayList<>();
+
+            arrValue.value().foreach(member -> {
+                Val memberVal = member.force();
+                //FIXME
+                Materializer.apply(memberVal, evalScope);//TODO we need to review this - it works but it calculates values of ALL objects, not just previously evaluated ones
+                Object mappedVal = mapValue(memberVal, evalScope);
+                mappedArr.add(mappedVal instanceof ValueInfo ? (ValueInfo)mappedVal : new ValueInfo(memberVal.sourcePosition(), "", mapValue(memberVal, evalScope)));
+                return null;
+            });
+
+            mapped = mappedArr;
+        } else {
+            mapped = new ValueInfo(theVal.sourcePosition(), "", Materializer.apply(theVal, evalScope));
         }
-
-        return mappedObject;
+        return mapped;
     }
 
+    public int getDiffOffset() {
+        return diffOffset;
+    }
     /**
      * Return a SourcePos for the expr on the fileScope<br/>
      *
@@ -258,7 +304,6 @@ public class DataSonnetDebugger {
 
             if (lineCount != -1) { // If the code is wrapped by IDE, remove auto-generated lines
                 String[] sourceLines = sourceCode.split("\\R");
-                logger.debug("sourceLines: " + sourceLines);
 
                 if (diffLinesCount == -1 && diffOffset == -1) {
                     diffLinesCount = sourceLines.length - lineCount;
@@ -289,6 +334,7 @@ public class DataSonnetDebugger {
             SourcePos sourcePos = new SourcePos();
             sourcePos.setCurrentFile(Objects.toString(fileScope.currentFile()));
             sourcePos.setCaretPos(caretPos);
+
             // Lines are zero-based, and the caret is on the last line of the array
             sourcePos.setLine(lines.length - (diffLinesCount != -1 ? diffLinesCount : 0) - 1);
             sourcePos.setCaretPosInLine(caretPos - ( prefaceIncludingCurrent.lastIndexOf("\n") + 1 ));

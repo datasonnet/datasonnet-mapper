@@ -32,13 +32,15 @@ import scala.collection.mutable
   * imported module to be re-used. Parsing is cached separatedly by an external
   * `parseCache`.
   */
-class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]],
+class Evaluator(parseCacheP: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]],
                 val extVars: Map[String, ujson.Value],
                 val wd: Path,
                 importer: (Path, String) => Option[(Path, String)],
                 override val preserveOrder: Boolean = false,
                 override val defaultValue: Value = null) extends EvalScope{
   implicit def evalScope: EvalScope = this
+
+  val parseCache = parseCacheP
 
   val loadedFileContents = mutable.Map.empty[Path, String]
   def loadCachedSource(p: Path) = loadedFileContents.get(p)
@@ -54,7 +56,7 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
       DataSonnetDebugger.getDebugger.probeExpr(expr, scope, fileScope, evalScope)
     }
 
-    try expr match {
+    val evaluatedVal = try expr match {
       case Null(offset) => Val.Null
       case Parened(offset, inner) => visitExpr(inner)
       case True(offset) => Val.True
@@ -111,6 +113,10 @@ class Evaluator(parseCache: collection.mutable.Map[String, fastparse.Parsed[(Exp
         extension.addSuper(original)
       }
     } catch Error.tryCatch(expr.offset)
+    //Remember the source position of the expression
+    val diffOffset = if (DataSonnetDebugger.getDebugger.getDiffOffset != - 1) DataSonnetDebugger.getDebugger.getDiffOffset + 1 else 0
+    evaluatedVal.setSourcePosition(expr.offset - diffOffset)
+    evaluatedVal
   }
 
   def visitId(offset: Int, value: Int)(implicit scope: ValScope, fileScope: FileScope): Val = {

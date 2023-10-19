@@ -63,4 +63,9 @@ public class DebuggerTest {
         Document<String> response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
     }
 
+    @Test
+    void testBinding() throws IOException, URISyntaxException, JSONException {
+        final Mapper mapper = new Mapper(TestResourceReader.readFileAsString("debug.ds"));
+        Document<String> response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
+    }
 }

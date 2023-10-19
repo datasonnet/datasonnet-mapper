@@ -27,7 +27,7 @@ public class StoppedProgramContext {
 
   private SourcePos sourcePos;
 
-  private Map<String, Map<String, ValueInfo>> namedVariables;
+  private Map<String, Object> namedVariables;
 
   public void setSourcePos(SourcePos sourcePos) {
     this.sourcePos = sourcePos;
@@ -37,11 +37,11 @@ public class StoppedProgramContext {
     return this.sourcePos;
   }
 
-  public void setNamedVariables(Map<String, Map<String, ValueInfo>> namedVariables) {
+  public void setNamedVariables(Map<String, Object> namedVariables) {
     this.namedVariables = namedVariables;
   }
 
-  public Map<String, Map<String, ValueInfo>> getNamedVariables() {
+  public Map<String, Object> getNamedVariables() {
     return this.namedVariables;
   }
 }

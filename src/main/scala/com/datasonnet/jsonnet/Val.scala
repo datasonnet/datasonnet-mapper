@@ -36,6 +36,12 @@ sealed trait Val{
     else throw new Error.Delegate(
       "Expected " + implicitly[PrettyNamed[T]].s + ", found " + prettyName
     )
+
+  var sourcePosition: Int = 0
+
+  def setSourcePosition(v: Int) = {
+    sourcePosition = v
+  }
 }
 class PrettyNamed[T](val s: String)
 object PrettyNamed{

@@ -109,6 +109,15 @@ class FileScope(val currentFile: Path,
   // ( And also for debugger support )
   lazy val indexNames = nameIndices.map(_.swap)
   lazy val source = sourceP
+
+  def getNameByIndex(idx: Int): Option[String] = {
+    val found = nameIndices.find(_._2 == idx)
+    if (found.nonEmpty) {
+      Some(found.get._1)
+    } else {
+      None
+    }
+  }
 }
 
 trait EvalErrorScope {
