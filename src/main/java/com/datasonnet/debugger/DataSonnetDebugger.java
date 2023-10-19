@@ -196,13 +196,27 @@ public class DataSonnetDebugger {
 
         StoppedProgramContext spc = new StoppedProgramContext();
         spc.setSourcePos(sourcePos);
-        Map<String, Map<String, ValueInfo>> namedVariables = new HashMap<>();
+        Map<String, Object> namedVariables = new HashMap<>();
 
         namedVariables.put("self", valScope.self0().nonEmpty() ? (Map<String, ValueInfo>)this.mapValue(valScope.self0().get(), evalScope) : null);
         namedVariables.put("super", valScope.super0().nonEmpty() ? (Map<String, ValueInfo>)this.mapValue(valScope.super0().get(), evalScope) : null);
         namedVariables.put("$", valScope.dollar0().nonEmpty() ? (Map<String, ValueInfo>)this.mapValue(valScope.dollar0().get(), evalScope) : null);
 
         scala.collection.immutable.Map<String, Object> nameIndices = fileScope.nameIndices();
+
+        Val.Lazy[] bindings = valScope.getBindings();
+
+        for (int idx = 0; idx < bindings.length; idx++) {
+            Val.Lazy nextBinding = bindings[idx];
+            if (nextBinding != null) {
+                Option<String> name = fileScope.getNameByIndex(idx);
+                if (name.nonEmpty()) {
+                    Val forced = nextBinding.force();
+                    Object mapped = this.mapValue(forced, evalScope);
+                    namedVariables.put(name.get(), mapped);
+                }
+            }
+        }
 
         spc.setNamedVariables(namedVariables);
         // FIXME is there a way to get the local variables as bindings? The parser removes the local variables names
