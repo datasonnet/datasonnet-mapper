@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,6 @@ import com.datasonnet.Mapper;
 import com.datasonnet.debugger.DataSonnetDebugger;
 import com.datasonnet.debugger.SourcePos;
 import com.datasonnet.debugger.StoppedProgramContext;
-import com.datasonnet.debugger.ValueInfo;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.MediaTypes;
 import org.eclipse.lsp4j.debug.Breakpoint;
@@ -687,7 +687,9 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
   }
 
   private SourcePos getStoppedAtSourcePos() {
-    return DataSonnetDebugger.getDebugger().getStoppedProgramContext().getSourcePos();
+    return DataSonnetDebugger.getDebugger().getStoppedProgramContext() != null
+        ? DataSonnetDebugger.getDebugger().getStoppedProgramContext().getSourcePos()
+        : null;
   }
 
   /**
@@ -755,8 +757,8 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
 
           // First scope: refs
           Scope refsScope = this.getRefsScope();
-          // FIXME Second scope: bindings ( local vars )
-          //          Scope bindingsScope = this.getBindingsScope();
+          // Second scope: bindings ( local vars )
+          Scope bindingsScope = this.getBindingsScope();
 
           // FIXME third: evalScope
           // The evaluator is also an EvalScope, context that is propagated throughout the Jsonnet evaluation.
@@ -766,7 +768,7 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
           // FIXME fourth: result
 
 //          Scope extVarsScope = this.getExtVarsScope();
-          response.setScopes(new Scope[]{refsScope});
+          response.setScopes(new Scope[]{refsScope, bindingsScope});
           return response;
         }
     );
@@ -844,6 +846,24 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
     return refsScope;
   }
 
+
+  @NotNull
+  private Scope getBindingsScope() {
+    Scope bindingsScope = new Scope();
+    bindingsScope.setName("locals");
+
+    bindingsScope.setVariablesReference(BINDINGS_VARIABLES_REFERENCE_ID);
+
+    bindingsScope.setNamedVariables(this.getBoundVariables().size());
+    bindingsScope.setIndexedVariables(0);
+    bindingsScope.setPresentationHint("locals");
+    bindingsScope.setSource(this.getCurrentSource());
+    return bindingsScope;
+  }
+
+
+
+
   /**
    * and then the variables for a scope
    *
@@ -881,6 +901,9 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
           if ( args.getVariablesReference() == REF_VARIABLES_REFERENCE_ID ) {
             List<Variable> vars = this.getRefVariables();
             response.setVariables(vars.toArray(new Variable[0]));
+          } else if ( args.getVariablesReference() == BINDINGS_VARIABLES_REFERENCE_ID ) {
+            List<Variable> vars = this.getBoundVariables();
+            response.setVariables(vars.toArray(new Variable[0]));
           } else if ( args.getVariablesReference() == SELF_VAR_REF ) {
 //        FIXME HERE    List<Variable> vars = this.getRefVariables();
 //            response.setVariables(vars.toArray(new Variable[0]));
@@ -907,6 +930,9 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
   private List<Variable> getRefVariables() {
     //FIXME this needs to be reworked to support object structures
     StoppedProgramContext spc = DataSonnetDebugger.getDebugger().getStoppedProgramContext();
+    if ( spc == null || spc.getNamedVariables() == null) {
+      return List.of();
+    }
     Object selfValue = spc.getNamedVariables().get(DataSonnetDebugger.SELF_VAR_NAME);
     Variable self_ = this.createRefVariable(DataSonnetDebugger.SELF_VAR_NAME, "Object", selfValue == null ? "null" : selfValue.toString(), SELF_VAR_REF);
 
@@ -917,6 +943,40 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
     Variable dollar_ = this.createRefVariable(DataSonnetDebugger.DOLLAR_VAR_NAME, "Object", dollarValue == null ? "null" : dollarValue.toString(), DOLLAR_VAR_REF);
 
     return List.of(self_, super_, dollar_);
+  }
+
+  private List<Variable> getBoundVariables() {
+    //FIXME this needs to be reworked to support object structures
+    StoppedProgramContext spc = DataSonnetDebugger.getDebugger().getStoppedProgramContext();
+    if ( spc == null || spc.getNamedVariables() == null) {
+      return List.of();
+    }
+    List<Variable> vars = new ArrayList<>();
+    Set<String> avoided = Set.of(DataSonnetDebugger.SELF_VAR_NAME, DataSonnetDebugger.SUPER_VAR_NAME,
+        DataSonnetDebugger.DOLLAR_VAR_NAME);
+    spc.getNamedVariables().forEach((k,v) -> {
+      if ( !avoided.contains(k)) {
+        vars.add(this.createLocalVariable(k, "Object", v == null ? "null" : v.toString(), variablesKeyGenerator.incrementAndGet()));
+      }
+    });
+    return vars;
+  }
+
+  private Variable createLocalVariable(String name, String type, String value, int ref) {
+    Variable var_ = new Variable();
+    var_.setValue(value);
+    var_.setType(type);
+    var_.setName(name);
+    VariablePresentationHint ph = new VariablePresentationHint();
+    ph.setKind("local");
+    ph.setAttributes(new String[]{"readOnly"});
+    ph.setVisibility("final");
+    ph.setLazy(false);  // with true, VS Code shows an "eye" to click to expand the value
+    var_.setPresentationHint(ph);
+    var_.setVariablesReference(ref);
+    var_.setNamedVariables(0);
+    var_.setIndexedVariables(0);
+    return var_;
   }
 
   private Variable createRefVariable(String name, String type, String value, int ref) {

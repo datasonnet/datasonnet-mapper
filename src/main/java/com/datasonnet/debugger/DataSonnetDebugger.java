@@ -221,10 +221,12 @@ public class DataSonnetDebugger {
                 Option<String> name = fileScope.getNameByIndex(idx);
                 if (name.nonEmpty()) {
                     String nameStr = name.get();
+                    logger.debug("nameStr: " + nameStr);
                     if (!nameStr.equals("std") && !nameStr.equals("cml")) { //TODO we don't need to show them or do we?
                         Val forced = nextBinding.force();
                         Object mapped = this.mapValue(forced, evalScope);
-                        namedVariables.put(name.get(), mapped);
+                        namedVariables.put(nameStr, mapped);
+                        logger.debug("mapped: " + mapped);
                     }
                 }
             }
@@ -297,7 +299,7 @@ public class DataSonnetDebugger {
      * @return
      */
     private SourcePos getSourcePos(Expr expr, FileScope fileScope) {
-        if (fileScope.source() != null) {
+        if (fileScope.source() != null && fileScope.source().length() > 0 ) {
             String sourceCode = fileScope.source();
             // offset points to the first character of the expressions. Offsets are zero based.
             String visibleCode = sourceCode;
