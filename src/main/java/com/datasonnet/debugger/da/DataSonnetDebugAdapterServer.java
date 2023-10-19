@@ -907,13 +907,13 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
   private List<Variable> getRefVariables() {
     //FIXME this needs to be reworked to support object structures
     StoppedProgramContext spc = DataSonnetDebugger.getDebugger().getStoppedProgramContext();
-    Map<String, ValueInfo> selfValue = spc.getNamedVariables().get(DataSonnetDebugger.SELF_VAR_NAME);
+    Object selfValue = spc.getNamedVariables().get(DataSonnetDebugger.SELF_VAR_NAME);
     Variable self_ = this.createRefVariable(DataSonnetDebugger.SELF_VAR_NAME, "Object", selfValue == null ? "null" : selfValue.toString(), SELF_VAR_REF);
 
-    Map<String, ValueInfo> superValue = spc.getNamedVariables().get(DataSonnetDebugger.SUPER_VAR_NAME);
+    Object superValue = spc.getNamedVariables().get(DataSonnetDebugger.SUPER_VAR_NAME);
     Variable super_ = this.createRefVariable(DataSonnetDebugger.SUPER_VAR_NAME, "Object", superValue == null ? "null" : superValue.toString(), SUPER_VAR_REF);
 
-    Map<String, ValueInfo> dollarValue = spc.getNamedVariables().get(DataSonnetDebugger.DOLLAR_VAR_NAME);
+    Object dollarValue = spc.getNamedVariables().get(DataSonnetDebugger.DOLLAR_VAR_NAME);
     Variable dollar_ = this.createRefVariable(DataSonnetDebugger.DOLLAR_VAR_NAME, "Object", dollarValue == null ? "null" : dollarValue.toString(), DOLLAR_VAR_REF);
 
     return List.of(self_, super_, dollar_);
