@@ -202,9 +202,9 @@ public class DataSonnetDebugger {
         spc.setSourcePos(sourcePos);
         Map<String, Object> namedVariables = new HashMap<>();
 
-        namedVariables.put(SELF_VAR_NAME, valScope.self0().nonEmpty() ? (Map<String, ValueInfo>) this.mapValue(valScope.self0().get(), evalScope) : null);
-        namedVariables.put(SUPER_VAR_NAME, valScope.super0().nonEmpty() ? (Map<String, ValueInfo>) this.mapValue(valScope.super0().get(), evalScope) : null);
-        namedVariables.put(DOLLAR_VAR_NAME, valScope.dollar0().nonEmpty() ? (Map<String, ValueInfo>) this.mapValue(valScope.dollar0().get(), evalScope) : null);
+        namedVariables.put(SELF_VAR_NAME, valScope.self0().nonEmpty() ? (Map<String, ValueInfo>) this.mapValue(valScope.self0().get(), evalScope, false) : null);
+        namedVariables.put(SUPER_VAR_NAME, valScope.super0().nonEmpty() ? (Map<String, ValueInfo>) this.mapValue(valScope.super0().get(), evalScope, false) : null);
+        namedVariables.put(DOLLAR_VAR_NAME, valScope.dollar0().nonEmpty() ? (Map<String, ValueInfo>) this.mapValue(valScope.dollar0().get(), evalScope, false) : null);
         logger.debug("saveContext. namedVariables is: " + namedVariables);
 
         scala.collection.immutable.Map<String, Object> nameIndices = fileScope.nameIndices();
@@ -217,12 +217,12 @@ public class DataSonnetDebugger {
                 Option<String> name = fileScope.getNameByIndex(idx);
                 if (name.nonEmpty()) {
                     String nameStr = name.get();
-                    logger.debug("nameStr: " + nameStr);
+                    logger.debug("Next binding name is: " + nameStr);
                     if (!nameStr.equals("std") && !nameStr.equals("cml")) { //TODO we don't need to show them or do we?
                         Val forced = nextBinding.force();
-                        Object mapped = this.mapValue(forced, evalScope);
+                        Object mapped = this.mapValue(forced, evalScope, true);
                         namedVariables.put(nameStr, mapped);
-                        logger.debug("mapped: " + mapped);
+                        logger.debug("Binding '" + nameStr + "' value is: " + mapped);
                     }
                 }
             }
@@ -240,17 +240,20 @@ public class DataSonnetDebugger {
         }
     }
 
-    private Object mapValue(@Nullable Val theVal, EvalScope evalScope) {
+    private Object mapValue(@Nullable Val theVal, EvalScope evalScope, boolean isBinding) {
         Object mapped = null;
         if (theVal instanceof Val.Obj) {
             Val.Obj objectValue = (Val.Obj) theVal;
+            if (isBinding) {
+                Materializer.apply(objectValue, evalScope);//To populate the cache
+            }
             Map<String, ValueInfo> mappedObject = new ConcurrentHashMap<>();
 
             objectValue.foreachVisibleKey((key, visibility) -> { //TODO Only visible keys?
                 Option<Val> member = objectValue.valueCache().get(key);
                 if (member.nonEmpty() && !"self".equals(key) && !"$".equals(key) && !"super".equals(key)) {
                     Val memberVal = member.get();
-                    Object mappedVal = mapValue(memberVal, evalScope);
+                    Object mappedVal = mapValue(memberVal, evalScope, isBinding);
                     mappedObject.put(key, mappedVal instanceof ValueInfo ? (ValueInfo) mappedVal : new ValueInfo(memberVal.sourcePosition(), key, mappedVal));
                 } else {
                     mappedObject.put(key, new ValueInfo(0, key, null));
@@ -267,12 +270,14 @@ public class DataSonnetDebugger {
                 Val memberVal = member.force();
                 //FIXME
                 Materializer.apply(memberVal, evalScope);//TODO we need to review this - it works but it calculates values of ALL objects, not just previously evaluated ones
-                Object mappedVal = mapValue(memberVal, evalScope);
-                mappedArr.add(mappedVal instanceof ValueInfo ? (ValueInfo) mappedVal : new ValueInfo(memberVal.sourcePosition(), "", mapValue(memberVal, evalScope)));
+                Object mappedVal = mapValue(memberVal, evalScope, isBinding);
+                mappedArr.add(mappedVal instanceof ValueInfo ? (ValueInfo) mappedVal : new ValueInfo(memberVal.sourcePosition(), "", mapValue(memberVal, evalScope, isBinding)));
                 return null;
             });
 
             mapped = mappedArr;
+        } else if (theVal instanceof Val.Func) {
+            mapped = new ValueInfo(theVal.sourcePosition(), "", "FUNCTION");
         } else {
             mapped = new ValueInfo(theVal.sourcePosition(), "", Materializer.apply(theVal, evalScope));
         }
@@ -315,13 +320,13 @@ public class DataSonnetDebugger {
             int caretLine = sourceBeforeCaret.split("\\R").length - diffLinesCount - 1;
             int caretPos = expr.offset() - diffOffset.get();
 
-            logger.debug("caretPos: " + caretPos);
+            logger.debug("Caret Position: " + caretPos);
             if (caretPos < 0) {
-                logger.debug("caretPos is in invisible code");
+                logger.debug("CaretPos is in invisible code, returning null...");
                 return null;
             }
             if (caretPos > sourceCode.length()) {
-                logger.error("caretPos: " + caretPos + " > sourceCode.length() " + sourceCode.length());
+                logger.error("CaretPos: " + caretPos + " > sourceCode.length() " + sourceCode.length());
                 return null;
             }
 
@@ -341,7 +346,7 @@ public class DataSonnetDebugger {
      * resume execution
      */
     public void resume() {
-        logger.debug("resume");
+        logger.debug("Resume command received");
         if (latch != null && latch.getCount() > 0) {
             logger.debug("latch.countDown");
             latch.countDown();
