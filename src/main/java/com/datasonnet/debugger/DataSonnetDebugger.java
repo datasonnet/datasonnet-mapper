@@ -358,7 +358,7 @@ public class DataSonnetDebugger {
             System.setProperty("debug", "true");
             if (clear) {
                 breakpoints.clear();
-                setStepMode(false);
+                setStepMode(true);
             }
         }
     }
