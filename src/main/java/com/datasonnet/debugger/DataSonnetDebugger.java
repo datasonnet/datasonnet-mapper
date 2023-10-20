@@ -19,21 +19,18 @@ package com.datasonnet.debugger;
 import com.datasonnet.debugger.da.DataSonnetDebugListener;
 import com.datasonnet.jsonnet.*;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import scala.Option;
+import scala.util.Either;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import scala.util.Either;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Singleton that enables debugging features on an Evaluator.
@@ -61,7 +58,7 @@ public class DataSonnetDebugger {
     /**
      * Is the dapServer attached?
      */
-    private boolean attached = false;
+    private AtomicBoolean attached = new AtomicBoolean(false);
 
     /**
      * Synchronization latch between dapServer and this debugger
@@ -71,16 +68,15 @@ public class DataSonnetDebugger {
     /**
      * Forces a stopped event on every evaluation step
      */
-    private boolean stepMode = false;
+    private AtomicBoolean stepMode = new AtomicBoolean(false);
 
     /**
      * Holds information, mainly around the variables and caret pos, when the program stops
      */
     private StoppedProgramContext spc;
 
-    private int lineCount = -1;
-    private int diffOffset = -1;
-    private int diffLinesCount = -1;
+    private AtomicInteger lineCount = new AtomicInteger(-1);
+    private AtomicInteger diffOffset = new AtomicInteger(-1);
 
     private ValScope currentValScope;
     private FileScope currentFileScope;
@@ -110,14 +106,14 @@ public class DataSonnetDebugger {
     }
 
     public void probeExpr(Expr expr, ValScope valScope, FileScope fileScope, EvalScope evalScope) {
-        if (this.attached) {
+        if (isAttached()) {
             this.detach(false);//We must detach the debugger while probing the expression, to avoid stack overflow
         }
 
         SourcePos sourcePos = this.getSourcePos(expr, fileScope);
         if (sourcePos == null) {
             logger.debug("sourcePos is null, returning");
-            if (!this.attached) {
+            if (!isAttached()) {
                 this.attach(false);
             }
             return;
@@ -146,13 +142,13 @@ public class DataSonnetDebugger {
             }
         }
 
-        if (!this.attached) {
+        if (!isAttached()) {
             this.attach(false);
         }
     }
 
     public Object evaluateExpression(String expression) {
-        if (this.attached) {
+        if (isAttached()) {
             this.detach(false);//We must detach the debugger while probing the expression, to avoid stack overflow
         }
 
@@ -170,7 +166,7 @@ public class DataSonnetDebugger {
             value = e;
         }
 
-        if (!this.attached) {
+        if (!isAttached()) {
             this.attach(false);
         }
 
@@ -194,7 +190,7 @@ public class DataSonnetDebugger {
      * @param sourcePos
      */
     private void saveContext(Expr expr, ValScope valScope, FileScope fileScope, EvalScope evalScope, SourcePos sourcePos) {
-        if (this.attached) {
+        if (isAttached()) {
             this.detach(false);//We must detach the debugger while probing the expression, to avoid stack overflow
         }
 
@@ -206,9 +202,9 @@ public class DataSonnetDebugger {
         spc.setSourcePos(sourcePos);
         Map<String, Object> namedVariables = new HashMap<>();
 
-        namedVariables.put(SELF_VAR_NAME, valScope.self0().nonEmpty() ? (Map<String, ValueInfo>)this.mapValue(valScope.self0().get(), evalScope) : null);
-        namedVariables.put(SUPER_VAR_NAME, valScope.super0().nonEmpty() ? (Map<String, ValueInfo>)this.mapValue(valScope.super0().get(), evalScope) : null);
-        namedVariables.put(DOLLAR_VAR_NAME, valScope.dollar0().nonEmpty() ? (Map<String, ValueInfo>)this.mapValue(valScope.dollar0().get(), evalScope) : null);
+        namedVariables.put(SELF_VAR_NAME, valScope.self0().nonEmpty() ? (Map<String, ValueInfo>) this.mapValue(valScope.self0().get(), evalScope) : null);
+        namedVariables.put(SUPER_VAR_NAME, valScope.super0().nonEmpty() ? (Map<String, ValueInfo>) this.mapValue(valScope.super0().get(), evalScope) : null);
+        namedVariables.put(DOLLAR_VAR_NAME, valScope.dollar0().nonEmpty() ? (Map<String, ValueInfo>) this.mapValue(valScope.dollar0().get(), evalScope) : null);
         logger.debug("saveContext. namedVariables is: " + namedVariables);
 
         scala.collection.immutable.Map<String, Object> nameIndices = fileScope.nameIndices();
@@ -239,7 +235,7 @@ public class DataSonnetDebugger {
 //        spc.setBidings();
         this.spc = spc;
 
-        if (!this.attached) {
+        if (!isAttached()) {
             this.attach(false);
         }
     }
@@ -247,7 +243,7 @@ public class DataSonnetDebugger {
     private Object mapValue(@Nullable Val theVal, EvalScope evalScope) {
         Object mapped = null;
         if (theVal instanceof Val.Obj) {
-            Val.Obj objectValue = (Val.Obj)theVal;
+            Val.Obj objectValue = (Val.Obj) theVal;
             Map<String, ValueInfo> mappedObject = new ConcurrentHashMap<>();
 
             objectValue.foreachVisibleKey((key, visibility) -> { //TODO Only visible keys?
@@ -255,7 +251,7 @@ public class DataSonnetDebugger {
                 if (member.nonEmpty() && !"self".equals(key) && !"$".equals(key) && !"super".equals(key)) {
                     Val memberVal = member.get();
                     Object mappedVal = mapValue(memberVal, evalScope);
-                    mappedObject.put(key, mappedVal instanceof ValueInfo ? (ValueInfo)mappedVal : new ValueInfo(memberVal.sourcePosition(), key, mappedVal));
+                    mappedObject.put(key, mappedVal instanceof ValueInfo ? (ValueInfo) mappedVal : new ValueInfo(memberVal.sourcePosition(), key, mappedVal));
                 } else {
                     mappedObject.put(key, new ValueInfo(0, key, null));
                 }
@@ -264,7 +260,7 @@ public class DataSonnetDebugger {
 
             mapped = mappedObject;
         } else if (theVal instanceof Val.Arr) {
-            Val.Arr arrValue = (Val.Arr)theVal;
+            Val.Arr arrValue = (Val.Arr) theVal;
             List<ValueInfo> mappedArr = new CopyOnWriteArrayList<>();
 
             arrValue.value().foreach(member -> {
@@ -272,7 +268,7 @@ public class DataSonnetDebugger {
                 //FIXME
                 Materializer.apply(memberVal, evalScope);//TODO we need to review this - it works but it calculates values of ALL objects, not just previously evaluated ones
                 Object mappedVal = mapValue(memberVal, evalScope);
-                mappedArr.add(mappedVal instanceof ValueInfo ? (ValueInfo)mappedVal : new ValueInfo(memberVal.sourcePosition(), "", mapValue(memberVal, evalScope)));
+                mappedArr.add(mappedVal instanceof ValueInfo ? (ValueInfo) mappedVal : new ValueInfo(memberVal.sourcePosition(), "", mapValue(memberVal, evalScope)));
                 return null;
             });
 
@@ -284,7 +280,7 @@ public class DataSonnetDebugger {
     }
 
     public int getDiffOffset() {
-        return diffOffset;
+        return diffOffset.get();
     }
     /**
      * Return a SourcePos for the expr on the fileScope<br/>
@@ -299,27 +295,26 @@ public class DataSonnetDebugger {
      * @return
      */
     private SourcePos getSourcePos(Expr expr, FileScope fileScope) {
-        if (fileScope.source() != null && fileScope.source().length() > 0 ) {
+        if (fileScope.source() != null && fileScope.source().length() > 0) {
             String sourceCode = fileScope.source();
+
             // offset points to the first character of the expressions. Offsets are zero based.
-            String visibleCode = sourceCode;
 
-            if (lineCount != -1) { // If the code is wrapped by IDE, remove auto-generated lines
+            int diffLinesCount = 0;
+
+            if (lineCount.get() != -1) { // If the code is wrapped by IDE, remove auto-generated lines
                 String[] sourceLines = sourceCode.split("\\R");
-
-                if (diffLinesCount == -1 && diffOffset == -1) {
-                    diffLinesCount = sourceLines.length - lineCount;
-                    String[] diffLines = Arrays.copyOfRange(sourceLines, 0, diffLinesCount);
-                    logger.debug("diffLines: " + diffLines);
-                    diffOffset = String.join(System.lineSeparator(), diffLines).length();
-                    logger.debug("diffOffset: " + diffOffset);
-                }
-
-                sourceLines = Arrays.copyOfRange(sourceLines, diffLinesCount, sourceLines.length);
-                visibleCode = String.join(System.lineSeparator(), sourceLines);
+                diffLinesCount = sourceLines.length - lineCount.get();
+                String[] diffLines = Arrays.copyOfRange(sourceLines, 0, diffLinesCount);
+                logger.debug("diffLines: " + diffLines);
+                diffOffset.set(String.join(System.lineSeparator(), diffLines).length());
+                logger.debug("diffOffset: " + diffOffset.get());
             }
 
-            int caretPos = expr.offset() - (diffOffset != -1 ? diffOffset : 0);
+            String sourceBeforeCaret = sourceCode.substring(0, expr.offset() + 1);
+            int caretLine = sourceBeforeCaret.split("\\R").length - diffLinesCount - 1;
+            int caretPos = expr.offset() - diffOffset.get();
+
             logger.debug("caretPos: " + caretPos);
             if (caretPos < 0) {
                 logger.debug("caretPos is in invisible code");
@@ -330,16 +325,13 @@ public class DataSonnetDebugger {
                 return null;
             }
 
-            String prefaceIncludingCurrent = visibleCode.substring(0, caretPos + 1);
-            String[] lines = prefaceIncludingCurrent.split("\\R");
-
             SourcePos sourcePos = new SourcePos();
             sourcePos.setCurrentFile(Objects.toString(fileScope.currentFile()));
             sourcePos.setCaretPos(caretPos);
 
             // Lines are zero-based, and the caret is on the last line of the array
-            sourcePos.setLine(lines.length - (diffLinesCount != -1 ? diffLinesCount : 0) - 1);
-            sourcePos.setCaretPosInLine(caretPos - ( prefaceIncludingCurrent.lastIndexOf("\n") + 1 ));
+            sourcePos.setLine(caretLine);
+            sourcePos.setCaretPosInLine(expr.offset() - (sourceBeforeCaret.lastIndexOf("\n") + 1));
             return sourcePos;
         }
         return null;
@@ -359,12 +351,14 @@ public class DataSonnetDebugger {
     public void attach() {
         this.attach(true);
     }
+
     public void attach(boolean clear) {
-        if (!attached) {
-            attached = true;
+        if (!isAttached()) {
+            attached.set(true);
             System.setProperty("debug", "true");
             if (clear) {
                 breakpoints.clear();
+                setStepMode(false);
             }
         }
     }
@@ -375,25 +369,27 @@ public class DataSonnetDebugger {
     public void detach() {
         this.detach(true);
     }
+
     public void detach(boolean clear) {
-        attached = false;
+        attached.set(false);
         System.setProperty("debug", "false");
         if (clear) {
             breakpoints.clear();
+            setStepMode(false);
         }
         this.resume();
     }
 
     public boolean isAttached() {
-        return attached;
+        return attached.get();
     }
 
     public void setStepMode(boolean stepMode) {
-        this.stepMode = stepMode;
+        this.stepMode.set(stepMode);
     }
 
     public boolean isStepMode() {
-        return this.stepMode;
+        return this.stepMode.get();
     }
 
     public void setDebuggerAdapter(DataSonnetDebugListener dataSonnetDebugListener) {
@@ -401,10 +397,10 @@ public class DataSonnetDebugger {
     }
 
     public int getLineCount() {
-        return lineCount;
+        return lineCount.get();
     }
 
     public void setLineCount(int lineCount) {
-        this.lineCount = lineCount;
+        this.lineCount.set(lineCount);
     }
 }
