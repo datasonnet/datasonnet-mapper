@@ -529,35 +529,25 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
           // The transformation is run on a Thread
           mapperThread = new java.lang.Thread((Runnable) () -> {
             logger.info("running mapper.transform.");
-            String mappedJson = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
-            logger.info("mappedJson: " + mappedJson);
-            this.resultVariable = mappedJson;
-            // If we got here the mapper finished its job
-            this.finished();
+            try {
+              String mappedJson = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
+              logger.info("mappedJson: " + mappedJson);
+              this.resultVariable = mappedJson;
+              // If we got here the mapper finished its job
+              this.output("stdout", this.resultVariable);
+              this.terminated();
+              this.exited(1);
+            } catch ( IllegalArgumentException ex ) {
+              logger.error("Running mapper", ex);
+              this.outputError("Script execution finished with an error:\n" + ex.getMessage());
+              this.terminated();
+              this.exited(1);
+            }
 
-            // FIXME We could send an output event from the debugger to show the results
-            // FIXME eventually send these two? Currently we're not doing this to avoid terminating the session for a
-            // client who may be looking at the result
-//            this.terminated();
-//            this.exited(0);
-
-            // FIXME catch exceptions and send a breakpoint to the client;
           }, "DataSonnet Thread");
           mapperThread.start();
         }
     );
-  }
-
-  /**
-   * Sends a finished event to the client
-   */
-  private void finished() {
-    StoppedEventArguments args = new StoppedEventArguments();
-    args.setReason("finished");
-    args.setDescription("finished");
-    args.setThreadId(DATASONNET_THREAD_ID);
-    args.setText("Program finished OK");
-    this.client.stopped(args);
   }
 
   /**
@@ -570,7 +560,7 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
   }
 
   /**
-   * Sends a exited event to the client
+   * Sends an exited event to the client
    */
   private void exited(int i) {
     ExitedEventArguments args = new ExitedEventArguments();
@@ -578,6 +568,24 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
     this.client.exited(args);
   }
 
+  /**
+   * Sends an output event to the client
+   */
+  private void outputError(String msg) {
+    this.output("stderr", msg);
+  }
+
+  private void outputInfo(String msg) {
+    this.output("console", msg);
+  }
+
+  private void output(String category, String msg) {
+    OutputEventArguments args = new OutputEventArguments();
+    args.setCategory(category);
+    args.setOutput(msg);
+    logger.debug("Sending: {}", args);
+    this.client.output(args);
+  }
 
   /**
    * After configurationDone is received the client asks for the threads
@@ -1044,7 +1052,10 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
           ContinueResponse response = new ContinueResponse();
           int threadId = args.getThreadId();
           if (threadId == 0) {
-            DataSonnetDebugger.getDebugger().setStepMode(false);
+            runAsync(() -> {
+              DataSonnetDebugger.getDebugger().setStepMode(false);
+              DataSonnetDebugger.getDebugger().resume();
+            });
             response.setAllThreadsContinued(Boolean.TRUE);
             return response;
           } else {
