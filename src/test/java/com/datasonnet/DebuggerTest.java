@@ -21,6 +21,8 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.datasonnet.debugger.DataSonnetDebugger;
+import com.datasonnet.debugger.StoppedProgramContext;
+import com.datasonnet.debugger.da.DataSonnetDebugListener;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaTypes;
@@ -33,39 +35,54 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DebuggerTest {
 
     @Test
-    @Disabled
     void testDebugger() throws IOException, URISyntaxException, JSONException {
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        final String dsScript = TestResourceReader.readFileAsString("debug.ds");
+
         final DataSonnetDebugger debugger = DataSonnetDebugger.getDebugger();
         debugger.attach();
-        //debugger.addBreakpoint(4);
-        final Mapper mapper = new Mapper(TestResourceReader.readFileAsString("debug.ds"));
-        Runnable resume = new Runnable() {
+        debugger.addBreakpoint(5);
+        debugger.setLineCount(dsScript.split("\\R").length);
+        debugger.setDebuggerAdapter(new DataSonnetDebugListener() {
+            @Override
+            public void stopped(StoppedProgramContext stoppedProgramContext) {
+                latch.countDown();
+            }
+        });
+
+        Runnable runMap = new Runnable() {
             @Override
             public void run() {
-                while (true) {
-                    System.out.println("Resume?");
-                    try {
-                        System.in.read();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    debugger.resume();
-                }
+                String camelFunctions = "local cml = { exchangeProperty(str): exchangeProperty[str], header(str): header[str], properties(str): properties[str] };\n";
+                String dataSonnetScript = camelFunctions + dsScript;
+                Mapper mapper = new Mapper(dataSonnetScript);
+                mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
             }
         };
-        new Thread(resume).start();
-        Document<String> response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
+        new Thread(runMap).start();
+
+        try {
+            latch.await(5L, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            fail("The debugger did not stop at the breakpoint");
+        }
+
+        assertTrue(latch.getCount() == 0);
+        assertTrue(debugger.isStepMode());
+
+        StoppedProgramContext spc = debugger.getStoppedProgramContext();
+        assertNotNull(spc);
+        assertNotNull(spc.getSourcePos());
+        assertEquals(5, spc.getSourcePos().getLine());
     }
 
-    @Test
-    void testBinding() throws IOException, URISyntaxException, JSONException {
-        final Mapper mapper = new Mapper(TestResourceReader.readFileAsString("debug.ds"));
-        Document<String> response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
-    }
 }
