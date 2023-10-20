@@ -522,6 +522,7 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
     return runAsync(
         () -> {
           DataSonnetDebugger.getDebugger().attach();
+          DataSonnetDebugger.getDebugger().setStepMode(true);
           DataSonnetDebugger.getDebugger().setDebuggerAdapter(this);
 
 //					// FIXME we should have a document to transform here as an extra param to the launch config ( the payload )
