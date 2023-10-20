@@ -28,6 +28,7 @@ import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.TestResourceReader;
 import org.json.JSONException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -41,7 +42,6 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DebuggerTest {
-
     @Test
     void testDebugger() throws IOException, URISyntaxException, JSONException {
         final CountDownLatch latch = new CountDownLatch(1);
@@ -83,6 +83,8 @@ public class DebuggerTest {
         assertNotNull(spc);
         assertNotNull(spc.getSourcePos());
         assertEquals(5, spc.getSourcePos().getLine());
+
+        DataSonnetDebugger.getDebugger().detach();
     }
 
 }
