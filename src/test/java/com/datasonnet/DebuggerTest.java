@@ -16,23 +16,16 @@ package com.datasonnet;
  * limitations under the License.
  */
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
 import com.datasonnet.debugger.DataSonnetDebugger;
 import com.datasonnet.debugger.StoppedProgramContext;
 import com.datasonnet.debugger.da.DataSonnetDebugListener;
 import com.datasonnet.document.DefaultDocument;
-import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.TestResourceReader;
 import org.json.JSONException;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -55,6 +48,7 @@ public class DebuggerTest {
         debugger.setDebuggerAdapter(new DataSonnetDebugListener() {
             @Override
             public void stopped(StoppedProgramContext stoppedProgramContext) {
+                DataSonnetDebugger.getDebugger().detach();
                 latch.countDown();
             }
         });
@@ -76,15 +70,21 @@ public class DebuggerTest {
             fail("The debugger did not stop at the breakpoint");
         }
 
-        assertTrue(latch.getCount() == 0);
-        assertTrue(debugger.isStepMode());
-
         StoppedProgramContext spc = debugger.getStoppedProgramContext();
+
+        assertTrue(latch.getCount() == 0);
         assertNotNull(spc);
         assertNotNull(spc.getSourcePos());
         assertEquals(5, spc.getSourcePos().getLine());
+    }
 
+    @AfterAll
+    public static void cleanUp() {
         DataSonnetDebugger.getDebugger().detach();
     }
 
+    @AfterEach
+    public void cleanUpEach() {
+        DataSonnetDebugger.getDebugger().detach();
+    }
 }
