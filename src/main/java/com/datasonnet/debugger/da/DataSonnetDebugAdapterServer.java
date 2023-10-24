@@ -35,6 +35,7 @@ import com.datasonnet.debugger.DataSonnetDebugger;
 import com.datasonnet.debugger.SourcePos;
 import com.datasonnet.debugger.StoppedProgramContext;
 import com.datasonnet.document.DefaultDocument;
+import com.datasonnet.document.MediaType;
 import com.datasonnet.document.MediaTypes;
 import org.eclipse.lsp4j.debug.Breakpoint;
 import org.eclipse.lsp4j.debug.Capabilities;
@@ -184,6 +185,8 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
    */
   private String payload = "{}";
 
+  private MediaType outputType = MediaTypes.APPLICATION_JSON;
+
   /**
    * Holds the result of the program once it finishes
    */
@@ -325,7 +328,8 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
         "request": "launch",
         "name": "Launch Datasonnet Debugger",
         "program": "/home/dev/code/sampleWorkspace/stg-get.ds",
-        payload=/Users/ramiro/palomonte/github/camel-tooling/camel-dap-client-vscode/sampleWorkspace/resources/payload.json,
+        payload: /Users/ramiro/palomonte/github/camel-tooling/camel-dap-client-vscode/sampleWorkspace/resources/payload.json,
+        outputType: "application/json"
         "folder": "/home/dev/code/sampleWorkspace",
         "relativeFile": "stg-get.ds",
         "fileDirName": "/home/dev/code/sampleWorkspace",
@@ -351,6 +355,10 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
             String payloadFileName = (String) args.get("payload");
             if ( payloadFileName != null ) {
               this.payload = readFileAsString(payloadFileName);
+            }
+            String outputMime = (String) args.get("outputType");
+            if ( outputMime != null ) {
+              this.outputType = MediaType.parseMediaType(outputMime);
             }
             logger.info("Running mapper for script: " + this.script);
             mapper = new Mapper(this.script);
@@ -538,7 +546,7 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
           mapperThread = new java.lang.Thread((Runnable) () -> {
             logger.info("running mapper.transform.");
             try {
-              String mappedJson = mapper.transform(new DefaultDocument<String>(this.payload, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
+              String mappedJson = mapper.transform(new DefaultDocument<String>(this.payload, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), this.outputType).getContent();
               logger.info("mappedJson: " + mappedJson);
               this.resultVariable = mappedJson;
               // If we got here the mapper finished its job
