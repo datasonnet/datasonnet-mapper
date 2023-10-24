@@ -179,6 +179,12 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
   private String script;
 
   /**
+   * The payload to use as a param for the script
+   * FIXME: Move this to a Context object
+   */
+  private String payload = "{}";
+
+  /**
    * Holds the result of the program once it finishes
    */
   private String resultVariable;
@@ -315,12 +321,11 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
 {
     "command": "launch",
     "arguments": {
-        "type": "datasonnet.debugger",
+        "type": "datasonnet",
         "request": "launch",
         "name": "Launch Datasonnet Debugger",
         "program": "/home/dev/code/sampleWorkspace/stg-get.ds",
-        "file": "/home/dev/code/sampleWorkspace/stg-get.ds",
-        "fileBasename": "stg-get.ds",
+        payload=/Users/ramiro/palomonte/github/camel-tooling/camel-dap-client-vscode/sampleWorkspace/resources/payload.json,
         "folder": "/home/dev/code/sampleWorkspace",
         "relativeFile": "stg-get.ds",
         "fileDirName": "/home/dev/code/sampleWorkspace",
@@ -343,6 +348,10 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
             this.program = (String) args.get("program");
             this.programBaseName = (String) args.get("fileBasename");
             this.script = readFileAsString(program);
+            String payloadFileName = (String) args.get("payload");
+            if ( payloadFileName != null ) {
+              this.payload = readFileAsString(payloadFileName);
+            }
             logger.info("Running mapper for script: " + this.script);
             mapper = new Mapper(this.script);
             DataSonnetDebugger debugger = DataSonnetDebugger.getDebugger();
@@ -525,20 +534,18 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
           DataSonnetDebugger.getDebugger().setStepMode(true);
           DataSonnetDebugger.getDebugger().setDebuggerAdapter(this);
 
-//					// FIXME we should have a document to transform here as an extra param to the launch config ( the payload )
-					String jsonData = "{}";
           // The transformation is run on a Thread
           mapperThread = new java.lang.Thread((Runnable) () -> {
             logger.info("running mapper.transform.");
             try {
-              String mappedJson = mapper.transform(new DefaultDocument<String>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
+              String mappedJson = mapper.transform(new DefaultDocument<String>(this.payload, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_JSON).getContent();
               logger.info("mappedJson: " + mappedJson);
               this.resultVariable = mappedJson;
               // If we got here the mapper finished its job
               this.output("stdout", this.resultVariable);
               this.terminated();
               this.exited(1);
-            } catch ( IllegalArgumentException ex ) {
+            } catch ( Exception ex ) {
               logger.error("Running mapper", ex);
               this.outputError("Script execution finished with an error:\n" + ex.getMessage());
               this.terminated();
