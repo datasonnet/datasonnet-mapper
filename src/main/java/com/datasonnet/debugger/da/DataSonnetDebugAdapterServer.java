@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +57,7 @@ import org.eclipse.lsp4j.debug.SetBreakpointsResponse;
 import org.eclipse.lsp4j.debug.SetVariableArguments;
 import org.eclipse.lsp4j.debug.SetVariableResponse;
 import org.eclipse.lsp4j.debug.Source;
+import org.eclipse.lsp4j.debug.SourceBreakpoint;
 import org.eclipse.lsp4j.debug.SourcePresentationHint;
 import org.eclipse.lsp4j.debug.StackFrame;
 import org.eclipse.lsp4j.debug.StackFramePresentationHint;
@@ -254,6 +257,9 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
           capabilities.setSupportsConditionalBreakpoints(Boolean.FALSE);
           capabilities.setSupportsFunctionBreakpoints(Boolean.FALSE);
 
+          // This would be used to return a list of available locations to set breakpoints, including columns
+          capabilities.setSupportsBreakpointLocationsRequest(Boolean.FALSE);
+
           capabilities.setSupportsExceptionOptions(Boolean.FALSE);
           capabilities.setSupportsExceptionInfoRequest(Boolean.FALSE);
           capabilities.setSupportsExceptionFilterOptions(Boolean.FALSE);
@@ -363,7 +369,7 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
             logger.info("Running mapper for script: " + this.script);
             mapper = new Mapper(this.script);
             DataSonnetDebugger debugger = DataSonnetDebugger.getDebugger();
-            debugger.setStepMode(true);
+//            debugger.setStepMode(true);
             // don't start it yet!
 
             boolean launched = true;
@@ -455,7 +461,7 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
 
   /**
    * Save the breakpoints and map them to the current script being debugged
-   * FIXME actually save them
+   *
    * The setBreakpoints request registers all breakpoints that exist for a single source (so it is not incremental).
    * A simple implementation of these semantics in the debug adapter is to clear all previous breakpoints for the
    * source and then set the breakpoints specified in the request. setBreakpoints and setFunctionBreakpoints are
@@ -472,56 +478,63 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
   }
 
   private SetBreakpointsResponse setBreakpointsSync(SetBreakpointsArguments setBreakpointsArguments) {
+    // We need to save the breakpoints
+    // and share with the DataSonnetDebugger
+
+//  "command": "setBreakpoints",
+//  "arguments": {
+//    "source": {
+//      "name": "stg-get.ds",
+//      "path": "/Users/ramiro/palomonte/github/datasonnet/datasonnet-vscode-debugger/sampleWorkspace/stg-get.ds"
+//    },
+//    "lines": [
+//      11,
+//      14
+//    ],
+//    "breakpoints": [
+//      {
+//        "line": 11
+//      },
+//      {
+//        "line": 14
+//      }
+//    ],
+//    "sourceModified": false
+//  }
+//    public void addBreakpoint(int line, boolean temporary) {
+
+    DataSonnetDebugger.getDebugger().clearBreakpoints();
     SetBreakpointsResponse response = new SetBreakpointsResponse();
-    Breakpoint[] breakpoints = new Breakpoint[1];
-    Breakpoint bp = new Breakpoint();
-    bp.setId(2);
-    bp.setLine(9);
-//		bp.setMessage("this is a breakpoint");
-    bp.setVerified(true);
-    Source src = new Source();
-    src.setName("XXX");
-    src.setPath("XXXX program?");
-    bp.setSource(src);
-    breakpoints[0] = bp;
-    response.setBreakpoints(breakpoints);
+    response.setBreakpoints(new Breakpoint[0]);
+
+    Source source = setBreakpointsArguments.getSource();
+    if (source.getName() != null && source.getName().equals(this.programBaseName) &&
+        source.getPath() != null && source.getPath().equals(this.program)) {
+      SourceBreakpoint[] sourceBreakpoints = setBreakpointsArguments.getBreakpoints();
+      logger.debug("creating breakpoints for " + Arrays.toString(sourceBreakpoints));
+      Breakpoint[] breakpoints = new Breakpoint[sourceBreakpoints.length];
+      for (int i = 0; i < sourceBreakpoints.length; i++) {
+        SourceBreakpoint sourceBreakpoint = sourceBreakpoints[i];
+        int line = sourceBreakpoint.getLine();
+        // header
+        line++;
+        // vscode is 1-based, datasonnet is zero-based
+        line--;
+
+        // Create DataSonnetBreakpoint
+        DataSonnetDebugger.getDebugger().addBreakpoint(line);
+        Breakpoint bp = new Breakpoint();
+        bp.setId(i);
+        bp.setLine(line);
+        bp.setVerified(true);
+        breakpoints[i] = bp;
+      }
+      response.setBreakpoints(breakpoints);
+      logger.debug("created breakpoints " + Arrays.toString(breakpoints));
+
+    }
     return response;
-
-		/*
-		We need to save the breakpoints
-    and share with the DataSonnetDebugger
-
-		Source source = setBreakpointsArguments.getSource();
-		SourceBreakpoint[] sourceBreakpoints = setBreakpointsArguments.getBreakpoints();
-		Breakpoint[] breakpoints = new Breakpoint[sourceBreakpoints.length];
-		Set<String> breakpointIds = new HashSet<>();
-		for (int i = 0; i< sourceBreakpoints.length; i++) {
-			SourceBreakpoint sourceBreakpoint = sourceBreakpoints[i];
-			int line = sourceBreakpoint.getLine();
-			// Create DataSonnetBreakpoint
-
-						breakpoint.setVerified(true);
-					} else {
-						breakpoint.setMessage(String.format(BREAKPOINT_MESSAGE_CANNOT_FIND_ID, source.getPath(), line));
-					}
-					breakpoint.setMessage(String.format(BREAKPOINT_MESSAGE_EXCEPTION_OCCURED_WHEN_SEARCHING_ID, baseMessage, e.getMessage()));
-
-				String message = String.format(MESSAGE_NO_ACTIVE_ROUTES_FOUND, source.getPath(), line);
-//		this.removeOldBreakpoints(source, breakpointIds);
-		sourceToBreakpointIds.put(source.getPath(), breakpointIds);
-//		SetBreakpointsResponse response = new SetBreakpointsResponse();
-		response.setBreakpoints(breakpoints);
-		return response;
-
-		 */
   }
-
-//	private void addBreakpoint(SourceBreakpoint sourceBreakpoint, String nodeId) {
-////	}
-////
-////	private void removeOldBreakpoints(Source source, Set<String> breakpointIds) {
-//	}
-
   //setFunctionBreakpoints if the debug adapter supports function breakpoints,
 
   //setExceptionBreakpoints if the debug adapter supports any exception options,
@@ -538,8 +551,8 @@ public class DataSonnetDebugAdapterServer implements IDebugProtocolServer, DataS
   public CompletableFuture<Void> configurationDone(ConfigurationDoneArguments args) {
     return runAsync(
         () -> {
-          DataSonnetDebugger.getDebugger().attach();
-          DataSonnetDebugger.getDebugger().setStepMode(true);
+          DataSonnetDebugger.getDebugger().attach(false);
+//          DataSonnetDebugger.getDebugger().setStepMode(true);
           DataSonnetDebugger.getDebugger().setDebuggerAdapter(this);
 
           // The transformation is run on a Thread

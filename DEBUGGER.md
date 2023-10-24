@@ -10,16 +10,16 @@ Features
 
 * Implements a DAP server over STD IN/OUT
 * Sends output to the client, to be shown on the debugger console. For example, the program output
-* Support payloads from the client.
+* Supports payloads from the client.
+* Supports payloads with Content-Type other than JSON
+* Supports specifying the output MIME type 
+* Set up breakpoints from the client.
 
 ### TODOs
 
 Roughly in priority order:
 
-* Support payloads with Content-Type other than JSON.
-* Set up breakpoints from the client. Currently, the program starts in "auto-stop" mode, stopped at the beginning.
-* Provide better description of the local and global context, and bindings. See StoppedProgramContext
-* Currently only a string representation is returned to the client; complex variables can not be expanded on the client. See StoppedProgramContext
+* Provide a better representation for complex object. Currently only a string representation is returned to the client; complex variables can not be expanded on the client. See StoppedProgramContext
 * Handle already wrapped scripts; until this is ready source code refs will be off by one for these scripts
 * Be able to debug imported files
 * Support restart

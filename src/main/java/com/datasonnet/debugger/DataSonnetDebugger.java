@@ -105,6 +105,10 @@ public class DataSonnetDebugger {
         breakpoints.remove(line);
     }
 
+    public void clearBreakpoints() {
+        this.breakpoints.clear();
+    }
+
     public void probeExpr(Expr expr, ValScope valScope, FileScope fileScope, EvalScope evalScope) {
         if (isAttached()) {
             this.detach(false);//We must detach the debugger while probing the expression, to avoid stack overflow
@@ -120,7 +124,8 @@ public class DataSonnetDebugger {
         }
 
         int line = sourcePos.getLine();
-        Breakpoint breakpoint = sourcePos != null ? breakpoints.get(line) : null;
+        Breakpoint breakpoint = breakpoints.get(line);
+        logger.debug("line " + line + " breakpoints " + breakpoint);
         if (this.isStepMode() || (breakpoint != null && breakpoint.isEnabled())) {
             this.saveContext(expr, valScope, fileScope, evalScope, sourcePos);
             if (this.debugListener != null) {
