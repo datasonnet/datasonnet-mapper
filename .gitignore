@@ -7,4 +7,6 @@ tmp
 .classpath
 .factorypath
 .project
+.vscode
 build
+
