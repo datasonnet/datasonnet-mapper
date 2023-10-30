@@ -65,7 +65,9 @@ public class DebuggerTest {
         new Thread(runMap).start();
 
         try {
-            latch.await(5L, TimeUnit.SECONDS);
+            if (!latch.await(5L, TimeUnit.SECONDS)) {
+                fail("The debugger did not stop at the breakpoint");
+            }
         } catch (InterruptedException e) {
             fail("The debugger did not stop at the breakpoint");
         }

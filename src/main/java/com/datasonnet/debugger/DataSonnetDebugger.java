@@ -207,9 +207,9 @@ public class DataSonnetDebugger {
         spc.setSourcePos(sourcePos);
         Map<String, Object> namedVariables = new HashMap<>();
 
-        namedVariables.put(SELF_VAR_NAME, valScope.self0().nonEmpty() ? (Map<String, ValueInfo>) this.mapValue(valScope.self0().get(), evalScope, false) : null);
-        namedVariables.put(SUPER_VAR_NAME, valScope.super0().nonEmpty() ? (Map<String, ValueInfo>) this.mapValue(valScope.super0().get(), evalScope, false) : null);
-        namedVariables.put(DOLLAR_VAR_NAME, valScope.dollar0().nonEmpty() ? (Map<String, ValueInfo>) this.mapValue(valScope.dollar0().get(), evalScope, false) : null);
+        namedVariables.put(SELF_VAR_NAME, valScope.self0().nonEmpty() ? this.mapValue(valScope.self0().get(), evalScope, false) : null);
+        namedVariables.put(SUPER_VAR_NAME, valScope.super0().nonEmpty() ? this.mapValue(valScope.super0().get(), evalScope, false) : null);
+        namedVariables.put(DOLLAR_VAR_NAME, valScope.dollar0().nonEmpty() ? this.mapValue(valScope.dollar0().get(), evalScope, false) : null);
         logger.debug("saveContext. namedVariables is: " + namedVariables);
 
         scala.collection.immutable.Map<String, Object> nameIndices = fileScope.nameIndices();
