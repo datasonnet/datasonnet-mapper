@@ -207,9 +207,9 @@ public class DataSonnetDebugger {
         spc.setSourcePos(sourcePos);
         Map<String, Object> namedVariables = new HashMap<>();
 
-        namedVariables.put(SELF_VAR_NAME, valScope.self0().nonEmpty() ? this.mapValue(valScope.self0().get(), evalScope, false) : null);
-        namedVariables.put(SUPER_VAR_NAME, valScope.super0().nonEmpty() ? this.mapValue(valScope.super0().get(), evalScope, false) : null);
-        namedVariables.put(DOLLAR_VAR_NAME, valScope.dollar0().nonEmpty() ? this.mapValue(valScope.dollar0().get(), evalScope, false) : null);
+        namedVariables.put(SELF_VAR_NAME, valScope.self0().nonEmpty() ? this.mapValue(valScope.self0().get(), SELF_VAR_NAME, evalScope, false) : null);
+        namedVariables.put(SUPER_VAR_NAME, valScope.super0().nonEmpty() ? this.mapValue(valScope.super0().get(), SUPER_VAR_NAME, evalScope, false) : null);
+        namedVariables.put(DOLLAR_VAR_NAME, valScope.dollar0().nonEmpty() ? this.mapValue(valScope.dollar0().get(), DOLLAR_VAR_NAME, evalScope, false) : null);
         logger.debug("saveContext. namedVariables is: " + namedVariables);
 
         scala.collection.immutable.Map<String, Object> nameIndices = fileScope.nameIndices();
@@ -225,7 +225,7 @@ public class DataSonnetDebugger {
                     logger.debug("Next binding name is: " + nameStr);
                     if (!nameStr.equals("std") && !nameStr.equals("cml")) { //TODO we don't need to show them or do we?
                         Val forced = nextBinding.force();
-                        Object mapped = this.mapValue(forced, evalScope, true);
+                        Object mapped = this.mapValue(forced, nameStr, evalScope, true);
                         namedVariables.put(nameStr, mapped);
                         logger.debug("Binding '" + nameStr + "' value is: " + mapped);
                     }
@@ -245,7 +245,7 @@ public class DataSonnetDebugger {
         }
     }
 
-    private Object mapValue(@Nullable Val theVal, EvalScope evalScope, boolean isBinding) {
+    private Object mapValue(@Nullable Val theVal, String name, EvalScope evalScope, boolean isBinding) {
         Object mapped = null;
         if (theVal instanceof Val.Obj) {
             Val.Obj objectValue = (Val.Obj) theVal;
@@ -258,7 +258,7 @@ public class DataSonnetDebugger {
                 Option<Val> member = objectValue.valueCache().get(key);
                 if (member.nonEmpty() && !"self".equals(key) && !"$".equals(key) && !"super".equals(key)) {
                     Val memberVal = member.get();
-                    Object mappedVal = mapValue(memberVal, evalScope, isBinding);
+                    Object mappedVal = mapValue(memberVal, key, evalScope, isBinding);
                     mappedObject.put(key, mappedVal instanceof ValueInfo ? (ValueInfo) mappedVal : new ValueInfo(memberVal.sourcePosition(), key, mappedVal));
                 } else {
                     mappedObject.put(key, new ValueInfo(0, key, null));
@@ -275,16 +275,16 @@ public class DataSonnetDebugger {
                 Val memberVal = member.force();
                 //FIXME
                 Materializer.apply(memberVal, evalScope);//TODO we need to review this - it works but it calculates values of ALL objects, not just previously evaluated ones
-                Object mappedVal = mapValue(memberVal, evalScope, isBinding);
-                mappedArr.add(mappedVal instanceof ValueInfo ? (ValueInfo) mappedVal : new ValueInfo(memberVal.sourcePosition(), "", mapValue(memberVal, evalScope, isBinding)));
+                Object mappedVal = mapValue(memberVal, "", evalScope, isBinding);
+                mappedArr.add(mappedVal instanceof ValueInfo ? (ValueInfo) mappedVal : new ValueInfo(memberVal.sourcePosition(), "", mapValue(memberVal, "", evalScope, isBinding)));
                 return null;
             });
 
             mapped = mappedArr;
         } else if (theVal instanceof Val.Func) {
-            mapped = new ValueInfo(theVal.sourcePosition(), "", "FUNCTION");
+            mapped = new ValueInfo(theVal.sourcePosition(), name, "FUNCTION");
         } else {
-            mapped = new ValueInfo(theVal.sourcePosition(), "", Materializer.apply(theVal, evalScope));
+            mapped = new ValueInfo(theVal.sourcePosition(), name, Materializer.apply(theVal, evalScope));
         }
         return mapped;
     }
