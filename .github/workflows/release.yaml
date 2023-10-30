@@ -20,9 +20,6 @@ on:
       sonatype_password:
         description: 'Sonatype OSSRH password'
         required: true
-      profile:
-        description: 'javax or jakarta'
-        required: true
 
 jobs:
   release:
@@ -44,7 +41,7 @@ jobs:
         run: "./mvnw -V --no-transfer-progress --batch-mode --settings .settings.xml clean \
         -DreleaseVersion='${{ github.event.inputs.release_ver }}' \
         -DdevelopmentVersion='${{ github.event.inputs.snapshot_ver }}' \
-        release:prepare -P${{ github.event.inputs.profile }}"
+        release:prepare"
       - id: install-secret-key
         name: Install gpg secret key
         run: |
@@ -58,4 +55,4 @@ jobs:
           GPG_PASSPHRASE: ${{ github.event.inputs.gpg_passphrase }}
         run: "./mvnw -V --no-transfer-progress --batch-mode --settings .settings.xml \
         -Darguments='--settings .settings.xml -Dlicense.skip=true -DskipTests -Dmaven.install.skip=true ' \
-        release:perform -P${{ github.event.inputs.profile }},release"
+        release:perform -Prelease"
