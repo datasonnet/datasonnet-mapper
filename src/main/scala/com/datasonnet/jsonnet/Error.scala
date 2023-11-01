@@ -103,7 +103,7 @@ object Error {
   */
 class FileScope(val currentFile: Path,
                 val nameIndices: Map[String, Int],
-                 val sourceP: String = ""){
+                val sourceP: String = ""){
   // Only used for error messages, so in the common case
   // where nothing blows up this does not need to be allocated
   // ( And also for debugger support )

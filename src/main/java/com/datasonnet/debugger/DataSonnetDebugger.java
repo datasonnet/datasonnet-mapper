@@ -157,6 +157,9 @@ public class DataSonnetDebugger {
             this.detach(false);//We must detach the debugger while probing the expression, to avoid stack overflow
         }
 
+        //Load indices for the current mapping
+        Parser.setCachedIndices(currentFileScope.nameIndices());
+
         Interpreter interpreter = new Interpreter((Evaluator) currentEvalScope);
         Either either = interpreter.parse(expression, currentFileScope.currentFile());
         if (either.isLeft()) {
@@ -166,10 +169,13 @@ public class DataSonnetDebugger {
         Object value = "";
         try {
             Val exprVal = currentEvalScope.visitExpr(expr, currentValScope, currentFileScope);
-            value = Materializer.apply(exprVal, currentEvalScope);
+            value = this.mapValue(exprVal, "", currentEvalScope, true);
         } catch (Exception e) {
             value = e;
         }
+
+        //Reset indices
+        Parser.setCachedIndices(null);
 
         if (!isAttached()) {
             this.attach(false);

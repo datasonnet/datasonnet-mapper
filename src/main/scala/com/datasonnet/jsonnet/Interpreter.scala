@@ -15,11 +15,12 @@ package com.datasonnet.jsonnet
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.datasonnet.Mapper
 import com.datasonnet.jsonnet.Expr.Params
 import fastparse.Parsed
 
 import java.io.{PrintWriter, StringWriter}
-import scala.collection.{immutable}
+import scala.collection.immutable
 
 /**
  * Wraps all the machinery of evaluating Jsonnet source code, from parsing to
@@ -49,7 +50,7 @@ class Interpreter(eval: Evaluator) {
   }
 
   def parse(txt: String, path: Path): Either[String, Expr] = {
-    val res = parseCache.getOrElseUpdate(txt, fastparse.parse(txt, Parser.document(_))) match {
+    val res = parseCache.getOrElseUpdate(txt, fastparse.parse(txt, Mapper.parser)) match {
       case f@Parsed.Failure(l, i, e) => Left("Parse error: " + f.trace().msg)
       case Parsed.Success(r, index) => Right(r._1)
     }

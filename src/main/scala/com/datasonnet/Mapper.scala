@@ -15,23 +15,24 @@ package com.datasonnet
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import java.io.{PrintWriter, StringWriter}
-import java.util.Collections
-
 import com.datasonnet.document.{DefaultDocument, Document, MediaType, MediaTypes}
 import com.datasonnet.header.Header
-import com.datasonnet.spi.{DataFormatService, Library}
-import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
-import fastparse.Parsed
 import com.datasonnet.jsonnet.Expr.Params
 import com.datasonnet.jsonnet.Val.{Func, Lazy, Obj}
 import com.datasonnet.jsonnet._
+import com.datasonnet.spi.{DataFormatService, Library}
+import com.datasonnet.wrap.{DataSonnetPath, NoFileEvaluator}
+import fastparse.{P, Parsed}
 
+import java.io.{PrintWriter, StringWriter}
+import java.util.Collections
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.{IterableHasAsScala, MapHasAsScala}
 import scala.util.{Failure, Success, Try}
 
 object Mapper {
+  val parser: P[_] => P[(Expr, Map[String, Int])] = Parser.document(_)
+
   private def asFunction(script: String, argumentNames: Iterable[String]) =
     (Seq("payload") ++ argumentNames).mkString("function(", ",", ")\n") + script
 
@@ -51,7 +52,7 @@ object Mapper {
 
   def evaluate(script: String, evaluator: Evaluator, cache: collection.mutable.Map[String, fastparse.Parsed[(Expr, Map[String, Int])]], libraries: Map[String, Val], lineOffset: Int): Try[Val] = {
     for {
-      fullParse <- cache.getOrElseUpdate(script, fastparse.parse(script, Parser.document(_))) match {
+      fullParse <- cache.getOrElseUpdate(script, fastparse.parse(script, parser)) match {
         case f@Parsed.Failure(l, i, e) => Failure(new IllegalArgumentException("Problem parsing: " + expandErrorLineNumber(f.trace().msg, lineOffset)))
         case Parsed.Success(r, index) => Success(r)
       }

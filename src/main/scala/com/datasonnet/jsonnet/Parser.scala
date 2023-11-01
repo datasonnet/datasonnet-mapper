@@ -18,7 +18,9 @@ package com.datasonnet.jsonnet
 import fastparse.JsonnetWhitespace._
 import fastparse._
 import Expr.Member.Visibility
+
 import scala.annotation.switch
+import scala.collection.mutable
 
 /**
   * Parses Jsonnet source code `String`s into a [[Expr]] syntax tree, using the
@@ -27,6 +29,19 @@ import scala.annotation.switch
   * to allow better performance at runtime.
   */
 object Parser{
+  var cachedIndices: mutable.Map[Any, Any] = null
+
+  def setCachedIndices(indices: Map[String, Any]) = {
+    this.synchronized {
+      if (indices != null) {
+        cachedIndices = collection.mutable.Map[Any, Any]()
+        cachedIndices ++= indices
+      } else {
+        cachedIndices = null
+      }
+    }
+  }
+
   val precedenceTable = Seq(
     Seq("default"),
     Seq("*", "/", "%"),
@@ -377,11 +392,12 @@ object Parser{
     * The Jsonnet standard library `std` always lives at slot 0.
     */
   def indexFor[_: P](name: String): Int = {
-    P.current.misc("std") = 0
-    P.current.misc.get(name) match{
+    val indices: mutable.Map[Any, Any] = if (cachedIndices != null) cachedIndices else P.current.misc
+    indices("std") = 0
+    indices.get(name) match{
       case None =>
-        val index = P.current.misc.size
-        P.current.misc(name) = index
+        val index = indices.size
+        indices(name) = index
         index
       case Some(index) => index.asInstanceOf[Int]
     }
