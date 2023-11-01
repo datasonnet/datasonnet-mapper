@@ -891,8 +891,6 @@ object Std {
       { (scope, thisFile, ev, fs, outerOffset) =>
         val logger = Logger(Mapper.getClass)
         val Val.Str(msg) = scope.bindings(0).get.force
-            //TODO remove
-            System.err.println(s"TRACE: $thisFile " + msg)
         logger.trace(msg)
         scope.bindings(1).get.force
       }
