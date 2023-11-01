@@ -568,11 +568,36 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.22.2</version>
-        <configuration>
-          <additionalClasspathElements>
-            <additionalClasspathElement>src/test/java/</additionalClasspathElement>
-          </additionalClasspathElements>
-        </configuration>
+        <executions>
+          <execution>
+            <id>default-test</id><!-- here we configure the default execution -->
+            <configuration>
+              <excludes>
+                <exclude>**/DebuggerTest.java</exclude>
+              </excludes>
+              <additionalClasspathElements>
+                <additionalClasspathElement>src/test/java/</additionalClasspathElement>
+              </additionalClasspathElements>
+            </configuration>
+          </execution>
+          <execution>
+            <id>debugger-test</id><!-- and here we configure the special execution -->
+            <phase>test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <configuration>
+              <forkCount>1</forkCount>
+              <reuseForks>false</reuseForks>
+              <includes>
+                <include>**/DebuggerTest.java</include>
+              </includes>
+              <additionalClasspathElements>
+                <additionalClasspathElement>src/test/java/</additionalClasspathElement>
+              </additionalClasspathElements>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
