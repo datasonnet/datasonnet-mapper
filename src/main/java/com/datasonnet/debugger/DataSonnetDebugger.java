@@ -386,8 +386,8 @@ public class DataSonnetDebugger {
         if (clear) {
             breakpoints.clear();
             setStepMode(false);
+            this.resume();
         }
-        this.resume();
     }
 
     public boolean isAttached() {
