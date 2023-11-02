@@ -889,7 +889,7 @@ object Std {
       None,
       Params(Array(("str", None, 0), ("rest", None, 1))),
       { (scope, thisFile, ev, fs, outerOffset) =>
-        val logger = Logger(Mapper.getClass)
+        val logger = Logger("DS_TRACE")
         val Val.Str(msg) = scope.bindings(0).get.force
         logger.trace(msg)
         scope.bindings(1).get.force
