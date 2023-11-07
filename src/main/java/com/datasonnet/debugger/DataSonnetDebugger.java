@@ -255,7 +255,7 @@ public class DataSonnetDebugger {
         Object mapped = null;
         if (theVal instanceof Val.Obj) {
             Val.Obj objectValue = (Val.Obj) theVal;
-            if (isBinding) {
+            if (isBinding && objectValue.valueCache().isEmpty()) {
                 Materializer.apply(objectValue, evalScope);//To populate the cache
             }
             Map<String, ValueInfo> mappedObject = new ConcurrentHashMap<>();
