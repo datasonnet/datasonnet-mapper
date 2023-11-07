@@ -1,9 +1,9 @@
 ### Changelog
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
-#### [2.5.3](https://github.com/datasonnet/datasonnet-mapper/compare/2.5.2...2.5.3)
+#### [3.0.0-RC1](https://github.com/datasonnet/datasonnet-mapper/compare/2.5.2...3.0.0-RC1)
 
-> 19 October 2023
+> 8 November 2023
 
 - Debugger server added
 - `ds.util` library removed as redundant
