@@ -77,16 +77,17 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <jackson.version>2.15.0</jackson.version>
-    <junit.version>5.6.2</junit.version>
-    <bouncycastle.version>1.69</bouncycastle.version>
-    <quickcheck.version>0.9.4</quickcheck.version>
-    <xmlunit.version>2.7.0</xmlunit.version>
+    <jackson.version>2.15.3</jackson.version>
+    <junit.version>5.10.0</junit.version>
+    <bouncycastle.version>1.76</bouncycastle.version>
+    <quickcheck.version>1.0</quickcheck.version>
+    <xmlunit.version>2.9.1</xmlunit.version>
     <json-path.version>2.8.0</json-path.version>
 
-    <mycila.version>4.1</mycila.version>
+    <picocli.version>4.7.5</picocli.version>
+    <mycila.version>4.3</mycila.version>
 
-    <scala.library.version>2.13.10</scala.library.version>
+    <scala.library.version>2.13.12</scala.library.version>
     <scala-logging.version>3.9.5</scala-logging.version>
 
     <ujson.version>1.2.0</ujson.version>
@@ -151,7 +152,7 @@
     <dependency>
       <groupId>org.jetbrains</groupId>
       <artifactId>annotations</artifactId>
-      <version>13.0</version>
+      <version>24.0.1</version>
     </dependency>
 
     <!-- plugin deps: start -->
@@ -189,12 +190,12 @@
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-core</artifactId>
-      <version>4.0.1</version>
+      <version>4.0.4</version>
     </dependency>
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
-      <version>4.0.1</version>
+      <version>4.0.4</version>
     </dependency>
 
     <!-- Multipart plugin dependencies -->
@@ -220,36 +221,36 @@
     <!-- crypto deps: start -->
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpg-jdk15on</artifactId>
+      <artifactId>bcpg-jdk18on</artifactId>
       <version>${bouncycastle.version}</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-ext-jdk15on</artifactId>
+      <artifactId>bcprov-ext-jdk18on</artifactId>
       <version>${bouncycastle.version}</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
+      <artifactId>bcprov-jdk18on</artifactId>
       <version>${bouncycastle.version}</version>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpkix-jdk15on</artifactId>
+      <artifactId>bcpkix-jdk18on</artifactId>
       <version>${bouncycastle.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.google.re2j</groupId>
       <artifactId>re2j</artifactId>
-      <version>1.4</version>
+      <version>1.7</version>
     </dependency>
     <!-- crypto deps: end -->
 
     <dependency>
       <groupId>info.picocli</groupId>
       <artifactId>picocli</artifactId>
-      <version>4.5.1</version>
+      <version>${picocli.version}</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
@@ -292,7 +293,7 @@
     <dependency>
       <groupId>org.junit.platform</groupId>
       <artifactId>junit-platform-runner</artifactId>
-      <version>1.6.2</version>
+      <version>1.10.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -332,14 +333,14 @@
     <dependency>
       <groupId>org.skyscreamer</groupId>
       <artifactId>jsonassert</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.1</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpmime</artifactId>
-      <version>4.5.13</version>
+      <version>4.5.14</version>
       <scope>test</scope>
     </dependency>
 
@@ -425,12 +426,12 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>3.4.0</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.3.1</version>
       </plugin>
       <plugin>
         <groupId>com.mycila</groupId>
@@ -512,7 +513,7 @@
             <path>
               <groupId>info.picocli</groupId>
               <artifactId>picocli-codegen</artifactId>
-              <version>4.0.1</version>
+              <version>${picocli.version}</version>
             </path>
           </annotationProcessorPaths>
           <compilerArgs>
@@ -531,7 +532,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.2</version>
+        <version>3.3.0</version>
         <configuration>
           <archive>
             <manifest>
@@ -543,7 +544,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>3.6.0</version>
         <configuration>
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
@@ -612,7 +613,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.8</version>
+        <version>1.6.13</version>
         <extensions>true</extensions>
         <configuration>
           <serverId>sonatype-ossrh</serverId>
@@ -648,7 +649,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.2.0</version>
+            <version>3.3.0</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -661,7 +662,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.2.0</version>
+            <version>3.6.0</version>
             <executions>
               <execution>
                 <id>attach-javadocs</id>
