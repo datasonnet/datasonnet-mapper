@@ -7,5 +7,6 @@ tmp
 .classpath
 .factorypath
 .project
+.vscode
 build
 local-ignore
