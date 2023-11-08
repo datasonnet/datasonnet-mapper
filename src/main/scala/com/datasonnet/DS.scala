@@ -45,7 +45,7 @@ object DSLowercase extends Library {
 
   override def namespace() = "ds"
 
-  override def libsonnets(): java.util.Set[String] = Set("util").asJava
+  override def libsonnets(): java.util.Set[String] = java.util.Collections.emptySet()
 
   override def functions(dataFormats: DataFormatService, header: Header): java.util.Map[String, Val.Func] = Map(
     builtin("contains", "container", "value") {
@@ -1629,33 +1629,31 @@ object DSLowercase extends Library {
           val functL = valSeq(2).asInstanceOf[Applyer]
           val functR = valSeq(3).asInstanceOf[Applyer]
 
-          //make backup array for leftovers
-          var leftoversL = arrL.value
-
           val out = collection.mutable.Buffer.empty[Val.Lazy]
 
-          arrL.value.foreach({
+          val arrLValue = arrL.value
+          val arrRValue = arrR.value
+
+          //Map left elements
+          arrLValue.foreach({
             valueL =>
               val compareL = functL.apply(valueL)
-              //append all that match the condition
-              out.appendAll(arrR.value.collect({
-                case valueR if compareL.equals(functR.apply(valueR)) =>
-                  val temp = scala.collection.mutable.Map[String, Val.Obj.Member]()
-                  //remove matching values from the leftOvers arrays
-                  leftoversL = leftoversL.filter(item => !item.force.equals(valueL.force))
-
-                  temp += ("l" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueL.force))
-                  temp += ("r" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueR.force))
-                  Val.Lazy(new Val.Obj(temp, _ => (), None))
-              }))
+              //Get all elements from arrR that match
+              val elementsR = arrRValue.filter(item => compareL.equals(functR.apply(item)))
+              val temp = scala.collection.mutable.Map[String, Val.Obj.Member]()
+              if (elementsR.isEmpty) {
+                temp += ("l" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueL.force))
+              } else {
+                elementsR.foreach(
+                  valueR => {
+                    temp += ("l" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueL.force))
+                    temp += ("r" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueR.force))
+                  }
+                )
+              }
+              out.append(Val.Lazy(new Val.Obj(temp, _ => (), None)))
           })
 
-          out.appendAll(leftoversL.map(
-            leftOver =>
-              Val.Lazy(new Val.Obj(
-                scala.collection.mutable.Map("l" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => leftOver.force)),
-                _ => (), None))
-          ))
           Val.Arr(out.toSeq)
       },
 
@@ -1678,40 +1676,41 @@ object DSLowercase extends Library {
           val functL = valSeq(2).asInstanceOf[Applyer]
           val functR = valSeq(3).asInstanceOf[Applyer]
 
-          //make backup array for leftovers
-          var leftoversL = arrL.value
-          var leftoversR = arrR.value
-
           val out = collection.mutable.Buffer.empty[Val.Lazy]
 
-          arrL.value.foreach({
+          val arrLValue = arrL.value
+          val arrRValue = arrR.value
+
+          //Map left elements
+          arrLValue.foreach({
             valueL =>
               val compareL = functL.apply(valueL)
-              //append all that match the condition
-              out.appendAll(arrR.value.collect({
-                case valueR if compareL.equals(functR.apply(valueR)) =>
-                  val temp = scala.collection.mutable.Map[String, Val.Obj.Member]()
-                  //remove matching values from the leftOvers arrays
-                  leftoversL = leftoversL.filter(item => !item.force.equals(valueL.force))
-                  leftoversR = leftoversR.filter(item => !item.force.equals(valueR.force))
-
-                  temp += ("l" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueL.force))
-                  temp += ("r" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueR.force))
-                  Val.Lazy(new Val.Obj(temp, _ => (), None))
-              }))
+              //Get all elements from arrR that match
+              val elementsR = arrRValue.filter(item => compareL.equals(functR.apply(item)))
+              val temp = scala.collection.mutable.Map[String, Val.Obj.Member]()
+              if (elementsR.isEmpty) {
+                temp += ("l" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueL.force))
+              } else {
+                elementsR.foreach(
+                  valueR => {
+                    temp += ("l" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueL.force))
+                    temp += ("r" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueR.force))
+                  }
+                )
+              }
+              out.append(Val.Lazy(new Val.Obj(temp, _ => (), None)))
           })
 
-          out.appendAll(leftoversL.map(
-            leftOver =>
-              Val.Lazy(new Val.Obj(
-                scala.collection.mutable.Map("l" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => leftOver.force)),
-                _ => (), None))
-          ).appendedAll(leftoversR.map(
-            leftOver =>
-              Val.Lazy(new Val.Obj(
-                scala.collection.mutable.Map("r" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => leftOver.force)),
-                _ => (), None)))
-          ))
+          //Add non-matching elements from the right
+          val elementsR = arrRValue.filter(item => !arrLValue.map(functL.apply(_)).contains(functR.apply(item)))
+          val temp = scala.collection.mutable.Map[String, Val.Obj.Member]()
+          elementsR.foreach(
+            valueR => {
+              temp += ("r" -> Val.Obj.Member(add = false, Visibility.Normal, (_, _, _, _) => valueR.force))
+            }
+          )
+          out.append(Val.Lazy(new Val.Obj(temp, _ => (), None)))
+
           Val.Arr(out.toSeq)
       },
 

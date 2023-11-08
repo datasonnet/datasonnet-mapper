@@ -1,0 +1,9 @@
+local test = "HelloWorld";
+
+{
+  local flocal = "GoodByeWorld",
+
+  field1: std.trace("FIELD 1", "String value"),
+  field2: std.trace("FIELD 2", 0),
+  field3: std.trace("FIELD 3", std.length("HelloWorld"))
+}

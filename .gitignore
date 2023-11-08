@@ -8,3 +8,4 @@ tmp
 .factorypath
 .project
 build
+local-ignore

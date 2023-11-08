@@ -230,7 +230,12 @@ object Std {
     builtin("pow", "x", "n"){ (ev, fs, x: Double, n: Double) =>
       math.pow(x, n)
     },
-
+    builtin("sign", "x") { (ev, fs, x: Double) =>
+      math.signum(x)
+    },
+    builtin("round", "x") { (ev, fs, x: Double) =>
+      math.round(x).toInt
+    },
     builtin("floor", "x"){ (ev, fs, x: Double) =>
       math.floor(x)
     },
@@ -249,7 +254,6 @@ object Std {
     builtin("tan", "x"){ (ev, fs, x: Double) =>
       math.tan(x)
     },
-
     builtin("asin", "x"){ (ev, fs, x: Double) =>
       math.asin(x)
     },
@@ -411,6 +415,9 @@ object Std {
     },
     builtin("char", "n"){ (ev, fs, n: Double) =>
       n.toInt.toChar.toString
+    },
+    builtin("isEmpty", "a") { (ev, fs, a: String) =>
+      a.isEmpty
     },
 
     builtin("strReplace", "str", "from", "to"){ (ev, fs, str: String, from: String, to: String) =>
@@ -889,9 +896,8 @@ object Std {
       None,
       Params(Array(("str", None, 0), ("rest", None, 1))),
       { (scope, thisFile, ev, fs, outerOffset) =>
-        val logger = Logger(Mapper.getClass)
+        val logger = Logger("DS_TRACE")
         val Val.Str(msg) = scope.bindings(0).get.force
-        //System.err.println(s"TRACE: $thisFile " + msg)
         logger.trace(msg)
         scope.bindings(1).get.force
       }
@@ -929,6 +935,13 @@ object Std {
         throw Error.Delegate("Array must contain only boolean values")
       }
       a.find(b => Materializer.apply(b.force)(ev).value == false) == None
+    },
+
+    builtin("xor", "x", "y") { (ev, fs, x: Boolean, y: Boolean) =>
+      (x || y) && !(x && y)
+    },
+    builtin("xnor", "x", "y") { (ev, fs, x: Boolean, y: Boolean) =>
+      !x ^ y
     },
 
     "extVar" -> Val.Func(

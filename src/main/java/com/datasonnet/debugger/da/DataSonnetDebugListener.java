@@ -1,4 +1,4 @@
-package com.datasonnet.wrap
+package com.datasonnet.debugger.da;
 
 /*-
  * Copyright 2019-2023 the original author or authors.
@@ -15,20 +15,9 @@ package com.datasonnet.wrap
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.datasonnet.jsonnet.Path
 
-case class DataSonnetPath(path: String) extends Path {
+import com.datasonnet.debugger.StoppedProgramContext;
 
-  def relativeToString(p: Path): String = p match {
-    case other: DataSonnetPath if path.startsWith(other.path) => path.drop(other.path.length)
-    case _ => path
-  }
-
-  def parent(): Path = DataSonnetPath(path.split('/').dropRight(1).mkString("/"))
-
-  def segmentCount(): Int = path.split('/').length
-
-  def last: String = path.split('/').last
-
-  def /(s: String): Path = DataSonnetPath(path + "/" + s)
+public interface DataSonnetDebugListener {
+  void stopped(StoppedProgramContext stoppedProgramContext);
 }

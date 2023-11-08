@@ -1,7 +1,7 @@
 package com.datasonnet.jsonnet
 
 /*-
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@ package com.datasonnet.jsonnet
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import fastparse.IndexedParserInput
 
 /**
@@ -103,10 +102,22 @@ object Error {
   * which is shared throughout each file.
   */
 class FileScope(val currentFile: Path,
-                val nameIndices: Map[String, Int]){
+                val nameIndices: Map[String, Int],
+                val sourceP: String = ""){
   // Only used for error messages, so in the common case
   // where nothing blows up this does not need to be allocated
+  // ( And also for debugger support )
   lazy val indexNames = nameIndices.map(_.swap)
+  lazy val source = sourceP
+
+  def getNameByIndex(idx: Int): Option[String] = {
+    val found = nameIndices.find(_._2 == idx)
+    if (found.nonEmpty) {
+      Some(found.get._1)
+    } else {
+      None
+    }
+  }
 }
 
 trait EvalErrorScope {

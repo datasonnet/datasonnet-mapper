@@ -141,7 +141,7 @@ public class StdTest {
     @Test
     void testTrace() throws IOException, URISyntaxException, JSONException {
         ListAppender<ILoggingEvent> appender;
-        Logger mapperLogger = (Logger) LoggerFactory.getLogger(Mapper.class);
+        Logger mapperLogger = (Logger) LoggerFactory.getLogger("DS_TRACE");
         appender = new ListAppender<>();
         appender.start();
         mapperLogger.setLevel(Level.ALL);

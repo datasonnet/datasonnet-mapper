@@ -1,6 +1,13 @@
 ### Changelog
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
+#### [3.0.0-RC1](https://github.com/datasonnet/datasonnet-mapper/compare/2.5.2...3.0.0-RC1)
+
+> 8 November 2023
+
+- Debugger server added
+- `ds.util` library removed as redundant
+- Fully migrated from `javax` to `jakarta` JAXB implementation
 
 #### [2.5.2](https://github.com/datasonnet/datasonnet-mapper/compare/2.5.1...2.5.2), [2.5.2-jakarta4](https://github.com/datasonnet/datasonnet-mapper/compare/2.5.1-jakarta...2.5.2-jakarta4)
 

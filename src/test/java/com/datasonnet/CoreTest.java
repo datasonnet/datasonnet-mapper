@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -775,7 +775,7 @@ public class CoreTest {
         Matcher match = pattern.matcher(value.toLowerCase());
         assertFalse(match.find());
 
-        logger.info("UUID: " + value);
+        //logger.info("UUID: " + value);
     }
 
     @Test

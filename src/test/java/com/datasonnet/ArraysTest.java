@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2021 the original author or authors.
+ * Copyright 2019-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,10 @@ package com.datasonnet;
  * limitations under the License.
  */
 
+import com.datasonnet.document.DefaultDocument;
+import com.datasonnet.document.MediaTypes;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,7 +165,6 @@ public class ArraysTest {
         Mapper mapper = new Mapper(lib + pack + ".join([{\"id\":1,\"v\":\"a\"},{\"id\":1,\"v\":\"b\"}],[{\"id\":1,\"v\":\"c\"}], function(item) item.id,function(item) item.id)\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[{r:{id:1,v:c},l:{id:1,v:a}},{r:{id:1,v:c},l:{id:1,v:b}}]", value);
-
     }
 
     @Test
@@ -209,11 +211,83 @@ public class ArraysTest {
     }
 
     @Test
-    void testArrays_outerJoin() {
+    void testArrays_outerJoin() throws Exception {
         Mapper mapper = new Mapper(lib + pack + ".outerJoin([{\"id\":1,\"v\":\"a\"},{\"id\":1,\"v\":\"b\"},{\"id\":2,\"v\":\"d\"}],[{\"id\":1,\"v\":\"c\"},{\"id\":3,\"v\":\"e\"}], function(item) item.id,function(item) item.id)\n", new ArrayList<>(), new HashMap<>(), true);
         String value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("[{r:{id:1,v:c},l:{id:1,v:a}},{r:{id:1,v:c},l:{id:1,v:b}},{l:{id:2,v:d}},{r:{id:3,v:e}}]", value);
 
+        //Test example from the documentation
+        String json = "{\n" +
+                "    \"countries\": [\n" +
+                "      {\n" +
+                "        \"id\": 1,\n" +
+                "        \"name\":\"Spain\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 2,\n" +
+                "        \"name\":\"France\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": 3,\n" +
+                "        \"name\":\"Germany\"\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"languages\": [\n" +
+                "      {\n" +
+                "        \"countryId\": 1,\n" +
+                "        \"name\":\"Spanish\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"countryId\": 2,\n" +
+                "        \"name\":\"French\"\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"countryId\": 4,\n" +
+                "        \"name\":\"Danish\"\n" +
+                "      }\n" +
+                "    ]\n" +
+                "}";
+        mapper = new Mapper("ds.arrays.outerJoin(\n" +
+                "    payload.countries,\n" +
+                "    payload.languages,\n" +
+                "    function(item) item.id,\n" +
+                "    function(item) item.countryId\n" +
+                ")", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform(new DefaultDocument<String>(json, MediaTypes.APPLICATION_JSON)).getContent();
+        JSONAssert.assertEquals("[\n" +
+                "  {\n" +
+                "    \"r\": {\n" +
+                "      \"countryId\": 1,\n" +
+                "      \"name\": \"Spanish\"\n" +
+                "    },\n" +
+                "    \"l\": {\n" +
+                "      \"id\": 1,\n" +
+                "      \"name\": \"Spain\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"r\": {\n" +
+                "      \"countryId\": 2,\n" +
+                "      \"name\": \"French\"\n" +
+                "    },\n" +
+                "    \"l\": {\n" +
+                "      \"id\": 2,\n" +
+                "      \"name\": \"France\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"l\": {\n" +
+                "      \"id\": 3,\n" +
+                "      \"name\": \"Germany\"\n" +
+                "    }\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"r\": {\n" +
+                "      \"countryId\": 4,\n" +
+                "      \"name\": \"Danish\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "]", value, true);
     }
 
 
