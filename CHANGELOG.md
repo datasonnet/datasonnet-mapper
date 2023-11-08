@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - Debugger server added
 - `ds.util` library removed as redundant
 - Fully migrated from `javax` to `jakarta` JAXB implementation
+- Added Boolean std library functions
 
 #### [2.5.2](https://github.com/datasonnet/datasonnet-mapper/compare/2.5.1...2.5.2), [2.5.2-jakarta4](https://github.com/datasonnet/datasonnet-mapper/compare/2.5.1-jakarta...2.5.2-jakarta4)
 
