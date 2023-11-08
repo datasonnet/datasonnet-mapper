@@ -16,8 +16,9 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.datasonnet</groupId>
@@ -77,18 +78,18 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <jackson.version>2.15.3</jackson.version>
-        <junit.version>5.10.0</junit.version>
-        <bouncycastle.version>1.76</bouncycastle.version>
-        <quickcheck.version>1.0</quickcheck.version>
-        <xmlunit.version>2.9.1</xmlunit.version>
-        <json-path.version>2.8.0</json-path.version>
+    <jackson.version>2.15.3</jackson.version>
+    <junit.version>5.10.0</junit.version>
+    <bouncycastle.version>1.76</bouncycastle.version>
+    <quickcheck.version>1.0</quickcheck.version>
+    <xmlunit.version>2.9.1</xmlunit.version>
+    <json-path.version>2.8.0</json-path.version>
 
-        <picocli.version>4.7.5</picocli.version>
-        <mycila.version>4.3</mycila.version>
+    <picocli.version>4.7.5</picocli.version>
+    <mycila.version>4.3</mycila.version>
 
-        <scala.library.version>2.13.12</scala.library.version>
-        <scala-logging.version>3.9.5</scala-logging.version>
+    <scala.library.version>2.13.12</scala.library.version>
+    <scala-logging.version>3.9.5</scala-logging.version>
 
     <ujson.version>1.2.0</ujson.version>
     <fastparse.version>2.3.0</fastparse.version>
@@ -149,11 +150,11 @@
       <version>${scalatags.version}</version>
     </dependency>
 
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>24.0.1</version>
-        </dependency>
+    <dependency>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
+      <version>24.0.1</version>
+    </dependency>
 
     <!-- plugin deps: start -->
     <dependency>
@@ -218,34 +219,34 @@
       <version>${json-path.version}</version>
     </dependency>
 
-        <!-- crypto deps: start -->
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpg-jdk18on</artifactId>
-            <version>${bouncycastle.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-ext-jdk18on</artifactId>
-            <version>${bouncycastle.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk18on</artifactId>
-            <version>${bouncycastle.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk18on</artifactId>
-            <version>${bouncycastle.version}</version>
-        </dependency>
+    <!-- crypto deps: start -->
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpg-jdk18on</artifactId>
+      <version>${bouncycastle.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-ext-jdk18on</artifactId>
+      <version>${bouncycastle.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk18on</artifactId>
+      <version>${bouncycastle.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk18on</artifactId>
+      <version>${bouncycastle.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>com.google.re2j</groupId>
-            <artifactId>re2j</artifactId>
-            <version>1.7</version>
-        </dependency>
-        <!-- crypto deps: end -->
+    <dependency>
+      <groupId>com.google.re2j</groupId>
+      <artifactId>re2j</artifactId>
+      <version>1.7</version>
+    </dependency>
+    <!-- crypto deps: end -->
 
     <dependency>
       <groupId>info.picocli</groupId>
@@ -265,37 +266,37 @@
       <version>1.4.11</version>
     </dependency>
 
-        <!-- test deps: start -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-runner</artifactId>
-            <version>1.10.0</version>
-            <scope>test</scope>
-        </dependency>
+    <!-- test deps: start -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.platform</groupId>
+      <artifactId>junit-platform-runner</artifactId>
+      <version>1.10.0</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.hamcrest</groupId>
@@ -317,33 +318,33 @@
       <scope>test</scope>
     </dependency>
 
-        <dependency>
-            <groupId>org.xmlunit</groupId>
-            <artifactId>xmlunit-core</artifactId>
-            <version>${xmlunit.version}</version>
-            <scope>test</scope>
-        </dependency>
+    <dependency>
+      <groupId>org.xmlunit</groupId>
+      <artifactId>xmlunit-core</artifactId>
+      <version>${xmlunit.version}</version>
+      <scope>test</scope>
+    </dependency>
 
-        <dependency>
-            <groupId>org.xmlunit</groupId>
-            <artifactId>xmlunit-matchers</artifactId>
-            <version>${xmlunit.version}</version>
-            <scope>test</scope>
-        </dependency>
+    <dependency>
+      <groupId>org.xmlunit</groupId>
+      <artifactId>xmlunit-matchers</artifactId>
+      <version>${xmlunit.version}</version>
+      <scope>test</scope>
+    </dependency>
 
-        <dependency>
-            <groupId>org.skyscreamer</groupId>
-            <artifactId>jsonassert</artifactId>
-            <version>1.5.1</version>
-            <scope>test</scope>
-        </dependency>
+    <dependency>
+      <groupId>org.skyscreamer</groupId>
+      <artifactId>jsonassert</artifactId>
+      <version>1.5.1</version>
+      <scope>test</scope>
+    </dependency>
 
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpmime</artifactId>
-            <version>4.5.14</version>
-            <scope>test</scope>
-        </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+      <version>4.5.14</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -357,73 +358,75 @@
 
   <build>
     <plugins>
-       <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-dependency-plugin</artifactId>
-         <version>3.6.0</version>
-         <executions>
-           <execution>
-             <id>unpack-lsp4j</id>
-             <!--
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <execution>
+            <id>unpack-lsp4j</id>
+            <!--
              We have to unpack the org.eclipse.lsp4j.debug jar to remove the signatures to avoid
-             > Caused by: java.lang.SecurityException: class "org.eclipse.lsp4j.debug.ExceptionInfoArguments"'s signer
+             > Caused by: java.lang.SecurityException: class "org.eclipse.lsp4j.debug.ExceptionInfoArguments"'s
+            signer
              > information does not match signer information of other classes in the same package
              That is caused because the jar includes a) source files ( .java ) and b) signature.
-             The scala compiler compiles the .java files into target/classes but then they don't match the signature
+             The scala compiler compiles the .java files into target/classes but then they don't match the
+            signature
              that other files on the jar have, so that triggers the exception.
 
              -->
-             <phase>validate</phase>
-             <goals>
-               <goal>unpack</goal>
-             </goals>
-             <configuration>
-               <artifactItems>
-                 <artifactItem>
-                   <groupId>org.eclipse.lsp4j</groupId>
-                   <artifactId>org.eclipse.lsp4j.debug</artifactId>
-                   <version>0.21.1</version>
-                   <type>jar</type>
-                   <overWrite>true</overWrite>
-                   <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                   <includes>**/*.class</includes>
-                   <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
-                 </artifactItem>
-                 <artifactItem>
-                   <groupId>org.eclipse.lsp4j</groupId>
-                   <artifactId>org.eclipse.lsp4j.jsonrpc.debug</artifactId>
-                   <version>0.21.1</version>
-                   <type>jar</type>
-                   <overWrite>true</overWrite>
-                   <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                   <includes>**/*.class</includes>
-                   <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
-                 </artifactItem>
-                 <artifactItem>
-                   <groupId>org.eclipse.lsp4j</groupId>
-                   <artifactId>org.eclipse.lsp4j.jsonrpc</artifactId>
-                   <version>0.21.1</version>
-                   <type>jar</type>
-                   <overWrite>true</overWrite>
-                   <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                   <includes>**/*.class</includes>
-                   <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
-                 </artifactItem>
-                 <artifactItem>
-                   <groupId>com.google.code.gson</groupId>
-                   <artifactId>gson</artifactId>
-                   <version>2.10.1</version>
-                   <type>jar</type>
-                   <overWrite>true</overWrite>
-                   <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                   <includes>**/*.class</includes>
-                   <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
-                 </artifactItem>
-               </artifactItems>
-             </configuration>
-           </execution>
-         </executions>
-       </plugin>
+            <phase>validate</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.eclipse.lsp4j</groupId>
+                  <artifactId>org.eclipse.lsp4j.debug</artifactId>
+                  <version>0.21.1</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                  <includes>**/*.class</includes>
+                  <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.eclipse.lsp4j</groupId>
+                  <artifactId>org.eclipse.lsp4j.jsonrpc.debug</artifactId>
+                  <version>0.21.1</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                  <includes>**/*.class</includes>
+                  <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.eclipse.lsp4j</groupId>
+                  <artifactId>org.eclipse.lsp4j.jsonrpc</artifactId>
+                  <version>0.21.1</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                  <includes>**/*.class</includes>
+                  <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.google.code.gson</groupId>
+                  <artifactId>gson</artifactId>
+                  <version>2.10.1</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                  <includes>**/*.class</includes>
+                  <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
