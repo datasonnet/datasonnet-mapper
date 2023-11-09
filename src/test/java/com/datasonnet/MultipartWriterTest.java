@@ -15,22 +15,30 @@ package com.datasonnet;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaTypes;
 import com.datasonnet.util.TestResourceReader;
-import org.apache.commons.fileupload.*;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload2.core.DiskFileItem;
+import org.apache.commons.fileupload2.core.FileUploadException;
+import org.apache.commons.fileupload2.core.RequestContext;
+import org.apache.commons.fileupload2.jakarta.JakartaServletDiskFileUpload;
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MultipartWriterTest {
 
@@ -55,7 +63,7 @@ public class MultipartWriterTest {
 
         //Mimic servlet context here
         try {
-            List<FileItem> parts = new FileUpload(new DiskFileItemFactory()).parseRequest(new RequestContext() {
+            List<DiskFileItem> parts = new JakartaServletDiskFileUpload().parseRequest(new RequestContext() {
                 @Override
                 public String getCharacterEncoding() {
                     return "UTF-8";
@@ -67,7 +75,7 @@ public class MultipartWriterTest {
                 }
 
                 @Override
-                public int getContentLength() {
+                public long getContentLength() {
                     return multiPart.size();
                 }
 
@@ -76,7 +84,7 @@ public class MultipartWriterTest {
                     return new ByteArrayInputStream(multiPart.toByteArray());
                 }
             });
-            for (FileItem part : parts) {
+            for (DiskFileItem part : parts) {
                 String fieldName = part.getFieldName();
                 if ("textPart".equalsIgnoreCase(fieldName)) {
                     assertEquals("Hello World", part.getString());

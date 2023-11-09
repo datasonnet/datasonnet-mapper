@@ -24,8 +24,8 @@ import com.datasonnet.spi.ujsonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.commons.fileupload.*;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload2.core.*;
+import org.apache.commons.fileupload2.jakarta.JakartaServletDiskFileUpload;
 import ujson.Value;
 
 import java.io.*;
@@ -90,7 +90,7 @@ public class MimeMultipartPlugin extends BaseJacksonDataFormatPlugin {
         final ByteArrayInputStream finalMultipartData = multipartData;
 
         try {
-            List<FileItem> parts = new FileUpload(new DiskFileItemFactory()).parseRequest(new RequestContext() {
+            List<DiskFileItem> parts = new JakartaServletDiskFileUpload().parseRequest(new RequestContext() {
                     @Override
                     public String getCharacterEncoding() {
                         return "UTF-8";
@@ -102,7 +102,7 @@ public class MimeMultipartPlugin extends BaseJacksonDataFormatPlugin {
                     }
 
                     @Override
-                    public int getContentLength() {
+                    public long getContentLength() {
                         return finalMultipartData.available();
                     }
 
