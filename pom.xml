@@ -23,7 +23,7 @@
 
   <groupId>com.datasonnet</groupId>
   <artifactId>datasonnet-mapper</artifactId>
-  <version>3.0.0-SNAPSHOT</version>
+  <version>3.0.1-SNAPSHOT</version>
   <name>DataSonnet Mapper</name>
   <description>A transformation domain specific language</description>
   <url>https://github.com/datasonnet/datasonnet-mapper</url>
@@ -65,7 +65,7 @@
     <connection>scm:git:https://github.com/datasonnet/datasonnet-mapper.git</connection>
     <developerConnection>scm:git:https://github.com/datasonnet/datasonnet-mapper.git</developerConnection>
     <url>https://github.com/datasonnet/datasonnet-mapper</url>
-    <tag>HEAD</tag>
+    <tag>3.0.0-RC1</tag>
   </scm>
   <distributionManagement>
     <repository>
@@ -191,12 +191,12 @@
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-core</artifactId>
-      <version>4.0.1</version>
+      <version>4.0.4</version>
     </dependency>
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
       <artifactId>jaxb-impl</artifactId>
-      <version>4.0.1</version>
+      <version>4.0.4</version>
     </dependency>
 
     <!-- Multipart plugin dependencies -->
@@ -430,12 +430,12 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>3.4.0</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.3.1</version>
       </plugin>
       <plugin>
         <groupId>com.mycila</groupId>
@@ -517,7 +517,7 @@
             <path>
               <groupId>info.picocli</groupId>
               <artifactId>picocli-codegen</artifactId>
-              <version>4.0.1</version>
+              <version>${picocli.version}</version>
             </path>
           </annotationProcessorPaths>
           <compilerArgs>
@@ -536,7 +536,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.2</version>
+        <version>3.3.0</version>
         <configuration>
           <archive>
             <manifest>
@@ -548,7 +548,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>3.6.0</version>
         <configuration>
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
@@ -617,7 +617,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.8</version>
+        <version>1.6.13</version>
         <extensions>true</extensions>
         <configuration>
           <serverId>sonatype-ossrh</serverId>
@@ -653,7 +653,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.2.0</version>
+            <version>3.3.0</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -666,7 +666,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>3.2.0</version>
+            <version>3.6.0</version>
             <executions>
               <execution>
                 <id>attach-javadocs</id>
