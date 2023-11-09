@@ -16,7 +16,9 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.datasonnet</groupId>
@@ -322,6 +324,7 @@
       <version>${xmlunit.version}</version>
       <scope>test</scope>
     </dependency>
+
     <dependency>
       <groupId>org.xmlunit</groupId>
       <artifactId>xmlunit-matchers</artifactId>
@@ -355,73 +358,75 @@
 
   <build>
     <plugins>
-       <plugin>
-         <groupId>org.apache.maven.plugins</groupId>
-         <artifactId>maven-dependency-plugin</artifactId>
-         <version>3.6.0</version>
-         <executions>
-           <execution>
-             <id>unpack-lsp4j</id>
-             <!--
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.6.0</version>
+        <executions>
+          <execution>
+            <id>unpack-lsp4j</id>
+            <!--
              We have to unpack the org.eclipse.lsp4j.debug jar to remove the signatures to avoid
-             > Caused by: java.lang.SecurityException: class "org.eclipse.lsp4j.debug.ExceptionInfoArguments"'s signer
+             > Caused by: java.lang.SecurityException: class "org.eclipse.lsp4j.debug.ExceptionInfoArguments"'s
+            signer
              > information does not match signer information of other classes in the same package
              That is caused because the jar includes a) source files ( .java ) and b) signature.
-             The scala compiler compiles the .java files into target/classes but then they don't match the signature
+             The scala compiler compiles the .java files into target/classes but then they don't match the
+            signature
              that other files on the jar have, so that triggers the exception.
 
              -->
-             <phase>validate</phase>
-             <goals>
-               <goal>unpack</goal>
-             </goals>
-             <configuration>
-               <artifactItems>
-                 <artifactItem>
-                   <groupId>org.eclipse.lsp4j</groupId>
-                   <artifactId>org.eclipse.lsp4j.debug</artifactId>
-                   <version>0.21.1</version>
-                   <type>jar</type>
-                   <overWrite>true</overWrite>
-                   <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                   <includes>**/*.class</includes>
-                   <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
-                 </artifactItem>
-                 <artifactItem>
-                   <groupId>org.eclipse.lsp4j</groupId>
-                   <artifactId>org.eclipse.lsp4j.jsonrpc.debug</artifactId>
-                   <version>0.21.1</version>
-                   <type>jar</type>
-                   <overWrite>true</overWrite>
-                   <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                   <includes>**/*.class</includes>
-                   <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
-                 </artifactItem>
-                 <artifactItem>
-                   <groupId>org.eclipse.lsp4j</groupId>
-                   <artifactId>org.eclipse.lsp4j.jsonrpc</artifactId>
-                   <version>0.21.1</version>
-                   <type>jar</type>
-                   <overWrite>true</overWrite>
-                   <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                   <includes>**/*.class</includes>
-                   <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
-                 </artifactItem>
-                 <artifactItem>
-                   <groupId>com.google.code.gson</groupId>
-                   <artifactId>gson</artifactId>
-                   <version>2.10.1</version>
-                   <type>jar</type>
-                   <overWrite>true</overWrite>
-                   <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                   <includes>**/*.class</includes>
-                   <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
-                 </artifactItem>
-               </artifactItems>
-             </configuration>
-           </execution>
-         </executions>
-       </plugin>
+            <phase>validate</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.eclipse.lsp4j</groupId>
+                  <artifactId>org.eclipse.lsp4j.debug</artifactId>
+                  <version>0.21.1</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                  <includes>**/*.class</includes>
+                  <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.eclipse.lsp4j</groupId>
+                  <artifactId>org.eclipse.lsp4j.jsonrpc.debug</artifactId>
+                  <version>0.21.1</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                  <includes>**/*.class</includes>
+                  <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.eclipse.lsp4j</groupId>
+                  <artifactId>org.eclipse.lsp4j.jsonrpc</artifactId>
+                  <version>0.21.1</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                  <includes>**/*.class</includes>
+                  <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.google.code.gson</groupId>
+                  <artifactId>gson</artifactId>
+                  <version>2.10.1</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                  <includes>**/*.class</includes>
+                  <excludes>META-INF/ECLIPSE_.RSA,META-INF/ECLIPSE_.SF</excludes>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
