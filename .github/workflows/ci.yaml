@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '11', '17' ]
+        java: [ '17' ]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -20,26 +20,20 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
       - name: mvn clean verify
-        run: ./mvnw -V --no-transfer-progress --batch-mode clean verify -Pjavax
+        run: ./mvnw -V --no-transfer-progress --batch-mode clean verify
   deploy:
     if: github.ref == 'refs/heads/main'
     needs: [ build ]
     runs-on: [ ubuntu-latest ]
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 11
+      - name: Set up JDK 17
         uses: actions/setup-java@v1
         with:
-          java-version: 11
+          java-version: 17
       - name: mvn clean deploy
         env:
           REPO_USER: ${{ secrets.REPO_USER }}
           REPO_PASSWORD: ${{ secrets.REPO_PASSWORD }}
         run: "./mvnw -V --no-transfer-progress --batch-mode --settings .settings.xml clean \
-        -Dlicense.skip=true -DskipTests -Dmaven.install.skip=true deploy -Pjavax"
-      - name: mvn clean deploy jakarta4
-        env:
-          REPO_USER: ${{ secrets.REPO_USER }}
-          REPO_PASSWORD: ${{ secrets.REPO_PASSWORD }}
-        run: "./mvnw -V --no-transfer-progress --batch-mode --settings .settings.xml clean \
-        -Dlicense.skip=true -DskipTests -Dmaven.install.skip=true deploy -Pjakarta"
+        -Dlicense.skip=true -DskipTests -Dmaven.install.skip=true deploy"
