@@ -15,46 +15,135 @@ DataSonnet is distributed as a JAR which contains all necessary classes and depe
 
 where `${datasonnet.version}` is the latest released version.
 
-The simplest scenario is mapping from JSON to JSON with no additional variables:
+The simplest scenario is mapping from Java object to JSON with no additional variables:
 
 [source,java]
-------
-String json = ...; //JSON object as string
+----------
+String payload = "HelloWorld";
+String script = """
+    {
+       "greetings": payload
+    }
+    """;
+String expected = """
+    {
+       "greetings": "HelloWorld"
+     }
+    """;
 
-Mapper mapper = new Mapper(datasonnetScript);
-String transformedJson = mapper.transform(json)
-------
+Mapper mapper = new Mapper(script);
+String result = mapper.transform(payload);
+----------
 
-More complex scenarios may involve passing additional variables as well as xref:dataformats.adoc[transforming to/from other supported data formats]:
+By default the input data will be interpreted as a Java object (in this example, a String) and the output format is JSON.
+
+To transform complex data, it is recommended to use an overloaded `transform` method which accepts an instance of `DefaultDocument` object with media type that matches the input type, for example:
+[source,java]
+----------
+String json = """
+    {
+      "userId" : "123",
+      "name" : "DataSonnet"
+    }
+    """;
+String script = """
+    {
+       "uid": payload.userId,
+       "uname": payload.name,
+     }
+    """;
+String expected = """
+    {
+       "uid": "123",
+       "uname": "DataSonnet"
+     }
+    """;
+
+Mapper mapper = new Mapper(script);
+String result = mapper.transform(new DefaultDocument<>(json, MediaTypes.APPLICATION_JSON)).getContent();
+----------
+
+Aside from the payload, additional parameters (i.e. variables) may be passed to the transformation:
 
 [source,java]
-------
-String jsonData = ...;
+----------
+String payload = "{ \"greetings\": \"HelloWorld\"}";
 
-String jsonVar = ...;
-String xmlVar = ...;
-String textVar = ...;
+String json = """
+    {
+      "userId" : "123",
+      "name" : "DataSonnet"
+    }
+    """;
 
-Map<String, Document> variables = new HashMap<>();
-variables.put("varJson", new StringDocument(jsonVar, "application/json"));
-variables.put("varXml", new StringDocument(xmlVar, "application/xml"));
-variables.put("varTxt", new StringDocument(textVar, "text/plain"));
+Map<String, Document<?>> variables = new HashMap<>();
+variables.put("userData", new DefaultDocument<>(json, MediaTypes.APPLICATION_JSON));
 
-Mapper mapper = new Mapper(datasonnetScript, variables.keySet());
-Document transformedResult = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json");
-String jsonResult = transformedResult.getContentsAsString();
-------
+String script = """
+    {
+       "greetings": payload.greetings,
+       "uid": userData.userId,
+       "uname": userData.name,
+     }
+    """;
+String expected = """
+    {
+       "greetings": "HelloWorld",
+       "uid": "123",
+       "uname": "DataSonnet"
+     }
+    """;
 
-The `Mapper` constructor accepts the following arguments:
+Mapper mapper = new Mapper(script, variables.keySet());
+String result = mapper.transform(new DefaultDocument<String>(payload, MediaTypes.APPLICATION_JSON), variables, MediaTypes.APPLICATION_JSON).getContent();
+----------
 
-- `datasonnetScript` - the `String` which contains the mapping code;
-- `argumentNames` - the `java.util.Set` which contains the names of the additional variables
+A mapper and/or transformation can also be created using the `MapperBuilder` class:
 
-The `transform` method accepts the following arguments:
+[source,java]
+----------
+String payload = "{ \"greetings\": \"HelloWorld\"}";
 
-- payload - the instance of the `com.datasonnet.Document` which contains the data and the mime type;
-- variables - the instance of the `Map<String, com.datasonnet.Document>` which contains the additional variables.
+String json = """
+    {
+      "userId" : "123",
+      "name" : "DataSonnet"
+    }
+    """;
 
-The result of the `transform` method invocation is the instance of the `com.datasonnet.Document` object which contains the result of the mapping and its mime type.
+Map<String, Document<?>> variables = new HashMap<>();
+variables.put("userData", new DefaultDocument<>(json, MediaTypes.APPLICATION_JSON));
 
-There are overloaded `transform` methods which accept different sets of parameters; see the DataSonnet source code and documentation for details.
+String script = """
+    local importedLib = import 'importTest.ds';
+
+    {
+       "greetings": payload.greetings,
+       "sayHello": testlib.sayHello(),
+       "uid": userData.userId,
+       "uname": userData.name,
+       "foo": importedLib.caps('foo')
+     }
+    """;
+String expected = """
+    {
+       "greetings": "HelloWorld",
+       "sayHello": "Hello, World",
+       "uid": "123",
+       "uname": "DataSonnet",
+       "foo": "FOO"
+     }
+    """;
+
+final String dsImport = TestResourceReader.readFileAsString("importTest.ds");
+
+String result = new MapperBuilder(script)
+        .withImports(Collections.singletonMap("importTest.ds", dsImport))
+        .withLibrary(TestLib.getInstance())
+        .withInputNames(variables.keySet())
+        .build()
+        .transform(new DefaultDocument<String>(payload, MediaTypes.APPLICATION_JSON), variables, MediaTypes.APPLICATION_JSON).getContent();
+----------
+
+For more examples of programmatic DataSonnet usages please refer to the tests part of the DataSonnet source code at https://github.com/datasonnet/datasonnet-mapper/tree/main/src/test
+

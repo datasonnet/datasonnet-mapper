@@ -1,10 +1,8 @@
 = IntelliJ Plugin
 
-The latest version of the IntelliJ plugin is available at the https://plugins.jetbrains.com/plugin/23097-datasonnet-mapper/edit[JetBrains Marketplace]. It can be installed directly from the IDE, see the https://www.jetbrains.com/help/idea/managing-plugins.html[IntelliJ IDEA documentation] for details.
+The latest version of the IntelliJ plugin is available at https://github.com/datasonnet/datasonnet-intellij-plugin/releases
 
-Previous releases are available at the https://github.com/datasonnet/datasonnet-intellij-plugin/releases[DataSonnet plugin Github repository].
-
-== Installing the plugin from a binary distribution file.
+== Installing the plugin
 
 - Download the plugin archive (ZIP or JAR) from the https://github.com/datasonnet/datasonnet-intellij-plugin/releases[Releases page].
 - Press `⌘ Comma` to open the IDE settings and select *Plugins*.
@@ -12,4 +10,4 @@ Previous releases are available at the https://github.com/datasonnet/datasonnet-
 - Select the plugin archive file and click *OK*.
 - Click *OK* to apply the changes and restart the IDE if prompted.
 
-See the https://www.jetbrains.com/help/idea/managing-plugins.html[IntelliJ IDEA documentation] for more information.
+See the https://www.jetbrains.com/help/idea/managing-plugins.html[JetBrains documentation] for more information.

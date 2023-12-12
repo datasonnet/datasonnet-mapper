@@ -1,3 +1,4 @@
 {
-    uppercase(name):: ds.upper(name)
+    uppercase(name):: ds.upper(name),
+    caps(name):: std.asciiUpper(name)
 }

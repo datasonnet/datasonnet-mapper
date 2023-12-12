@@ -1,0 +1,47 @@
+package com.datasonnet.library;
+
+import com.datasonnet.header.Header;
+import com.datasonnet.jsonnet.Val;
+import com.datasonnet.spi.DataFormatService;
+import com.datasonnet.spi.Library;
+
+import java.util.*;
+import java.util.function.Function;
+
+public class TestLib extends Library {
+    private static final TestLib INSTANCE = new TestLib();
+    public TestLib() {
+    }
+    public static TestLib getInstance() {
+        return INSTANCE;
+    }
+    @Override
+    public String namespace() {
+        return "testlib";
+    }
+    @Override
+    public Map<String, Val.Func> functions(DataFormatService dataFormats, Header header) {
+        Map<String, Val.Func> answer = new HashMap<>();
+        answer.put("sayHello", makeSimpleFunc(
+                Collections.emptyList(), //parameters list
+                new Function<List<Val>, Val>() {
+                    @Override
+                    public Val apply(List<Val> vals) {
+                        return new Val.Str("Hello, World");
+                    }
+                }));
+        return answer;
+    }
+
+    @Override
+    public Map<String, Val.Obj> modules(DataFormatService dataFormats, Header header) {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Set<String> libsonnets() {
+        return Collections.emptySet();
+    }
+}
+
+
