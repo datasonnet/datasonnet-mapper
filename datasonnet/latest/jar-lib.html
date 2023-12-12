@@ -27,7 +27,7 @@
     <div class="panels">
 <div class="nav-panel-menu is-active" data-panel="menu">
   <nav class="nav-menu">
-    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all"></button>
+    <button class="nav-menu-toggle" aria-label="Toggle expand/collapse all" style="display: none"></button>
     <h3 class="title"><a href="index.html">DataSonnet</a></h3>
 <ul class="nav-list">
   <li class="nav-item" data-depth="0">
@@ -175,68 +175,143 @@
 <p>where <code>${datasonnet.version}</code> is the latest released version.</p>
 </div>
 <div class="paragraph">
-<p>The simplest scenario is mapping from JSON to JSON with no additional variables:</p>
+<p>The simplest scenario is mapping from Java object to JSON with no additional variables:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">String json = ...; //JSON object as string
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">String payload = "HelloWorld";
+String script = """
+    {
+       "greetings": payload
+    }
+    """;
+String expected = """
+    {
+       "greetings": "HelloWorld"
+     }
+    """;
 
-Mapper mapper = new Mapper(datasonnetScript);
-String transformedJson = mapper.transform(json)</code></pre>
+Mapper mapper = new Mapper(script);
+String result = mapper.transform(payload);</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>More complex scenarios may involve passing additional variables as well as <a href="dataformats.html" class="page">transforming to/from other supported data formats</a>:</p>
+<p>By default the input data will be interpreted as a Java object (in this example, a String) and the output format is JSON.</p>
+</div>
+<div class="paragraph">
+<p>To transform complex data, it is recommended to use an overloaded <code>transform</code> method which accepts an instance of <code>DefaultDocument</code> object with media type that matches the input type, for example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">String jsonData = ...;
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">String json = """
+    {
+      "userId" : "123",
+      "name" : "DataSonnet"
+    }
+    """;
+String script = """
+    {
+       "uid": payload.userId,
+       "uname": payload.name,
+     }
+    """;
+String expected = """
+    {
+       "uid": "123",
+       "uname": "DataSonnet"
+     }
+    """;
 
-String jsonVar = ...;
-String xmlVar = ...;
-String textVar = ...;
+Mapper mapper = new Mapper(script);
+String result = mapper.transform(new DefaultDocument&lt;&gt;(json, MediaTypes.APPLICATION_JSON)).getContent();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Aside from the payload, additional parameters (i.e. variables) may be passed to the transformation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">String payload = "{ \"greetings\": \"HelloWorld\"}";
 
-Map&lt;String, Document&gt; variables = new HashMap&lt;&gt;();
-variables.put("varJson", new StringDocument(jsonVar, "application/json"));
-variables.put("varXml", new StringDocument(xmlVar, "application/xml"));
-variables.put("varTxt", new StringDocument(textVar, "text/plain"));
+String json = """
+    {
+      "userId" : "123",
+      "name" : "DataSonnet"
+    }
+    """;
 
-Mapper mapper = new Mapper(datasonnetScript, variables.keySet());
-Document transformedResult = mapper.transform(new StringDocument(jsonData, "application/json"), variables, "application/json");
-String jsonResult = transformedResult.getContentsAsString();</code></pre>
+Map&lt;String, Document&lt;?&gt;&gt; variables = new HashMap&lt;&gt;();
+variables.put("userData", new DefaultDocument&lt;&gt;(json, MediaTypes.APPLICATION_JSON));
+
+String script = """
+    {
+       "greetings": payload.greetings,
+       "uid": userData.userId,
+       "uname": userData.name,
+     }
+    """;
+String expected = """
+    {
+       "greetings": "HelloWorld",
+       "uid": "123",
+       "uname": "DataSonnet"
+     }
+    """;
+
+Mapper mapper = new Mapper(script, variables.keySet());
+String result = mapper.transform(new DefaultDocument&lt;String&gt;(payload, MediaTypes.APPLICATION_JSON), variables, MediaTypes.APPLICATION_JSON).getContent();</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The <code>Mapper</code> constructor accepts the following arguments:</p>
+<p>A mapper and/or transformation can also be created using the <code>MapperBuilder</code> class:</p>
 </div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>datasonnetScript</code> - the <code>String</code> which contains the mapping code;</p>
-</li>
-<li>
-<p><code>argumentNames</code> - the <code>java.util.Set</code> which contains the names of the additional variables</p>
-</li>
-</ul>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">String payload = "{ \"greetings\": \"HelloWorld\"}";
+
+String json = """
+    {
+      "userId" : "123",
+      "name" : "DataSonnet"
+    }
+    """;
+
+Map&lt;String, Document&lt;?&gt;&gt; variables = new HashMap&lt;&gt;();
+variables.put("userData", new DefaultDocument&lt;&gt;(json, MediaTypes.APPLICATION_JSON));
+
+String script = """
+    local importedLib = import 'importTest.ds';
+
+    {
+       "greetings": payload.greetings,
+       "sayHello": testlib.sayHello(),
+       "uid": userData.userId,
+       "uname": userData.name,
+       "foo": importedLib.caps('foo')
+     }
+    """;
+String expected = """
+    {
+       "greetings": "HelloWorld",
+       "sayHello": "Hello, World",
+       "uid": "123",
+       "uname": "DataSonnet",
+       "foo": "FOO"
+     }
+    """;
+
+final String dsImport = TestResourceReader.readFileAsString("importTest.ds");
+
+String result = new MapperBuilder(script)
+        .withImports(Collections.singletonMap("importTest.ds", dsImport))
+        .withLibrary(TestLib.getInstance())
+        .withInputNames(variables.keySet())
+        .build()
+        .transform(new DefaultDocument&lt;String&gt;(payload, MediaTypes.APPLICATION_JSON), variables, MediaTypes.APPLICATION_JSON).getContent();</code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p>The <code>transform</code> method accepts the following arguments:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>payload - the instance of the <code>com.datasonnet.Document</code> which contains the data and the mime type;</p>
-</li>
-<li>
-<p>variables - the instance of the <code>Map&lt;String, com.datasonnet.Document&gt;</code> which contains the additional variables.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>The result of the <code>transform</code> method invocation is the instance of the <code>com.datasonnet.Document</code> object which contains the result of the mapping and its mime type.</p>
-</div>
-<div class="paragraph">
-<p>There are overloaded <code>transform</code> methods which accept different sets of parameters; see the DataSonnet source code and documentation for details.</p>
+<p>For more examples of programmatic DataSonnet usages please refer to the tests part of the DataSonnet source code at <a href="https://github.com/datasonnet/datasonnet-mapper/tree/main/src/test" class="bare">https://github.com/datasonnet/datasonnet-mapper/tree/main/src/test</a></p>
 </div>
 </article>
   </div>
