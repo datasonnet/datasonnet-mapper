@@ -129,7 +129,7 @@
   </div>
   <ul class="components">
     <li class="component is-current">
-      <a class="title" href="index.html">DataSonnet</a>
+      <div class="title"><a href="index.html">DataSonnet</a></div>
       <ul class="versions">
         <li class="version is-current is-latest">
           <a href="index.html">latest</a>
@@ -184,9 +184,9 @@
 </div>
 </div>
 <div class="sect2">
-<h3 id="_encodestring_data_string_encodingutf_8"><a class="anchor" href="#_encodestring_data_string_encodingutf_8"></a><code>encode(string data, string encoding="UTF-8")</code></h3>
+<h3 id="_randomintint_min_int_max"><a class="anchor" href="#_randomintint_min_int_max"></a><code>randomInt(int min, int max)</code></h3>
 <div class="paragraph">
-<p>Translates a string into <code>application/x-www-form-urlencoded</code> format using the supplied encoding scheme to obtain the bytes for unsafe characters. The default encoding is <code>UTF-8</code>.</p>
+<p>Generates a random Integer within the specified range. If no range is provided, <code>Int.MinValue</code> and <code>Int.MaxValue</code> are used.</p>
 </div>
 <div class="paragraph">
 <p><strong>Example</strong></p>
@@ -194,13 +194,65 @@
 <div class="listingblock">
 <div class="title">DataSonnet map:</div>
 <div class="content">
-<pre>ds.url.encode('Hello World')</pre>
+<pre>ds.randomInt(0, 10)</pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Result</div>
 <div class="content">
-<pre>"Hello+World"</pre>
+<pre>6</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_randomdoubledouble_min_double_max"><a class="anchor" href="#_randomdoubledouble_min_double_max"></a><code>randomDouble(double min, double max)</code></h3>
+<div class="paragraph">
+<p>Generates a random Double within the specified range. If no range is provided, <code>Double.MinValue</code> and <code>Double.MaxValue</code> are used.</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>ds.randomDouble(0, 10)</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>5.496831038689612</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_randomstringint_length_bool_includealpha_bool_includenumbers_bool_includeother"><a class="anchor" href="#_randomstringint_length_bool_includealpha_bool_includenumbers_bool_includeother"></a><code>randomString(int length, bool includeAlpha, bool includeNumbers, bool includeOther)</code></h3>
+<div class="paragraph">
+<p>Generates a random ASCII String of specified length. Optional parameters control whether alpha, numeric or other ASCII characters are included</p>
+</div>
+<div class="paragraph">
+<p><strong>Example</strong></p>
+</div>
+<div class="listingblock">
+<div class="title">DataSonnet map:</div>
+<div class="content">
+<pre>{
+  randomStr: ds.random.randomString(10),
+  randomStrAlpha: ds.random.randomString(10, true, false, false),
+  randomStrNum: ds.random.randomString(10, false, true, false),
+  randomStrOther: ds.random.randomString(10, false, false, true)
+}</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Result</div>
+<div class="content">
+<pre>{
+  "randomStr": "]z|E;PJ9\\3",
+  "randomStrAlpha": "GuFHZwsyNc",
+  "randomStrNum": "7375934531",
+  "randomStrOther": "-:&amp;)/_|\"\"\\"
+}</pre>
 </div>
 </div>
 </div>
