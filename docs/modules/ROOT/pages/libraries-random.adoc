@@ -15,17 +15,58 @@ ds.random.uuid()
 "addd286c-a04c-4493-b8a0-6466e9ff5050"
 ------------------------
 
-### `encode(string data, string encoding="UTF-8")`
+### `randomInt(int min, int max)`
 
-Translates a string into `application/x-www-form-urlencoded` format using the supplied encoding scheme to obtain the bytes for unsafe characters. The default encoding is `UTF-8`.
+Generates a random Integer within the specified range. If no range is provided, `Int.MinValue` and `Int.MaxValue` are used.
 
 *Example*
 
 .DataSonnet map:
 ------------------------
-ds.url.encode('Hello World')
+ds.randomInt(0, 10)
 ------------------------
 .Result
 ------------------------
-"Hello+World"
+6
 ------------------------
+
+### `randomDouble(double min, double max)`
+
+Generates a random Double within the specified range. If no range is provided, `Double.MinValue` and `Double.MaxValue` are used.
+
+*Example*
+
+.DataSonnet map:
+------------------------
+ds.randomDouble(0, 10)
+------------------------
+.Result
+------------------------
+5.496831038689612
+------------------------
+
+### `randomString(int length, bool includeAlpha, bool includeNumbers, bool includeOther)`
+
+Generates a random ASCII String of specified length. Optional parameters control whether alpha, numeric or other ASCII characters are included
+
+*Example*
+
+.DataSonnet map:
+------------------------
+{
+  randomStr: ds.random.randomString(10),
+  randomStrAlpha: ds.random.randomString(10, true, false, false),
+  randomStrNum: ds.random.randomString(10, false, true, false),
+  randomStrOther: ds.random.randomString(10, false, false, true)
+}
+------------------------
+.Result
+------------------------
+{
+  "randomStr": "]z|E;PJ9\\3",
+  "randomStrAlpha": "GuFHZwsyNc",
+  "randomStrNum": "7375934531",
+  "randomStrOther": "-:&)/_|\"\"\\"
+}
+------------------------
+
