@@ -23,7 +23,9 @@ import com.datasonnet.document.MediaTypes;
 import com.datasonnet.plugins.BaseJacksonDataFormatPlugin;
 import com.datasonnet.spi.PluginException;
 import com.datasonnet.spi.ujsonUtils;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -60,6 +62,7 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         // TODO: 9/8/20 add test for empty beans
         DEFAULT_OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         DEFAULT_OBJECT_MAPPER.setDateFormat(makeDateFormat(DEFAULT_DS_DATE_FORMAT));
+        DEFAULT_OBJECT_MAPPER.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
     }
 
     @NotNull
