@@ -103,7 +103,7 @@
         <scalatags.version>0.9.1</scalatags.version>
         <slf4j.version>2.0.9</slf4j.version>
         <ujson.version>1.2.0</ujson.version>
-        <xmlunit.version>2.9.1</xmlunit.version>
+        <xmlunit.version>2.10.0</xmlunit.version>
     </properties>
 
     <dependencies>
