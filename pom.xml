@@ -77,27 +77,34 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <jackson.version>2.15.3</jackson.version>
-        <junit.version>5.10.0</junit.version>
+        <awaitility.version>4.2.0</awaitility.version>
         <bouncycastle.version>1.78.1</bouncycastle.version>
-        <quickcheck.version>1.0</quickcheck.version>
-        <xmlunit.version>2.9.1</xmlunit.version>
-        <json-path.version>2.9.0</json-path.version>
-
-        <picocli.version>4.7.5</picocli.version>
-        <mycila.version>4.3</mycila.version>
-
-        <scala.library.version>2.13.12</scala.library.version>
-        <scala-logging.version>3.9.5</scala-logging.version>
-
-        <ujson.version>1.2.0</ujson.version>
         <fastparse.version>2.3.0</fastparse.version>
-        <pprint.version>0.5.9</pprint.version>
-        <scalatags.version>0.9.1</scalatags.version>
-
-        <jakarta-xml-bind-api-version>4.0.0</jakarta-xml-bind-api-version>
-
+        <fileupload.version>2.0.0-M1</fileupload.version>
+        <hamcrest.version>2.2</hamcrest.version>
+        <httpmime.version>4.5.14</httpmime.version>
+        <jackson.version>2.15.3</jackson.version>
+        <jakarta-servlet-api.version>6.0.0</jakarta-servlet-api.version>
+        <jakarta-xml-bind-api.version>4.0.0</jakarta-xml-bind-api.version>
+        <jaxb.version>4.0.4</jaxb.version>
+        <jetbrains.annotations.version>24.0.1</jetbrains.annotations.version>
+        <json-path.version>2.9.0</json-path.version>
+        <jsonassert.version>1.5.1</jsonassert.version>
+        <junit.platform.version>1.10.0</junit.platform.version>
+        <junit.version>5.10.0</junit.version>
         <logback.classic.version>1.5.6</logback.classic.version>
+        <lsp4j.version>0.21.1</lsp4j.version>
+        <mycila.version>4.3</mycila.version>
+        <picocli.version>4.7.5</picocli.version>
+        <pprint.version>0.5.9</pprint.version>
+        <quickcheck.version>1.0</quickcheck.version>
+        <re2j.version>1.7</re2j.version>
+        <scala-logging.version>3.9.5</scala-logging.version>
+        <scala.library.version>2.13.12</scala.library.version>
+        <scalatags.version>0.9.1</scalatags.version>
+        <slf4j.version>2.0.9</slf4j.version>
+        <ujson.version>1.2.0</ujson.version>
+        <xmlunit.version>2.9.1</xmlunit.version>
     </properties>
 
     <dependencies>
@@ -106,14 +113,14 @@
         <dependency>
             <groupId>org.eclipse.lsp4j</groupId>
             <artifactId>org.eclipse.lsp4j.debug</artifactId>
-            <version>0.21.1</version>
+            <version>${lsp4j.version}</version>
             <!-- provided because the jar is unpacked below, see the maven-dependency-plugin -->
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
-            <version>4.2.0</version>
+            <version>${awaitility.version}</version>
         </dependency>
         <!-- END DA -->
 
@@ -154,7 +161,7 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>24.0.1</version>
+            <version>${jetbrains.annotations.version}</version>
         </dependency>
 
         <!-- plugin deps: start -->
@@ -187,29 +194,29 @@
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>${jakarta-xml-bind-api-version}</version>
+            <version>${jakarta-xml-bind-api.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-core</artifactId>
-            <version>4.0.4</version>
+            <version>${jaxb.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>4.0.4</version>
+            <version>${jaxb.version}</version>
         </dependency>
 
         <!-- Multipart plugin dependencies -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.0.0</version>
+            <version>${jakarta-servlet-api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-fileupload2-jakarta</artifactId>
-            <version>2.0.0-M1</version>
+            <version>${fileupload.version}</version>
         </dependency>
         <!-- plugin deps: end -->
 
@@ -244,7 +251,7 @@
         <dependency>
             <groupId>com.google.re2j</groupId>
             <artifactId>re2j</artifactId>
-            <version>1.7</version>
+            <version>${re2j.version}</version>
         </dependency>
         <!-- crypto deps: end -->
 
@@ -258,7 +265,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.9</version>
+            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -294,14 +301,14 @@
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-runner</artifactId>
-            <version>1.10.0</version>
+            <version>${junit.platform.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
-            <version>2.2</version>
+            <version>${hamcrest.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -334,14 +341,14 @@
         <dependency>
             <groupId>org.skyscreamer</groupId>
             <artifactId>jsonassert</artifactId>
-            <version>1.5.1</version>
+            <version>${jsonassert.version}</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpmime</artifactId>
-            <version>4.5.14</version>
+            <version>${httpmime.version}</version>
             <scope>test</scope>
         </dependency>
 
