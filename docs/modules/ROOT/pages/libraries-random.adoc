@@ -23,7 +23,7 @@ Generates a random Integer within the specified range. If no range is provided, 
 
 .DataSonnet map:
 ------------------------
-ds.randomInt(0, 10)
+ds.random.randomInt(0, 10)
 ------------------------
 .Result
 ------------------------
@@ -38,7 +38,7 @@ Generates a random Double within the specified range. If no range is provided, `
 
 .DataSonnet map:
 ------------------------
-ds.randomDouble(0, 10)
+ds.random.randomDouble(0, 10)
 ------------------------
 .Result
 ------------------------
