@@ -181,6 +181,66 @@ ds.arrays.duplicates(payload)
 ]
 ------------------------
 
+### `removeDuplicates(array arr, function compF)`
+Removes any duplicates from the array and returns the resulting array. An optional comparator function takes two parameters.
+
+*Example*
+
+.Payload
+----------
+[
+  1,
+  2,
+  2,
+  3,
+  4
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.removeDuplicates(payload)
+------------------------
+.Result
+------------------------
+[ 1, 2, 3, 4]
+------------------------
+
+.Payload
+----------
+[
+    {
+        x: 1, y: "a"
+    },
+    {
+        x: 1, y: "b"
+    },
+    {
+        x: 2, y: "a"
+    },
+    {
+        x: 3, y: "a"
+    }
+]
+----------
+.DataSonnet map:
+------------------------
+ds.arrays.removeDuplicates(payload, function(i1, i2) i1.x == i2.x)
+------------------------
+.Result
+------------------------
+[
+    {
+        x: 1, y: "a"
+    },
+    {
+        x: 2, y: "a"
+    },
+    {
+        x: 3, y: "a"
+    }
+]
+------------------------
+
 ### `every(array arr, function func)`
 Returns true if every value `arr` returns true in `func`.
 
