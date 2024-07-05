@@ -1544,7 +1544,6 @@ object DSLowercase extends Library {
           Val.Arr(out.toSeq)
       },
 
-      //TODO Comparison fuction!!!!
       builtinWithDefaults("removeDuplicates", "array" -> None, "compF" -> Some(Expr.False(0))) { (args, ev) =>
           val array = args("array").asInstanceOf[Val.Arr]
           val compF = args("compF")
