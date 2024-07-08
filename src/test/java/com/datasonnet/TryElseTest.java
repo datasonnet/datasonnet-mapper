@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ public class TryElseTest {
     void testDefault() throws IOException, URISyntaxException, JSONException {
         Mapper mapper = new Mapper(TestResourceReader.readFileAsString("default.ds"));
         Document<String>  response = mapper.transform(new DefaultDocument<>("{}", MediaTypes.APPLICATION_JSON));
-        JSONAssert.assertEquals("{\"tryNonexistent\":\"OK\",\"tryChain\":\"OK\",\"tryNaN\":-1}", response.getContent(), true);
+        JSONAssert.assertEquals("{\"tryNonexistent\":\"OK\",\"tryChain\":\"OK\",\"tryNaN\":-1,\"tryArr\":\"emptyArr\",\"tryArr2\":\"nullArr\"}", response.getContent(), true);
     }
 
     @Test
