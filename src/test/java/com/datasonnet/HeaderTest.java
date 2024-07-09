@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public class HeaderTest {
     Header header;
 
     String headerStr = "/** DataSonnet\n" +
-            "version=2.0\n" +
+            "version=3.0\n" +
             "preserveOrder=false\n" +
             "  \n" +
             "// comment\n" +
@@ -63,7 +63,7 @@ public class HeaderTest {
 
     @Test
     void testHeaderVersion() throws HeaderParseException {
-        assertEquals(header.getVersion(), "2.0");
+        assertEquals(header.getVersion(), "3.0");
         assertEquals(Header.parseHeader(
                 "/** DataSonnet\n" +
                 "version=2.1\n" +
@@ -83,7 +83,7 @@ public class HeaderTest {
         assertThrows(HeaderParseException.class,  ()  -> {
             Header.parseHeader(
                     "/** DataSonnet\n" +
-                    "version=3.2\n" +
+                    "version=4.2\n" +
                     "*/\n"
             );});
     }
@@ -129,7 +129,7 @@ public class HeaderTest {
     void testUnknownHeaderFails() {
         assertThrows(HeaderParseException.class,  ()  -> {
            Header.parseHeader("/** DataSonnet\n" +
-                   "version=2.0\n" +
+                   "version=3.0\n" +
                    "nonsense\n" +
                    "*/");
         });
@@ -139,14 +139,14 @@ public class HeaderTest {
     void testUnterminatedHeaderFailsNicely() {
         assertThrows(HeaderParseException.class,  ()  -> {
             Header.parseHeader("/** DataSonnet\n" +
-                    "version=2.0\n");
+                    "version=3.0\n");
         });
     }
 
     @Test
     public void testDefaultOutput() throws HeaderParseException {
         Header header1 = Header.parseHeader("/** DataSonnet\n" +
-                "version=2.0\n" +
+                "version=3.0\n" +
                 "output application/x-java-object;q=0.9\n" +
                 "output application/json;q=1.0\n" +
                 "*/");

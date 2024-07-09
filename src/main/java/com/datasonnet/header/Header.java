@@ -1,7 +1,7 @@
 package com.datasonnet.header;
 
 /*-
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ public class Header {
     public static final String DATASONNET_PRESERVE_ORDER = "preserveOrder";
     public static final String DATAFORMAT_PREFIX = "dataformat";
     public static final String DATAFORMAT_ALL = "*";
-    public static final String LATEST_RELEASE_VERSION = "2.5"; //update this as required
+    public static final String LATEST_RELEASE_VERSION = "3.0"; //update this as required
     private final String versionMajor;
     private final String versionMinor;
     private final boolean preserveOrder;
@@ -157,6 +157,15 @@ public class Header {
                     //not sure if a print out is a good enough warning or if we want to add loggers
                     System.err.println("WARNING: You are using a version that is still in development. " +
                                        "The latest release version is: " + LATEST_RELEASE_VERSION);
+                    return parseHeader20(headerWithoutVersion, version);
+                }
+            case "3":
+                if ("0".equals(splitVersion[1])) {
+                    return parseHeader30(headerWithoutVersion);
+                } else {
+                    //not sure if a print out is a good enough warning or if we want to add loggers
+                    System.err.println("WARNING: You are using a version that is still in development. " +
+                            "The latest release version is: " + LATEST_RELEASE_VERSION);
                     return parseHeader20(headerWithoutVersion, version);
                 }
             default:
@@ -331,6 +340,10 @@ public class Header {
     @NotNull
     private static Header parseHeader20(String headerSection) throws HeaderParseException{
         return parseHeader20(headerSection, "2.0");
+    }
+    @NotNull
+    private static Header parseHeader30(String headerSection) throws HeaderParseException{
+        return parseHeader20(headerSection, "3.0");
     }
 
     public String getVersion() {
