@@ -1,7 +1,7 @@
 package com.datasonnet
 
 /*-
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import com.datasonnet.jsonnet.Std._
 import com.datasonnet.jsonnet.{Applyer, Error, EvalScope, Expr, FileScope, Materializer, Val}
 import com.datasonnet.modules.{Crypto, JsonPath, Regex}
 import com.datasonnet.spi.{DataFormatService, Library, ujsonUtils}
+import sourcecode.Macros.Chunk
 import ujson.Value
 
 import java.math.{BigDecimal, RoundingMode}
@@ -1539,6 +1540,23 @@ object DSLowercase extends Library {
           array.value.collect({
             case item if array.value.count(_.force == item.force)>=2 &&
                            !out.exists(_.force == item.force) => out.append(item)
+          })
+          Val.Arr(out.toSeq)
+      },
+
+      builtinWithDefaults("removeDuplicates", "array" -> None, "compF" -> Some(Expr.False(0))) { (args, ev) =>
+          val array = args("array").asInstanceOf[Val.Arr]
+          val compF = args("compF")
+
+          val out = mutable.Buffer.empty[Val.Lazy]
+          array.value.collect({
+            case item if !out.exists(
+              x => if (compF == Val.False) x.force == item.force else {
+                val compFunc = compF.asInstanceOf[Val.Func]
+                val compApplyer = Applyer(compFunc, ev, null)
+                compApplyer.apply(x, item).asInstanceOf[Val.Bool] == Val.True
+              }
+            ) => out.append(item)
           })
           Val.Arr(out.toSeq)
       },

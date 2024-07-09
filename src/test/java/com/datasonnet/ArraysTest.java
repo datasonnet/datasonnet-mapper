@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -372,4 +372,18 @@ public class ArraysTest {
         assertEquals("[0,1]", value);
     }
 
+    @Test
+    void testArrays_removeDuplicates() throws Exception {
+        Mapper mapper = new Mapper(lib + pack + ".removeDuplicates([0,1,2,1])\n", new ArrayList<>(), new HashMap<>(), true);
+        String value = mapper.transform("{}").replaceAll("\"", "");
+        JSONAssert.assertEquals("[0,1,2]", value, true);
+
+        mapper = new Mapper(lib + pack + ".removeDuplicates([{ x: 1, y: \"a\"},{ x: 1, y: \"b\"},{ x: 2, y: \"a\"},{ x: 3, y: \"a\"}], function(i1, i2) i1.x == i2.x)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        JSONAssert.assertEquals("[{ x: 1, y: \"a\"},{ x: 2, y: \"a\"},{ x: 3, y: \"a\"}]", value, true);
+
+        mapper = new Mapper(lib + pack + ".removeDuplicates([{ x: 1, y: \"a\"},{ x: 1, y: \"a\"},{ x: 2, y: \"a\"},{ x: 3, y: \"a\"}], function(i1, i2) i1.x == i2.x)\n", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        JSONAssert.assertEquals("[{ x: 1, y: \"a\"},{ x: 2, y: \"a\"},{ x: 3, y: \"a\"}]", value, true);
+    }
 }

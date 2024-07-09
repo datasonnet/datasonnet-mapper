@@ -1,7 +1,7 @@
 package com.datasonnet.jsonnet
 
 /*-
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -262,7 +262,7 @@ class Evaluator(parseCacheP: collection.mutable.Map[String, fastparse.Parsed[(Ex
         .getOrElse(Error.fail("Cannot use `super` outside an object", offset))
         .value(name, offset, scope.self0.get, defaultValue)
     } else visitExpr(value) match {
-      case obj: Val.Obj => if (!tryCatch) obj.value(name, offset, obj, defaultValue) else Error.fail(s"Object does not have a field ${name}", offset)
+      case obj: Val.Obj => obj.value(name, offset, obj, if (tryCatch) null else defaultValue)
       case r => if (defaultValue != null && !tryCatch) Materializer.reverse(defaultValue) else Error.fail(s"attempted to index a ${r.prettyName} with string ${name}", offset)
     }
   }
