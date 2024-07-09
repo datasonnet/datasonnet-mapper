@@ -3,5 +3,6 @@
   tryChain: payload.doesntExist default payload.missing default "OK",
   tryNaN: std.parseInt("NotANumber") default -1,
   tryArr: [][0] default "emptyArr",
-  tryArr2: null[0] default "nullArr"
+  tryArr2: null[0] default "nullArr",
+  tryExists: payload.key default "none"
 }
