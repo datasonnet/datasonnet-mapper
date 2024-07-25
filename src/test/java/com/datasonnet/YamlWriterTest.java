@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ public class YamlWriterTest {
 
     @Test
     void testYamlWriter() throws Exception {
-        String data ="{\"message\":\"Hello World\",\"object\":{\"num\":3.14159,\"bool\":true,\"array\":[1,2]}}";
+        String data ="{\"message\":\"Hello World\",\"object\":{\"num\":3.14159,\"bool\":true,\"array\":[1.0,1,2.0]}}";
         DefaultDocument<?> doc = new DefaultDocument<>(data, MediaTypes.APPLICATION_JSON);
 
         String mapping = "/** DataSonnet\n" +
@@ -45,15 +45,16 @@ public class YamlWriterTest {
                 "  num: 3.14159\n" +
                 "  bool: true\n" +
                 "  array:\n" +
-                "  - 1.0\n" +
-                "  - 2.0\n";
+                "  - 1\n" +
+                "  - 1\n" +
+                "  - 2\n";
         assertEquals(expectedYaml,mapped);
     }
 
 
     @Test
     void testYamlWriterRemoveHead() throws Exception {
-        String data ="{\"message\":\"Hello World\",\"object\":{\"num\":3.14159,\"bool\":true,\"array\":[1,2]}}";
+        String data ="{\"message\":\"Hello World\",\"object\":{\"num\":3.14159,\"bool\":true,\"array\":[1.0,2.0]}}";
         DefaultDocument<?> doc = new DefaultDocument<>(data, MediaTypes.APPLICATION_JSON);
 
         String mapping = "/** DataSonnet\n" +
@@ -71,8 +72,8 @@ public class YamlWriterTest {
                 "  num: 3.14159\n" +
                 "  bool: true\n" +
                 "  array:\n" +
-                "  - 1.0\n" +
-                "  - 2.0\n";
+                "  - 1\n" +
+                "  - 2\n";
         assertEquals(expectedYaml,mapped);
 
         mapping = "/** DataSonnet\n" +
@@ -91,7 +92,7 @@ public class YamlWriterTest {
 
     @Test
     void testYamlWriterDisableQuotes() throws Exception {
-        String data ="{\"message\":\"Hello World\",\"object\":{\"num\":3.14159,\"bool\":true,\"array\":[1,2]}}";
+        String data ="{\"message\":\"Hello World\",\"object\":{\"num\":3.14159,\"bool\":true,\"array\":[1.0,2.0]}}";
         DefaultDocument<?> doc = new DefaultDocument<>(data, MediaTypes.APPLICATION_JSON);
 
         String mapping = "/** DataSonnet\n" +
@@ -109,8 +110,8 @@ public class YamlWriterTest {
                 "  num: 3.14159\n" +
                 "  bool: true\n" +
                 "  array:\n" +
-                "  - 1.0\n" +
-                "  - 2.0\n";
+                "  - 1\n" +
+                "  - 2\n";
         assertEquals(expectedYaml,mapped);
     }
 
@@ -140,8 +141,8 @@ public class YamlWriterTest {
                 "  num: 3.14159\n" +
                 "  bool: true\n" +
                 "  array:\n" +
-                "  - 1.0\n" +
-                "  - 2.0\n";
+                "  - 1\n" +
+                "  - 2\n";
         assertEquals(expectedYaml,mapped);
     }
 
@@ -168,6 +169,33 @@ public class YamlWriterTest {
                 "---\n" +
                 "test: \"Value\"\n";
         assertEquals(expectedYaml, mapped);
+    }
+
+    @Test
+    void testYamlWriterIntegers() throws Exception {
+        String data ="{\"message\":\"Hello World\",\"object\":{\"int\":3,\"double\":3.14159,\"bool\":true,\"array\":[1,2]}}";
+        DefaultDocument<?> doc = new DefaultDocument<>(data, MediaTypes.APPLICATION_JSON);
+
+        String mapping = "/** DataSonnet\n" +
+                "version=2.0\n" +
+                "output application/x-yaml\n" +
+                "input payload application/json\n" +
+                "*/\n" +
+                "payload";
+
+        Mapper mapper = new Mapper(mapping);
+        String mapped = mapper.transform(doc, new HashMap<>(), MediaTypes.APPLICATION_YAML).getContent();
+
+        String expectedYaml ="---\n" +
+                "message: \"Hello World\"\n" +
+                "object:\n" +
+                "  int: 3\n" +
+                "  double: 3.14159\n" +
+                "  bool: true\n" +
+                "  array:\n" +
+                "  - 1\n" +
+                "  - 2\n";
+        assertEquals(expectedYaml,mapped);
     }
 
 }

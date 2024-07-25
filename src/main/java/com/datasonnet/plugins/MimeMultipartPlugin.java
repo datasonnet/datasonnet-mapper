@@ -1,7 +1,7 @@
 package com.datasonnet.plugins;
 
 /*-
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -171,9 +171,9 @@ public class MimeMultipartPlugin extends BaseJacksonDataFormatPlugin {
             if (isBinary) {
                 writer.flush();
 
-                List<Double> fileBytes = (List<Double>) nextPart.get("content"); //Why ujson produces Doubles from byte array???
+                List<Integer> fileBytes = (List<Integer>) nextPart.get("content");
                 ByteArrayOutputStream content = new ByteArrayOutputStream();
-                for (Double nextOne : fileBytes) {
+                for (Integer nextOne : fileBytes) {
                     content.write(nextOne.byteValue());
                 }
                 byte[] contentBytes = content.toByteArray();
