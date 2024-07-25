@@ -42,7 +42,7 @@ object ujsonUtils {
   def javaObjectFrom(node: ujson.Value): java.lang.Object = node match {
     case Null => null
     case Bool(value) => value.asInstanceOf[java.lang.Boolean]
-    case Num(value) => value.asInstanceOf[java.lang.Double]
+    case Num(value) => if (node.toString.contains(".")) value.asInstanceOf[java.lang.Double] else Integer.valueOf(value.asInstanceOf[java.lang.Double].intValue())
     case Str(value) => value
     case Obj(value) => value.map(keyVal => (keyVal._1, javaObjectFrom(keyVal._2))).asJava
     case Arr(value) => value.map(javaObjectFrom).asJava

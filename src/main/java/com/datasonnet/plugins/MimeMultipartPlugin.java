@@ -171,9 +171,9 @@ public class MimeMultipartPlugin extends BaseJacksonDataFormatPlugin {
             if (isBinary) {
                 writer.flush();
 
-                List<Double> fileBytes = (List<Double>) nextPart.get("content"); //Why ujson produces Doubles from byte array???
+                List<Integer> fileBytes = (List<Integer>) nextPart.get("content");
                 ByteArrayOutputStream content = new ByteArrayOutputStream();
-                for (Double nextOne : fileBytes) {
+                for (Integer nextOne : fileBytes) {
                     content.write(nextOne.byteValue());
                 }
                 byte[] contentBytes = content.toByteArray();
