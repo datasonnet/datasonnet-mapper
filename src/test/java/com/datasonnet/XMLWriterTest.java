@@ -175,17 +175,17 @@ public class XMLWriterTest {
 
         String mappedXml = mapper.transform(new DefaultDocument<>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
 
-        assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
+        //assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
+        assertThat(mappedXml, CompareMatcher.isIdenticalTo(expectedXml).ignoreWhitespace());
 
         expectedXml = TestResourceReader.readFileAsString("xmlEmptyElementsNoNull.xml");
         datasonnet = TestResourceReader.readFileAsString("xmlEmptyElementsNoNull.ds");
 
         mapper = new Mapper(datasonnet);
 
-
         mappedXml = mapper.transform(new DefaultDocument<>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
 
-        assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
+        assertThat(mappedXml, CompareMatcher.isIdenticalTo(expectedXml).ignoreWhitespace());
     }
 
     @Test

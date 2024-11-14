@@ -131,7 +131,9 @@ class BadgerFishWriter(val params: EffectiveParams) {
       }
     }
 
-    if (children.isEmpty && params.autoEmpty) {
+    val isNullElement = element.equals("nullElement") || element.endsWith(":nullElement")
+
+    if ((children.isEmpty || isNullElement) && params.autoEmpty) {
       sb append "/>"
     } else {
       // children, so use long form: <xyz ...>...</xyz>
