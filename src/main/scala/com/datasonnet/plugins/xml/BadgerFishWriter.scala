@@ -1,7 +1,7 @@
 package com.datasonnet.plugins.xml
 
 /*-
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,9 @@ class BadgerFishWriter(val params: EffectiveParams) {
       }
     }
 
-    if (children.isEmpty && params.autoEmpty) {
+    val isNullElement = element.equals("nullElement") || element.endsWith(":nullElement")
+
+    if ((children.isEmpty || isNullElement) && params.autoEmpty) {
       sb append "/>"
     } else {
       // children, so use long form: <xyz ...>...</xyz>

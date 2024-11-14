@@ -1,7 +1,7 @@
 package com.datasonnet;
 
 /*-
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,17 +175,17 @@ public class XMLWriterTest {
 
         String mappedXml = mapper.transform(new DefaultDocument<>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
 
-        assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
+        //assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
+        assertThat(mappedXml, CompareMatcher.isIdenticalTo(expectedXml).ignoreWhitespace());
 
         expectedXml = TestResourceReader.readFileAsString("xmlEmptyElementsNoNull.xml");
         datasonnet = TestResourceReader.readFileAsString("xmlEmptyElementsNoNull.ds");
 
         mapper = new Mapper(datasonnet);
 
-
         mappedXml = mapper.transform(new DefaultDocument<>(jsonData, MediaTypes.APPLICATION_JSON), Collections.emptyMap(), MediaTypes.APPLICATION_XML).getContent();
 
-        assertThat(mappedXml, CompareMatcher.isSimilarTo(expectedXml).ignoreWhitespace());
+        assertThat(mappedXml, CompareMatcher.isIdenticalTo(expectedXml).ignoreWhitespace());
     }
 
     @Test
