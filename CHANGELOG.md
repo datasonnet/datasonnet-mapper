@@ -1,6 +1,15 @@
 ### Changelog
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
+#### [3.0.0](https://github.com/datasonnet/datasonnet-mapper/compare/3.0.0-RC3...3.0.0)
+
+> 15 November 2024
+
+- Integer numbers are not converted to double and displayed without .0
+- Null XML elements formatting is controlled by auto-empty parameter
+- Header version 3.0 supported
+- `ds.removeDuplicates` function implemented
+
 #### [3.0.0-RC1](https://github.com/datasonnet/datasonnet-mapper/compare/2.5.2...3.0.0-RC1)
 
 > 8 November 2023
