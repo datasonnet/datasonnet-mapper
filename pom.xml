@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2019-2024 the original author or authors.
+    Copyright 2019-2025 the original author or authors.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@
         <fileupload.version>2.0.0-M1</fileupload.version>
         <hamcrest.version>2.2</hamcrest.version>
         <httpmime.version>4.5.14</httpmime.version>
-        <jackson.version>2.15.3</jackson.version>
+        <jackson.version>2.18.3</jackson.version>
         <jakarta-servlet-api.version>6.0.0</jakarta-servlet-api.version>
         <jakarta-xml-bind-api.version>4.0.0</jakarta-xml-bind-api.version>
         <jaxb.version>4.0.4</jaxb.version>
@@ -187,6 +187,16 @@
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-properties</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
             <version>${jackson.version}</version>
         </dependency>
 
@@ -351,12 +361,7 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
-            <scope>test</scope>
-        </dependency>
+
         <!-- test deps: end -->
 
     </dependencies>

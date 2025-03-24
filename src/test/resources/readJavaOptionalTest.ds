@@ -1,0 +1,14 @@
+/** DataSonnet
+version=2.0
+input payload application/x-java-object;
+*/
+std.prune({
+    "userName": payload.name,
+    "userEmail": if std.objectHas(payload, "email") then payload.email else null,
+    "userAge": if std.objectHas(payload, "age") then payload.age else null,
+    "userHeight": if std.objectHas(payload, "height") then payload.height else null,
+    "userWeight": if std.objectHas(payload, "weight") then payload.weight else null,
+    "userBirthDate": payload.birthDate,
+    "userWakeUpTime": payload.wakeUpTime,
+    "userLunchTime": payload.lunchTime
+})

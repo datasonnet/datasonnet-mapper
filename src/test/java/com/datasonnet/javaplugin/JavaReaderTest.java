@@ -1,7 +1,7 @@
 package com.datasonnet.javaplugin;
 
 /*-
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,15 @@ import org.skyscreamer.jsonassert.JSONAssert;
 
 import javax.xml.namespace.QName;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -64,6 +70,57 @@ public class JavaReaderTest {
         String expectedJson = TestResourceReader.readFileAsString("javaTest.json");
         JSONAssert.assertEquals(expectedJson, mapped, true);
     }
+
+    @Test
+    void testOptionalJavaReader() throws Exception {
+        User user = new User("John Doe", "john@example.com");
+        Document<User> data = new DefaultDocument<>(user, MediaTypes.APPLICATION_JAVA);
+        String mapping = TestResourceReader.readFileAsString("readJavaOptionalTest.ds");
+        Mapper mapper = new Mapper(mapping);
+        String mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JSON).getContent();
+
+        String expectedJson = "{\"userName\":\"John Doe\",\"userEmail\":\"john@example.com\"}";
+        JSONAssert.assertEquals(expectedJson, mapped, true);
+
+        user.setEmail(null);
+        data = new DefaultDocument<>(user, MediaTypes.APPLICATION_JAVA);
+        mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JSON).getContent();
+        expectedJson = "{\"userName\":\"John Doe\"}";
+        JSONAssert.assertEquals(expectedJson, mapped, true);
+    }
+
+    @Test
+    void testJava8TypesReader() throws Exception {
+        User user = new User(
+                "John Doe",
+                "john@example.com",
+                30,
+                180L,
+                70.5,
+                LocalDate.of(1990, 1, 1),
+                LocalTime.of(7, 0),
+                LocalDateTime.of(2023, 3, 24, 12, 0)
+        );
+
+        Document<User> data = new DefaultDocument<>(user, MediaTypes.APPLICATION_JAVA);
+        String mapping = TestResourceReader.readFileAsString("readJavaOptionalTest.ds");
+        Mapper mapper = new Mapper(mapping);
+        String mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JSON).getContent();
+
+        String expectedUserResponse = TestResourceReader.readFileAsString("user1.json");
+
+        JSONAssert.assertEquals(expectedUserResponse, mapped, true);
+        user.setAge(OptionalInt.empty());
+        user.setHeight(OptionalLong.empty());
+        user.setWeight(OptionalDouble.empty());
+        user.setEmail(null);
+        data = new DefaultDocument<>(user, MediaTypes.APPLICATION_JAVA);
+        mapped = mapper.transform(data, new HashMap<>(), MediaTypes.APPLICATION_JSON).getContent();
+        String expectedJson = TestResourceReader.readFileAsString("user2.json");
+        JSONAssert.assertEquals(expectedJson, mapped, true);
+    }
+
+
 
     @Test
     void testJAXBElementMapping() throws Exception {

@@ -1,7 +1,7 @@
 package com.datasonnet.plugins.javaplugin;
 
 /*-
- * Copyright 2019-2024 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ujson.Value;
@@ -58,6 +60,8 @@ public class DefaultJavaFormatPlugin extends BaseJacksonDataFormatPlugin {
         SimpleModule module = new SimpleModule();
         module.addSerializer(JAXBElement.class, new JAXBElementSerializer());
         DEFAULT_OBJECT_MAPPER.registerModule(module);
+        DEFAULT_OBJECT_MAPPER.registerModule(new Jdk8Module());
+        DEFAULT_OBJECT_MAPPER.registerModule(new JavaTimeModule());
         DEFAULT_OBJECT_MAPPER.addMixIn(JAXBElement.class, JAXBElementMixIn.class);
         // TODO: 9/8/20 add test for empty beans
         DEFAULT_OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
