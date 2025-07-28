@@ -485,6 +485,14 @@ public class StringsTest {
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("abc", value);
 
+        mapper = new Mapper(lib + pack + ".substringAfter(\"abcba\", \"ab\")", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("cba", value);
+
+        mapper = new Mapper(lib + pack + ".substringAfter(\"abcXXXba\", \"XXX\")", new ArrayList<>(), new HashMap<>(), true);
+        value = mapper.transform("{}").replaceAll("\"", "");
+        assertEquals("ba", value);
+
     }
 
     @Test

@@ -2353,10 +2353,11 @@ object DSLowercase extends Library {
         (_, _, value: Val, sep: String) =>
           value match {
             case Val.Str(s) =>
+              val sepLength = sep.length
               Val.Lazy(Val.Str(s.substring(
                 s.indexOf(sep) match {
                   case -1 => s.length
-                  case i => if (sep.equals("")) i else i + 1
+                  case i => if (sep.equals("")) i else i + sepLength
                 }
               ))).force
             case Val.Null => Val.Lazy(Val.Null).force
