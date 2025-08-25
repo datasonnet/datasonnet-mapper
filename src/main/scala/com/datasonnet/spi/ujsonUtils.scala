@@ -26,7 +26,16 @@ object ujsonUtils {
 
   def stringValueOf(value: ujson.Value): String = String.valueOf(value.value)
 
-  def parse(jsonData: String): Value = ujson.read(ujson.Readable.fromString(jsonData))
+  def parse(jsonData: String): Value = {
+    val processedJson = quoteLargeIntegers(jsonData)
+    ujson.read(ujson.Readable.fromString(processedJson))
+  }
+
+  private def quoteLargeIntegers(json: String): String = {
+    // Match integers that exceed JavaScript's safe integer range (2^53 - 1)
+    // This prevents precision loss when parsed as double
+    json.replaceAll("\\b([1-9]\\d{15,})\\b", "\"__LARGE_INT__$1\"")
+  }
 
   def read(s: Readable, trace: Boolean = false): Value.Value = ujson.read(s, trace)
 
@@ -44,11 +53,27 @@ object ujsonUtils {
     case Bool(value) => value.asInstanceOf[java.lang.Boolean]
     case Num(value) =>
       val num = value.doubleValue()
-      if (Math.ceil(num) == Math.floor(num))
-        java.lang.Integer.valueOf(value.intValue())
-      else
+      if (Math.ceil(num) == Math.floor(num)) {
+        val longValue = value.longValue()
+        if (longValue >= Integer.MIN_VALUE && longValue <= Integer.MAX_VALUE)
+          java.lang.Integer.valueOf(value.intValue)
+        else
+          java.lang.Long.valueOf(longValue)
+      } else
         java.lang.Double.valueOf(value.doubleValue())
-    case Str(value) => value
+    case Str(value) => 
+      if (value.startsWith("__LARGE_INT__")) {
+        val numberStr = value.substring("__LARGE_INT__".length)
+        try {
+          java.lang.Long.valueOf(numberStr)
+        } catch {
+          case _: NumberFormatException => 
+            // If it doesn't fit in Long, use BigInteger
+            new java.math.BigInteger(numberStr)
+        }
+      } else {
+        value
+      }
     case Obj(value) => value.map(keyVal => (keyVal._1, javaObjectFrom(keyVal._2))).asJava
     case Arr(value) => value.map(javaObjectFrom).asJava
   }
@@ -62,7 +87,18 @@ object ujsonUtils {
         case Null => done(null)
         case Bool(value) => done(value.asInstanceOf[java.lang.Boolean])
         case Num(value) => done(value.asInstanceOf[java.lang.Double])
-        case Str(value) => done(value)
+        case Str(value) => 
+          if (value.startsWith("__LARGE_INT__")) {
+            val numberStr = value.substring("__LARGE_INT__".length)
+            done(try {
+              java.lang.Long.valueOf(numberStr)
+            } catch {
+              case _: NumberFormatException => 
+                new java.math.BigInteger(numberStr)
+            })
+          } else {
+            done(value)
+          }
         case Obj(value) => value.toList.foldRight(done(List.empty[(String, java.lang.Object)])) {
           (keyVal, tailrecEntrySet) =>
             for {
