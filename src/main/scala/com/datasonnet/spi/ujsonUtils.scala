@@ -45,7 +45,7 @@ object ujsonUtils {
     case Num(value) =>
       val num = value.doubleValue()
       if (Math.ceil(num) == Math.floor(num))
-        java.lang.Integer.valueOf(value.intValue())
+        java.lang.Long.valueOf(value.longValue())
       else
         java.lang.Double.valueOf(value.doubleValue())
     case Str(value) => value

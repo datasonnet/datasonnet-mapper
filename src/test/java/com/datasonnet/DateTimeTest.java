@@ -15,10 +15,17 @@ package com.datasonnet;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.datasonnet.document.DefaultDocument;
+import com.datasonnet.document.Document;
+import com.datasonnet.document.MediaTypes;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
+import java.util.Date;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -50,6 +57,19 @@ public class DateTimeTest {
 
         assertTrue(before.compareTo(mapped) <= 0);
         assertTrue(after.compareTo(mapped) >= 0);
+    }
+
+    @Test
+    void testMilliseconds() throws Exception {
+        Mapper mapper = new Mapper("ds.datetime.now().asMilliseconds()");
+        Document<Long> mapped = mapper.transform(new DefaultDocument<String>("{}", MediaTypes.APPLICATION_JSON), new HashMap(), MediaTypes.APPLICATION_JAVA, java.lang.Long.class);
+        Long mappedValue = mapped.getContent();
+
+        DateFormat simple = new SimpleDateFormat("dd MMM yyyy");
+        Date today = new Date();
+        Date mappedDate = new Date(Long.valueOf(mappedValue));
+
+        assertEquals(simple.format(today), simple.format(mappedDate));
     }
 
     @Test

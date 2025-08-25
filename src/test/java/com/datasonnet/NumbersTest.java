@@ -54,8 +54,6 @@ public class NumbersTest {
         mapper = new Mapper(lib + pack + ".fromBinary(\"1111111111111111111111111111111111111111111111111111111111111\")");
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("2305843009213693952", value);
-
-
     }
 
     @Test
@@ -167,7 +165,6 @@ public class NumbersTest {
         mapper = new Mapper(lib + pack + ".toRadixNumber(68719476735, 16)");
         value = mapper.transform("{}").replaceAll("\"", "");
         assertEquals("fffffffff", value);
-
     }
 
 

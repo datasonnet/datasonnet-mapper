@@ -171,9 +171,9 @@ public class MimeMultipartPlugin extends BaseJacksonDataFormatPlugin {
             if (isBinary) {
                 writer.flush();
 
-                List<Integer> fileBytes = (List<Integer>) nextPart.get("content");
+                List<Long> fileBytes = (List<Long>) nextPart.get("content");
                 ByteArrayOutputStream content = new ByteArrayOutputStream();
-                for (Integer nextOne : fileBytes) {
+                for (Long nextOne : fileBytes) {
                     content.write(nextOne.byteValue());
                 }
                 byte[] contentBytes = content.toByteArray();
