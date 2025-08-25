@@ -454,12 +454,13 @@
                             <excludes>
                                 <exclude>**/NOTICE</exclude>
                                 <exclude>**/LICENSE</exclude>
-                                <exclude>README.md</exclude>
+                                <exclude>*.md</exclude>
                                 <exclude>mvnw*</exclude>
                                 <exclude>.mvn/**</exclude>
                                 <exclude>docs/**</exclude>
                                 <exclude>src/test/resources/**</exclude>
                                 <exclude>**/target/**</exclude>
+                                <exclude>pom.xml</exclude>
                             </excludes>
                         </licenseSet>
                     </licenseSets>
