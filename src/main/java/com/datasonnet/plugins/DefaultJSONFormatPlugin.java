@@ -67,7 +67,7 @@ public class DefaultJSONFormatPlugin extends AbstractDataFormatPlugin {
             if ("".equals(content.trim())) {
                 return ujson.Null$.MODULE$;
             }
-            return ujsonUtils.read(ujson.Readable.fromString(content), false);
+            return ujsonUtils.parse(content);
         }
 
         if (CharSequence.class.isAssignableFrom(targetType)) {
@@ -75,7 +75,7 @@ public class DefaultJSONFormatPlugin extends AbstractDataFormatPlugin {
             if ("".equals(charSequence.toString().trim())) {
                 return ujson.Null$.MODULE$;
             }
-            return ujsonUtils.read(ujson.Readable.fromCharSequence(charSequence), false);
+            return ujsonUtils.parse(charSequence.toString());
         }
 
         if (Path.class.isAssignableFrom(targetType)) {

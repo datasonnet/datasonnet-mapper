@@ -1,6 +1,16 @@
 ### Changelog
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
+
+#### [3.0.1](https://github.com/datasonnet/datasonnet-mapper/compare/3.0.0...3.0.1)
+
+> 25 August 2025
+
+- Fixed ClassCastException in multipart form data processing when binary content contains large integers
+- Enhanced ujson number handling to preserve precision for large integers (>15 digits) by preventing double precision loss
+- Improved numeric type conversion to use Integer for values in Integer range, Long for larger values, and BigInteger for values exceeding Long range
+- Updated MimeMultipartPlugin to handle both Integer and Long numeric types using Number interface
+
 #### [3.0.0](https://github.com/datasonnet/datasonnet-mapper/compare/3.0.0-RC3...3.0.0)
 
 > 15 November 2024

@@ -9,3 +9,5 @@ tmp
 .project
 build
 local-ignore
+.claude
+.mvn
