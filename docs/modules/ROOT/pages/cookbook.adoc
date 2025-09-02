@@ -405,7 +405,7 @@ std.sort(payload)
 //TODO Sort with key
 
 ### Group By
-`DS.Util.groupBy()` function provided. The first argument is a list of objects, the second is the name of the element to group by. The following example groups list of objects by name of the language:
+`ds.groupBy()` function provided. The first argument is a list of objects, the second is a function to extract the grouping key. The following example groups list of objects by name of the language:
 
 .Payload
 -------------
@@ -442,7 +442,7 @@ std.sort(payload)
 [subs="quotes"]
 -------------
 {
-  languages: DS.Util.groupBy(payload.languages, 'language.name'),
+  languages: ds.groupBy(payload.languages, function(x) x.language.name),
 }
 -------------
 .Output
@@ -481,7 +481,7 @@ std.sort(payload)
 }
 -------------
 ### Distinct By
-`DS.Util.distinctBy()` function provided.
+`ds.distinctBy()` function provided.
 
 .Payload
 -------------
@@ -526,8 +526,8 @@ std.sort(payload)
 [subs="quotes"]
 -------------
 {
-  uniqueLetters: *DS.Util.distinctBy*(payload.arrayOfLetters),
-  uniqueObjects: *DS.Util.distinctBy*(payload.arrayOfObjects)
+  uniqueLetters: *ds.distinctBy*(payload.arrayOfLetters, function(x) x),
+  uniqueObjects: *ds.distinctBy*(payload.arrayOfObjects, function(x) x)
 }
 -------------
 .Output
@@ -590,7 +590,7 @@ local listOfLanguages =
       }
     ];
 
-DS.Util.distinctBy(listOfLanguages, *"language.name"*)
+ds.distinctBy(listOfLanguages, function(x) x.language.name)
 -------------
 .Output
 -------------
@@ -614,7 +614,7 @@ DS.Util.distinctBy(listOfLanguages, *"language.name"*)
 `std.length()` function is available out of the box. If parameter is an array, it will return number of elements in the array.
 
 ### Array Flattening
-`DS.Util.deepFlattenArrays()` function recursively iterates over array of elements, some or all of which may be arrays too, and merges them all in a single array.
+`ds.deepFlatten()` function recursively iterates over array of elements, some or all of which may be arrays too, and merges them all in a single array.
 
 .Payload
 -------------
@@ -640,7 +640,7 @@ DS.Util.distinctBy(listOfLanguages, *"language.name"*)
 .Mapping
 [subs="quotes"]
 -------------
-DS.Util.deepFlattenArrays(payload)
+ds.deepFlatten(payload)
 -------------
 .Output
 -------------
@@ -762,17 +762,19 @@ std.map(function(obj) *defaultValues + obj*, payload)
 -------------
 
 ### Add and Subtract Dates
-DataSonnet uses ISO-8601 dates and periods. To add or subtract a number of years. months and days, use `DS.LocalDateTime.offset()` and `DS.ZonedDateTime.offset()` functions.
+DataSonnet uses ISO-8601 dates and periods. To add or subtract a number of years, months and days, use `ds.datetime` module functions.
 
 .Mapping
 [subs="quotes"]
 ---------------
-DS.LocalDateTime.offset("2019-07-22T21:00:00", "P1Y1D")
+// Parse a datetime string and add a period
+local dt = ds.datetime.parse("2019-07-22T21:00:00+00:00");
+dt.plus("P1Y1D").toISO()
 ---------------
 .Output
 [subs="quotes"]
 -------------
-2020-07-23T21:00:00
+2020-07-23T21:00:00+00:00
 -------------
 
 See https://docs.oracle.com/javase/8/docs/api/java/time/Period.html#parse-java.lang.CharSequence-[Java 8 Period documentation] for period format details and examples.
@@ -880,11 +882,11 @@ local removeFields = [ "photo", "generic", "disabled", "update_whitelist", "id" 
 }
 --------
 
-`DS.Util.remove(object, key)` and `DS.Util.removeAll(object, arrayOfKeys)` functions provided for convenience:
+`ds.remove(object, key)` function provided for convenience:
 
 [subs="quotes"]
 --------
-*DS.Util.removeAll*(payload, [ "photo", "generic", "disabled", "update_whitelist", "id" ])
+std.foldl(function(obj, key) ds.remove(obj, key), payload, [ "photo", "generic", "disabled", "update_whitelist", "id" ])
 --------
 
 ### Finding If Array Contains Value
@@ -910,7 +912,7 @@ For simple scenarios `std.count(arr, val) > 0` will return `true` if an array co
 .Mapping
 [subs="quotes"]
 --------
-local javaLanguages = DS.JsonPath.select(payload, "$..language[?(@.name == 'Java')]");
+local javaLanguages = ds.jsonpath.select(payload, "$..language[?(@.name == 'Java')]");
 
 std.length(javaLanguages) > 0
 --------
