@@ -243,6 +243,7 @@ Errors can arise from the language itself (e.g. an array overrun) or thrown from
 -------------
 
 Indexes are not available in `for` loop. In order to use both element value and index in the mapping, use `std.mapWithIndex()` function with custom mapping function, e.g.
+
 .Payload
 -------------
 {
