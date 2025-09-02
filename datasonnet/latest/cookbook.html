@@ -73,12 +73,6 @@
     <a class="nav-link" href="libraries-datetime.html">Datetime</a>
   </li>
   <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="libraries-zoneddatetime.html">ZonedDateTime</a>
-  </li>
-  <li class="nav-item" data-depth="2">
-    <a class="nav-link" href="libraries-localdatetime.html">LocalDateTime</a>
-  </li>
-  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="libraries-period.html">Period</a>
   </li>
   <li class="nav-item" data-depth="2">
@@ -491,10 +485,10 @@
 </div>
 </div>
 <div class="paragraph">
-<p>Indexes are not available in <code>for</code> loop. In order to use both element value and index in the mapping, use <code>std.mapWithIndex()</code> function with custom mapping function, e.g.
-.Payload</p>
+<p>Indexes are not available in <code>for</code> loop. In order to use both element value and index in the mapping, use <code>std.mapWithIndex()</code> function with custom mapping function, e.g.</p>
 </div>
 <div class="listingblock">
+<div class="title">Payload</div>
 <div class="content">
 <pre>{
     "flights": [
@@ -673,7 +667,7 @@
 <div class="sect2">
 <h3 id="_group_by"><a class="anchor" href="#_group_by"></a>Group By</h3>
 <div class="paragraph">
-<p><code>DS.Util.groupBy()</code> function provided. The first argument is a list of objects, the second is the name of the element to group by. The following example groups list of objects by name of the language:</p>
+<p><code>ds.groupBy()</code> function provided. The first argument is a list of objects, the second is a function to extract the grouping key. The following example groups list of objects by name of the language:</p>
 </div>
 <div class="listingblock">
 <div class="title">Payload</div>
@@ -712,7 +706,7 @@
 <div class="title">Mapping</div>
 <div class="content">
 <pre>{
-  languages: DS.Util.groupBy(payload.languages, 'language.name'),
+  languages: ds.groupBy(payload.languages, function(x) x.language.name),
 }</pre>
 </div>
 </div>
@@ -757,7 +751,7 @@
 <div class="sect2">
 <h3 id="_distinct_by"><a class="anchor" href="#_distinct_by"></a>Distinct By</h3>
 <div class="paragraph">
-<p><code>DS.Util.distinctBy()</code> function provided.</p>
+<p><code>ds.distinctBy()</code> function provided.</p>
 </div>
 <div class="listingblock">
 <div class="title">Payload</div>
@@ -803,8 +797,8 @@
 <div class="title">Mapping</div>
 <div class="content">
 <pre>{
-  uniqueLetters: <strong>DS.Util.distinctBy</strong>(payload.arrayOfLetters),
-  uniqueObjects: <strong>DS.Util.distinctBy</strong>(payload.arrayOfObjects)
+  uniqueLetters: <strong>ds.distinctBy</strong>(payload.arrayOfLetters, function(x) x),
+  uniqueObjects: <strong>ds.distinctBy</strong>(payload.arrayOfObjects, function(x) x)
 }</pre>
 </div>
 </div>
@@ -871,7 +865,7 @@
       }
     ];
 
-DS.Util.distinctBy(listOfLanguages, <strong>"language.name"</strong>)</pre>
+ds.distinctBy(listOfLanguages, function(x) x.language.name)</pre>
 </div>
 </div>
 <div class="listingblock">
@@ -903,7 +897,7 @@ DS.Util.distinctBy(listOfLanguages, <strong>"language.name"</strong>)</pre>
 <div class="sect2">
 <h3 id="_array_flattening"><a class="anchor" href="#_array_flattening"></a>Array Flattening</h3>
 <div class="paragraph">
-<p><code>DS.Util.deepFlattenArrays()</code> function recursively iterates over array of elements, some or all of which may be arrays too, and merges them all in a single array.</p>
+<p><code>ds.deepFlatten()</code> function recursively iterates over array of elements, some or all of which may be arrays too, and merges them all in a single array.</p>
 </div>
 <div class="listingblock">
 <div class="title">Payload</div>
@@ -931,7 +925,7 @@ DS.Util.distinctBy(listOfLanguages, <strong>"language.name"</strong>)</pre>
 <div class="listingblock">
 <div class="title">Mapping</div>
 <div class="content">
-<pre>DS.Util.deepFlattenArrays(payload)</pre>
+<pre>ds.deepFlatten(payload)</pre>
 </div>
 </div>
 <div class="listingblock">
@@ -1087,18 +1081,20 @@ std.map(function(obj) <strong>defaultValues + obj</strong>, payload)</pre>
 <div class="sect2">
 <h3 id="_add_and_subtract_dates"><a class="anchor" href="#_add_and_subtract_dates"></a>Add and Subtract Dates</h3>
 <div class="paragraph">
-<p>DataSonnet uses ISO-8601 dates and periods. To add or subtract a number of years. months and days, use <code>DS.LocalDateTime.offset()</code> and <code>DS.ZonedDateTime.offset()</code> functions.</p>
+<p>DataSonnet uses ISO-8601 dates and periods. To add or subtract a number of years, months and days, use <code>ds.datetime</code> module functions.</p>
 </div>
 <div class="listingblock">
 <div class="title">Mapping</div>
 <div class="content">
-<pre>DS.LocalDateTime.offset("2019-07-22T21:00:00", "P1Y1D")</pre>
+<pre>// Parse a datetime string and add a period
+local dt = ds.datetime.parse("2019-07-22T21:00:00+00:00");
+dt.plus("P1Y1D").toISO()</pre>
 </div>
 </div>
 <div class="listingblock">
 <div class="title">Output</div>
 <div class="content">
-<pre>2020-07-23T21:00:00</pre>
+<pre>2020-07-23T21:00:00+00:00</pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1221,11 +1217,11 @@ local payloadWithDefaults = std.map(function(obj) overlay + obj, payload);
 </div>
 </div>
 <div class="paragraph">
-<p><code>DS.Util.remove(object, key)</code> and <code>DS.Util.removeAll(object, arrayOfKeys)</code> functions provided for convenience:</p>
+<p><code>ds.remove(object, key)</code> function provided for convenience:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre><strong>DS.Util.removeAll</strong>(payload, [ "photo", "generic", "disabled", "update_whitelist", "id" ])</pre>
+<pre>std.foldl(function(obj, key) ds.remove(obj, key), payload, [ "photo", "generic", "disabled", "update_whitelist", "id" ])</pre>
 </div>
 </div>
 </div>
@@ -1256,7 +1252,7 @@ local payloadWithDefaults = std.map(function(obj) overlay + obj, payload);
 <div class="listingblock">
 <div class="title">Mapping</div>
 <div class="content">
-<pre>local javaLanguages = DS.JsonPath.select(payload, "$..language[?(@.name == 'Java')]");
+<pre>local javaLanguages = ds.jsonpath.select(payload, "$..language[?(@.name == 'Java')]");
 
 std.length(javaLanguages) > 0</pre>
 </div>
