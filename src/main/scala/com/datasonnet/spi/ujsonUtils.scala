@@ -34,7 +34,7 @@ object ujsonUtils {
   private def quoteLargeIntegers(json: String): String = {
     // Match integers that exceed JavaScript's safe integer range (2^53 - 1)
     // This prevents precision loss when parsed as double
-    json.replaceAll("\\b([1-9]\\d{15,})\\b", "\"__LARGE_INT__$1\"")
+    json.replaceAll("(?<=[:\\[,]\\s*|^\\s*)(-?\\d{16,})(?=\\s*[,\\]\\}]|$)", "\"__LARGE_INT__$1\"")
   }
 
   def read(s: Readable, trace: Boolean = false): Value.Value = ujson.read(s, trace)

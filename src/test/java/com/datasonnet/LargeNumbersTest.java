@@ -19,12 +19,13 @@ package com.datasonnet;
 import com.datasonnet.document.DefaultDocument;
 import com.datasonnet.document.Document;
 import com.datasonnet.document.MediaTypes;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -39,5 +40,18 @@ public class LargeNumbersTest {
         assertEquals("102506060000000002", mapped.getContent().toString());
     }
 
+    @Test
+    void testLargeNumbersInStrings() {
+        Mapper mapper = new Mapper("payload");
+        Document<Map> mapped = mapper.transform(new DefaultDocument<String>("{\n" +
+                "  \"longNumberInString\": \"String-12345678901234567890-String\"," +
+                "  \"number\": 12345678901234567890,\n" +
+                "  \"array\": [ 12345678901234567890, 1234546756754667890 ]\n" +
+                "}", MediaTypes.APPLICATION_JSON), new HashMap(), MediaTypes.APPLICATION_JAVA, java.util.HashMap.class);
+        Map objValues = mapped.getContent();
+        assertEquals("String-12345678901234567890-String", objValues.get("longNumberInString").toString());
+        assertEquals("12345678901234567890", objValues.get("number").toString());
+        assertEquals("12345678901234567890", ((List)objValues.get("array")).get(0).toString());
+    }
 
 }
