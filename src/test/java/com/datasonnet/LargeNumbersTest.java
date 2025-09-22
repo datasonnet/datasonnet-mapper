@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LargeNumbersTest {
@@ -37,6 +38,7 @@ public class LargeNumbersTest {
     void testLargeNumberHandling() {
         Mapper mapper = new Mapper("payload");
         Document<Long> mapped = mapper.transform(new DefaultDocument<String>("102506060000000002", MediaTypes.APPLICATION_JSON), new HashMap(), MediaTypes.APPLICATION_JAVA, java.lang.Long.class);
+        assertEquals(java.lang.Long.class, mapped.getContent().getClass());
         assertEquals("102506060000000002", mapped.getContent().toString());
     }
 
@@ -46,12 +48,13 @@ public class LargeNumbersTest {
         Document<Map> mapped = mapper.transform(new DefaultDocument<String>("{\n" +
                 "  \"longNumberInString\": \"String-12345678901234567890-String\"," +
                 "  \"number\": 12345678901234567890,\n" +
-                "  \"array\": [ 12345678901234567890, 1234546756754667890 ]\n" +
+                "  \"array\": [ 12345678901234567890, 1234546756754667890, 123 ]\n" +
                 "}", MediaTypes.APPLICATION_JSON), new HashMap(), MediaTypes.APPLICATION_JAVA, java.util.HashMap.class);
         Map objValues = mapped.getContent();
         assertEquals("String-12345678901234567890-String", objValues.get("longNumberInString").toString());
+        assertEquals(java.math.BigInteger.class, objValues.get("number").getClass());
         assertEquals("12345678901234567890", objValues.get("number").toString());
+        assertEquals(java.math.BigInteger.class, ((List)objValues.get("array")).get(0).getClass());
         assertEquals("12345678901234567890", ((List)objValues.get("array")).get(0).toString());
     }
-
 }

@@ -16,25 +16,80 @@ package com.datasonnet.spi
  * limitations under the License.
  */
 
+import com.fasterxml.jackson.databind.node._
+import com.fasterxml.jackson.databind.{DeserializationFeature, JsonNode, ObjectMapper, SerializationFeature}
+import com.fasterxml.jackson.core.{JsonFactory, JsonParser}
 import ujson._
 
-import scala.jdk.CollectionConverters.{MapHasAsJava, SeqHasAsJava}
+import scala.jdk.CollectionConverters.{IteratorHasAsScala, MapHasAsJava, SeqHasAsJava}
 import scala.util.control.TailCalls.{TailRec, done, tailcall}
 
 object ujsonUtils {
+  private val DIGIT_THRESHOLD = 15
+  // Create JsonFactory with configuration for large numbers
+  private val jsonFactory = new JsonFactory()
+
+  private val mapper: ObjectMapper = new ObjectMapper(jsonFactory)
+    .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
+    .enable(DeserializationFeature.USE_BIG_INTEGER_FOR_INTS)
+
+  private val nodeFactory = JsonNodeFactory.withExactBigDecimals(true)
+
   def strValueOf(str: String): Str = Str(str)
 
   def stringValueOf(value: ujson.Value): String = String.valueOf(value.value)
 
   def parse(jsonData: String): Value = {
-    val processedJson = quoteLargeIntegers(jsonData)
+    val processedJson = replaceLargeNumbers(jsonData)
     ujson.read(ujson.Readable.fromString(processedJson))
   }
+  //
+  //  private def quoteLargeIntegers(json: String): String = {
+  //    // Match integers that exceed JavaScript's safe integer range (2^53 - 1)
+  //    // This prevents precision loss when parsed as double
+  //    json.replaceAll("(:[\\s\\n\\r]*)(\\d{16,})([\\s\\n\\r]*[,\\]\\}])", "\"__LARGE_INT__$1\"")
+  //  }
 
-  private def quoteLargeIntegers(json: String): String = {
-    // Match integers that exceed JavaScript's safe integer range (2^53 - 1)
-    // This prevents precision loss when parsed as double
-    json.replaceAll("(?<=[:\\[,]\\s*|^\\s*)(-?\\d{16,})(?=\\s*[,\\]\\}]|$)", "\"__LARGE_INT__$1\"")
+  def replaceLargeNumbers(jsonString: String): String = {
+    try {
+      val rootNode = mapper.readTree(jsonString)
+      val processedNode = processNode(rootNode)
+      mapper.writeValueAsString(processedNode)
+    } catch {
+      case e: Exception =>
+        throw new Exception(s"Failed to parse JSON: ${e.getMessage}", e)
+    }
+  }
+
+  private def processNode(node: JsonNode): JsonNode = {
+    node match {
+      case objNode: ObjectNode =>
+        val newNode = mapper.createObjectNode()
+        objNode.fields().asScala.foreach { entry =>
+          newNode.set[JsonNode](entry.getKey, processNode(entry.getValue))
+        }
+        newNode
+
+      case arrNode: ArrayNode =>
+        val newNode = mapper.createArrayNode()
+        arrNode.elements().asScala.foreach { element =>
+          newNode.add(processNode(element))
+        }
+        newNode
+
+      case numNode: NumericNode =>
+        val numberStr = numNode.asText()
+        val digitsOnly = numberStr.filter(_.isDigit)
+
+        if (digitsOnly.length > DIGIT_THRESHOLD) {
+          new TextNode(s"__LARGE_INT__$numberStr")
+        } else {
+          numNode
+        }
+
+      case _ =>
+        node
+    }
   }
 
   def read(s: Readable, trace: Boolean = false): Value.Value = ujson.read(s, trace)
@@ -61,13 +116,13 @@ object ujsonUtils {
           java.lang.Long.valueOf(longValue)
       } else
         java.lang.Double.valueOf(value.doubleValue())
-    case Str(value) => 
+    case Str(value) =>
       if (value.startsWith("__LARGE_INT__")) {
         val numberStr = value.substring("__LARGE_INT__".length)
         try {
           java.lang.Long.valueOf(numberStr)
         } catch {
-          case _: NumberFormatException => 
+          case _: NumberFormatException =>
             // If it doesn't fit in Long, use BigInteger
             new java.math.BigInteger(numberStr)
         }
@@ -87,13 +142,13 @@ object ujsonUtils {
         case Null => done(null)
         case Bool(value) => done(value.asInstanceOf[java.lang.Boolean])
         case Num(value) => done(value.asInstanceOf[java.lang.Double])
-        case Str(value) => 
+        case Str(value) =>
           if (value.startsWith("__LARGE_INT__")) {
             val numberStr = value.substring("__LARGE_INT__".length)
             done(try {
               java.lang.Long.valueOf(numberStr)
             } catch {
-              case _: NumberFormatException => 
+              case _: NumberFormatException =>
                 new java.math.BigInteger(numberStr)
             })
           } else {
