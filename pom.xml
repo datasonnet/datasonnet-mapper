@@ -88,7 +88,7 @@
         <fileupload.version>2.0.0-M1</fileupload.version>
         <hamcrest.version>2.2</hamcrest.version>
         <httpmime.version>4.5.14</httpmime.version>
-        <jackson.version>2.15.3</jackson.version>
+        <jackson.version>2.18.6</jackson.version>
         <jakarta-servlet-api.version>6.0.0</jakarta-servlet-api.version>
         <jakarta-xml-bind-api.version>4.0.0</jakarta-xml-bind-api.version>
         <jaxb.version>4.0.4</jaxb.version>
